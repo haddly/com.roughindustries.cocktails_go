@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+        "os"
+        "path/filepath"
 )
 
 type Page struct {
@@ -12,8 +14,12 @@ type Page struct {
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, _ := template.ParseFiles("webcontent\\" + tmpl + ".html")
-	t.Execute(w, p)
+        
+	t, err := template.ParseFiles("./webcontent/" + tmpl + ".html")
+        if err != nil {
+            log.Fatal(err)
+        }
+        t.Execute(w, p)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,11 +43,16 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	log.Println("Starting ... \n")
+        dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+        if err != nil {
+            log.Fatal(err)
+        }
+        log.Println(dir)
 	// Mandatory root-based resources and redirects for other resources
-	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("webcontent/images"))))
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("webcontent/css"))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("webcontent/js"))))
-	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("webcontent/fonts"))))
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./webcontent/images"))))
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./webcontent/css"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./webcontent/js"))))
+	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./webcontent/fonts"))))
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "webcontent/favicon.ico")
 	})
