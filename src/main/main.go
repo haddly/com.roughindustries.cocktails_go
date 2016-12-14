@@ -15,7 +15,6 @@ type Page struct {
 
 //render the page based on the name of the file provided
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-
 	t, err := template.ParseFiles("./webcontent/" + tmpl + ".html")
 	if err != nil {
 		log.Fatal(err)
@@ -26,8 +25,12 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 //handle / requests to the server
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("indexHandler: " + r.URL.Path[1:])
+	//parse the url and get the information after the localhost:8080/
+	//stick that in the name
 	name := r.URL.Path[1:]
+	//load of the name and title for doing tempating
 	p := &Page{Title: "Commonwealth Cocktails", Name: name}
+	//apply the template page info to the index page
 	renderTemplate(w, "index", p)
 }
 
@@ -54,5 +57,6 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 
 	log.Println("Added Handlers ... Starting Server\n")
+	//this starts up the server
 	http.ListenAndServe(":8080", nil)
 }
