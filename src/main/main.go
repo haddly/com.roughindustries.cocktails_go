@@ -29,18 +29,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "cocktailTemplate", p)
 }
 
-func jamaicanQuaaludeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("jamaicanQuaaludeHandler: " + r.URL.String())
-	p := &Page{Title: "Commonwealth Cocktails", Name: "Jamaican Quaalude"}
-	renderTemplate(w, "jamaicanQuaalude", p)
-}
-
-func searchHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("searchHandler: " + r.URL.String())
-	p := &Page{Title: "Commonwealth Cocktails", Name: "Magarita"}
-	renderTemplate(w, "search", p)
-}
-
 func main() {
 	log.Println("Starting ... \n")
         dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -59,8 +47,6 @@ func main() {
 
 	//Web Service and Web Page Handlers
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/jamaicanQuaalude", jamaicanQuaaludeHandler)
-	http.HandleFunc("/search", searchHandler)
 
 	log.Println("Added Handlers ... Starting Server\n")
 	http.ListenAndServe(":8080", nil)
