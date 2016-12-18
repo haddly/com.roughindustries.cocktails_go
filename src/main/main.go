@@ -9,8 +9,17 @@ import (
 )
 
 type Page struct {
-	Title string
-	Name  string
+	Title       string
+	Name        string
+	Description string
+}
+
+var cockatils = []Page{
+	Page{
+		Title:       "Jamaican Quaalude",
+		Name:        "Jamaican Quaalude",
+		Description: "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
+	},
 }
 
 //render the page based on the name of the file provided
@@ -28,13 +37,20 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	//parse the url and get the information after the localhost:8080/
 	//stick that in the name
 	name := r.URL.Path[1:]
-	//load of the name and title for doing tempating
-	p := &Page{Title: "Commonwealth Cocktails", Name: name}
+	p := &Page{}
+	for _, element := range cockatils {
+		// index is the index where we are
+		// element is the element from someSlice for where we are
+		if element.Name == name {
+			p = &element
+			break
+		}
+	}
 	//apply the template page info to the index page
 	renderTemplate(w, "index", p)
 }
 
-func init(){
+func init() {
 	//Web Service and Web Page Handlers
 	//http.HandleFunc("/", indexHandler)
 }
