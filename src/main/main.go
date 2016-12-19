@@ -8,17 +8,104 @@ import (
 	"path/filepath"
 )
 
+// recipe:
+//   - !recipeStep
+//       ingredient:
+//          componentName: Pineapple
+//          componentType: 3
+//       recipeCardinal: 1.0
+//       recipeDoze: whole
+//       recipeOrdinal: 1
+
 type Page struct {
 	Title       string
 	Name        string
 	Description string
+	Recipe      Recipe
 }
+
+type Recipe struct {
+	RecipeSteps []RecipeStep
+}
+
+type RecipeStep struct {
+	Ingredient     Component
+	RecipeCardinal float64
+	RecipeDoze     Doze
+	RecipeOrdinal  int
+}
+
+type Doze int
+
+const (
+	Shot = 1 + iota
+	Ounce
+	Whole
+	Dash
+)
+
+var Dozes = [...]string{
+	"Shot",
+	"Ounce",
+	"Whole",
+	"Dash",
+}
+
+// String returns the English name of the doze ("Shot", "Ounce", ...).
+func (d Doze) String() string { return Dozes[d-1] }
+
+// Spirit (0)
+// Liqueur (1)
+// Wine (2)
+// Mixer (3)
+// Beer (4)
+
+type ComponentType int
+
+const (
+	Spirit = 1 + iota
+	Liqueur
+	Wine
+	Mixer
+	Beer
+)
+
+var ComponentTypes = [...]string{
+	"Spirit",
+	"Liqueur",
+	"Wine",
+	"Mixer",
+	"Beer",
+}
+
+type Component struct {
+	ComponentName       string
+	ComponentType       ComponentType
+	ComponentTypeString string
+}
+
+// String returns the English name of the doze ("Shot", "Ounce", ...).
+func (ct ComponentType) String() string { return ComponentTypes[ct-1] }
 
 var cockatils = []Page{
 	Page{
 		Title:       "Jamaican Quaalude",
 		Name:        "Jamaican Quaalude",
 		Description: "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
+		Recipe: Recipe{
+			RecipeSteps: []RecipeStep{
+				RecipeStep{
+					Ingredient: Component{
+						ComponentName:       "Pineapple",
+						ComponentType:       Spirit,
+						ComponentTypeString: ComponentTypes[Spirit-1],
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     1,
+					RecipeOrdinal:  0,
+				},
+			},
+		},
 	},
 }
 
@@ -28,7 +115,10 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	t.Execute(w, p)
+	err = t.Execute(w, p)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 //handle / requests to the server
@@ -46,6 +136,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	log.Println(p)
 	//apply the template page info to the index page
 	renderTemplate(w, "index", p)
 }
