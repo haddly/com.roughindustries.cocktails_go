@@ -46,19 +46,13 @@ const (
 
 var Dozes = [...]string{
 	"Shot",
-	"Ounce",
+	"Oz",
 	"Whole",
 	"Dash",
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).
 func (d Doze) String() string { return Dozes[d-1] }
-
-// Spirit (0)
-// Liqueur (1)
-// Wine (2)
-// Mixer (3)
-// Beer (4)
 
 type ComponentType int
 
@@ -79,9 +73,8 @@ var ComponentTypes = [...]string{
 }
 
 type Component struct {
-	ComponentName       string
-	ComponentType       ComponentType
-	ComponentTypeString string
+	ComponentName string
+	ComponentType ComponentType
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).
@@ -96,12 +89,11 @@ var cockatils = []Page{
 			RecipeSteps: []RecipeStep{
 				RecipeStep{
 					Ingredient: Component{
-						ComponentName:       "Pineapple",
-						ComponentType:       Spirit,
-						ComponentTypeString: ComponentTypes[Spirit-1],
+						ComponentName: "Pineapple",
+						ComponentType: Spirit,
 					},
 					RecipeCardinal: 1.0,
-					RecipeDoze:     1,
+					RecipeDoze:     Ounce,
 					RecipeOrdinal:  0,
 				},
 			},
