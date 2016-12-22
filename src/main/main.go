@@ -18,13 +18,28 @@ import (
 //       recipeOrdinal: 1
 
 type Cocktail struct {
-	Title          string
-	Name           string
-	Description    string
-	Recipe         Recipe
-	CocktailMethod string
-	Garnish        []Component
-	Image          string
+	Title           string
+	Name            string
+	Description     string
+	Recipe          Recipe
+	CocktailMethod  string
+	Garnish         []Component
+	Image           string
+	ImageSourceName string
+	ImageSourceLink string
+	Drinkware       []Component
+	Tool            []Component
+	SourceName      string
+	SourceLink      string
+	Rating          float32
+	Flavor          []Meta
+	Type            []Meta
+	BaseSpirit      []Meta
+	Served          []Meta
+	Technique       []Meta
+	Strength        []Meta
+	Difficulty      []Meta
+	TOD             []Meta
 }
 
 type Recipe struct {
@@ -66,32 +81,122 @@ const (
 	Mixer
 	Beer
 	Garnish
+	Drinkware
+	Tool
 )
 
-var ComponentTypes = [...]string{
+var ComponentTypeStrings = [...]string{
 	"Spirit",
 	"Liqueur",
 	"Wine",
 	"Mixer",
 	"Beer",
 	"Garnish",
+	"Drinkware",
+	"Tool",
 }
+
+// String returns the English name of the componenttype ("Spirit", "Liqueur", ...).
+func (ct ComponentType) String() string { return ComponentTypeStrings[ct-1] }
 
 type Component struct {
 	ComponentName string
 	ComponentType ComponentType
 }
 
-// String returns the English name of the doze ("Shot", "Ounce", ...).
-func (ct ComponentType) String() string { return ComponentTypes[ct-1] }
+type MetaType int
+
+const (
+	Flavor = 1 + iota
+	BaseSpirit
+	Type
+	Served
+	Technique
+	Strength
+	Difficulty
+	TOD
+)
+
+var MetaTypeStrings = [...]string{
+	"Flavor",
+	"Base Spirit",
+	"Type",
+	"Served",
+	"Technique",
+	"Strength",
+	"Difficulty",
+	"Time of Day",
+}
+
+// String returns the English name of the metatype ("Flavor", "Base Spirit", ...).
+func (mt MetaType) String() string { return MetaTypeStrings[mt-1] }
+
+type Meta struct {
+	MetaName string
+	MetaType MetaType
+}
 
 var cockatils = []Cocktail{
 	Cocktail{
-		Title:          "Jamaican Quaalude",
-		Name:           "Jamaican Quaalude",
-		Description:    "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
-		CocktailMethod: "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
-		Image:          "jamaican_quaalude_750_750.png",
+		Title:           "Jamaican Quaalude",
+		Name:            "Jamaican Quaalude",
+		Description:     "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
+		CocktailMethod:  "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
+		Image:           "jamaican_quaalude_750_750.png",
+		ImageSourceName: "Unknown",
+		ImageSourceLink: "",
+		SourceName:      "Hampton Roads Happy Hour",
+		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
+		Rating:          5.0,
+		Tool: []Component{
+			Component{
+				ComponentName: "Shaker",
+				ComponentType: Tool,
+			},
+		},
+		Strength: []Meta{
+			Meta{
+				MetaName: "Medium",
+				MetaType: Flavor,
+			},
+		},
+		Difficulty: []Meta{
+			Meta{
+				MetaName: "Easy",
+				MetaType: Difficulty,
+			},
+		},
+		TOD: []Meta{
+			Meta{
+				MetaName: "Evening",
+				MetaType: TOD,
+			},
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Creamy",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Creamy",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Meta{
+				MetaName: "On the Rocks",
+				MetaType: Served,
+			},
+		},
+		Technique: []Meta{
+			Meta{
+				MetaName: "Shaken",
+				MetaType: Technique,
+			},
+		},
+		BaseSpirit: []Meta{},
 		Garnish: []Component{
 			Component{
 				ComponentName: "Cherry",
@@ -100,6 +205,12 @@ var cockatils = []Cocktail{
 			Component{
 				ComponentName: "Slice of Starfruit",
 				ComponentType: Garnish,
+			},
+		},
+		Drinkware: []Component{
+			Component{
+				ComponentName: "Old Fashioned",
+				ComponentType: Drinkware,
 			},
 		},
 		Recipe: Recipe{
