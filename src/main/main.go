@@ -20,9 +20,10 @@ import (
 type Cocktail struct {
 	Title           string
 	Name            string
+	AKA             []AKA
 	Description     string
 	Recipe          Recipe
-	CocktailMethod  string
+	Method          string
 	Garnish         []Component
 	Image           string
 	ImageSourceName string
@@ -40,6 +41,10 @@ type Cocktail struct {
 	Strength        []Meta
 	Difficulty      []Meta
 	TOD             []Meta
+}
+
+type AKA struct {
+	Name string
 }
 
 type Recipe struct {
@@ -141,13 +146,18 @@ var cockatils = []Cocktail{
 		Title:           "Jamaican Quaalude",
 		Name:            "Jamaican Quaalude",
 		Description:     "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
-		CocktailMethod:  "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
+		Method:          "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
 		Image:           "jamaican_quaalude_750_750.png",
 		ImageSourceName: "Unknown",
 		ImageSourceLink: "",
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
-		Rating:          5.0,
+		Rating:          2.5 / 5.0 * 100,
+		AKA: []AKA{
+			AKA{
+				Name: "Jamaican Quaalude",
+			},
+		},
 		Tool: []Component{
 			Component{
 				ComponentName: "Shaker",
