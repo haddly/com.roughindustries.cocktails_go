@@ -119,17 +119,17 @@ const (
 )
 
 var MetaTypeStrings = [...]string{
-	"Flavor",
-	"Base Spirit",
-	"Type",
-	"Occasion",
-	"Family",
+	"Flavor",      //Fruity, Bitter, Creamy, ...
+	"Base Spirit", //Vodka, Gin, Bourbon, ...
+	"Type",        //Tiki,
+	"Occasion",    //Christmas, 4th of July, Halloween, ...
+	"Family",      //Margarita, Martini, ...
 	"Formula",
-	"Served",
-	"Technique",
-	"Strength",
-	"Difficulty",
-	"Time of Day",
+	"Served",      //Highball, Martini, Old Fashioned, ...
+	"Technique",   //Shaking, Stirring, Straining
+	"Strength",    //Weak, Medium, Strong
+	"Difficulty",  //Easy, Medium, Hard
+	"Time of Day", //Evening, Dessert, Brunch, ...
 }
 
 // String returns the English name of the metatype ("Flavor", "Base Spirit", ...).
@@ -139,4 +139,3 @@ type Meta struct {
 	MetaName string
 	MetaType MetaType
 }
-
