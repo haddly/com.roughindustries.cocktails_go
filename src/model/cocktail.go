@@ -13,8 +13,13 @@ package model
 type Cocktail struct {
 	Title           string
 	Name            string
-	AKA             []AKA
+	DisplayName     string
+	AlternateName   []Name
+	SpokenName      string
+	Origin          string
+	AKA             []Name
 	Description     string
+	Comment         string
 	Recipe          Recipe
 	Method          string
 	Garnish         []Product
@@ -36,7 +41,7 @@ type Cocktail struct {
 	TOD             []Meta
 }
 
-type AKA struct {
+type Name struct {
 	Name string
 }
 
@@ -100,6 +105,8 @@ func (ct ProductType) String() string { return ProductTypeStrings[ct-1] }
 type Product struct {
 	ProductName string
 	ProductType ProductType
+	Article     string
+	Blurb       string
 }
 
 type MetaType int
@@ -138,4 +145,6 @@ func (mt MetaType) String() string { return MetaTypeStrings[mt-1] }
 type Meta struct {
 	MetaName string
 	MetaType MetaType
+	Article  string
+	Blurb    string
 }
