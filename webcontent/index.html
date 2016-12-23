@@ -82,7 +82,7 @@
 									<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinal}} {{.RecipeDoze}}</td>
 									<td width="10">&nbsp;</td>
 									<td>
-										{{with .Ingredient}} {{.ComponentName}} {{end}}
+										{{with .Ingredient}} {{.ProductName}} {{end}}
 									</td>
 								</tr>
 								{{end}} {{end}}
@@ -99,14 +99,14 @@
 						<h3>Garnish</h3>
 						<h4>
 							{{range .Garnish}}
-							<a href="#"><span class="label label-default">{{.ComponentName}}</span></a> {{end}}
+							<a href="#"><span class="label label-default">{{.ProductName}}</span></a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Drinkware</h3>
 						<h4>
 							{{range .Drinkware}}
-							<a href="#"><span class="label label-default">{{.ComponentName}}</span></a> {{end}}
+							<a href="#"><span class="label label-default">{{.ProductName}}</span></a> {{end}}
 						</h4>
 					</div>
 				</div>
@@ -115,7 +115,7 @@
 						<h3>Tools</h3>
 						<h4>
 							{{range .Tool}}
-							<a href="#"><span class="label label-default">{{.ComponentName}}</span></a> {{end}}
+							<a href="#"><span class="label label-default">{{.ProductName}}</span></a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
