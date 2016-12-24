@@ -4,12 +4,12 @@ api_version: go1
 handlers:
 - url: /view/webcontent/www/favicon.ico
   static_files: webcontent/\1
-  upload: /view/webcontent/www/favicon.ico\
+  upload: view/webcontent/www/favicon.ico\
 - url: /images
-  static_dir: /view/webcontent/www/images
+  static_dir: view/webcontent/www/images
 - url: /css
-  static_dir: /view/webcontent/www/css
+  static_dir: view/webcontent/www/css
 - url: /js
-  static_dir: /view/webcontent/www/js
+  static_dir: view/webcontent/www/js
 - url: /.*
   script: _go_app

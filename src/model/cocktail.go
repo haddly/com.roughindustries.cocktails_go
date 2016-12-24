@@ -63,6 +63,7 @@ const (
 	Ounce
 	Whole
 	Dash
+	Slice
 )
 
 var Dozes = [...]string{
@@ -70,6 +71,7 @@ var Dozes = [...]string{
 	"oz.",
 	"whole",
 	"dash",
+	"slice",
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).

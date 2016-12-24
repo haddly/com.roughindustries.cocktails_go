@@ -3,6 +3,7 @@ package www
 import (
 	"html/template"
 	"log"
+	"math/rand"
 	"model"
 	"net/http"
 )
@@ -29,16 +30,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	//stick that in the name
 	//name := r.URL.Path[1:]
 	//or setup a default for now
-	name := "Jamaican Quaalude"
-	c := &model.Cocktail{}
-	for _, element := range model.Cocktails {
-		// index is the index where we are
-		// element is the element from someSlice for where we are
-		if element.Name == name {
-			c = &element
-			break
-		}
-	}
+	c := &model.Cocktails[rand.Intn(len(model.Cocktails))]
 	log.Println(c)
 	//apply the template page info to the index page
 	cocktail.RenderTemplate(w, "index", c)
