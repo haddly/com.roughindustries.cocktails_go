@@ -12,7 +12,8 @@ var Cocktails = []Cocktail{
 		ImageSourceLink: "",
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
-		Rating:          2.5 / 5.0 * 100,
+		// Rating:          2.5 / 5.0 * 100,
+		Rating: 2.5,
 		AKA: []Name{
 			Name{
 				Name: "Jamaican Quaalude",
