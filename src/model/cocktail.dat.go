@@ -1,0 +1,432 @@
+//model/cocktail.dat.go
+package model
+
+var Cocktails = []Cocktail{
+	Cocktail{
+		ID:              0,
+		Title:           "Jamaican Quaalude",
+		Name:            "Jamaican Quaalude",
+		Description:     "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
+		Method:          "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
+		Image:           "jamaican_quaalude_750_750.png",
+		ImageSourceName: "Unknown",
+		ImageSourceLink: "",
+		SourceName:      "Hampton Roads Happy Hour",
+		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
+		// Rating:          2.5 / 5.0 * 100,
+		Rating: 5,
+		AKA:    []Name{},
+		Tool: []Product{
+			Product{
+				ProductName: "Shaker",
+				ProductType: Tool,
+			},
+		},
+		Strength: []Meta{
+			Meta{
+				MetaName: "Medium",
+				MetaType: Flavor,
+			},
+		},
+		Difficulty: []Meta{
+			Meta{
+				MetaName: "Easy",
+				MetaType: Difficulty,
+			},
+		},
+		TOD: []Meta{
+			Meta{
+				MetaName: "Evening",
+				MetaType: TOD,
+			},
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Creamy",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Creamy",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Meta{
+				MetaName: "On the Rocks",
+				MetaType: Served,
+			},
+		},
+		Technique: []Meta{
+			Meta{
+				MetaName: "Shaken",
+				MetaType: Technique,
+			},
+		},
+		BaseSpirit: []Meta{},
+		Garnish: []Product{
+			Product{
+				ProductName: "Cherry",
+				ProductType: Garnish,
+			},
+			Product{
+				ProductName: "Slice of Starfruit",
+				ProductType: Garnish,
+			},
+		},
+		Drinkware: []Product{
+			Product{
+				ProductName: "Old Fashioned",
+				ProductType: Drinkware,
+			},
+		},
+		Recipe: Recipe{
+			RecipeSteps: []RecipeStep{
+				//1 oz. Kahlua
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Kahlua",
+						ProductType: Liqueur,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  0,
+				},
+				//1 oz. Coconut Rum
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Coconut Rum",
+						ProductType: Spirit,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  1,
+				},
+				//1 oz. Baileys Irish Cream
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Irish Cream",
+						ProductType: Liqueur,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  2,
+				},
+				//.5 oz Amaretto
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Amaretto",
+						ProductType: Liqueur,
+					},
+					RecipeCardinal: 0.5,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  3,
+				},
+				//.5 oz Frangelico
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Frangelico",
+						ProductType: Liqueur,
+					},
+					RecipeCardinal: 0.5,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  4,
+				},
+				//1 oz Cream
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Cream",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  5,
+				},
+			},
+		},
+	},
+	Cocktail{
+		ID:              1,
+		Title:           "Devil's Share",
+		Name:            "Devil's Share",
+		Description:     "This cocktail is really smooth on the toungue because of the maple syrup.  The citrus from the lemon and sugar from the maple syrup give a great sour flavor profile.  One of my favorites, mostly because of the maple syrup.",
+		Method:          "Muddle ginger in base of shaker. Add other ingredients, shake with ice and fine strain into ice-filled glass.",
+		Image:           "devils_share.jpg",
+		ImageSourceName: "Difford's Guide",
+		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
+		SourceName:      "Difford's Guide",
+		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
+		Rating:          5,
+		AKA:             []Name{},
+		Tool: []Product{
+			Product{
+				ProductName: "Shaker",
+				ProductType: Tool,
+			},
+			Product{
+				ProductName: "Muddler",
+				ProductType: Tool,
+			},
+		},
+		Strength: []Meta{
+			Meta{
+				MetaName: "Medium",
+				MetaType: Flavor,
+			},
+		},
+		Difficulty: []Meta{
+			Meta{
+				MetaName: "Easy",
+				MetaType: Difficulty,
+			},
+		},
+		TOD: []Meta{
+			Meta{
+				MetaName: "Afternoon",
+				MetaType: TOD,
+			},
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Fruity/Citrus",
+				MetaType: Flavor,
+			},
+			Meta{
+				MetaName: "Sour",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Recommended",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Meta{
+				MetaName: "On the Rocks",
+				MetaType: Served,
+			},
+		},
+		Technique: []Meta{
+			Meta{
+				MetaName: "Shaken",
+				MetaType: Technique,
+			},
+			Meta{
+				MetaName: "Muddled",
+				MetaType: Technique,
+			},
+		},
+		BaseSpirit: []Meta{
+			Meta{
+				MetaName: "Bourbon Whiskey",
+				MetaType: BaseSpirit,
+			},
+		},
+		Garnish: []Product{
+			Product{
+				ProductName: "Orange Zest Twist",
+				ProductType: Garnish,
+			},
+		},
+		Drinkware: []Product{
+			Product{
+				ProductName: "Old Fashioned",
+				ProductType: Drinkware,
+			},
+		},
+		Recipe: Recipe{
+			RecipeSteps: []RecipeStep{
+				//2 slice Fresh root ginger
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Ginger Root",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 2.0,
+					RecipeDoze:     Slice,
+					RecipeOrdinal:  0,
+				},
+				//2 oz. Bourbon Whiskey
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Bourbon Whiskey",
+						ProductType: Spirit,
+					},
+					RecipeCardinal: 2.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  1,
+				},
+				//.75 oz. Orange Juice
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Orange Juice",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: .75,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  2,
+				},
+				//1 oz Lemon Juice
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Lemon Juice",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  3,
+				},
+				//.5 oz Maple Syrup
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Maple Syrup",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 0.5,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  4,
+				},
+			},
+		},
+	},
+	Cocktail{
+		ID:              2,
+		Title:           "Mad Monk Milkshake",
+		Name:            "Mad Monk Milkshake",
+		Description:     "This was one of my really first adventures into creamy cocktails.  It was and still is one of my favorite cocktails ever.  It is smooth, really easy ot drink, and frankly just fun.",
+		Method:          "Shake all ingredients with ice and strain into ice-filled glass.",
+		Image:           "mad_monk_milkshake.jpg",
+		ImageSourceName: "Difford's Guide",
+		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
+		SourceName:      "Difford's Guide",
+		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
+		Rating:          5,
+		AKA:             []Name{},
+		Tool: []Product{
+			Product{
+				ProductName: "Shaker",
+				ProductType: Tool,
+			},
+		},
+		Strength: []Meta{
+			Meta{
+				MetaName: "Medium",
+				MetaType: Flavor,
+			},
+		},
+		Difficulty: []Meta{
+			Meta{
+				MetaName: "Easy",
+				MetaType: Difficulty,
+			},
+		},
+		TOD: []Meta{
+			Meta{
+				MetaName: "Dessert",
+				MetaType: TOD,
+			},
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Creamy",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Recommended",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Meta{
+				MetaName: "On the Rocks",
+				MetaType: Served,
+			},
+		},
+		Technique: []Meta{
+			Meta{
+				MetaName: "Shaken",
+				MetaType: Technique,
+			},
+		},
+		BaseSpirit: []Meta{},
+		Garnish: []Product{
+			Product{
+				ProductName: "Cherry",
+				ProductType: Garnish,
+			},
+		},
+		Drinkware: []Product{
+			Product{
+				ProductName: "Collins",
+				ProductType: Drinkware,
+			},
+			Product{
+				ProductName: "Old Fashioned",
+				ProductType: Drinkware,
+			},
+			Product{
+				ProductName: "Highball",
+				ProductType: Drinkware,
+			},
+		},
+		Recipe: Recipe{
+			RecipeSteps: []RecipeStep{
+				//1 ounce irish cream
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Irish Cream",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Liqueur,
+					RecipeOrdinal:  0,
+				},
+				//2 oz. Frangelico
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Frangelico",
+						ProductType: Liqueur,
+					},
+					RecipeCardinal: 2.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  1,
+				},
+				//.5 oz. Orange Juice
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Kahlua",
+						ProductType: Liqueur,
+					},
+					RecipeCardinal: .5,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  2,
+				},
+				//2 oz Milk
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Milk",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 2.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  3,
+				},
+				//1 oz Cream
+				RecipeStep{
+					Ingredient: Product{
+						ProductName: "Cream",
+						ProductType: Mixer,
+					},
+					RecipeCardinal: 1.0,
+					RecipeDoze:     Ounce,
+					RecipeOrdinal:  4,
+				},
+			},
+		},
+	},
+}
