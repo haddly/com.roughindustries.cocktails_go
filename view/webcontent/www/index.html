@@ -86,7 +86,7 @@
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Method</h3>
-						{{.Method}}
+						{{with .Recipe}}{{.Method}}{{end}}
 					</div>
 				</div>
 				<div class="row">

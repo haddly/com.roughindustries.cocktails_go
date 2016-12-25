@@ -33,6 +33,16 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	//name := r.URL.Path[1:]
 	//or setup a default for now
 	c := &model.Cocktails[rand.Intn(len(model.Cocktails))]
+	for index, element := range c.Recipe.RecipeSteps {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		if element.Ingredient.IsBase {
+			// if so do we need to override it
+			if element.Ingredient.Overrider != 0 {
+				c.Recipe.RecipeSteps[index].Ingredient = model.Products[element.Ingredient.Overrider]
+			}
+		}
+	}
 	log.Println(c)
 	//apply the template page info to the index page
 	cocktail.RenderTemplate(w, "index", c)
