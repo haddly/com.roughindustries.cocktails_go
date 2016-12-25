@@ -36,7 +36,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 func init(){
 	//Web Service and Web Page Handlers
-	//http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/", indexHandler)
 }
 
 //where it all starts
