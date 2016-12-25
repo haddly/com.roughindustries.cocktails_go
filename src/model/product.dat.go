@@ -14,4 +14,17 @@ var Products = []Product{
 		ProductType: Mixer,
 		IsBase:      false,
 	},
+	Product{
+		ID:          2,
+		ProductName: "Lemon Juice",
+		ProductType: Mixer,
+		IsBase:      true,
+		Overrider:   3,
+	},
+	Product{
+		ID:          3,
+		ProductName: "ReaLemon™ Lemon Juice",
+		ProductType: Mixer,
+		IsBase:      false,
+	},
 }

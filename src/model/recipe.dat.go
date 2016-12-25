@@ -100,10 +100,7 @@ var Recipes = []Recipe{
 			},
 			//1 oz Lemon Juice
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Lemon Juice",
-					ProductType: Mixer,
-				},
+				Ingredient:     Products[2],
 				RecipeCardinal: 1.0,
 				RecipeDoze:     Ounce,
 				RecipeOrdinal:  3,
