@@ -11,6 +11,8 @@ import (
 type Cocktail struct {
 }
 
+var cocktail = new(Cocktail)
+
 //render the page based on the name of the file provided
 func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *model.Cocktail) {
 	t, err := template.ParseFiles("./view/webcontent/www/" + tmpl + ".html")
@@ -36,7 +38,8 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	cocktail.RenderTemplate(w, "index", c)
 }
 
-func (cocktail *Cocktail) Init() {
+func init() {
 	//Web Service and Web Page Handlers
+	log.Println("Init in www/Cocktail.go")
 	http.HandleFunc("/", cocktail.IndexHandler)
 }

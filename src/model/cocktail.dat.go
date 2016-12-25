@@ -3,6 +3,7 @@ package model
 
 var Cocktails = []Cocktail{
 	Cocktail{
+		ID:              0,
 		Title:           "Jamaican Quaalude",
 		Name:            "Jamaican Quaalude",
 		Description:     "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
@@ -146,6 +147,7 @@ var Cocktails = []Cocktail{
 		},
 	},
 	Cocktail{
+		ID:              1,
 		Title:           "Devil's Share",
 		Name:            "Devil's Share",
 		Description:     "This cocktail is really smooth on the toungue because of the maple syrup.  The citrus from the lemon and sugar from the maple syrup give a great sour flavor profile.  One of my favorites, mostly because of the maple syrup.",
@@ -291,6 +293,7 @@ var Cocktails = []Cocktail{
 		},
 	},
 	Cocktail{
+		ID:              2,
 		Title:           "Mad Monk Milkshake",
 		Name:            "Mad Monk Milkshake",
 		Description:     "This was one of my really first adventures into creamy cocktails.  It was and still is one of my favorite cocktails ever.  It is smooth, really easy ot drink, and frankly just fun.",

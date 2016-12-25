@@ -11,6 +11,7 @@ package model
 //       recipeOrdinal: 1
 
 type Cocktail struct {
+	ID              int
 	Title           string
 	Name            string
 	DisplayName     string
