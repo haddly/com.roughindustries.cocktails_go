@@ -46,29 +46,24 @@
 		<!-- Portfolio Item Heading -->
 		<div class="page-header">
 			<h1 align="center">{{.Name}}</h1>
-			<div class="star-ratings-css">
-				<div class="star-ratings-css-top" style="width: {{.Rating}}%"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-				<div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-			</div>
+			<h5 align="center">Rating: {{.Rating}} / 5</h5>
+			<!--<div class="star-ratings-css">-->
+			<!--	<div class="star-ratings-css-top" style="width: {{.Rating}}%"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>-->
+			<!--	<div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>-->
+			<!--</div>-->
 			<h6 align="center">Source: <a target="_blank" href="{{.SourceLink}}">{{.SourceName}}</a></h6>
 		</div>
 		<div class="row">
 			<div class="col-md-8">
 				<!--<img class="img-responsive" src="images/{{.Image}}" alt="{{.Name}}" />-->
-				<div style="position: relative; width: 100%;">
+				<div align="center" style="position: relative; width: 100%;">
 					<img class="img-responsive" src="images/{{.Image}}" alt="{{.Name}}" />
-					<h6 style="color: #FFF; background: rgba(0, 0, 0, 0.0); position: absolute; bottom: 0; left: 0; width: 100%;">Source: <a style="color: #FFF;" href=".ImageSourceLink">{{.ImageSourceName}}</a></h6>
+					<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0.0); position: absolute; bottom: 0; left: 0; width: 100%;">Source: <a target="_blank" style="color: #555;" href="{{.ImageSourceLink}}">{{.ImageSourceName}}</a></h6>
 				</div>
 				<div class="row">
 					<div class="col-md-12">
 						<h3>Cocktail Description</h3>
 						{{.Description}}
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-						<h3>Rating</h3>
-
 					</div>
 				</div>
 				<div class="row">
@@ -82,7 +77,7 @@
 									<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinal}} {{.RecipeDoze}}</td>
 									<td width="10">&nbsp;</td>
 									<td>
-										{{with .Ingredient}} {{.ComponentName}} {{end}}
+										{{with .Ingredient}} {{.ProductName}} {{end}}
 									</td>
 								</tr>
 								{{end}} {{end}}
@@ -99,14 +94,14 @@
 						<h3>Garnish</h3>
 						<h4>
 							{{range .Garnish}}
-							<a href="#"><span class="label label-default">{{.ComponentName}}</span></a> {{end}}
+							<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span></a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Drinkware</h3>
 						<h4>
 							{{range .Drinkware}}
-							<a href="#"><span class="label label-default">{{.ComponentName}}</span></a> {{end}}
+							<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span></a> {{end}}
 						</h4>
 					</div>
 				</div>
@@ -115,14 +110,14 @@
 						<h3>Tools</h3>
 						<h4>
 							{{range .Tool}}
-							<a href="#"><span class="label label-default">{{.ComponentName}}</span></a> {{end}}
+							<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span></a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						{{range .AKA}}
-						<h3>AKA</h3>
+						<h3>Alternate Names</h3>
 						<h4>
-							<span class="label label-default">{{.Name}}</span> {{end}}
+							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.Name}}</span> {{end}}
 						</h4>
 					</div>
 				</div>
@@ -131,67 +126,79 @@
 						<h3>Cocktail Metadata</h3>
 					</div>
 					<div class="row">
-						<div class="col-xs-12 text-center">Flavor: {{range .Flavor}}
-							<a href="#"><span class="label label-default">{{.MetaName}}</span></a> {{end}}
+						<div class="col-xs-12 text-center">
+							<p>Flavor: {{range .Flavor}}
+								<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+							</p>
 						</div>
 						<hr style="border-color: #FFF;">
 						<div class="row">
 							<div class="col-sm-6 col-xs-12 clearfix x-recipe-terms recipe-link">
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Base Spirit: </div>
-									{{range .BaseSpirit}}
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Base Spirit: </div>
 									<div class="col-xs-7 x-recipe-spirit">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .BaseSpirit}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										</p>
 									</div>
-									{{end}}
 								</div>
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Cocktail Type: </div>
-									{{range .Type}}
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Cocktail Type: </div>
 									<div class="col-xs-7 x-recipe-type">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .Type}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										</p>
 									</div>
-									{{end}}
 								</div>
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Served: </div>
-									{{range .Served}}
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Served: </div>
+
 									<div class="col-xs-7 x-recipe-served">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .Served}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										</p>
 									</div>
-									{{end}}
 								</div>
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Technique: </div>
-									{{range .Technique}}
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Technique: </div>
 									<div class="col-xs-7 x-recipe-preparation">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .Technique}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										</p>
 									</div>
-									{{end}}
 								</div>
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Strength: </div>
-									{{range .Strength}}
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Strength: </div>
 									<div class="col-xs-7 x-recipe-preparation">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .Strength}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+										</p>
 									</div>
-									{{end}} </div>
+								</div>
 							</div>
 							<div class="col-sm-6 col-xs-12 clearfix">
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Difficulty: </div>
-									{{range .Difficulty}}
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Difficulty: </div>
 									<div class="col-xs-7 x-recipe-preparation">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .Difficulty}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+										</p>
 									</div>
-									{{end}} </div>
+								</div>
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap">Time of Day: </div>
-									{{range .TOD}}
+									<div class="col-xs-5 text-right no-wrap"><p>Time of Day: </div>
 									<div class="col-xs-7 x-recipe-preparation">
-										<a href="#"><span class="label label-default">{{.MetaName}}</span></a>
+										{{range .TOD}}
+										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+								    </p>
 									</div>
-									{{end}} </div>
+								</div>
 							</div>
 						</div>
 					</div>
