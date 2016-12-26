@@ -52,6 +52,9 @@
 			<!--	<div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>-->
 			<!--</div>-->
 			<h6 align="center">Source: <a target="_blank" href="{{.SourceLink}}">{{.SourceName}}</a></h6>
+			{{with .Advertisement}} {{if .AdvertiserName}} 
+			<h6 align="center">Sponsored by: <a target="_blank" href="">{{.AdvertiserName}}</a></h6>
+			{{end}}{{end}}
 		</div>
 		<div class="row">
 			<div class="col-md-8">
@@ -74,7 +77,13 @@
 							<tbody>
 								{{with .Recipe}} {{range .RecipeSteps}}
 								<tr>
-									<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinal}} {{.RecipeDoze}}</td>
+									{{if .RecipeCardinalString}}
+									<td style="white-space: nowrap;">{{.RecipeCardinalString}}</td>
+									{{else}}
+									<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinalFloat}}</td>
+									{{end}}
+									<td width="10">&nbsp;</td>
+									<td style="white-space: nowrap;">{{.RecipeDoze}}</td>
 									<td width="10">&nbsp;</td>
 									<td>
 										{{with .Ingredient}} {{.ProductName}} {{end}}
@@ -192,11 +201,12 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-xs-5 text-right no-wrap"><p>Time of Day: </div>
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Time of Day: </div>
 									<div class="col-xs-7 x-recipe-preparation">
 										{{range .TOD}}
 										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
-								    </p>
+										</p>
 									</div>
 								</div>
 							</div>

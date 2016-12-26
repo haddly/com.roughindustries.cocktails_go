@@ -6,12 +6,11 @@ import (
 	"math/rand"
 	"model"
 	"net/http"
+	"strconv"
 )
 
 type Cocktail struct {
 }
-
-var cocktail = new(Cocktail)
 
 //render the page based on the name of the file provided
 func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *model.Cocktail) {
@@ -33,13 +32,36 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	//name := r.URL.Path[1:]
 	//or setup a default for now
 	c := &model.Cocktails[rand.Intn(len(model.Cocktails))]
+	prod_ignore := []int{}
+
+	for _, ad_element := range model.Advertisements {
+		for ad_index, adcocktails_element := range ad_element.Cocktails {
+			if c.ID == adcocktails_element {
+				c.Advertisement = model.Advertisements[ad_index]
+				log.Println(strconv.Itoa(c.ID) + " " + strconv.Itoa(adcocktails_element))
+				for index, element := range c.Recipe.RecipeSteps {
+					// element is the element from someSlice for where we are
+					// is this a base product
+					for _, adprod_element := range ad_element.Products {
+						log.Println(strconv.Itoa(element.Ingredient.ID) + " " + strconv.Itoa(adprod_element.BaseProductID))
+						if element.Ingredient.ID == adprod_element.BaseProductID {
+							c.Recipe.RecipeSteps[index].Ingredient = model.Products[adprod_element.AdvertisedProductID-1]
+							prod_ignore = append(prod_ignore, adprod_element.BaseProductID)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	for index, element := range c.Recipe.RecipeSteps {
 		// element is the element from someSlice for where we are
 		// is this a base product
-		if element.Ingredient.IsBase {
-			// if so do we need to override it
-			if element.Ingredient.Overrider != 0 {
-				c.Recipe.RecipeSteps[index].Ingredient = model.Products[element.Ingredient.Overrider]
+		for _, ad_element := range model.Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.Ingredient.ID == adprod_element.BaseProductID {
+					c.Recipe.RecipeSteps[index].Ingredient = model.Products[adprod_element.AdvertisedProductID-1]
+				}
 			}
 		}
 	}
@@ -48,7 +70,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	cocktail.RenderTemplate(w, "index", c)
 }
 
-func init() {
+func (cocktail *Cocktail) Init() {
 	//Web Service and Web Page Handlers
 	log.Println("Init in www/Cocktail.go")
 	http.HandleFunc("/", cocktail.IndexHandler)

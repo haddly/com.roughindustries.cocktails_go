@@ -11,6 +11,10 @@ import (
 
 var c = www.Cocktail{}
 
+func init() {
+	c.Init()
+}
+
 func main() {
 	log.Println("Starting ... \n")
 	//print out the current directory
@@ -29,6 +33,8 @@ func main() {
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
 	})
+
+	c.Init()
 
 	log.Println("Added Handlers ... Starting Server\n")
 	//this starts up the server

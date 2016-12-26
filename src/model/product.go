@@ -30,7 +30,6 @@ func (ct ProductType) String() string { return ProductTypeStrings[ct-1] }
 
 type Product struct {
 	ID          int
-	Overrider   int
 	ProductName string
 	ProductType ProductType
 	Article     string

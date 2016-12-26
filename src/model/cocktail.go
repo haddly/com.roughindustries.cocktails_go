@@ -39,6 +39,9 @@ type Cocktail struct {
 	Strength        []Meta
 	Difficulty      []Meta
 	TOD             []Meta
+
+	//Advertiser Info
+	Advertisement Advertisement
 }
 
 type Name struct {

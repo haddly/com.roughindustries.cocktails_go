@@ -3,7 +3,7 @@ package model
 
 var Cocktails = []Cocktail{
 	Cocktail{
-		ID:              0,
+		ID:              1,
 		Title:           "Jamaican Quaalude",
 		Name:            "Jamaican Quaalude",
 		Description:     "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
@@ -83,7 +83,7 @@ var Cocktails = []Cocktail{
 		Recipe: Recipes[0],
 	},
 	Cocktail{
-		ID:              1,
+		ID:              2,
 		Title:           "Devil's Share",
 		Name:            "Devil's Share",
 		Description:     "This cocktail is really smooth on the toungue because of the maple syrup.  The citrus from the lemon and sugar from the maple syrup give a great sour flavor profile.  One of my favorites, mostly because of the maple syrup.",
@@ -175,7 +175,7 @@ var Cocktails = []Cocktail{
 		Recipe: Recipes[1],
 	},
 	Cocktail{
-		ID:              2,
+		ID:              3,
 		Title:           "Mad Monk Milkshake",
 		Name:            "Mad Monk Milkshake",
 		Description:     "This was one of my really first adventures into creamy cocktails.  It was and still is one of my favorite cocktails ever.  It is smooth, really easy ot drink, and frankly just fun.",
@@ -264,9 +264,9 @@ var Cocktails = []Cocktail{
 						ProductName: "Irish Cream",
 						ProductType: Mixer,
 					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Liqueur,
-					RecipeOrdinal:  0,
+					RecipeCardinalFloat: 1.0,
+					RecipeDoze:          Liqueur,
+					RecipeOrdinal:       0,
 				},
 				//2 oz. Frangelico
 				RecipeStep{
@@ -274,9 +274,9 @@ var Cocktails = []Cocktail{
 						ProductName: "Frangelico",
 						ProductType: Liqueur,
 					},
-					RecipeCardinal: 2.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  1,
+					RecipeCardinalFloat: 2.0,
+					RecipeDoze:          Ounce,
+					RecipeOrdinal:       1,
 				},
 				//.5 oz. Orange Juice
 				RecipeStep{
@@ -284,9 +284,9 @@ var Cocktails = []Cocktail{
 						ProductName: "Kahlua",
 						ProductType: Liqueur,
 					},
-					RecipeCardinal: .5,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  2,
+					RecipeCardinalFloat: .5,
+					RecipeDoze:          Ounce,
+					RecipeOrdinal:       2,
 				},
 				//2 oz Milk
 				RecipeStep{
@@ -294,9 +294,9 @@ var Cocktails = []Cocktail{
 						ProductName: "Milk",
 						ProductType: Mixer,
 					},
-					RecipeCardinal: 2.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  3,
+					RecipeCardinalFloat: 2.0,
+					RecipeDoze:          Ounce,
+					RecipeOrdinal:       3,
 				},
 				//1 oz Cream
 				RecipeStep{
@@ -304,9 +304,9 @@ var Cocktails = []Cocktail{
 						ProductName: "Cream",
 						ProductType: Mixer,
 					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  4,
+					RecipeCardinalFloat: 1.0,
+					RecipeDoze:          Ounce,
+					RecipeOrdinal:       4,
 				},
 			},
 		},
