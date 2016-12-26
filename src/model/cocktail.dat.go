@@ -260,10 +260,7 @@ var Cocktails = []Cocktail{
 			RecipeSteps: []RecipeStep{
 				//1 ounce irish cream
 				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Irish Cream",
-						ProductType: Mixer,
-					},
+					Ingredient:          Products[7],
 					RecipeCardinalFloat: 1.0,
 					RecipeDoze:          Liqueur,
 					RecipeOrdinal:       0,

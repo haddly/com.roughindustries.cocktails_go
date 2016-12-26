@@ -30,10 +30,7 @@ var Recipes = []Recipe{
 			},
 			//1 oz. Baileys Irish Cream
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Irish Cream",
-					ProductType: Liqueur,
-				},
+				Ingredient:           Products[7],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,

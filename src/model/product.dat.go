@@ -43,4 +43,16 @@ var Products = []Product{
 		ProductType: Spirit,
 		IsBase:      false,
 	},
+	Product{
+		ID:          8,
+		ProductName: "Irish Cream",
+		ProductType: Mixer,
+		IsBase:      true,
+	},
+	Product{
+		ID:          9,
+		ProductName: "Bailey's Irish Cream",
+		ProductType: Mixer,
+		IsBase:      false,
+	},
 }

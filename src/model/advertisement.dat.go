@@ -2,7 +2,7 @@ package model
 
 var Advertisements = []Advertisement{
 	Advertisement{
-		ID:             0,
+		ID:             1,
 		AdvertiserName: "Breckenridge™ Distillery",
 		Article:        "",
 		Blurb:          "",
@@ -18,8 +18,8 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             1,
-		AdvertiserName: "Breckenridge™ Distillery",
+		ID:             2,
+		AdvertiserName: "Pappy Van Winkle's™ Distillery",
 		Article:        "",
 		Blurb:          "",
 		Image:          "",
@@ -31,8 +31,8 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             2,
-		AdvertiserName: "ReaLemon™ Distillery",
+		ID:             3,
+		AdvertiserName: "ReaLemon™",
 		Article:        "",
 		Blurb:          "",
 		Image:          "",
@@ -45,7 +45,7 @@ var Advertisements = []Advertisement{
 	},
 	Advertisement{
 		ID:             3,
-		AdvertiserName: "Tropicana™ Distillery",
+		AdvertiserName: "Tropicana™",
 		Article:        "",
 		Blurb:          "",
 		Image:          "",
@@ -53,6 +53,19 @@ var Advertisements = []Advertisement{
 			ProdcutAdvertisement{
 				BaseProductID:       1,
 				AdvertisedProductID: 2,
+			},
+		},
+	},
+	Advertisement{
+		ID:             4,
+		AdvertiserName: "Bailey and Co™",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProductID:       8,
+				AdvertisedProductID: 9,
 			},
 		},
 	},
