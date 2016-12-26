@@ -28,10 +28,7 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
 			Meta{
