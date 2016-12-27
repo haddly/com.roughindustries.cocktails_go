@@ -146,4 +146,47 @@ var Recipes = []Recipe{
 			},
 		},
 	},
+	Recipe{
+		Method: "Shake the booze and cream with ice. Strain into a short glass with lots of ice, but make sure not to fill it to the brim (we know you want too). Leave some space to top it off with cola.",
+		RecipeSteps: []RecipeStep{
+			//1 oz Kahlua
+			RecipeStep{
+				Ingredient:           Products[13],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 oz Vodka
+			RecipeStep{
+				Ingredient:           Products[22],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 oz Milk
+			RecipeStep{
+				Ingredient:           Products[15],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        2,
+			},
+			//1 oz Cream
+			RecipeStep{
+				Ingredient:           Products[16],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        3,
+			},
+			//Top off with Cola
+			RecipeStep{
+				Ingredient:    Products[23],
+				RecipeDoze:    TopOffWith,
+				RecipeOrdinal: 4,
+			},
+		},
+	},
 }

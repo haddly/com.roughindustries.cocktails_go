@@ -133,4 +133,16 @@ var Products = []Product{
 		ProductType: Mixer,
 		IsBase:      true,
 	},
+	Product{
+		ID:          23,
+		ProductName: "Vodka",
+		ProductType: Spirit,
+		IsBase:      true,
+	},
+	Product{
+		ID:          24,
+		ProductName: "Cola",
+		ProductType: Mixer,
+		IsBase:      true,
+	},
 }

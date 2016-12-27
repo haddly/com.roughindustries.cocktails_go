@@ -254,4 +254,79 @@ var Cocktails = []Cocktail{
 		},
 		Recipe: Recipes[2],
 	},
+	Cocktail{
+		ID:              4,
+		Title:           "Colorado Bulldog",
+		Name:            "Colorado Bulldog",
+		Description:     "",
+		Image:           "mad_monk_milkshake.jpg",
+		ImageSourceName: "Difford's Guide",
+		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
+		SourceName:      "Kahlúa Website",
+		SourceLink:      "http://www.kahlua.com/en/drinks/classic/colorado-bulldog/",
+		Rating:          4,
+		AKA:             []Name{},
+		Tool: []Product{
+			Product{
+				ProductName: "Shaker",
+				ProductType: Tool,
+			},
+		},
+		Strength: []Meta{
+			Meta{
+				MetaName: "Medium",
+				MetaType: Flavor,
+			},
+		},
+		Difficulty: []Meta{
+			Meta{
+				MetaName: "Easy",
+				MetaType: Difficulty,
+			},
+		},
+		TOD: []Meta{
+			Meta{
+				MetaName: "Dessert",
+				MetaType: TOD,
+			},
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Creamy",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Recommended",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Meta{
+				MetaName: "On the Rocks",
+				MetaType: Served,
+			},
+		},
+		Technique: []Meta{
+			Meta{
+				MetaName: "Shaken",
+				MetaType: Technique,
+			},
+		},
+		BaseSpirit: []Meta{},
+		Garnish: []Product{
+			Product{
+				ProductName: "Cherry",
+				ProductType: Garnish,
+			},
+		},
+		Drinkware: []Product{
+			Product{
+				ProductName: "Old Fashioned",
+				ProductType: Drinkware,
+			},
+		},
+		Recipe: Recipes[3],
+	},
 }

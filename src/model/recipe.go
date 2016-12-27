@@ -23,6 +23,7 @@ const (
 	Whole
 	Dash
 	Slice
+	TopOffWith
 )
 
 var Dozes = [...]string{
@@ -31,6 +32,7 @@ var Dozes = [...]string{
 	"whole",
 	"dash",
 	"slice",
+	"top off with",
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).

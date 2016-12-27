@@ -99,8 +99,10 @@
 								<tr>
 									{{if .RecipeCardinalString}}
 									<td style="white-space: nowrap;">{{.RecipeCardinalString}}</td>
-									{{else}}
+									{{else if .RecipeCardinalString}}
 									<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinalFloat}}</td>
+									{{else}}
+									<td style="white-space: nowrap;">&nbsp;</td>
 									{{end}}
 									<td width="10">&nbsp;</td>
 									<td style="white-space: nowrap;">{{.RecipeDoze}}</td>
