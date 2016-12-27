@@ -11,5 +11,7 @@ handlers:
   static_dir: view/webcontent/www/css
 - url: /js
   static_dir: view/webcontent/www/js
+- url: /fonts
+  static_dir: view/webcontent/www/fonts
 - url: /.*
   script: _go_app

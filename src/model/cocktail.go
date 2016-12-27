@@ -30,7 +30,7 @@ type Cocktail struct {
 	Tool            []Product
 	SourceName      string
 	SourceLink      string
-	Rating          float32
+	Rating          int
 	Flavor          []Meta
 	Type            []Meta
 	BaseSpirit      []Meta

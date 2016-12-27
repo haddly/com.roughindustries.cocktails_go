@@ -9,7 +9,7 @@
 	<meta content="" name="author" />
 	<title>{{.Title}}</title>
 	<!-- Bootstrap Core CSS -->
-	<link href="css/bootstrap.min.css" rel="stylesheet" />
+	<link href="css/bootstrap.css" rel="stylesheet" />
 	<!-- Custom CSS -->
 	<link href="css/commonwealth_cocktails.css" rel="stylesheet" />
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -18,6 +18,9 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/commonwealth_cocktails.js"></script>
 </head>
 
 <body>
@@ -25,7 +28,7 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container">
 			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header"><button class="navbar-toggle" data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" type="button"><span class="sr-only">Toggle navigation</span></button><a class="navbar-brand" href="#">Commonwealth Cocktails</a></div>
+			<div class="navbar-header"><button class="navbar-toggle" data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" type="button"><span class="sr-only">Toggle navigation</span></button><a class="navbar-brand" href="/">Commonwealth Cocktails</a></div>
 			<!-- Collect the nav links, forms, and other content for toggling -->
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -46,20 +49,26 @@
 		<!-- Portfolio Item Heading -->
 		<div class="page-header">
 			<h1 align="center">{{.Name}}</h1>
-			<h5 align="center">Rating: {{.Rating}} / 5</h5>
+			<h5 align="center">
+				<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
+			</h5>
 			<!--<div class="star-ratings-css">-->
 			<!--	<div class="star-ratings-css-top" style="width: {{.Rating}}%"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>-->
 			<!--	<div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>-->
 			<!--</div>-->
-			<h6 align="center">Source: <a target="_blank" href="{{.SourceLink}}">{{.SourceName}}</a></h6>
-			{{with .Advertisement}} {{if .AdvertiserName}} 
-			<h6 align="center">Sponsored by: <a target="_blank" href="">{{.AdvertiserName}}</a></h6>
-			{{end}}{{end}}
+			<h6 align="center">Original Source: <a class="external" target="_blank" href="{{.SourceLink}}">{{.SourceName}}</a></h6>
 		</div>
 		<div class="row">
 			<div class="col-md-8">
 				<!--<img class="img-responsive" src="images/{{.Image}}" alt="{{.Name}}" />-->
 				<div align="center" style="position: relative; width: 100%;">
+					{{with .Advertisement}} {{if .AdvertiserName}} {{if .Image}}
+					<div align="center" style="position: relative; width: 100%;">
+						<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image}}" alt="{{.AdvertiserName}}" /></a>
+					</div>
+					{{else}}
+					<h6 align="center">Sponsored by: <a class="external" target="_blank" href="{{.AdvertiserLink}}">{{.AdvertiserName}}</a></h6>
+					{{end}}{{end}}{{end}}
 					<img class="img-responsive" src="images/{{.Image}}" alt="{{.Name}}" />
 					<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0.0); position: absolute; bottom: 0; left: 0; width: 100%;">Source: <a target="_blank" style="color: #555;" href="{{.ImageSourceLink}}">{{.ImageSourceName}}</a></h6>
 				</div>
@@ -236,7 +245,6 @@
 			</div>
 		</div>
 	</div>
-
 
 	<!-- Footer -->
 	<footer>

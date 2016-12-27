@@ -4,9 +4,10 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             1,
 		AdvertiserName: "Breckenridge™ Distillery",
+		AdvertiserLink: "http://www.breckenridgedistillery.com/",
 		Article:        "",
 		Blurb:          "",
-		Image:          "",
+		Image:          "breckenridgedistillery-02.png",
 		Cocktails: []int{
 			2,
 		},

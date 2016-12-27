@@ -4,6 +4,7 @@ package model
 type Advertisement struct {
 	ID             int
 	AdvertiserName string
+	AdvertiserLink string
 	Article        string
 	Blurb          string
 	Image          string
