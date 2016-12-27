@@ -79,4 +79,58 @@ var Products = []Product{
 		ProductType: Liqueur,
 		IsBase:      false,
 	},
+	Product{
+		ID:          14,
+		ProductName: "Coffee Liqueur",
+		ProductType: Liqueur,
+		IsBase:      true,
+	},
+	Product{
+		ID:          15,
+		ProductName: "Kahlúa™",
+		ProductType: Liqueur,
+		IsBase:      false,
+	},
+	Product{
+		ID:          16,
+		ProductName: "Milk",
+		ProductType: Mixer,
+		IsBase:      true,
+	},
+	Product{
+		ID:          17,
+		ProductName: "Cream",
+		ProductType: Mixer,
+		IsBase:      true,
+	},
+	Product{
+		ID:          18,
+		ProductName: "Coconut Rum",
+		ProductType: Spirit,
+		IsBase:      true,
+	},
+	Product{
+		ID:          19,
+		ProductName: "Malibu™ Coconut Rum",
+		ProductType: Spirit,
+		IsBase:      false,
+	},
+	Product{
+		ID:          20,
+		ProductName: "Amaretto",
+		ProductType: Liqueur,
+		IsBase:      true,
+	},
+	Product{
+		ID:          21,
+		ProductName: "Disaronno™",
+		ProductType: Liqueur,
+		IsBase:      false,
+	},
+	Product{
+		ID:          22,
+		ProductName: "Ginger Root",
+		ProductType: Mixer,
+		IsBase:      true,
+	},
 }

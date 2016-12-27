@@ -8,13 +8,13 @@ var Advertisements = []Advertisement{
 		Article:        "",
 		Blurb:          "",
 		Image:          "breckenridgedistillery-02.png",
-		Cocktails: []int{
-			2,
+		Cocktails: []Cocktail{
+			Cocktails[1],
 		},
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       5,
-				AdvertisedProductID: 7,
+				BaseProduct:       Products[4],
+				AdvertisedProduct: Products[6],
 			},
 		},
 	},
@@ -26,8 +26,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       5,
-				AdvertisedProductID: 6,
+				BaseProduct:       Products[4],
+				AdvertisedProduct: Products[5],
 			},
 		},
 	},
@@ -39,8 +39,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       3,
-				AdvertisedProductID: 4,
+				BaseProduct:       Products[2],
+				AdvertisedProduct: Products[3],
 			},
 		},
 	},
@@ -52,8 +52,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       1,
-				AdvertisedProductID: 2,
+				BaseProduct:       Products[0],
+				AdvertisedProduct: Products[1],
 			},
 		},
 	},
@@ -65,8 +65,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       8,
-				AdvertisedProductID: 9,
+				BaseProduct:       Products[7],
+				AdvertisedProduct: Products[8],
 			},
 		},
 	},
@@ -77,13 +77,13 @@ var Advertisements = []Advertisement{
 		Article:        "",
 		Blurb:          "",
 		Image:          "frangelico.jpg",
-		Cocktails: []int{
-			3,
+		Cocktails: []Cocktail{
+			Cocktails[2],
 		},
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       10,
-				AdvertisedProductID: 11,
+				BaseProduct:       Products[9],
+				AdvertisedProduct: Products[10],
 			},
 		},
 	},
@@ -95,8 +95,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       10,
-				AdvertisedProductID: 11,
+				BaseProduct:       Products[9],
+				AdvertisedProduct: Products[10],
 			},
 		},
 	},
@@ -108,8 +108,54 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProductID:       12,
-				AdvertisedProductID: 13,
+				BaseProduct:       Products[11],
+				AdvertisedProduct: Products[12],
+			},
+		},
+	},
+	Advertisement{
+		ID:             9,
+		AdvertiserName: "Pernod Ricard",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[13],
+				AdvertisedProduct: Products[14],
+			},
+			ProdcutAdvertisement{
+				BaseProduct:       Products[17],
+				AdvertisedProduct: Products[18],
+			},
+		},
+	},
+	Advertisement{
+		ID:             10,
+		AdvertiserName: "The Kahlúa™ Company",
+		Article:        "",
+		Blurb:          "",
+		Image:          "kahlua.png",
+		Cocktails: []Cocktail{
+			Cocktails[0],
+		},
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[13],
+				AdvertisedProduct: Products[14],
+			},
+		},
+	},
+	Advertisement{
+		ID:             11,
+		AdvertiserName: "ILLVA SARONNO S.p.A",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[19],
+				AdvertisedProduct: Products[20],
 			},
 		},
 	},

@@ -8,10 +8,7 @@ var Recipes = []Recipe{
 		RecipeSteps: []RecipeStep{
 			//1 oz. Kahlua
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Kahlua",
-					ProductType: Liqueur,
-				},
+				Ingredient:           Products[13],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
@@ -19,10 +16,7 @@ var Recipes = []Recipe{
 			},
 			//1 oz. Coconut Rum
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Coconut Rum",
-					ProductType: Spirit,
-				},
+				Ingredient:           Products[17],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
@@ -38,10 +32,7 @@ var Recipes = []Recipe{
 			},
 			//.5 oz Amaretto
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Amaretto",
-					ProductType: Liqueur,
-				},
+				Ingredient:           Products[19],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
 				RecipeDoze:           Ounce,
@@ -57,10 +48,7 @@ var Recipes = []Recipe{
 			},
 			//1 oz Cream
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Cream",
-					ProductType: Mixer,
-				},
+				Ingredient:           Products[16],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
@@ -73,10 +61,7 @@ var Recipes = []Recipe{
 		RecipeSteps: []RecipeStep{
 			//2 slice Fresh root ginger
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Ginger Root",
-					ProductType: Mixer,
-				},
+				Ingredient:           Products[21],
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
 				RecipeDoze:           Slice,
@@ -111,6 +96,51 @@ var Recipes = []Recipe{
 				Ingredient:           Products[11],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        4,
+			},
+		},
+	},
+	Recipe{
+		Method: "Shake all ingredients with ice and strain into ice-filled glass.",
+		RecipeSteps: []RecipeStep{
+			//1 ounce irish cream
+			RecipeStep{
+				Ingredient:           Products[7],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Liqueur,
+				RecipeOrdinal:        0,
+			},
+			//2 oz. Frangelico
+			RecipeStep{
+				Ingredient:           Products[9],
+				RecipeCardinalFloat:  2.0,
+				RecipeCardinalString: "2",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        1,
+			},
+			//.5 oz. Orange Juice
+			RecipeStep{
+				Ingredient:           Products[13],
+				RecipeCardinalFloat:  .5,
+				RecipeCardinalString: "½",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        2,
+			},
+			//2 oz Milk
+			RecipeStep{
+				Ingredient:           Products[15],
+				RecipeCardinalFloat:  2.0,
+				RecipeCardinalString: "2",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        3,
+			},
+			//1 oz Cream
+			RecipeStep{
+				Ingredient:           Products[16],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
 				RecipeOrdinal:        4,
 			},

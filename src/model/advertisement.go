@@ -8,11 +8,11 @@ type Advertisement struct {
 	Article        string
 	Blurb          string
 	Image          string
-	Cocktails      []int
+	Cocktails      []Cocktail
 	Products       []ProdcutAdvertisement
 }
 
 type ProdcutAdvertisement struct {
-	BaseProductID       int
-	AdvertisedProductID int
+	BaseProduct       Product
+	AdvertisedProduct Product
 }

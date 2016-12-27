@@ -36,17 +36,17 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	for ad_index, ad_element := range model.Advertisements {
 		for _, adcocktails_element := range ad_element.Cocktails {
-			if c.ID == adcocktails_element {
+			if c.ID == adcocktails_element.ID {
 				c.Advertisement = model.Advertisements[ad_index]
-				log.Println(strconv.Itoa(c.ID) + " " + strconv.Itoa(adcocktails_element))
+				log.Println(strconv.Itoa(c.ID) + " " + strconv.Itoa(adcocktails_element.ID))
 				for index, element := range c.Recipe.RecipeSteps {
 					// element is the element from someSlice for where we are
 					// is this a base product
 					for _, adprod_element := range ad_element.Products {
-						log.Println(strconv.Itoa(element.Ingredient.ID) + " " + strconv.Itoa(adprod_element.BaseProductID))
-						if element.Ingredient.ID == adprod_element.BaseProductID {
-							c.Recipe.RecipeSteps[index].Ingredient = model.Products[adprod_element.AdvertisedProductID-1]
-							prod_ignore = append(prod_ignore, adprod_element.BaseProductID)
+						log.Println(strconv.Itoa(element.Ingredient.ID) + " " + strconv.Itoa(adprod_element.BaseProduct.ID))
+						if element.Ingredient.ID == adprod_element.BaseProduct.ID {
+							c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct
+							prod_ignore = append(prod_ignore, adprod_element.BaseProduct.ID)
 						}
 					}
 				}
@@ -59,8 +59,8 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		// is this a base product
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
-				if element.Ingredient.ID == adprod_element.BaseProductID {
-					c.Recipe.RecipeSteps[index].Ingredient = model.Products[adprod_element.AdvertisedProductID-1]
+				if element.Ingredient.ID == adprod_element.BaseProduct.ID {
+					c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct
 				}
 			}
 		}

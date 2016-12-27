@@ -252,54 +252,6 @@ var Cocktails = []Cocktail{
 				ProductType: Drinkware,
 			},
 		},
-		Recipe: Recipe{
-			Method: "Shake all ingredients with ice and strain into ice-filled glass.",
-			RecipeSteps: []RecipeStep{
-				//1 ounce irish cream
-				RecipeStep{
-					Ingredient:          Products[7],
-					RecipeCardinalFloat: 1.0,
-					RecipeDoze:          Liqueur,
-					RecipeOrdinal:       0,
-				},
-				//2 oz. Frangelico
-				RecipeStep{
-					Ingredient:          Products[9],
-					RecipeCardinalFloat: 2.0,
-					RecipeDoze:          Ounce,
-					RecipeOrdinal:       1,
-				},
-				//.5 oz. Orange Juice
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Kahlua",
-						ProductType: Liqueur,
-					},
-					RecipeCardinalFloat: .5,
-					RecipeDoze:          Ounce,
-					RecipeOrdinal:       2,
-				},
-				//2 oz Milk
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Milk",
-						ProductType: Mixer,
-					},
-					RecipeCardinalFloat: 2.0,
-					RecipeDoze:          Ounce,
-					RecipeOrdinal:       3,
-				},
-				//1 oz Cream
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Cream",
-						ProductType: Mixer,
-					},
-					RecipeCardinalFloat: 1.0,
-					RecipeDoze:          Ounce,
-					RecipeOrdinal:       4,
-				},
-			},
-		},
+		Recipe: Recipes[2],
 	},
 }
