@@ -49,10 +49,7 @@ var Recipes = []Recipe{
 			},
 			//.5 oz Frangelico
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Frangelico",
-					ProductType: Liqueur,
-				},
+				Ingredient:           Products[9],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
 				RecipeDoze:           Ounce,
@@ -111,10 +108,7 @@ var Recipes = []Recipe{
 			},
 			//.5 oz Maple Syrup
 			RecipeStep{
-				Ingredient: Product{
-					ProductName: "Maple Syrup",
-					ProductType: Mixer,
-				},
+				Ingredient:           Products[11],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
 				RecipeDoze:           Ounce,

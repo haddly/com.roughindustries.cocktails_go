@@ -80,5 +80,37 @@ var Advertisements = []Advertisement{
 		Cocktails: []int{
 			3,
 		},
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProductID:       10,
+				AdvertisedProductID: 11,
+			},
+		},
+	},
+	Advertisement{
+		ID:             7,
+		AdvertiserName: "Frangelico™",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProductID:       10,
+				AdvertisedProductID: 11,
+			},
+		},
+	},
+	Advertisement{
+		ID:             8,
+		AdvertiserName: "Stonewall Kitchen™",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProductID:       12,
+				AdvertisedProductID: 13,
+			},
+		},
 	},
 }

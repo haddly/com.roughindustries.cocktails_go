@@ -45,14 +45,38 @@ var Products = []Product{
 	},
 	Product{
 		ID:          8,
-		ProductName: "Irish Cream",
-		ProductType: Mixer,
+		ProductName: "Irish Cream Liqueur",
+		ProductType: Liqueur,
 		IsBase:      true,
 	},
 	Product{
 		ID:          9,
-		ProductName: "Bailey's Irish Cream",
-		ProductType: Mixer,
+		ProductName: "Bailey's Irish Cream™",
+		ProductType: Liqueur,
+		IsBase:      false,
+	},
+	Product{
+		ID:          10,
+		ProductName: "Hazelnut Liqueur",
+		ProductType: Liqueur,
+		IsBase:      true,
+	},
+	Product{
+		ID:          11,
+		ProductName: "Frangelico™",
+		ProductType: Liqueur,
+		IsBase:      false,
+	},
+	Product{
+		ID:          12,
+		ProductName: "Maple Syrup",
+		ProductType: Liqueur,
+		IsBase:      true,
+	},
+	Product{
+		ID:          13,
+		ProductName: "Stonewall Kitchen™ Maine Maple Syrup",
+		ProductType: Liqueur,
 		IsBase:      false,
 	},
 }

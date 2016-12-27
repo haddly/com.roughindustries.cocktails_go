@@ -264,10 +264,7 @@ var Cocktails = []Cocktail{
 				},
 				//2 oz. Frangelico
 				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Frangelico",
-						ProductType: Liqueur,
-					},
+					Ingredient:          Products[9],
 					RecipeCardinalFloat: 2.0,
 					RecipeDoze:          Ounce,
 					RecipeOrdinal:       1,
