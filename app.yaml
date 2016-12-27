@@ -2,9 +2,9 @@ runtime: go
 api_version: go1
 
 handlers:
-- url: /view/webcontent/www/favicon.ico
-  static_files: webcontent/\1
-  upload: view/webcontent/www/favicon.ico\
+- url: /favicon.ico
+  static_files: view/webcontent/www/favicon.ico
+  upload: view/webcontent/www/favicon.ico
 - url: /images
   static_dir: view/webcontent/www/images
 - url: /css
