@@ -45,7 +45,7 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             3,
+		ID:             4,
 		AdvertiserName: "Tropicana™",
 		Article:        "",
 		Blurb:          "",
@@ -58,7 +58,7 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             4,
+		ID:             5,
 		AdvertiserName: "Bailey and Co™",
 		Article:        "",
 		Blurb:          "",
@@ -68,6 +68,17 @@ var Advertisements = []Advertisement{
 				BaseProductID:       8,
 				AdvertisedProductID: 9,
 			},
+		},
+	},
+	Advertisement{
+		ID:             6,
+		AdvertiserName: "Frangelico™",
+		AdvertiserLink: "http://frangelico.com/",
+		Article:        "",
+		Blurb:          "",
+		Image:          "frangelico.jpg",
+		Cocktails: []int{
+			3,
 		},
 	},
 }

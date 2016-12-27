@@ -34,8 +34,8 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	c := &model.Cocktails[rand.Intn(len(model.Cocktails))]
 	prod_ignore := []int{}
 
-	for _, ad_element := range model.Advertisements {
-		for ad_index, adcocktails_element := range ad_element.Cocktails {
+	for ad_index, ad_element := range model.Advertisements {
+		for _, adcocktails_element := range ad_element.Cocktails {
 			if c.ID == adcocktails_element {
 				c.Advertisement = model.Advertisements[ad_index]
 				log.Println(strconv.Itoa(c.ID) + " " + strconv.Itoa(adcocktails_element))
