@@ -1,6 +1,8 @@
 package www
 
 import (
+	"bytes"
+	"encoding/gob"
 	"html/template"
 	"log"
 	"math/rand"
@@ -31,7 +33,21 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	//stick that in the name
 	//name := r.URL.Path[1:]
 	//or setup a default for now
-	c := &model.Cocktails[rand.Intn(len(model.Cocktails))]
+	var c model.Cocktail
+	var network bytes.Buffer        // Stand-in for a network connection
+	enc := gob.NewEncoder(&network) // Will write to network.
+	dec := gob.NewDecoder(&network) // Will read from network.
+	// Encode (send) the value.
+	err := enc.Encode(model.Cocktails[rand.Intn(len(model.Cocktails))])
+	if err != nil {
+		log.Fatal("encode error:", err)
+	}
+	// Decode (receive) the value.
+	err = dec.Decode(&c)
+	if err != nil {
+		log.Fatal("decode error:", err)
+	}
+	//c := &model.Cocktails[rand.Intn(len(model.Cocktails))]
 	prod_ignore := []int{}
 
 	for ad_index, ad_element := range model.Advertisements {
@@ -45,8 +61,10 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 					for _, adprod_element := range ad_element.Products {
 						log.Println(strconv.Itoa(element.Ingredient.ID) + " " + strconv.Itoa(adprod_element.BaseProduct.ID))
 						if element.Ingredient.ID == adprod_element.BaseProduct.ID {
-							c.Recipe.RecipeSteps[index].Ingredient = &adprod_element.AdvertisedProduct.Product
-							prod_ignore = append(prod_ignore, adprod_element.BaseProduct.ID)
+							temp := element.Ingredient.ID
+							c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct.Product
+							c.Recipe.RecipeSteps[index].Ingredient.ID = temp
+							prod_ignore = append(prod_ignore, temp)
 						}
 					}
 				}
@@ -61,7 +79,9 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.Ingredient.ID == adprod_element.BaseProduct.ID {
-					c.Recipe.RecipeSteps[index].Ingredient = &adprod_element.AdvertisedProduct.Product
+					if !intInSlice(element.Ingredient.ID, prod_ignore) {
+						c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct.Product
+					}
 				}
 			}
 		}
@@ -73,7 +93,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Drinkware[index] = &adprod_element.AdvertisedProduct.Product
+					c.Drinkware[index] = adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}
@@ -85,7 +105,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Tool[index] = &adprod_element.AdvertisedProduct.Product
+					c.Tool[index] = adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}
@@ -97,14 +117,23 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Garnish[index] = &adprod_element.AdvertisedProduct.Product
+					c.Garnish[index] = adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}
 	}
 	log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderTemplate(w, "index", c)
+	cocktail.RenderTemplate(w, "index", &c)
+}
+
+func intInSlice(a int, list []int) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 func (cocktail *Cocktail) Init() {

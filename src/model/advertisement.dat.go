@@ -13,7 +13,7 @@ var Advertisements = []Advertisement{
 		},
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[4],
+				BaseProduct:       Products[2],
 				AdvertisedProduct: DerivedProducts[3],
 			},
 		},
@@ -26,7 +26,7 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[4],
+				BaseProduct:       Products[2],
 				AdvertisedProduct: DerivedProducts[2],
 			},
 		},
