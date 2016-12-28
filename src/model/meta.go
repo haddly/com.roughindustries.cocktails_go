@@ -35,6 +35,7 @@ var MetaTypeStrings = [...]string{
 func (mt MetaType) String() string { return MetaTypeStrings[mt-1] }
 
 type Meta struct {
+	ID       int
 	MetaName string
 	MetaType MetaType
 	Article  string

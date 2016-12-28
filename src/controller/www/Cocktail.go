@@ -14,11 +14,11 @@ type Cocktail struct {
 
 //render the page based on the name of the file provided
 func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *model.Cocktail) {
-	t, err := template.ParseFiles("./view/webcontent/www/" + tmpl + ".html")
+	t, err := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/ga.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = t.Execute(w, c)
+	err = t.ExecuteTemplate(w, "base", c)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,6 +54,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//recipe ingredient ad replacement
 	for index, element := range c.Recipe.RecipeSteps {
 		// element is the element from someSlice for where we are
 		// is this a base product
@@ -61,6 +62,42 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 			for _, adprod_element := range ad_element.Products {
 				if element.Ingredient.ID == adprod_element.BaseProduct.ID {
 					c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct
+				}
+			}
+		}
+	}
+	//drinkware ad replacement
+	for index, element := range c.Drinkware {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range model.Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.ID == adprod_element.BaseProduct.ID {
+					c.Drinkware[index] = adprod_element.AdvertisedProduct
+				}
+			}
+		}
+	}
+	//tool ad replacement
+	for index, element := range c.Tool {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range model.Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.ID == adprod_element.BaseProduct.ID {
+					c.Tool[index] = adprod_element.AdvertisedProduct
+				}
+			}
+		}
+	}
+	//garnish ad replacement
+	for index, element := range c.Garnish {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range model.Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.ID == adprod_element.BaseProduct.ID {
+					c.Garnish[index] = adprod_element.AdvertisedProduct
 				}
 			}
 		}

@@ -37,3 +37,13 @@ type Product struct {
 	Recipe      Recipe
 	IsBase      bool
 }
+
+type DerivedProduct struct {
+	ID          int
+	ProductName string
+	BaseProduct Product
+	ProductType ProductType
+	Article     string
+	Blurb       string
+	Recipe      Recipe
+}

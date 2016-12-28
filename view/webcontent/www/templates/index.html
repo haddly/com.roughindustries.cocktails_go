@@ -1,3 +1,4 @@
+{{define "base"}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,6 +22,7 @@
 	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/commonwealth_cocktails.js"></script>
+	{{template "ga" .}}
 </head>
 
 <body>
@@ -235,6 +237,19 @@
 						</div>
 					</div>
 				</div>
+				{{if .Comment}}
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Comment</h3>
+						{{.Comment}}
+					</div>
+				</div>
+				{{end}}
+				<div class="row">
+					<div class="col-md-12">
+						Social Media
+					</div>
+				</div>
 			</div>
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
@@ -274,3 +289,4 @@
 </body>
 
 </html>
+{{end}}

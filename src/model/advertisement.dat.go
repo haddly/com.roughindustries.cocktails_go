@@ -159,4 +159,56 @@ var Advertisements = []Advertisement{
 			},
 		},
 	},
+	Advertisement{
+		ID:             12,
+		AdvertiserName: "Taylor'd Milestones",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[27],
+				AdvertisedProduct: Products[28],
+			},
+		},
+	},
+	Advertisement{
+		ID:             12,
+		AdvertiserName: "OXO",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[24],
+				AdvertisedProduct: Products[30],
+			},
+		},
+	},
+	Advertisement{
+		ID:             13,
+		AdvertiserName: "The Absolut™ Company",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[22],
+				AdvertisedProduct: Products[34],
+			},
+		},
+	},
+	Advertisement{
+		ID:             14,
+		AdvertiserName: "Anchor Distilling Company",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[25],
+				AdvertisedProduct: Products[35],
+			},
+		},
+	},
 }

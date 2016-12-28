@@ -12,29 +12,19 @@ var Cocktails = []Cocktail{
 		ImageSourceLink: "",
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
-		// Rating:          2.5 / 5.0 * 100,
-		Rating: 5,
-		AKA:    []Name{},
+		Rating:          5,
+		AKA:             []Name{},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
+			Products[24],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
 			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Evening",
-				MetaType: TOD,
-			},
+			Metadata[10],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -55,27 +45,15 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
+			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
 		Garnish: []Product{
-			Product{
-				ProductName: "Cherry",
-				ProductType: Garnish,
-			},
-			Product{
-				ProductName: "Slice of Starfruit",
-				ProductType: Garnish,
-			},
+			Products[25],
+			Products[26],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
+			Products[27],
 		},
 		Recipe: Recipes[0],
 	},
@@ -92,32 +70,17 @@ var Cocktails = []Cocktail{
 		Rating:          5,
 		AKA:             []Name{},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
-			Product{
-				ProductName: "Muddler",
-				ProductType: Tool,
-			},
+			Products[24],
+			Products[29],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Afternoon",
-				MetaType: TOD,
-			},
+			Metadata[7],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -136,38 +99,20 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Served: []Meta{
-			Meta{
-				MetaName: "On the Rocks",
-				MetaType: Served,
-			},
+			Metadata[12],
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
-			Meta{
-				MetaName: "Muddled",
-				MetaType: Technique,
-			},
+			Metadata[14],
+			Metadata[15],
 		},
 		BaseSpirit: []Meta{
-			Meta{
-				MetaName: "Bourbon Whiskey",
-				MetaType: BaseSpirit,
-			},
+			Metadata[16],
 		},
 		Garnish: []Product{
-			Product{
-				ProductName: "Orange Zest Twist",
-				ProductType: Garnish,
-			},
+			Products[33],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
+			Products[27],
 		},
 		Recipe: Recipes[1],
 	},
@@ -184,28 +129,16 @@ var Cocktails = []Cocktail{
 		Rating:          5,
 		AKA:             []Name{},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
+			Products[24],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Dessert",
-				MetaType: TOD,
-			},
+			Metadata[9],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -220,37 +153,19 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Served: []Meta{
-			Meta{
-				MetaName: "On the Rocks",
-				MetaType: Served,
-			},
+			Metadata[12],
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
+			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
 		Garnish: []Product{
-			Product{
-				ProductName: "Cherry",
-				ProductType: Garnish,
-			},
+			Products[25],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Collins",
-				ProductType: Drinkware,
-			},
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
-			Product{
-				ProductName: "Highball",
-				ProductType: Drinkware,
-			},
+			Products[31],
+			Products[27],
+			Products[32],
 		},
 		Recipe: Recipes[2],
 	},
@@ -258,7 +173,7 @@ var Cocktails = []Cocktail{
 		ID:              4,
 		Title:           "Colorado Bulldog",
 		Name:            "Colorado Bulldog",
-		Description:     "",
+		Description:     "The combination of coffee liqueur, vodka, cream and the cola creates a sweet and refreshing taste. We know it looks like a White Russian but don’t be misled; the Colorado Bulldog is bubbly.",
 		Image:           "mad_monk_milkshake.jpg",
 		ImageSourceName: "Difford's Guide",
 		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
@@ -267,28 +182,16 @@ var Cocktails = []Cocktail{
 		Rating:          4,
 		AKA:             []Name{},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
+			Products[24],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Dessert",
-				MetaType: TOD,
-			},
+			Metadata[8],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -303,29 +206,17 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Served: []Meta{
-			Meta{
-				MetaName: "On the Rocks",
-				MetaType: Served,
-			},
+			Metadata[12],
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
+			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
 		Garnish: []Product{
-			Product{
-				ProductName: "Cherry",
-				ProductType: Garnish,
-			},
+			Products[25],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
+			Products[27],
 		},
 		Recipe: Recipes[3],
 	},
