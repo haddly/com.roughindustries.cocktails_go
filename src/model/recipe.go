@@ -8,7 +8,7 @@ type Recipe struct {
 }
 
 type RecipeStep struct {
-	Ingredient           Product
+	Ingredient           *Product
 	RecipeCardinalFloat  float64
 	RecipeCardinalString string
 	RecipeDoze           Doze

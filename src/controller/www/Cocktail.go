@@ -45,7 +45,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 					for _, adprod_element := range ad_element.Products {
 						log.Println(strconv.Itoa(element.Ingredient.ID) + " " + strconv.Itoa(adprod_element.BaseProduct.ID))
 						if element.Ingredient.ID == adprod_element.BaseProduct.ID {
-							c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct
+							c.Recipe.RecipeSteps[index].Ingredient = &adprod_element.AdvertisedProduct.Product
 							prod_ignore = append(prod_ignore, adprod_element.BaseProduct.ID)
 						}
 					}
@@ -61,7 +61,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.Ingredient.ID == adprod_element.BaseProduct.ID {
-					c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct
+					c.Recipe.RecipeSteps[index].Ingredient = &adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}
@@ -73,7 +73,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Drinkware[index] = adprod_element.AdvertisedProduct
+					c.Drinkware[index] = &adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}
@@ -85,7 +85,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Tool[index] = adprod_element.AdvertisedProduct
+					c.Tool[index] = &adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}
@@ -97,7 +97,7 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Garnish[index] = adprod_element.AdvertisedProduct
+					c.Garnish[index] = &adprod_element.AdvertisedProduct.Product
 				}
 			}
 		}

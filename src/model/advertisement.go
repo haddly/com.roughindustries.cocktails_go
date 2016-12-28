@@ -14,5 +14,5 @@ type Advertisement struct {
 
 type ProdcutAdvertisement struct {
 	BaseProduct       Product
-	AdvertisedProduct Product
+	AdvertisedProduct DerivedProduct
 }

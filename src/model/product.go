@@ -36,14 +36,11 @@ type Product struct {
 	Blurb       string
 	Recipe      Recipe
 	IsBase      bool
+	PreText     string
+	PostText    string
 }
 
 type DerivedProduct struct {
-	ID          int
-	ProductName string
+	Product     Product
 	BaseProduct Product
-	ProductType ProductType
-	Article     string
-	Blurb       string
-	Recipe      Recipe
 }

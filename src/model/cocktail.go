@@ -22,12 +22,12 @@ type Cocktail struct {
 	Description     string
 	Comment         string
 	Recipe          Recipe
-	Garnish         []Product
+	Garnish         []*Product
 	Image           string
 	ImageSourceName string
 	ImageSourceLink string
-	Drinkware       []Product
-	Tool            []Product
+	Drinkware       []*Product
+	Tool            []*Product
 	SourceName      string
 	SourceLink      string
 	Rating          int

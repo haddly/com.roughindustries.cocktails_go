@@ -14,7 +14,7 @@ var Advertisements = []Advertisement{
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
 				BaseProduct:       Products[4],
-				AdvertisedProduct: Products[6],
+				AdvertisedProduct: DerivedProducts[3],
 			},
 		},
 	},
@@ -27,7 +27,7 @@ var Advertisements = []Advertisement{
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
 				BaseProduct:       Products[4],
-				AdvertisedProduct: Products[5],
+				AdvertisedProduct: DerivedProducts[2],
 			},
 		},
 	},
@@ -39,8 +39,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[2],
-				AdvertisedProduct: Products[3],
+				BaseProduct:       Products[1],
+				AdvertisedProduct: DerivedProducts[1],
 			},
 		},
 	},
@@ -53,7 +53,7 @@ var Advertisements = []Advertisement{
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
 				BaseProduct:       Products[0],
-				AdvertisedProduct: Products[1],
+				AdvertisedProduct: DerivedProducts[0],
 			},
 		},
 	},
@@ -65,8 +65,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[7],
-				AdvertisedProduct: Products[8],
+				BaseProduct:       Products[3],
+				AdvertisedProduct: DerivedProducts[4],
 			},
 		},
 	},
@@ -82,8 +82,8 @@ var Advertisements = []Advertisement{
 		},
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[9],
-				AdvertisedProduct: Products[10],
+				BaseProduct:       Products[4],
+				AdvertisedProduct: DerivedProducts[5],
 			},
 		},
 	},
@@ -95,8 +95,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[9],
-				AdvertisedProduct: Products[10],
+				BaseProduct:       Products[4],
+				AdvertisedProduct: DerivedProducts[5],
 			},
 		},
 	},
@@ -108,8 +108,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[11],
-				AdvertisedProduct: Products[12],
+				BaseProduct:       Products[5],
+				AdvertisedProduct: DerivedProducts[6],
 			},
 		},
 	},
@@ -121,12 +121,12 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[13],
-				AdvertisedProduct: Products[14],
+				BaseProduct:       Products[6],
+				AdvertisedProduct: DerivedProducts[7],
 			},
 			ProdcutAdvertisement{
-				BaseProduct:       Products[17],
-				AdvertisedProduct: Products[18],
+				BaseProduct:       Products[9],
+				AdvertisedProduct: DerivedProducts[8],
 			},
 		},
 	},
@@ -141,8 +141,8 @@ var Advertisements = []Advertisement{
 		},
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[13],
-				AdvertisedProduct: Products[14],
+				BaseProduct:       Products[6],
+				AdvertisedProduct: DerivedProducts[7],
 			},
 		},
 	},
@@ -154,8 +154,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[19],
-				AdvertisedProduct: Products[20],
+				BaseProduct:       Products[10],
+				AdvertisedProduct: DerivedProducts[9],
 			},
 		},
 	},
@@ -167,8 +167,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[27],
-				AdvertisedProduct: Products[28],
+				BaseProduct:       Products[17],
+				AdvertisedProduct: DerivedProducts[10],
 			},
 		},
 	},
@@ -180,8 +180,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[24],
-				AdvertisedProduct: Products[30],
+				BaseProduct:       Products[14],
+				AdvertisedProduct: DerivedProducts[11],
 			},
 		},
 	},
@@ -193,8 +193,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[22],
-				AdvertisedProduct: Products[34],
+				BaseProduct:       Products[12],
+				AdvertisedProduct: DerivedProducts[12],
 			},
 		},
 	},
@@ -206,8 +206,8 @@ var Advertisements = []Advertisement{
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
-				BaseProduct:       Products[25],
-				AdvertisedProduct: Products[35],
+				BaseProduct:       Products[15],
+				AdvertisedProduct: DerivedProducts[13],
 			},
 		},
 	},

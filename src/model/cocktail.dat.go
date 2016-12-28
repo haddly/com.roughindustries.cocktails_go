@@ -14,8 +14,8 @@ var Cocktails = []Cocktail{
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
 		Rating:          5,
 		AKA:             []Name{},
-		Tool: []Product{
-			Products[24],
+		Tool: []*Product{
+			&Products[16],
 		},
 		Strength: []Meta{
 			Metadata[4],
@@ -48,12 +48,12 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
-		Garnish: []Product{
-			Products[25],
-			Products[26],
+		Garnish: []*Product{
+			&Products[15],
+			&Products[16],
 		},
-		Drinkware: []Product{
-			Products[27],
+		Drinkware: []*Product{
+			&Products[17],
 		},
 		Recipe: Recipes[0],
 	},
@@ -69,9 +69,9 @@ var Cocktails = []Cocktail{
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
 		Rating:          5,
 		AKA:             []Name{},
-		Tool: []Product{
-			Products[24],
-			Products[29],
+		Tool: []*Product{
+			&Products[14],
+			&Products[18],
 		},
 		Strength: []Meta{
 			Metadata[4],
@@ -108,11 +108,11 @@ var Cocktails = []Cocktail{
 		BaseSpirit: []Meta{
 			Metadata[16],
 		},
-		Garnish: []Product{
-			Products[33],
+		Garnish: []*Product{
+			&Products[21],
 		},
-		Drinkware: []Product{
-			Products[27],
+		Drinkware: []*Product{
+			&Products[17],
 		},
 		Recipe: Recipes[1],
 	},
@@ -128,8 +128,8 @@ var Cocktails = []Cocktail{
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
 		Rating:          5,
 		AKA:             []Name{},
-		Tool: []Product{
-			Products[24],
+		Tool: []*Product{
+			&Products[16],
 		},
 		Strength: []Meta{
 			Metadata[4],
@@ -159,13 +159,13 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
-		Garnish: []Product{
-			Products[25],
+		Garnish: []*Product{
+			&Products[15],
 		},
-		Drinkware: []Product{
-			Products[31],
-			Products[27],
-			Products[32],
+		Drinkware: []*Product{
+			&Products[20],
+			&Products[17],
+			&Products[21],
 		},
 		Recipe: Recipes[2],
 	},
@@ -181,8 +181,8 @@ var Cocktails = []Cocktail{
 		SourceLink:      "http://www.kahlua.com/en/drinks/classic/colorado-bulldog/",
 		Rating:          4,
 		AKA:             []Name{},
-		Tool: []Product{
-			Products[24],
+		Tool: []*Product{
+			&Products[14],
 		},
 		Strength: []Meta{
 			Metadata[4],
@@ -212,11 +212,11 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
-		Garnish: []Product{
-			Products[25],
+		Garnish: []*Product{
+			&Products[15],
 		},
-		Drinkware: []Product{
-			Products[27],
+		Drinkware: []*Product{
+			&Products[17],
 		},
 		Recipe: Recipes[3],
 	},
