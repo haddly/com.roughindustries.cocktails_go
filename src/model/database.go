@@ -6,11 +6,7 @@ import (
 	"log"
 )
 
-type Database struct {
-	Name string
-}
-
-func GetCurrentDB() Database {
+func GetCurrentDB() string {
 	conn, _ := db.GetDB()
 	rows, _ := conn.Query("SELECT DATABASE();")
 	var dbname string
@@ -18,6 +14,5 @@ func GetCurrentDB() Database {
 		rows.Scan(&dbname)
 		log.Println(dbname)
 	}
-	db := Database{dbname}
-	return db
+	return dbname
 }

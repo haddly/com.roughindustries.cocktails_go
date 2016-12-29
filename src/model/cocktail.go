@@ -1,6 +1,10 @@
 //model/cocktail.go
 package model
 
+import (
+	"log"
+)
+
 // recipe:
 //   - !recipeStep
 //       ingredient:
@@ -46,4 +50,9 @@ type Cocktail struct {
 
 type Name struct {
 	Name string
+}
+
+func InitCocktailTable() string {
+	log.Println("CocktailTable Init")
+	return "CocktailTable Init"
 }
