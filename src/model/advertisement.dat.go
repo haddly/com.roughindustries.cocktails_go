@@ -133,6 +133,7 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             10,
 		AdvertiserName: "The Kahlúa™ Company",
+		AdvertiserLink: "http://www.kahlua.com/",
 		Article:        "",
 		Blurb:          "",
 		Image:          "kahlua.png",

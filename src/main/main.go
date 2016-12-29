@@ -9,9 +9,11 @@ import (
 	"path/filepath"
 )
 
+var d = www.Database{}
 var c = www.Cocktail{}
 
 func init() {
+	d.Init()
 	c.Init()
 }
 
@@ -33,8 +35,6 @@ func main() {
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
 	})
-
-	c.Init()
 
 	log.Println("Added Handlers ... Starting Server\n")
 	//this starts up the server

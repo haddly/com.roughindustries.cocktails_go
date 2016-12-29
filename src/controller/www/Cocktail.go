@@ -29,10 +29,7 @@ func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *
 //handle / requests to the server
 func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("indexHandler: " + r.URL.Path[1:])
-	//parse the url and get the information after the localhost:8080/
-	//stick that in the name
-	//name := r.URL.Path[1:]
-	//or setup a default for now
+
 	var c model.Cocktail
 	var network bytes.Buffer        // Stand-in for a network connection
 	enc := gob.NewEncoder(&network) // Will write to network.
