@@ -51,6 +51,7 @@
 		<!-- Portfolio Item Heading -->
 		<div class="page-header">
 			<h1 align="center">{{.Name}}</h1>
+			<h6 align="center">{{range .AKA}}({{.Name}}){{end}}</h6>
 			<h5 align="center">
 				<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
 			</h5>
@@ -106,7 +107,9 @@
 									<td style="white-space: nowrap;">{{.RecipeDoze}}</td>
 									<td width="10">&nbsp;</td>
 									<td>
-										{{with .Ingredient}} {{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}} {{end}}
+										<div class="iconlink"><a href="#" style="text-decoration : none; color : #000;">
+										{{if .AdIngredient.ProductName}} {{.AdIngredient.ProductName}} {{else}} {{if .OriginalIngredient.PreText}} ({.OriginalIngredient.PreText}}&nbsp; {{end}} {{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}} {{end}}
+									</a></div>
 									</td>
 								</tr>
 								{{end}} {{end}}
@@ -116,6 +119,14 @@
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Method</h3>
 						{{with .Recipe}}{{.Method}}{{end}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Alternative Ingredients</h3>
+						{{with .Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
+						<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.OriginalIngredient.ProductName}}</span>{{end}} {{range .AltIngredient}}<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>{{end}} {{end}}{{end}}
+
 					</div>
 				</div>
 				<div class="row">
@@ -143,11 +154,9 @@
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-						{{range .AKA}}
-						<h3>Alternate Names</h3>
-						<h4>
-							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.Name}}</span> {{end}}
-						</h4>
+						{{if .Comment}}
+						<h3>Comment</h3>
+						{{.Comment}} {{end}}
 					</div>
 				</div>
 				<div class="row">
@@ -233,14 +242,6 @@
 						</div>
 					</div>
 				</div>
-				{{if .Comment}}
-				<div class="row">
-					<div class="col-md-12">
-						<h3>Comment</h3>
-						{{.Comment}}
-					</div>
-				</div>
-				{{end}}
 				<div class="row">
 					<div class="col-md-12">
 						<!--Social Media Links-->

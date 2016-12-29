@@ -37,7 +37,7 @@ func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Reque
 	buffer.WriteString(model.InitCocktailTable() + "/<br/>")
 	//apply the template page info to the index page
 	status := Status{buffer.String()}
-	database.RenderTemplate(w, "dbvalidate", &status)
+	database.RenderTemplate(w, "dbindex", &status)
 }
 
 func (database *Database) Init() {

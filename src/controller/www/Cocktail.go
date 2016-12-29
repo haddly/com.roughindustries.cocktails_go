@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"model"
 	"net/http"
-	"strconv"
+	//"strconv"
 )
 
 type Cocktail struct {
@@ -51,17 +51,13 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		for _, adcocktails_element := range ad_element.Cocktails {
 			if c.ID == adcocktails_element.ID {
 				c.Advertisement = model.Advertisements[ad_index]
-				log.Println(strconv.Itoa(c.ID) + " " + strconv.Itoa(adcocktails_element.ID))
 				for index, element := range c.Recipe.RecipeSteps {
 					// element is the element from someSlice for where we are
 					// is this a base product
 					for _, adprod_element := range ad_element.Products {
-						log.Println(strconv.Itoa(element.Ingredient.ID) + " " + strconv.Itoa(adprod_element.BaseProduct.ID))
-						if element.Ingredient.ID == adprod_element.BaseProduct.ID {
-							temp := element.Ingredient.ID
-							c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct.Product
-							c.Recipe.RecipeSteps[index].Ingredient.ID = temp
-							prod_ignore = append(prod_ignore, temp)
+						if element.OriginalIngredient.ID == adprod_element.BaseProduct.ID {
+							c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct.Product
+							prod_ignore = append(prod_ignore, element.OriginalIngredient.ID)
 						}
 					}
 				}
@@ -69,15 +65,15 @@ func (cocktail *Cocktail) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	//recipe ingredient ad replacement
+	//recipe OriginalIngredient ad replacement
 	for index, element := range c.Recipe.RecipeSteps {
 		// element is the element from someSlice for where we are
 		// is this a base product
 		for _, ad_element := range model.Advertisements {
 			for _, adprod_element := range ad_element.Products {
-				if element.Ingredient.ID == adprod_element.BaseProduct.ID {
-					if !intInSlice(element.Ingredient.ID, prod_ignore) {
-						c.Recipe.RecipeSteps[index].Ingredient = adprod_element.AdvertisedProduct.Product
+				if element.OriginalIngredient.ID == adprod_element.BaseProduct.ID {
+					if !intInSlice(element.OriginalIngredient.ID, prod_ignore) {
+						c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct.Product
 					}
 				}
 			}

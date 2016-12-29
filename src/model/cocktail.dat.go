@@ -13,7 +13,9 @@ var Cocktails = []Cocktail{
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
 		Rating:          5,
-		AKA:             []Name{},
+		AKA: []Name{
+			Name{Name: "Jamaican Milkshake"},
+		},
 		Tool: []Product{
 			Products[14],
 		},
@@ -67,6 +69,7 @@ var Cocktails = []Cocktail{
 		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
 		SourceName:      "Difford's Guide",
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
+		Comment:         "A little more OJ won't hurt it.",
 		Rating:          5,
 		AKA:             []Name{},
 		Tool: []Product{

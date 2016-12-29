@@ -137,6 +137,18 @@ var Products = []Product{
 		IsBase:      true,
 		PostText:    "Zest Twist",
 	},
+	Product{
+		ID:          23,
+		ProductName: "Rye Whiskey",
+		ProductType: Spirit,
+		IsBase:      true,
+	},
+	Product{
+		ID:          24,
+		ProductName: "Tennessee Whiskey",
+		ProductType: Spirit,
+		IsBase:      true,
+	},
 }
 
 var DerivedProducts = []DerivedProduct{
