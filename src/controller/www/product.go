@@ -14,7 +14,7 @@ type Product struct {
 }
 
 //render the page based on the name of the file provided
-func (product *Product) RenderTemplate(w http.ResponseWriter, tmpl string, p *model.Product) {
+func (product *Product) RenderTemplate(w http.ResponseWriter, tmpl string, p *model.BaseProductWithDerived) {
 	t, err := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/header.html", "./view/webcontent/www/templates/footer.html")
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +26,7 @@ func (product *Product) RenderTemplate(w http.ResponseWriter, tmpl string, p *mo
 }
 
 func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
-	var p *model.Product
+	var p *model.BaseProductWithDerived
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
 		product.RenderTemplate(w, "404", p)
@@ -46,7 +46,7 @@ func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
 		if len(model.Products) <= id-1 {
 			product.RenderTemplate(w, "404", p)
 		} else {
-			p = &model.Products[id-1]
+			p = model.GetBaseProductWithDerived(id)
 			product.RenderTemplate(w, "product", p)
 		}
 	}

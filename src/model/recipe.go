@@ -8,6 +8,7 @@ type Recipe struct {
 }
 
 type RecipeStep struct {
+	ID                   int
 	OriginalIngredient   Product
 	AltIngredient        []Product
 	AdIngredient         Product
