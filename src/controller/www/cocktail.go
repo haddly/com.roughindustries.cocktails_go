@@ -50,7 +50,7 @@ func (cocktail *Cocktail) Init() {
 	//Web Service and Web Page Handlers
 	log.Println("Init in www/Cocktail.go")
 	http.HandleFunc("/", cocktail.CocktailHandler)
-	http.HandleFunc("/cocktail", cocktail.CocktailHandler)
+	http.HandleFunc("/cocktails", cocktail.CocktailHandler)
 	http.HandleFunc("/search", cocktail.CocktailSearchHandler)
 
 }

@@ -52,26 +52,30 @@
 					<div class="col-md-12">
 
 						<div class="btn-group btn-group-xs" role="group" aria-label="...">
-							<button type="button" class="btn btn-default" style="font-weight: bold;">Bourbon Whiskey</button>
+							<button id="button" type="button" class="btn btn-default" style="font-weight: bold;">Bourbon Whiskey</button>
 							<button id="include" title="Include" onclick="include()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
 							<button id="exclude" title="Exclude" onclick="exclude()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
 							<script type="text/javascript">
 								function include() {
 									document.getElementById("exclude").className = "btn btn-default";
+									document.getElementById("button").className = "btn btn-default";
 									if (document.getElementById("include").className.search("active") !== -1) {
 										document.getElementById("include").className = "btn btn-default";
 									}
 									else {
+										document.getElementById("button").className = "btn btn-default active";
 										document.getElementById("include").className = "btn btn-default active";
 									}
 								}
 
 								function exclude() {
 									document.getElementById("include").className = "btn btn-default";
+									document.getElementById("button").className = "btn btn-default";
 									if (document.getElementById("exclude").className.search("active") !== -1) {
 										document.getElementById("exclude").className = "btn btn-default";
 									}
 									else {
+										document.getElementById("button").className = "btn btn-default active";
 										document.getElementById("exclude").className = "btn btn-default active";
 									}
 								}
@@ -89,7 +93,7 @@
 					</div>
 				</div>
 				<br>
-				
+
 			</div>
 		</div>
 	</div>
