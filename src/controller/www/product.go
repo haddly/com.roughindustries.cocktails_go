@@ -6,6 +6,8 @@ import (
 	"log"
 	"model"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 type Product struct {
@@ -24,14 +26,34 @@ func (product *Product) RenderTemplate(w http.ResponseWriter, tmpl string, p *mo
 }
 
 func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
+	var p *model.Product
+	u, err := url.Parse(r.URL.String())
+	if err != nil {
+		product.RenderTemplate(w, "404", p)
+	}
 	log.Println("Product: " + r.URL.Path[1:])
+	m, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		product.RenderTemplate(w, "404", p)
+	}
+	if len(m["ID"]) == 0 {
+		product.RenderTemplate(w, "404", p)
+	} else {
+		log.Println("ID: " + m["ID"][0])
 
-	//apply the template page info to the index page
-	p := &model.Products[0]
-	product.RenderTemplate(w, "product", p)
+		//apply the template page info to the index page
+		id, _ := strconv.Atoi(m["ID"][0])
+		if len(model.Products) <= id-1 {
+			product.RenderTemplate(w, "404", p)
+		} else {
+			p = &model.Products[id-1]
+			product.RenderTemplate(w, "product", p)
+		}
+	}
 }
 
 func (product *Product) Init() {
 	log.Println("Init in www/product.go")
 	http.HandleFunc("/product", product.ProductHandler)
+	http.HandleFunc("/product/", product.ProductHandler)
 }

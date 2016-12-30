@@ -91,9 +91,15 @@
 									<td style="white-space: nowrap;">{{.RecipeDoze}}</td>
 									<td width="10">&nbsp;</td>
 									<td>
-										<div class="iconlink"><a href="#" style="text-decoration : none; color : #000;">
-										{{if .AdIngredient.ProductName}} {{.AdIngredient.ProductName}} {{else}} {{if .OriginalIngredient.PreText}} ({.OriginalIngredient.PreText}}&nbsp; {{end}} {{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}} {{end}}
-									</a></div>
+										<div class="iconlink">
+											{{if .AdIngredient.ProductName}}
+											<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">{{.AdIngredient.ProductName}} </a> {{else}}
+											<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
+											{{if .OriginalIngredient.PreText}}
+											{{.OriginalIngredient.PreText}}&nbsp; 
+											{{end}} 
+											{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}} </a> {{end}}
+										</div>
 									</td>
 								</tr>
 								{{end}} {{end}}
@@ -109,7 +115,12 @@
 					<div class="col-md-12">
 						<h3>Alternative Ingredients</h3>
 						{{with .Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
-						<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.OriginalIngredient.ProductName}}</span>{{end}} {{range .AltIngredient}}<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>{{end}} {{end}}{{end}}
+						<a href="/product?ID={{.OriginalIngredient.ID}}">
+							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.OriginalIngredient.ProductName}}</span>
+						</a>{{end}} {{range .AltIngredient}}
+						<a href="/product?ID={{.ID}}">
+							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
+						</a>{{end}} {{end}}{{end}}
 
 					</div>
 				</div>
@@ -118,14 +129,16 @@
 						<h3>Garnish</h3>
 						<h4>
 							{{range .Garnish}}
-							<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</span></a> {{end}}
+							<a href="/product?ID={{.ID}}"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</span></a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Drinkware</h3>
 						<h4>
 							{{range .Drinkware}}
-							<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span></a> {{end}}
+							<a href="/product?ID={{.ID}}">
+								<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
+							</a> {{end}}
 						</h4>
 					</div>
 				</div>
@@ -134,7 +147,9 @@
 						<h3>Tools</h3>
 						<h4>
 							{{range .Tool}}
-							<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span></a> {{end}}
+							<a href="/product?ID={{.ID}}">
+								<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
+							</a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
