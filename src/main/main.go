@@ -9,12 +9,15 @@ import (
 	"path/filepath"
 )
 
+//The controllers
 var d = www.Database{}
 var c = www.Cocktail{}
+var p = www.Product{}
 
 func init() {
 	d.Init()
 	c.Init()
+	p.Init()
 }
 
 func main() {

@@ -149,39 +149,43 @@ var Products = []Product{
 		ProductType: Spirit,
 		IsBase:      true,
 	},
+	Product{
+		ID:          25,
+		ProductName: "Tropicana™ Orange Juice",
+		ProductType: Mixer,
+	},
+	Product{
+		ID:          26,
+		ProductName: "ReaLemon™ Lemon Juice",
+		ProductType: Mixer,
+	},
+	Product{
+		ID:          27,
+		ProductName: "Pappy Van Winkle's™ Bourbon Whiskey",
+		ProductType: Spirit,
+	},
+	Product{
+		ID:          28,
+		ProductName: "Breckenridge™ Bourbon Whiskey",
+		ProductType: Spirit,
+	},
 }
 
 var DerivedProducts = []DerivedProduct{
 	DerivedProduct{
-		Product: Product{
-			ID:          1,
-			ProductName: "Tropicana™ Orange Juice",
-			ProductType: Mixer,
-		},
+		Product:     Products[24],
 		BaseProduct: Products[0],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          2,
-			ProductName: "ReaLemon™ Lemon Juice",
-			ProductType: Mixer,
-		},
+		Product:     Products[25],
 		BaseProduct: Products[1],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          3,
-			ProductName: "Pappy Van Winkle's™ Bourbon Whiskey",
-			ProductType: Spirit,
-		},
+		Product:     Products[26],
 		BaseProduct: Products[2],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          4,
-			ProductName: "Breckenridge™ Bourbon Whiskey",
-			ProductType: Spirit,
-		},
+		Product:     Products[27],
 		BaseProduct: Products[2],
 	},
 	DerivedProduct{
