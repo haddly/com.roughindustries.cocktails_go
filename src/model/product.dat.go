@@ -169,6 +169,56 @@ var Products = []Product{
 		ProductName: "Breckenridge™ Bourbon Whiskey",
 		ProductType: Spirit,
 	},
+	Product{
+		ID:          29,
+		ProductName: "Bailey's Irish Cream™",
+		ProductType: Liqueur,
+	},
+	Product{
+		ID:          30,
+		ProductName: "Frangelico™",
+		ProductType: Liqueur,
+	},
+	Product{
+		ID:          31,
+		ProductName: "Stonewall Kitchen™ Maine Maple Syrup",
+		ProductType: Liqueur,
+	},
+	Product{
+		ID:          32,
+		ProductName: "Kahlúa™",
+		ProductType: Liqueur,
+	},
+	Product{
+		ID:          33,
+		ProductName: "Malibu™ Coconut Rum",
+		ProductType: Spirit,
+	},
+	Product{
+		ID:          34,
+		ProductName: "Disaronno™",
+		ProductType: Liqueur,
+	},
+	Product{
+		ID:          35,
+		ProductName: "Taylor'd Milestones \"No.1 Classic\" Whiskey Glass",
+		ProductType: Drinkware,
+	},
+	Product{
+		ID:          36,
+		ProductName: "OXO™ SteeL Cocktail Shaker",
+		ProductType: Tool,
+	},
+	Product{
+		ID:          37,
+		ProductName: "Absolut™ Vodka",
+		ProductType: Spirit,
+	},
+	Product{
+		ID:          38,
+		ProductName: "Luxardo™ Original Maraschino Cherries",
+		ProductType: Garnish,
+	},
 }
 
 var DerivedProducts = []DerivedProduct{
@@ -189,83 +239,43 @@ var DerivedProducts = []DerivedProduct{
 		BaseProduct: Products[2],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          5,
-			ProductName: "Bailey's Irish Cream™",
-			ProductType: Liqueur,
-		},
+		Product:     Products[28],
 		BaseProduct: Products[3],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          6,
-			ProductName: "Frangelico™",
-			ProductType: Liqueur,
-		},
+		Product:     Products[29],
 		BaseProduct: Products[4],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          7,
-			ProductName: "Stonewall Kitchen™ Maine Maple Syrup",
-			ProductType: Liqueur,
-		},
+		Product:     Products[30],
 		BaseProduct: Products[5],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          8,
-			ProductName: "Kahlúa™",
-			ProductType: Liqueur,
-		},
+		Product:     Products[31],
 		BaseProduct: Products[6],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          9,
-			ProductName: "Malibu™ Coconut Rum",
-			ProductType: Spirit,
-		},
+		Product:     Products[32],
 		BaseProduct: Products[9],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          10,
-			ProductName: "Disaronno™",
-			ProductType: Liqueur,
-		},
+		Product:     Products[33],
 		BaseProduct: Products[10],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          11,
-			ProductName: "Taylor'd Milestones \"No.1 Classic\" Whiskey Glass",
-			ProductType: Drinkware,
-		},
+		Product:     Products[34],
 		BaseProduct: Products[17],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          12,
-			ProductName: "OXO™ SteeL Cocktail Shaker",
-			ProductType: Tool,
-		},
+		Product:     Products[35],
 		BaseProduct: Products[14],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          13,
-			ProductName: "Absolut™ Vodka",
-			ProductType: Spirit,
-		},
+		Product:     Products[36],
 		BaseProduct: Products[12],
 	},
 	DerivedProduct{
-		Product: Product{
-			ID:          14,
-			ProductName: "Luxardo™ Original Maraschino Cherries",
-			ProductType: Garnish,
-		},
+		Product:     Products[37],
 		BaseProduct: Products[15],
 	},
 }
