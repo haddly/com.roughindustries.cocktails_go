@@ -7,9 +7,8 @@
 	<meta content="IE=edge" http-equiv="X-UA-Compatible" />
 	<meta content="width=device-width, initial-scale=1" name="viewport" />
 	<meta content="" name="description" />
-	<meta content="" name="author" /> {{with .Product}}
-	<title>{{.ProductName}}</title>
-	{{end}}
+	<meta content="" name="author" />
+	<title>Search</title>
 	<!-- Bootstrap Core CSS -->
 	<link href="css/bootstrap.css" rel="stylesheet" />
 	<!-- Custom CSS -->
@@ -34,9 +33,7 @@
 	<div class="container">
 		<!-- Portfolio Item Heading -->
 		<div class="page-header">
-			{{with .Product}}
-			<h1 align="center">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</h1>
-			{{end}}
+			<h1 align="center">Cocktail Search</h1>
 		</div>
 		<div class="row">
 			<div class="col-md-8">
@@ -53,29 +50,33 @@
 				</div>
 				<div class="row">
 					<div class="col-md-12">
-						<h3>Product Description</h3>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12">
-						<h3>Product Details</h3>
-						&nbsp;
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xs-12">
-						{{if .DerivedProducts}}
-						<h3>Related Products</h3>
-						{{range .DerivedProducts}}
-						<a href="/product?ID={{.ID}}">
-							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
-						</a>
-						{{end}} {{else}} {{if .BaseProduct.ProductName}}{{with .BaseProduct}}
-						<h3>Base Product</h3>
-						<a href="/product?ID={{.ID}}">
-							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
-						</a>
-						{{end}} {{end}} {{end}}
+
+						<div class="btn-group btn-group-xs" role="group" aria-label="...">
+							<button type="button" class="btn btn-default" style="font-weight: bold;">Bourbon Whiskey</button>
+							<button id="include" title="Include" onclick="include()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+							<button id="exclude" title="Exclude" onclick="exclude()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+							<script type="text/javascript">
+								function include() {
+									document.getElementById("exclude").className = "btn btn-default";
+									if (document.getElementById("include").className.search("active") !== -1) {
+										document.getElementById("include").className = "btn btn-default";
+									}
+									else {
+										document.getElementById("include").className = "btn btn-default active";
+									}
+								}
+
+								function exclude() {
+									document.getElementById("include").className = "btn btn-default";
+									if (document.getElementById("exclude").className.search("active") !== -1) {
+										document.getElementById("exclude").className = "btn btn-default";
+									}
+									else {
+										document.getElementById("exclude").className = "btn btn-default active";
+									}
+								}
+							</script>
+						</div>
 
 					</div>
 				</div>
@@ -88,17 +89,12 @@
 					</div>
 				</div>
 				<br>
-				<div class="row">
-
-					<div style="color:gray" align="center">
-						<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
-							<span style="font-size: 16px; background-color: white; padding: 0 10px;">Related Cocktails <!--Padding is optional--></span>
-						</div>
-					</div>
-				</div>
+				
 			</div>
 		</div>
 	</div>
+
+
 
 	{{template "footer" .}}
 

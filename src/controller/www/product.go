@@ -31,7 +31,7 @@ func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		product.RenderTemplate(w, "404", p)
 	}
-	log.Println("Product: " + r.URL.Path[1:])
+	//log.Println("Product: " + r.URL.Path[1:])
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
 		product.RenderTemplate(w, "404", p)
@@ -39,7 +39,7 @@ func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	if len(m["ID"]) == 0 {
 		product.RenderTemplate(w, "404", p)
 	} else {
-		log.Println("ID: " + m["ID"][0])
+		//log.Println("ID: " + m["ID"][0])
 
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])

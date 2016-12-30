@@ -4,9 +4,11 @@ package main
 import (
 	"controller/www"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 //The controllers
@@ -15,6 +17,8 @@ var c = www.Cocktail{}
 var p = www.Product{}
 
 func init() {
+	// wanted it to be more random so i seed it time now
+	rand.Seed(time.Now().UnixNano())
 	d.Init()
 	c.Init()
 	p.Init()

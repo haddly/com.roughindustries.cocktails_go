@@ -39,7 +39,7 @@
 			<h5 align="center">
 				<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
 			</h5>
-			<h6 align="center">Original Source: <a class="external" target="_blank" href="{{.SourceLink}}">{{.SourceName}}</a></h6>
+			<h6 align="center">Original Source: <a title="Go to {{.SourceName}}" class="external" target="_blank" href="{{.SourceLink}}" style="text-decoration : none; color : #555;">{{.SourceName}}</a></h6>
 		</div>
 		<div class="row">
 			<div class="col-md-8">
@@ -59,7 +59,7 @@
 							<h6 align="center">Sponsored by: <a class="external" target="_blank" href="{{.AdvertiserLink}}">{{.AdvertiserName}}</a></h6>
 							{{end}}{{end}}{{end}}
 							<img class="img-responsive" src="images/{{.Image}}" alt="{{.Name}}" />
-							<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: <a target="_blank" style="color: #555;" href="{{.ImageSourceLink}}">{{.ImageSourceName}}</a></h6>
+							<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: <a target="_blank" style="text-decoration : none; color : #555;" href="{{.ImageSourceLink}}">{{.ImageSourceName}}</a></h6>
 						</div>
 					</div>
 					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">

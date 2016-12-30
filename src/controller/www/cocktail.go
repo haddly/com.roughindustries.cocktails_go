@@ -25,14 +25,25 @@ func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *
 
 //handle / requests to the server
 func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("indexHandler: " + r.URL.Path[1:])
+	//log.Println("indexHandler: " + r.URL.Path[1:])
 
 	var c model.Cocktail
 	c = model.GetCocktail()
 
-	log.Println(c)
+	//log.Println(c)
 	//apply the template page info to the index page
 	cocktail.RenderTemplate(w, "cocktail", &c)
+}
+
+//handle / requests to the server
+func (cocktail *Cocktail) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
+	//log.Println("indexHandler: " + r.URL.Path[1:])
+
+	var c model.Cocktail
+
+	//log.Println(c)
+	//apply the template page info to the index page
+	cocktail.RenderTemplate(w, "search", &c)
 }
 
 func (cocktail *Cocktail) Init() {
@@ -40,5 +51,6 @@ func (cocktail *Cocktail) Init() {
 	log.Println("Init in www/Cocktail.go")
 	http.HandleFunc("/", cocktail.CocktailHandler)
 	http.HandleFunc("/cocktail", cocktail.CocktailHandler)
+	http.HandleFunc("/search", cocktail.CocktailSearchHandler)
 
 }

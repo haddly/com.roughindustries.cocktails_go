@@ -36,3 +36,6 @@ footer {
   background-color: #DDD;
 }
 
+.active {
+  background-color: rgba(125,125,125,0.5);
+}
