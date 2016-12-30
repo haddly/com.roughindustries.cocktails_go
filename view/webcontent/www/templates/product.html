@@ -73,11 +73,12 @@
 						</a>
 						{{end}} 
 						{{else}} 
-						{{with .BaseProduct}}
+						{{if .BaseProduct.ProductName}}{{with .BaseProduct}}
 						<h3>Base Product</h3>
 						<a href="/product?ID={{.ID}}">
 							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
 						</a>
+						{{end}}
 						{{end}}
 						{{end}}
 
