@@ -13,7 +13,7 @@ type Cocktail struct {
 
 //render the page based on the name of the file provided
 func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *model.Cocktail) {
-	t, err := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/header.html", "./view/webcontent/www/templates/indexheader.html", "./view/webcontent/www/templates/footer.html")
+	t, err := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/header.html", "./view/webcontent/www/templates/footer.html")
 	if err != nil {
 		log.Fatal(err)
 	}
