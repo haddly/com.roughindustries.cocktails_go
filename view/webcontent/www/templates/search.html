@@ -5,7 +5,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta content="IE=edge" http-equiv="X-UA-Compatible" />
-	<meta content="width=device-width, initial-scale=1" name="viewport" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 	<meta content="" name="description" />
 	<meta content="" name="author" />
 	<title>Search</title>
@@ -51,7 +51,8 @@
 				<div class="row">
 					<div class="col-md-12">
 
-						<div class="btn-group btn-group-xs" role="group" aria-label="...">
+						<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="...">
+							<button id="hidden_button" type="button" style="display: none;" />
 							<button id="button" type="button" class="btn btn-default" style="font-weight: bold;">Bourbon Whiskey</button>
 							<button id="include" title="Include" onclick="include()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
 							<button id="exclude" title="Exclude" onclick="exclude()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
@@ -66,6 +67,7 @@
 										document.getElementById("button").className = "btn btn-default active";
 										document.getElementById("include").className = "btn btn-default active";
 									}
+									document.getElementById("include").blur()
 								}
 
 								function exclude() {
@@ -78,6 +80,7 @@
 										document.getElementById("button").className = "btn btn-default active";
 										document.getElementById("exclude").className = "btn btn-default active";
 									}
+									document.getElementById("exclude").blur()
 								}
 							</script>
 						</div>
