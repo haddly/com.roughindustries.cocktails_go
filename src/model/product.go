@@ -28,6 +28,23 @@ var ProductTypeStrings = [...]string{
 // String returns the English name of the Producttype ("Spirit", "Liqueur", ...).
 func (ct ProductType) String() string { return ProductTypeStrings[ct-1] }
 
+type BDGCategory int
+
+const (
+	Base = 1 + iota
+	Derived
+	Generic
+)
+
+var BDGCategoryStrings = [...]string{
+	"Base",
+	"Derived",
+	"Generic",
+}
+
+// String returns the English name of the Producttype ("Base", "Derived", "Generic).
+func (bdg BDGCategory) String() string { return BDGCategoryStrings[bdg-1] }
+
 type Product struct {
 	ID          int
 	ProductName string
@@ -35,7 +52,7 @@ type Product struct {
 	Article     string
 	Blurb       string
 	Recipe      Recipe
-	IsBase      bool
+	BDG         BDGCategory
 	PreText     string
 	PostText    string
 	Image       string
@@ -46,33 +63,67 @@ type DerivedProduct struct {
 	BaseProduct Product
 }
 
-type BaseProductWithDerived struct {
-	Product         Product
-	DerivedProducts []Product
-	BaseProduct     Product
+type GenericProduct struct {
+	Products       []Product
+	GenericProduct Product
 }
 
-func GetBaseProductWithDerived(ID int) *BaseProductWithDerived {
+type BaseProductWithBDG struct {
+	Product          Product
+	DerivedProducts  []Product
+	SpecificProducts []Product
+	BaseProduct      Product
+}
+
+func GetBaseProductWithBDG(ID int) *BaseProductWithBDG {
 	p := Products[ID-1]
-	var bpwd BaseProductWithDerived
-	bpwd.Product = p
+	var bpwbdg BaseProductWithBDG
+	bpwbdg.Product = p
 	var dp []Product
 	var bp Product
-	if p.IsBase {
+	var gp []Product
+	if p.BDG == Base {
 		for _, dps_element := range DerivedProducts {
 			if dps_element.BaseProduct.ID == ID {
 				dp = append(dp, dps_element.Product)
 			}
 		}
-		bpwd.DerivedProducts = dp
-	} else {
+		bpwbdg.DerivedProducts = dp
+	} else if p.BDG == Derived {
 		for _, dps_element := range DerivedProducts {
 			if dps_element.Product.ID == ID {
 				bp = dps_element.BaseProduct
 				break
 			}
 		}
-		bpwd.BaseProduct = bp
+		bpwbdg.BaseProduct = bp
+	} else {
+		for _, gps_element := range GenericProducts {
+			if gps_element.GenericProduct.ID == ID {
+				for _, prod := range gps_element.Products {
+					gp = append(gp, prod)
+				}
+			}
+		}
+		bpwbdg.SpecificProducts = gp
 	}
-	return &bpwd
+	return &bpwbdg
+}
+
+func GetSpecificProductsFromGeneric(ID int) *BaseProductWithBDG {
+	p := Products[ID-1]
+	var bpwbdg BaseProductWithBDG
+	bpwbdg.Product = p
+	var gp []Product
+	if p.BDG == Generic {
+		for _, gps_element := range GenericProducts {
+			if gps_element.GenericProduct.ID == ID {
+				for _, prod := range gps_element.Products {
+					gp = append(gp, prod)
+				}
+			}
+		}
+		bpwbdg.SpecificProducts = gp
+	}
+	return &bpwbdg
 }

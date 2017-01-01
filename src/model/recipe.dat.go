@@ -150,45 +150,47 @@ var Recipes = []Recipe{
 		},
 	},
 	Recipe{
-		Method: "Shake the booze and cream with ice. Strain into a short glass with lots of ice, but make sure not to fill it to the brim (we know you want too). Leave some space to top it off with cola.",
+		Method: "Shake all ingredients with ice and strain into ice-filled glass.",
 		RecipeSteps: []RecipeStep{
-			//1 oz Kahlua
+			//1 oz generic
 			RecipeStep{
-				OriginalIngredient:   Products[6],
+				OriginalIngredient:   Products[38],
+				RecipeCardinalFloat:  2.0,
+				RecipeCardinalString: "2",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 oz lemon juice
+			RecipeStep{
+				OriginalIngredient:   Products[1],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
 				RecipeOrdinal:        0,
 			},
-			//1 oz Vodka
+			//1/2 oz Simple Syrup
 			RecipeStep{
-				OriginalIngredient:   Products[12],
-				RecipeCardinalFloat:  1.0,
-				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
-			},
-			//1 oz Milk
-			RecipeStep{
-				OriginalIngredient:   Products[7],
-				RecipeCardinalFloat:  1.0,
-				RecipeCardinalString: "1",
+				OriginalIngredient:   Products[39],
+				RecipeCardinalFloat:  0.5,
+				RecipeCardinalString: "½",
 				RecipeDoze:           Ounce,
 				RecipeOrdinal:        2,
 			},
-			//1 oz Cream
+			//3 dashes bittes
 			RecipeStep{
-				OriginalIngredient:   Products[8],
-				RecipeCardinalFloat:  1.0,
-				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
+				OriginalIngredient:   Products[40],
+				RecipeCardinalFloat:  3.0,
+				RecipeCardinalString: "3",
+				RecipeDoze:           Dash,
 				RecipeOrdinal:        3,
 			},
-			//Top off with Cola
+			//.5 fresh egg white
 			RecipeStep{
-				OriginalIngredient: Products[13],
-				RecipeDoze:         TopOffWith,
-				RecipeOrdinal:      4,
+				OriginalIngredient:   Products[41],
+				RecipeCardinalFloat:  0.5,
+				RecipeCardinalString: "½",
+				RecipeDoze:           Fresh,
+				RecipeOrdinal:        4,
 			},
 		},
 	},

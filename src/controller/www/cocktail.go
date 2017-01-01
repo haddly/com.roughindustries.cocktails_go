@@ -5,6 +5,7 @@ import (
 	"log"
 	"model"
 	"net/http"
+	// "strings"
 	//"strconv"
 )
 
@@ -17,6 +18,11 @@ func (cocktail *Cocktail) RenderTemplate(w http.ResponseWriter, tmpl string, c *
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//c.Description = template.HTMLEscapeString(c.Description)
+	//log.Println(c.Description)
+	//c.Description = strings.Replace(c.Description, "\n", "<br>", -1)
+
 	err = t.ExecuteTemplate(w, "base", c)
 	if err != nil {
 		log.Fatal(err)

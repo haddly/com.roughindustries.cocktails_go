@@ -13,6 +13,7 @@ var Cocktails = []Cocktail{
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
 		Rating:          5,
+		IsGeneric:       false,
 		AKA: []Name{
 			Name{Name: "Jamaican Milkshake"},
 		},
@@ -71,6 +72,7 @@ var Cocktails = []Cocktail{
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
 		Comment:         "A little more OJ won't hurt it.",
 		Rating:          5,
+		IsGeneric:       false,
 		AKA:             []Name{},
 		Tool: []Product{
 			Products[14],
@@ -130,6 +132,7 @@ var Cocktails = []Cocktail{
 		SourceName:      "Difford's Guide",
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
 		Rating:          5,
+		IsGeneric:       false,
 		AKA:             []Name{},
 		Tool: []Product{
 			Products[14],
@@ -174,15 +177,17 @@ var Cocktails = []Cocktail{
 	},
 	Cocktail{
 		ID:              4,
-		Title:           "Colorado Bulldog",
-		Name:            "Colorado Bulldog",
-		Description:     "The combination of coffee liqueur, vodka, cream and the cola creates a sweet and refreshing taste. We know it looks like a White Russian but don’t be misled; the Colorado Bulldog is bubbly.",
-		Image:           "mad_monk_milkshake.jpg",
-		ImageSourceName: "Difford's Guide",
-		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
-		SourceName:      "Kahlúa Website",
-		SourceLink:      "http://www.kahlua.com/en/drinks/classic/colorado-bulldog/",
+		Title:           "Sour",
+		Name:            "Sour",
+		Description:     "Sours are aptly named drinks. Their flavour comes from either lemon or lime juice, which is balanced with sugar.<br><br>Sours can be based on practically any spirit but the bourbon based Whiskey Sour is by far the most popular. Many (including us) believe this drink is only properly made when smoothed with a little egg white.<br><br>Sours are served either straight-up in a sour glass (rather like a small flute) or on the rocks in an old-fashioned glass. They are traditionally garnished with a cherry and an orange slice, or sometimes a lemon slice.",
+		Image:           "24-sour.jpg",
+		ImageSourceName: "Liquor.com",
+		ImageSourceLink: "http://liquor.s3.amazonaws.com/wp-content/uploads/2010/02/24-sour.jpeg",
+		SourceName:      "Difford's Guide",
+		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1795/sour-generic-name",
+		Comment:         "This 4:2:8 formula is a tad sourer than the classic 3:4:8 which translates as: three quarter part of the sour ingredient (lemon juice), one part of the sweet ingredient (sugar syrup) and two parts of the strong ingredient (spirit). So if you find my formula too sour than best follow the classic proportions in future.",
 		Rating:          4,
+		IsGeneric:       true,
 		AKA:             []Name{},
 		Tool: []Product{
 			Products[14],
@@ -198,7 +203,7 @@ var Cocktails = []Cocktail{
 		},
 		Flavor: []Meta{
 			Meta{
-				MetaName: "Creamy",
+				MetaName: "Sour",
 				MetaType: Flavor,
 			},
 		},
@@ -213,6 +218,12 @@ var Cocktails = []Cocktail{
 		},
 		Technique: []Meta{
 			Metadata[14],
+		},
+		Ratio: []Meta{
+			Meta{
+				MetaName: "4:2:8",
+				MetaType: Ratio,
+			},
 		},
 		BaseSpirit: []Meta{},
 		Garnish: []Product{

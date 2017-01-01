@@ -212,4 +212,17 @@ var Advertisements = []Advertisement{
 			},
 		},
 	},
+	Advertisement{
+		ID:             15,
+		AdvertiserName: "",
+		Article:        "",
+		Blurb:          "",
+		Image:          "",
+		Products: []ProdcutAdvertisement{
+			ProdcutAdvertisement{
+				BaseProduct:       Products[40],
+				AdvertisedProduct: DerivedProducts[14],
+			},
+		},
+	},
 }

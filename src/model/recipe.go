@@ -1,10 +1,14 @@
 //model/recipe.go
 package model
 
+import (
+	"html/template"
+)
+
 type Recipe struct {
 	ID          int
 	RecipeSteps []RecipeStep
-	Method      string
+	Method      template.HTML
 }
 
 type RecipeStep struct {
@@ -16,6 +20,7 @@ type RecipeStep struct {
 	RecipeCardinalString string
 	RecipeDoze           Doze
 	RecipeOrdinal        int
+	BDG                  BaseProductWithBDG
 }
 
 type Doze int
@@ -27,6 +32,7 @@ const (
 	Dash
 	Slice
 	TopOffWith
+	Fresh
 )
 
 var Dozes = [...]string{
@@ -36,6 +42,7 @@ var Dozes = [...]string{
 	"dash",
 	"slice",
 	"top off with",
+	"fresh",
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).

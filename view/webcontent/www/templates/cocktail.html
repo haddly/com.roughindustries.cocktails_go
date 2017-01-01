@@ -34,7 +34,7 @@
 	<div class="container">
 		<!-- Portfolio Item Heading -->
 		<div class="page-header">
-			<h1 align="center">{{.Name}}</h1>
+			<h1 align="center">{{.Name}}{{if .IsGeneric}}&nbsp;(Generic){{end}}</h1>
 			<h6 align="center">{{range .AKA}}({{.Name}}){{end}}</h6>
 			<h5 align="center">
 				<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
@@ -115,13 +115,16 @@
 					<div class="col-md-12">
 						<h3>Alternative Ingredients</h3>
 						{{with .Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
-						<a href="/product?ID={{.OriginalIngredient.ID}}">
+						<a style="text-decoration : none;" href="/product?ID={{.OriginalIngredient.ID}}">
 							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.OriginalIngredient.ProductName}}</span>
 						</a>{{end}} {{range .AltIngredient}}
-						<a href="/product?ID={{.ID}}">
+						<a style="text-decoration : none;" href="/product?ID={{.ID}}">
 							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
-						</a>{{end}} {{end}}{{end}}
-
+						</a>{{end}} 
+						{{range .BDG.SpecificProducts}}<a style="text-decoration : none;" href="/product?ID={{.ID}}">
+							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
+						</a>
+						{{end}}{{end}}{{end}}
 					</div>
 				</div>
 				<div class="row">
@@ -129,14 +132,14 @@
 						<h3>Garnish</h3>
 						<h4>
 							{{range .Garnish}}
-							<a href="/product?ID={{.ID}}"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</span></a> {{end}}
+							<a style="text-decoration : none;" href="/product?ID={{.ID}}"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</span></a> {{end}}
 						</h4>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Drinkware</h3>
 						<h4>
 							{{range .Drinkware}}
-							<a href="/product?ID={{.ID}}">
+							<a style="text-decoration : none;" href="/product?ID={{.ID}}">
 								<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
 							</a> {{end}}
 						</h4>
@@ -147,7 +150,7 @@
 						<h3>Tools</h3>
 						<h4>
 							{{range .Tool}}
-							<a href="/product?ID={{.ID}}">
+							<a style="text-decoration : none;" href="/product?ID={{.ID}}">
 								<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
 							</a> {{end}}
 						</h4>
@@ -165,7 +168,7 @@
 					<div class="row">
 						<div class="col-xs-12 text-center">
 							<p>Flavor: {{range .Flavor}}
-								<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+								<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
 							</p>
 						</div>
 						<hr style="border-color: #FFF;">
@@ -176,7 +179,7 @@
 										<p>Base Spirit: </div>
 									<div class="col-xs-7 x-recipe-spirit">
 										{{range .BaseSpirit}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
 										</p>
 									</div>
 								</div>
@@ -185,7 +188,7 @@
 										<p>Cocktail Type: </div>
 									<div class="col-xs-7 x-recipe-type">
 										{{range .Type}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
 										</p>
 									</div>
 								</div>
@@ -195,7 +198,7 @@
 
 									<div class="col-xs-7 x-recipe-served">
 										{{range .Served}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
 										</p>
 									</div>
 								</div>
@@ -204,7 +207,7 @@
 										<p>Technique: </div>
 									<div class="col-xs-7 x-recipe-preparation">
 										{{range .Technique}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
 										</p>
 									</div>
 								</div>
@@ -213,7 +216,7 @@
 										<p>Strength: </div>
 									<div class="col-xs-7 x-recipe-preparation">
 										{{range .Strength}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
 										</p>
 									</div>
 								</div>
@@ -224,7 +227,7 @@
 										<p>Difficulty: </div>
 									<div class="col-xs-7 x-recipe-preparation">
 										{{range .Difficulty}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
 										</p>
 									</div>
 								</div>
@@ -233,7 +236,16 @@
 										<p>Time of Day: </div>
 									<div class="col-xs-7 x-recipe-preparation">
 										{{range .TOD}}
-										<a href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
+										</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Ratio: </div>
+									<div class="col-xs-7 x-recipe-preparation">
+										{{range .Ratio}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a>{{end}}
 										</p>
 									</div>
 								</div>

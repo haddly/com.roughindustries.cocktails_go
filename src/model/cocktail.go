@@ -4,6 +4,7 @@ package model
 import (
 	"bytes"
 	"encoding/gob"
+	"html/template"
 	"log"
 	"math/rand"
 )
@@ -26,8 +27,8 @@ type Cocktail struct {
 	SpokenName      string
 	Origin          string
 	AKA             []Name
-	Description     string
-	Comment         string
+	Description     template.HTML
+	Comment         template.HTML
 	Recipe          Recipe
 	Garnish         []Product
 	Image           string
@@ -46,6 +47,8 @@ type Cocktail struct {
 	Strength        []Meta
 	Difficulty      []Meta
 	TOD             []Meta
+	Ratio           []Meta
+	IsGeneric       bool
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -77,6 +80,10 @@ func GetCocktail() Cocktail {
 	}
 	//c := &Cocktails[rand.Intn(len(Cocktails))]
 	prod_ignore := []int{}
+
+	for index, element := range c.Recipe.RecipeSteps {
+		c.Recipe.RecipeSteps[index].BDG = *GetSpecificProductsFromGeneric(element.OriginalIngredient.ID)
+	}
 
 	for ad_index, ad_element := range Advertisements {
 		for _, adcocktails_element := range ad_element.Cocktails {
