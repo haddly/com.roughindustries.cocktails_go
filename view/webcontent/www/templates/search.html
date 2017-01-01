@@ -50,40 +50,116 @@
 				</div>
 				<div class="row">
 					<div class="col-md-12">
+						<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="headingOne">
+									<h4 class="panel-title">
+										<a style="text-decoration : none;" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Spirits&nbsp;<span class="glyphicon glyphicon-menu-down" aria-hidden="true" style="float:right"></span></a>
+									</h4>
+								</div>
+								<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+									<div class="panel-body">
+										<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="...">
+											<button id="hidden_button" type="button" style="display: none;" />
+											<button id="button" type="button" class="btn btn-default" style="font-weight: bold;">Bourbon Whiskey</button>
+											<button id="include" title="Include" onclick="include('include', 'exclude', 'button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+											<button id="exclude" title="Exclude" onclick="exclude('include', 'exclude', 'button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+											<script type="text/javascript">
+												function include(include, exclude, button) {
+													document.getElementById(exclude).className = "btn btn-default";
+													document.getElementById(button).className = "btn btn-default";
+													if (document.getElementById(include).className.search("active") !== -1) {
+														document.getElementById(include).className = "btn btn-default";
+													}
+													else {
+														document.getElementById(button).className = "btn btn-default active";
+														document.getElementById(include).className = "btn btn-default active";
+													}
+													document.getElementById(include).blur()
+												}
 
-						<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="...">
-							<button id="hidden_button" type="button" style="display: none;" />
-							<button id="button" type="button" class="btn btn-default" style="font-weight: bold;">Bourbon Whiskey</button>
-							<button id="include" title="Include" onclick="include()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
-							<button id="exclude" title="Exclude" onclick="exclude()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-							<script type="text/javascript">
-								function include() {
-									document.getElementById("exclude").className = "btn btn-default";
-									document.getElementById("button").className = "btn btn-default";
-									if (document.getElementById("include").className.search("active") !== -1) {
-										document.getElementById("include").className = "btn btn-default";
-									}
-									else {
-										document.getElementById("button").className = "btn btn-default active";
-										document.getElementById("include").className = "btn btn-default active";
-									}
-									document.getElementById("include").blur()
-								}
+												function exclude(include, exclude, button) {
+													document.getElementById(include).className = "btn btn-default";
+													document.getElementById(button).className = "btn btn-default";
+													if (document.getElementById(exclude).className.search("active") !== -1) {
+														document.getElementById(exclude).className = "btn btn-default";
+													}
+													else {
+														document.getElementById(button).className = "btn btn-default active";
+														document.getElementById(exclude).className = "btn btn-default active";
+													}
+													document.getElementById(exclude).blur()
+												}
+											</script>
+										</div>
+										
+										<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="...">
+											<button id="hidden_button" type="button" style="display: none;" />
+											<button id="vodka_button" type="button" class="btn btn-default" style="font-weight: bold;">Vodka</button>
+											<button id="vodka_include" title="Include" onclick="vodka_include()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+											<button id="vodka_exclude" title="Exclude" onclick="vodka_exclude()" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+											<script type="text/javascript">
+												function vodka_include() {
+													document.getElementById("vodka_exclude").className = "btn btn-default";
+													document.getElementById("vodka_button").className = "btn btn-default";
+													if (document.getElementById("vodka_include").className.search("active") !== -1) {
+														document.getElementById("vodka_include").className = "btn btn-default";
+													}
+													else {
+														document.getElementById("vodka_button").className = "btn btn-default active";
+														document.getElementById("vodka_include").className = "btn btn-default active";
+													}
+													document.getElementById("vodka_include").blur()
+												}
 
-								function exclude() {
-									document.getElementById("include").className = "btn btn-default";
-									document.getElementById("button").className = "btn btn-default";
-									if (document.getElementById("exclude").className.search("active") !== -1) {
-										document.getElementById("exclude").className = "btn btn-default";
-									}
-									else {
-										document.getElementById("button").className = "btn btn-default active";
-										document.getElementById("exclude").className = "btn btn-default active";
-									}
-									document.getElementById("exclude").blur()
-								}
-							</script>
+												function vodka_exclude() {
+													document.getElementById("vodka_include").className = "btn btn-default";
+													document.getElementById("vodka_button").className = "btn btn-default";
+													if (document.getElementById("vodka_exclude").className.search("active") !== -1) {
+														document.getElementById("vodka_exclude").className = "btn btn-default";
+													}
+													else {
+														document.getElementById("vodka_button").className = "btn btn-default active";
+														document.getElementById("vodka_exclude").className = "btn btn-default active";
+													}
+													document.getElementById("vodka_exclude").blur()
+												}
+											</script>
+										</div>
+										
+									</div>
+								</div>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="headingTwo">
+									<h4 class="panel-title">
+										<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Liqueur&nbsp;<span class="glyphicon glyphicon-menu-down" aria-hidden="true" style="float:right"></span>
+        </a>
+									</h4>
+								</div>
+								<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+									<div class="panel-body">
+										
+									</div>
+								</div>
+							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="headingThree">
+									<h4 class="panel-title">
+										<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Mixer&nbsp;<span class="glyphicon glyphicon-menu-down" aria-hidden="true" style="float:right"></span>
+        </a>
+									</h4>
+								</div>
+								<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+									<div class="panel-body">
+										
+									</div>
+								</div>
+							</div>
 						</div>
+
 
 					</div>
 				</div>
