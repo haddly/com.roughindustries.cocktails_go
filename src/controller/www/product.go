@@ -15,7 +15,7 @@ type Product struct {
 
 //render the page based on the name of the file provided
 func (product *Product) RenderTemplate(w http.ResponseWriter, tmpl string, p *model.BaseProductWithBDG) {
-	t, err := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
+	t, err := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
 	if err != nil {
 		log.Fatal(err)
 	}
