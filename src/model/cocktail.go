@@ -48,7 +48,8 @@ type Cocktail struct {
 	Difficulty      []Meta
 	TOD             []Meta
 	Ratio           []Meta
-	IsGeneric       bool
+	Family          Meta
+	IsFamilyRoot    bool
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -63,13 +64,25 @@ func InitCocktailTable() string {
 	return "CocktailTable Init"
 }
 
-func GetCocktail() Cocktail {
+type FamilyCocktail struct {
+	ChildCocktails []Cocktail
+	RootCocktail   Cocktail
+	Cocktail       Cocktail
+}
+
+func copyCocktail(ID int) Cocktail {
 	var c Cocktail
 	var network bytes.Buffer        // Stand-in for a network connection
 	enc := gob.NewEncoder(&network) // Will write to network.
 	dec := gob.NewDecoder(&network) // Will read from network.
+	var err error
 	// Encode (send) the value.
-	err := enc.Encode(Cocktails[rand.Intn(len(Cocktails))])
+	if ID <= 0 {
+		err = enc.Encode(Cocktails[rand.Intn(len(Cocktails))])
+	} else {
+		err = enc.Encode(Cocktails[ID-1])
+	}
+
 	if err != nil {
 		log.Fatal("encode error:", err)
 	}
@@ -78,11 +91,30 @@ func GetCocktail() Cocktail {
 	if err != nil {
 		log.Fatal("decode error:", err)
 	}
+
+	return c
+}
+
+func GetCocktailByID(ID int) FamilyCocktail {
+	var c Cocktail
+	c = copyCocktail(ID)
+	return processCocktailRequest(c)
+}
+
+func GetCocktail() FamilyCocktail {
+	var c Cocktail
+	c = copyCocktail(-1)
 	//c := &Cocktails[rand.Intn(len(Cocktails))]
+	return processCocktailRequest(c)
+}
+
+func processCocktailRequest(c Cocktail) FamilyCocktail {
+	var fc FamilyCocktail
+
 	prod_ignore := []int{}
 
 	for index, element := range c.Recipe.RecipeSteps {
-		c.Recipe.RecipeSteps[index].BDG = *GetSpecificProductsFromGeneric(element.OriginalIngredient.ID)
+		c.Recipe.RecipeSteps[index].BDG = *GetSpecificProductsFromGroup(element.OriginalIngredient.ID)
 	}
 
 	for ad_index, ad_element := range Advertisements {
@@ -94,7 +126,7 @@ func GetCocktail() Cocktail {
 					// is this a base product
 					for _, adprod_element := range ad_element.Products {
 						if element.OriginalIngredient.ID == adprod_element.BaseProduct.ID {
-							c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct.Product
+							c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct
 							prod_ignore = append(prod_ignore, element.OriginalIngredient.ID)
 						}
 					}
@@ -111,7 +143,7 @@ func GetCocktail() Cocktail {
 			for _, adprod_element := range ad_element.Products {
 				if element.OriginalIngredient.ID == adprod_element.BaseProduct.ID {
 					if !intInSlice(element.OriginalIngredient.ID, prod_ignore) {
-						c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct.Product
+						c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct
 					}
 				}
 			}
@@ -124,7 +156,7 @@ func GetCocktail() Cocktail {
 		for _, ad_element := range Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Drinkware[index] = adprod_element.AdvertisedProduct.Product
+					c.Drinkware[index] = adprod_element.AdvertisedProduct
 				}
 			}
 		}
@@ -136,7 +168,7 @@ func GetCocktail() Cocktail {
 		for _, ad_element := range Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Tool[index] = adprod_element.AdvertisedProduct.Product
+					c.Tool[index] = adprod_element.AdvertisedProduct
 				}
 			}
 		}
@@ -148,12 +180,31 @@ func GetCocktail() Cocktail {
 		for _, ad_element := range Advertisements {
 			for _, adprod_element := range ad_element.Products {
 				if element.ID == adprod_element.BaseProduct.ID {
-					c.Garnish[index] = adprod_element.AdvertisedProduct.Product
+					c.Garnish[index] = adprod_element.AdvertisedProduct
 				}
 			}
 		}
 	}
-	return c
+
+	//put the the cocktails in a family structf
+	if c.IsFamilyRoot {
+		for _, element := range FamilyCocktails {
+			if element.RootCocktail.ID == c.ID {
+				fc.ChildCocktails = element.ChildCocktails
+			}
+		}
+		fc.Cocktail = c
+	} else {
+		for _, cocktail := range FamilyCocktails {
+			for _, element := range cocktail.ChildCocktails {
+				if element.ID == c.ID {
+					fc.RootCocktail = cocktail.RootCocktail
+				}
+			}
+		}
+		fc.Cocktail = c
+	}
+	return fc
 }
 
 func intInSlice(a int, list []int) bool {

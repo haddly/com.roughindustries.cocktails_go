@@ -13,7 +13,7 @@ var Cocktails = []Cocktail{
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
 		Rating:          5,
-		IsGeneric:       false,
+		IsFamilyRoot:    false,
 		AKA: []Name{
 			Name{Name: "Jamaican Milkshake"},
 		},
@@ -72,7 +72,7 @@ var Cocktails = []Cocktail{
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
 		Comment:         "A little more OJ won't hurt it.",
 		Rating:          5,
-		IsGeneric:       false,
+		IsFamilyRoot:    false,
 		AKA:             []Name{},
 		Tool: []Product{
 			Products[14],
@@ -132,7 +132,7 @@ var Cocktails = []Cocktail{
 		SourceName:      "Difford's Guide",
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
 		Rating:          5,
-		IsGeneric:       false,
+		IsFamilyRoot:    false,
 		AKA:             []Name{},
 		Tool: []Product{
 			Products[14],
@@ -187,7 +187,6 @@ var Cocktails = []Cocktail{
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1795/sour-generic-name",
 		Comment:         "This 4:2:8 formula is a tad sourer than the classic 3:4:8 which translates as: three quarter part of the sour ingredient (lemon juice), one part of the sweet ingredient (sugar syrup) and two parts of the strong ingredient (spirit). So if you find my formula too sour than best follow the classic proportions in future.",
 		Rating:          4,
-		IsGeneric:       true,
 		AKA:             []Name{},
 		Tool: []Product{
 			Products[14],
@@ -204,6 +203,10 @@ var Cocktails = []Cocktail{
 		Flavor: []Meta{
 			Meta{
 				MetaName: "Sour",
+				MetaType: Flavor,
+			},
+			Meta{
+				MetaName: "Sweet",
 				MetaType: Flavor,
 			},
 		},
@@ -225,7 +228,12 @@ var Cocktails = []Cocktail{
 				MetaType: Ratio,
 			},
 		},
-		BaseSpirit: []Meta{},
+		Family: Meta{
+			MetaName: "Sour",
+			MetaType: Family,
+		},
+		IsFamilyRoot: true,
+		BaseSpirit:   []Meta{},
 		Garnish: []Product{
 			Products[15],
 		},
@@ -233,5 +241,75 @@ var Cocktails = []Cocktail{
 			Products[17],
 		},
 		Recipe: Recipes[3],
+	},
+	Cocktail{
+		ID:              5,
+		Title:           "Amaretto Sour",
+		Name:            "Amaretto Sour",
+		Description:     "Sweet 'n' sour - frothy with an almond buzz. Three dashes (12 drops) of Angostura bitters help balance the drink and add an extra burst of flavour",
+		Image:           "amaretto_sour.jpg",
+		ImageSourceName: "Difford's Guide",
+		ImageSourceLink: "https://d3d9kvjpisqjte.cloudfront.net/stock-images/2015/8/55/2015bed5b504e209d7e292dceaaf470b64b4.jpg",
+		SourceName:      "Difford's Guide",
+		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/53/amaretto-sour",
+		Rating:          3,
+		AKA:             []Name{},
+		Tool: []Product{
+			Products[14],
+		},
+		Strength: []Meta{
+			Metadata[4],
+		},
+		Difficulty: []Meta{
+			Metadata[0],
+		},
+		TOD: []Meta{
+			Metadata[8],
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Sour",
+				MetaType: Flavor,
+			},
+			Meta{
+				MetaName: "Sweet",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Recommended",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Metadata[12],
+		},
+		Technique: []Meta{
+			Metadata[14],
+		},
+		Ratio: []Meta{},
+		Family: Meta{
+			MetaName: "Sour",
+			MetaType: Family,
+		},
+		IsFamilyRoot: false,
+		BaseSpirit:   []Meta{},
+		Garnish: []Product{
+			Products[15],
+		},
+		Drinkware: []Product{
+			Products[17],
+		},
+		Recipe: Recipes[4],
+	},
+}
+
+var FamilyCocktails = []FamilyCocktail{
+	FamilyCocktail{
+		ChildCocktails: []Cocktail{
+			Cocktails[4],
+		},
+		RootCocktail: Cocktails[3],
 	},
 }

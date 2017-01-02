@@ -237,7 +237,7 @@ var Products = []Product{
 		ID:          39,
 		ProductName: "Brandy, whisk(e)y, gin, rum etc.",
 		ProductType: Spirit,
-		BDG:         Generic,
+		BDG:         Group,
 	},
 	Product{
 		ID:          40,
@@ -271,15 +271,15 @@ var Products = []Product{
 	},
 }
 
-var GenericProducts = []GenericProduct{
-	GenericProduct{
+var ProductGroups = []GroupProduct{
+	GroupProduct{
 		Products: []Product{
 			Products[2],
 			Products[22],
 			Products[23],
 			Products[42],
 		},
-		GenericProduct: Products[38],
+		GroupProduct: Products[38],
 	},
 }
 

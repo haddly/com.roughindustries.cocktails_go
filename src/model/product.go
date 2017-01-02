@@ -33,16 +33,16 @@ type BDGCategory int
 const (
 	Base = 1 + iota
 	Derived
-	Generic
+	Group
 )
 
 var BDGCategoryStrings = [...]string{
 	"Base",
 	"Derived",
-	"Generic",
+	"Group",
 }
 
-// String returns the English name of the Producttype ("Base", "Derived", "Generic).
+// String returns the English name of the Producttype ("Base", "Derived", "Group).
 func (bdg BDGCategory) String() string { return BDGCategoryStrings[bdg-1] }
 
 type Product struct {
@@ -63,16 +63,16 @@ type DerivedProduct struct {
 	BaseProduct Product
 }
 
-type GenericProduct struct {
-	Products       []Product
-	GenericProduct Product
+type GroupProduct struct {
+	Products     []Product
+	GroupProduct Product
 }
 
 type BaseProductWithBDG struct {
-	Product          Product
-	DerivedProducts  []Product
-	SpecificProducts []Product
-	BaseProduct      Product
+	Product         Product
+	DerivedProducts []Product
+	ProductGroups   []Product
+	BaseProduct     Product
 }
 
 func GetBaseProductWithBDG(ID int) *BaseProductWithBDG {
@@ -98,32 +98,32 @@ func GetBaseProductWithBDG(ID int) *BaseProductWithBDG {
 		}
 		bpwbdg.BaseProduct = bp
 	} else {
-		for _, gps_element := range GenericProducts {
-			if gps_element.GenericProduct.ID == ID {
+		for _, gps_element := range ProductGroups {
+			if gps_element.GroupProduct.ID == ID {
 				for _, prod := range gps_element.Products {
 					gp = append(gp, prod)
 				}
 			}
 		}
-		bpwbdg.SpecificProducts = gp
+		bpwbdg.ProductGroups = gp
 	}
 	return &bpwbdg
 }
 
-func GetSpecificProductsFromGeneric(ID int) *BaseProductWithBDG {
+func GetSpecificProductsFromGroup(ID int) *BaseProductWithBDG {
 	p := Products[ID-1]
 	var bpwbdg BaseProductWithBDG
 	bpwbdg.Product = p
 	var gp []Product
-	if p.BDG == Generic {
-		for _, gps_element := range GenericProducts {
-			if gps_element.GenericProduct.ID == ID {
+	if p.BDG == Group {
+		for _, gps_element := range ProductGroups {
+			if gps_element.GroupProduct.ID == ID {
 				for _, prod := range gps_element.Products {
 					gp = append(gp, prod)
 				}
 			}
 		}
-		bpwbdg.SpecificProducts = gp
+		bpwbdg.ProductGroups = gp
 	}
 	return &bpwbdg
 }

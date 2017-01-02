@@ -3,7 +3,7 @@ package model
 
 var Recipes = []Recipe{
 	Recipe{
-		ID:     0,
+		ID:     1,
 		Method: "Combine all of the OriginalIngredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
 		RecipeSteps: []RecipeStep{
 			//1 oz. Kahlua
@@ -57,6 +57,7 @@ var Recipes = []Recipe{
 		},
 	},
 	Recipe{
+		ID:     2,
 		Method: "Muddle ginger in base of shaker. Add other OriginalIngredients, shake with ice and fine strain into ice-filled glass.",
 		RecipeSteps: []RecipeStep{
 			//2 slice Fresh root ginger
@@ -105,6 +106,7 @@ var Recipes = []Recipe{
 		},
 	},
 	Recipe{
+		ID:     3,
 		Method: "Shake all OriginalIngredients with ice and strain into ice-filled glass.",
 		RecipeSteps: []RecipeStep{
 			//1 ounce irish cream
@@ -150,6 +152,7 @@ var Recipes = []Recipe{
 		},
 	},
 	Recipe{
+		ID:     4,
 		Method: "Shake all ingredients with ice and strain into ice-filled glass.",
 		RecipeSteps: []RecipeStep{
 			//1 oz generic
@@ -183,6 +186,44 @@ var Recipes = []Recipe{
 				RecipeCardinalString: "3",
 				RecipeDoze:           Dash,
 				RecipeOrdinal:        3,
+			},
+			//.5 fresh egg white
+			RecipeStep{
+				OriginalIngredient:   Products[41],
+				RecipeCardinalFloat:  0.5,
+				RecipeCardinalString: "½",
+				RecipeDoze:           Fresh,
+				RecipeOrdinal:        4,
+			},
+		},
+	},
+	Recipe{
+		ID:     5,
+		Method: "Dry Shake (without ice) all ingredients to emulsify. Add ice, shake again and strain into ice-filled glass.",
+		RecipeSteps: []RecipeStep{
+			//2 oz Amaretto
+			RecipeStep{
+				OriginalIngredient:   Products[10],
+				RecipeCardinalFloat:  2.0,
+				RecipeCardinalString: "2",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 oz lemon juice
+			RecipeStep{
+				OriginalIngredient:   Products[1],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 dashes bittes
+			RecipeStep{
+				OriginalIngredient:   Products[40],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Dash,
+				RecipeOrdinal:        1,
 			},
 			//.5 fresh egg white
 			RecipeStep{
