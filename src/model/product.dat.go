@@ -2,17 +2,26 @@ package model
 
 var Products = []Product{
 	Product{
-		ID:          1,
-		ProductName: "Orange Juice",
-		ProductType: Mixer,
-		BDG:         Base,
-		PreText:     "Fresh Squeezed",
+		ID:              1,
+		ProductName:     "Orange Juice",
+		ProductType:     Mixer,
+		BDG:             Base,
+		PreText:         "Fresh Squeezed",
+		Description:     "On the top ten important things to have in a bar, orange juice is a must have. Fresh squeezed such is preferable.",
+		Image:           "orange-juice-glass-bottle-1-pint.jpg",
+		ImageSourceName: "Mortons Dairies",
+		ImageSourceLink: "http://www.mortonsdairies.co.uk/media/products/orange-juice-glass-bottle-1-pint.jpg",
 	},
 	Product{
-		ID:          2,
-		ProductName: "Lemon Juice",
-		ProductType: Mixer,
-		BDG:         Base,
+		ID:              2,
+		ProductName:     "Lemon Juice",
+		ProductType:     Mixer,
+		BDG:             Base,
+		Description:     "Oh boy, this mixer is about as essential as it gets. Try to always use fresh squeezed juice! The one excuse for not using it is… No, we can't think of any.",
+		PreText:         "Fresh Squeezed",
+		Image:           "lemon.png",
+		ImageSourceName: "Dr Deborah Baker",
+		ImageSourceLink: "http://www.drdeborahbaker.com/wp-content/uploads/2014/07/lemon.png",
 	},
 	Product{
 		ID:          3,
@@ -69,11 +78,14 @@ var Products = []Product{
 		BDG:         Base,
 	},
 	Product{
-		ID:          12,
-		ProductName: "Ginger Root",
-		ProductType: Mixer,
-		BDG:         Base,
-		PostText:    "(thumbnail size)",
+		ID:              12,
+		ProductName:     "Ginger Root",
+		ProductType:     Mixer,
+		BDG:             Base,
+		PostText:        "(thumbnail size)",
+		Image:           "Ginger.jpg",
+		ImageSourceName: "LoveTheGarden.com",
+		ImageSourceLink: "https://www.lovethegarden.com/sites/default/files/styles/full_width_700/public/images_and_media/Ginger.jpg?itok=sIbshAWY",
 	},
 	Product{
 		ID:          13,
@@ -156,10 +168,15 @@ var Products = []Product{
 		BDG:         Derived,
 	},
 	Product{
-		ID:          26,
-		ProductName: "ReaLemon™ Lemon Juice",
-		ProductType: Mixer,
-		BDG:         Derived,
+		ID:              26,
+		ProductName:     "ReaLemon™ Lemon Juice",
+		ProductType:     Mixer,
+		BDG:             Derived,
+		Description:     "<p>Just about everyone recognizes ReaLemon and ReaLime – the distinctive, fruit-shaped squeeze bottles are a familiar sight to anyone who frequents grocery stores.</p>ReaLemon and ReaLime juices are made by concentrating the juice of high-quality fresh lemons and limes, and then adding back just the right amount of water to create regular-strength juice.</p>",
+		Details:         "<p>ReaLemon Lemon Juice From Concentrate was first introduced in 1934 by Irving Swartzburg. ReaLime Juice From Concentrate followed in 1947. Since then, people have come to trust ReaLemon and ReaLime because they provide all the great taste of premium-quality lemons and limes, but are more convenient, more economical and more consistent in taste and strength than fresh fruit. </p><p>By the year 2000, these two brands had grown to dominate their category. In August 2001, ReaLemon and ReaLime became part of the Mott's family when they were acquired from Eagle Family Foods.</p><p>ReaLemon Lemon Juice From Concentrate is regular-strength juice and convenient to use with no slicing or squeezing required. ReaLemon is an easy way to add perfect lemon flavor to all your favorite dishes with consistent taste from bottle to bottle.</p><p>Similar to ReaLemon, ReaLime Lime Juice From Concentrate is regular-strength juice made from fresh, quality limes. ReaLime adds a perfect citrusy zing to beverages, marinades, meats, seafood and salads.</p><p>Today, ReaLemon and ReaLime are part of Plano, Texas-based Dr Pepper Snapple Group, an integrated refreshment beverage business marketing more than 50 beverage brands throughout North America.</p>",
+		Image:           "realemon.png",
+		ImageSourceName: "Dr Pepper Snapple Group",
+		ImageSourceLink: "https://www.drpeppersnapplegroup.com/smedia/images/201610201611img-realemon-group-shot_124152725567.png",
 	},
 	Product{
 		ID:          27,
@@ -269,6 +286,29 @@ var Products = []Product{
 		ProductType: Mixer,
 		BDG:         Derived,
 	},
+	Product{
+		ID:          45,
+		ProductName: "Spiced Rum",
+		ProductType: Spirit,
+		BDG:         Base,
+	},
+	Product{
+		ID:              46,
+		ProductName:     "The Kraken Black Spiced Rum",
+		ProductType:     Spirit,
+		BDG:             Derived,
+		Description:     "Year Founded: Kraken Rum was founded in 2009<br>Distillery Location: Trinidad & Tobago<br>Types of Spirits Made: Rum",
+		Details:         "<ul><li>Kraken takes its name from a mythological sea beast that is said to attack ships sailing the Atlantic.</li><li>The rum in the spirit is made from molasses and is aged for 12 to 24 months.</li><li>The liquor is then flavored with a number of spices, including cinnamon, ginger and clove.</li></ul>",
+		Image:           "rum_kraken.jpg",
+		ImageSourceName: "The Whisky Exchange",
+		ImageSourceLink: "https://img.thewhiskyexchange.com/900/rum_kra3.jpg",
+		Rating:          5,
+		Drink: []Meta{
+			Metadata[17],
+			Metadata[18],
+			Metadata[19],
+		},
+	},
 }
 
 var ProductGroups = []GroupProduct{
@@ -343,5 +383,9 @@ var DerivedProducts = []DerivedProduct{
 	DerivedProduct{
 		Product:     Products[43],
 		BaseProduct: Products[40],
+	},
+	DerivedProduct{
+		Product:     Products[45],
+		BaseProduct: Products[44],
 	},
 }

@@ -87,4 +87,19 @@ var Metadata = []Meta{
 		MetaName: "Bourbon Whiskey",
 		MetaType: BaseSpirit,
 	},
+	Meta{
+		ID:       18,
+		MetaName: "Neat/Straight Up",
+		MetaType: Drink,
+	},
+	Meta{
+		ID:       19,
+		MetaName: "With Cola",
+		MetaType: Drink,
+	},
+	Meta{
+		ID:       20,
+		MetaName: "In Cocktails",
+		MetaType: Drink,
+	},
 }

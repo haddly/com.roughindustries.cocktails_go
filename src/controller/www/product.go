@@ -46,14 +46,22 @@ func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
 		if len(model.Products) <= id-1 {
 			product.RenderTemplate(w, "404", p)
 		} else {
-			p = model.GetBaseProductWithBDG(id)
+			p = model.GetBaseProductByIDWithBDG(id)
 			product.RenderTemplate(w, "product", p)
 		}
 	}
+}
+
+func (product *Product) ProductsHandler(w http.ResponseWriter, r *http.Request) {
+	var p *model.BaseProductWithBDG
+
+	p = model.GetBaseProductWithBDG()
+	product.RenderTemplate(w, "product", p)
 }
 
 func (product *Product) Init() {
 	log.Println("Init in www/product.go")
 	http.HandleFunc("/product", product.ProductHandler)
 	http.HandleFunc("/product/", product.ProductHandler)
+	http.HandleFunc("/products", product.ProductsHandler)
 }

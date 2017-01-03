@@ -16,6 +16,7 @@ const (
 	Difficulty
 	TOD
 	Ratio
+	Drink
 )
 
 var MetaTypeStrings = [...]string{
@@ -31,6 +32,7 @@ var MetaTypeStrings = [...]string{
 	"Difficulty",  //Easy, Medium, Hard
 	"Time of Day", //Evening, Dessert, Brunch, ...
 	"Ratio",       //3:4:8, ...
+	"Drink",
 }
 
 // String returns the English name of the metatype ("Flavor", "Base Spirit", ...).

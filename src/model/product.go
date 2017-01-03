@@ -1,6 +1,11 @@
 //model/product.go
 package model
 
+import (
+	"html/template"
+	"math/rand"
+)
+
 type ProductType int
 
 const (
@@ -46,16 +51,22 @@ var BDGCategoryStrings = [...]string{
 func (bdg BDGCategory) String() string { return BDGCategoryStrings[bdg-1] }
 
 type Product struct {
-	ID          int
-	ProductName string
-	ProductType ProductType
-	Article     string
-	Blurb       string
-	Recipe      Recipe
-	BDG         BDGCategory
-	PreText     string
-	PostText    string
-	Image       string
+	ID              int
+	ProductName     string
+	ProductType     ProductType
+	Description     template.HTML
+	Details         template.HTML
+	Image           string
+	ImageSourceName string
+	ImageSourceLink string
+	Article         string
+	Blurb           string
+	Recipe          Recipe
+	BDG             BDGCategory
+	PreText         string
+	PostText        string
+	Drink           []Meta
+	Rating          int
 }
 
 type DerivedProduct struct {
@@ -75,7 +86,43 @@ type BaseProductWithBDG struct {
 	BaseProduct     Product
 }
 
-func GetBaseProductWithBDG(ID int) *BaseProductWithBDG {
+func GetBaseProductWithBDG() *BaseProductWithBDG {
+	p := Products[rand.Intn(len(Cocktails))]
+	ID := p.ID
+	var bpwbdg BaseProductWithBDG
+	bpwbdg.Product = p
+	var dp []Product
+	var bp Product
+	var gp []Product
+	if p.BDG == Base {
+		for _, dps_element := range DerivedProducts {
+			if dps_element.BaseProduct.ID == ID {
+				dp = append(dp, dps_element.Product)
+			}
+		}
+		bpwbdg.DerivedProducts = dp
+	} else if p.BDG == Derived {
+		for _, dps_element := range DerivedProducts {
+			if dps_element.Product.ID == ID {
+				bp = dps_element.BaseProduct
+				break
+			}
+		}
+		bpwbdg.BaseProduct = bp
+	} else {
+		for _, gps_element := range ProductGroups {
+			if gps_element.GroupProduct.ID == ID {
+				for _, prod := range gps_element.Products {
+					gp = append(gp, prod)
+				}
+			}
+		}
+		bpwbdg.ProductGroups = gp
+	}
+	return &bpwbdg
+}
+
+func GetBaseProductByIDWithBDG(ID int) *BaseProductWithBDG {
 	p := Products[ID-1]
 	var bpwbdg BaseProductWithBDG
 	bpwbdg.Product = p

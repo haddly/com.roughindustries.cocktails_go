@@ -18,6 +18,11 @@
 			{{with .Product}}
 			<h1 align="center">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</h1>
 			{{end}}
+			{{if .Product.Rating}}
+			<h5 align="center">
+				<div id="stars-existing" class="starrr" data-rating='{{.Product.Rating}}'></div>
+			</h5>
+			{{end}}
 		</div>
 		<div class="row">
 			<div class="col-md-8">
@@ -26,23 +31,37 @@
 						&nbsp;
 					</div>
 					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-						&nbsp;
+						<div align="center" style="position: relative; width: 100%;">
+							{{if and .Product.Image}}
+							<img class="img-responsive" src="images/{{.Product.Image}}" alt="{{.Product.ProductName}}" />
+							<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source:
+								<a target="_blank" style="text-decoration : none; color : #555;" href="{{.Product.ImageSourceLink}}">
+								{{.Product.ImageSourceName}}
+								</a>
+							</h6>
+							{{end}}
+						</div>
 					</div>
 					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 						&nbsp;
 					</div>
 				</div>
+				{{if .Product.Description}}
 				<div class="row">
 					<div class="col-md-12">
 						<h3>Product Description</h3>
+						{{.Product.Description}}
 					</div>
 				</div>
+				{{end}} {{if .Product.Details}}
 				<div class="row">
 					<div class="col-xs-12">
 						<h3>Product Details</h3>
-						&nbsp;
+						{{.Product.Details}}
 					</div>
 				</div>
+				{{end}}
+				{{if or .DerivedProducts .BaseProduct.ProductName}}
 				<div class="row">
 					<div class="col-xs-12">
 						{{if .DerivedProducts}}
@@ -59,7 +78,43 @@
 						{{end}} {{end}} {{end}}
 
 					</div>
-				</div>
+				</div>{{end}}
+				{{if or .Product.Drink}}
+				<div class="row">
+					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+						<h3>Product Metadata</h3>
+					</div>
+					<div class="row">
+						<div class="col-xs-12 text-center">
+							&nbsp;
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row">
+							<div class="col-sm-6 col-xs-12 clearfix x-recipe-terms recipe-link">
+								{{if .Product.Drink}}
+								<div class="row">
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Drink: </div>
+									<div class="col-xs-7 x-recipe-spirit">
+										{{range .Product.Drink}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										</p>
+									</div>
+								</div>
+								{{end}}
+							</div>
+							<div class="col-sm-6 col-xs-12 clearfix">
+								<div class="row">
+									<div class="col-xs-5 text-right no-wrap">
+										<p>&nbsp;</div>
+									<div class="col-xs-7 x-recipe-preparation">
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>{{end}}
 			</div>
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
