@@ -31,30 +31,53 @@ footer {
     outline: none;
 }
 
-
 .iconlink a:hover {
-  background-color: #DDD;
+    background-color: #DDD;
 }
 
 .active {
-  background-color: rgba(125,125,125,0.5);
+    background-color: rgba(125, 125, 125, 0.5);
 }
 
-#accordion .panel-heading { padding: 0;}
-#accordion .panel-title > a {
-	display: block;
-	padding: 0.4em 0.6em;
+#accordion .panel-heading {
+    padding: 0;
+}
+
+#accordion .panel-title>a {
+    display: block;
+    padding: 0.4em 0.6em;
     outline: none;
-    font-weight:bold;
+    font-weight: bold;
     text-decoration: none;
 }
 
-#accordion .panel-title > a.accordion-toggle::before, #accordion a[data-toggle="collapse"]::before  {
-    content:"\e113";
+#accordion .panel-title>a.accordion-toggle::before,
+#accordion a[data-toggle="collapse"]::before {
+    content: "\e113";
     float: right;
     font-family: 'Glyphicons Halflings';
-	margin-right :1em;
+    margin-right: 1em;
 }
-#accordion .panel-title > a.accordion-toggle.collapsed::before, #accordion a.collapsed[data-toggle="collapse"]::before  {
-    content:"\e114";
+
+#accordion .panel-title>a.accordion-toggle.collapsed::before,
+#accordion a.collapsed[data-toggle="collapse"]::before {
+    content: "\e114";
+}
+
+.slider {
+    width: 75%;
+    margin: 0px auto;
+}
+
+.slick-slide {
+    margin: 0px 0px;
+}
+
+.slick-slide img {
+    width: 100%;
+}
+
+.slick-prev:before,
+.slick-next:before {
+    color: black;
 }

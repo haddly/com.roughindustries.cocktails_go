@@ -17,11 +17,12 @@
 		<div class="page-header">
 			{{with .Product}}
 			<h1 align="center">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</h1>
-			{{end}}
-			{{if .Product.Rating}}
+			{{end}} {{if .Product.Rating}}
 			<h5 align="center">
 				<div id="stars-existing" class="starrr" data-rating='{{.Product.Rating}}'></div>
 			</h5>
+			{{end}} {{if and .Product.SourceName .Product.SourceLink}}
+			<h6 align="center">Source: <a title="Go to {{.Product.SourceName}}" class="external" target="_blank" href="{{.Product.SourceLink}}" style="text-decoration : none; color : #555;">{{.Product.SourceName}}</a></h6>
 			{{end}}
 		</div>
 		<div class="row">
@@ -39,11 +40,17 @@
 								{{.Product.ImageSourceName}}
 								</a>
 							</h6>
-							{{end}}
+							{{else}}&nbsp;{{end}}
 						</div>
 					</div>
 					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 						&nbsp;
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<hr style="border-color: #FFF;">
+
 					</div>
 				</div>
 				{{if .Product.Description}}
@@ -60,8 +67,7 @@
 						{{.Product.Details}}
 					</div>
 				</div>
-				{{end}}
-				{{if or .DerivedProducts .BaseProduct.ProductName}}
+				{{end}} {{if or .DerivedProducts .BaseProduct.ProductName}}
 				<div class="row">
 					<div class="col-xs-12">
 						{{if .DerivedProducts}}
@@ -76,10 +82,8 @@
 							<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>
 						</a>
 						{{end}} {{end}} {{end}}
-
 					</div>
-				</div>{{end}}
-				{{if or .Product.Drink}}
+				</div>{{end}} {{if or .Product.Drink}}
 				<div class="row">
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Product Metadata</h3>

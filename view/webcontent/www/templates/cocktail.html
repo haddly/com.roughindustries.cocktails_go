@@ -26,7 +26,7 @@
 			<h6 align="center">Original Source: <a title="Go to {{.Cocktail.SourceName}}" class="external" target="_blank" href="{{.Cocktail.SourceLink}}" style="text-decoration : none; color : #555;">{{.Cocktail.SourceName}}</a></h6>
 			{{if .RootCocktail.Name}}
 			<a href="/cocktail?ID={{.RootCocktail.ID}}" style="text-decoration : none; color : #555;">
-				<h6 align="center">Root:&nbsp;{{.RootCocktail.Name}}</h6>
+				<h6 align="center">Root Cocktail:&nbsp;{{.RootCocktail.Name}}</h6>
 			</a>{{end}}
 		</div>
 		<div class="row">
@@ -63,36 +63,77 @@
 				<div class="row">
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Cocktail Details</h3>
-
-						<table align="left" border="0" cellpadding="1" cellspacing="1">
-							<tbody>
-								{{with .Cocktail.Recipe}} {{range .RecipeSteps}}
-								<tr>
-									{{if .RecipeCardinalString}}
-									<td style="white-space: nowrap;">{{.RecipeCardinalString}}</td>
-									{{else if .RecipeCardinalString}}
-									<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinalFloat}}</td>
-									{{else}}
-									<td style="white-space: nowrap;">&nbsp;</td>
-									{{end}}
-									<td width="10">&nbsp;</td>
-									<td style="white-space: nowrap;">{{.RecipeDoze}}</td>
-									<td width="10">&nbsp;</td>
-									<td>
-										<div class="iconlink">
-											{{if .AdIngredient.ProductName}}
-											<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">{{.AdIngredient.ProductName}} </a> {{else}}
-											<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
+						<div class="row">
+							<div class="col-xs-12">
+								<table align="left" border="0" cellpadding="1" cellspacing="1">
+									<tbody>
+										{{with .Cocktail.Recipe}} {{range .RecipeSteps}}
+										<tr>
+											{{if .RecipeCardinalString}}
+											<td style="white-space: nowrap;">{{.RecipeCardinalString}}</td>
+											{{else if .RecipeCardinalString}}
+											<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinalFloat}}</td>
+											{{else}}
+											<td style="white-space: nowrap;">&nbsp;</td>
+											{{end}}
+											<td width="10">&nbsp;</td>
+											<td style="white-space: nowrap;">{{.RecipeDoze}}</td>
+											<td width="10">&nbsp;</td>
+											<td>
+												<div class="iconlink">
+													{{if .AdIngredient.ProductName}}
+													<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">{{.AdIngredient.ProductName}} 
+													</a> {{else}}
+													<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
 											{{if .OriginalIngredient.PreText}}
 											{{.OriginalIngredient.PreText}}&nbsp; 
 											{{end}} 
 											{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}} </a> {{end}}
-										</div>
-									</td>
-								</tr>
-								{{end}} {{end}}
-							</tbody>
-						</table>
+												</div>
+											</td>
+										</tr>
+										{{end}} {{end}}
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row">
+							<div class="col-xs-1">
+								&nbsp;
+							</div>
+							<div class="col-xs-10">
+								<section class="regular slider">
+									{{with .Cocktail.Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
+									<div>
+										<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
+											<img  border="0" class="img-responsive" src="images/{{.AdIngredient.Image}}">
+										</a>
+									</div>
+									{{else}}
+									<div>
+										<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
+											<img  border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
+										</a>
+									</div>
+									{{end}} {{end}}{{end}}
+								</section>
+								<script type="text/javascript">
+									$(document).on('ready', function() {
+										$(".regular").slick({
+											dots: false,
+											infinite: true,
+											slidesToShow: 3,
+											slidesToScroll: 1,
+											centerMode: false
+										});
+									});
+								</script>
+							</div>
+							<div class="col-xs-1">
+								&nbsp;
+							</div>
+						</div>
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Method</h3>
@@ -292,6 +333,7 @@
 
 	<!-- /.container -->
 	</div>
+
 </body>
 
 </html>

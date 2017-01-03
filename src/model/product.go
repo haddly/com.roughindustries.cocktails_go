@@ -67,6 +67,8 @@ type Product struct {
 	PostText        string
 	Drink           []Meta
 	Rating          int
+	SourceName      string
+	SourceLink      string
 }
 
 type DerivedProduct struct {
@@ -87,7 +89,7 @@ type BaseProductWithBDG struct {
 }
 
 func GetBaseProductWithBDG() *BaseProductWithBDG {
-	p := Products[rand.Intn(len(Cocktails))]
+	p := Products[rand.Intn(len(Products))]
 	ID := p.ID
 	var bpwbdg BaseProductWithBDG
 	bpwbdg.Product = p

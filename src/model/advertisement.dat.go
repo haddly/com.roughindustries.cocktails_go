@@ -76,7 +76,7 @@ var Advertisements = []Advertisement{
 		AdvertiserLink: "http://frangelico.com/",
 		Article:        "",
 		Blurb:          "",
-		Image:          "frangelico.jpg",
+		Image:          "frangelico_logo.jpg",
 		Cocktails: []Cocktail{
 			Cocktails[2],
 		},
@@ -136,7 +136,7 @@ var Advertisements = []Advertisement{
 		AdvertiserLink: "http://www.kahlua.com/",
 		Article:        "",
 		Blurb:          "",
-		Image:          "kahlua.png",
+		Image:          "kahlua_logo.png",
 		Cocktails: []Cocktail{
 			Cocktails[0],
 		},
