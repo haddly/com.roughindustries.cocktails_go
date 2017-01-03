@@ -5,10 +5,10 @@ handlers:
 - url: /favicon.ico
   static_files: view/webcontent/www/favicon.ico
   upload: view/webcontent/www/favicon.ico
-- url: /slick.html
-  mime_type: text/html
-  static_files: view/webcontent/www/static/slick.html
-  upload: view/webcontent/www/static/slick.html
+#- url: /slick.html
+#  mime_type: text/html
+#  static_files: view/webcontent/www/static/slick.html
+#  upload: view/webcontent/www/static/slick.html
 - url: /images
   static_dir: view/webcontent/www/images
 - url: /css
