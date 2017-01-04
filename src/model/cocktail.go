@@ -70,6 +70,22 @@ type FamilyCocktail struct {
 	Cocktail       Cocktail
 }
 
+type CocktailSearch struct {
+	Products []Product
+	Metadata []Meta
+}
+
+func GetCocktailSearch() CocktailSearch {
+	var cs CocktailSearch
+	for _, element := range Products {
+		if element.BDG == Base {
+			cs.Products = append(cs.Products, element)
+		}
+	}
+	cs.Metadata = Metadata
+	return cs
+}
+
 func copyCocktail(ID int) Cocktail {
 	var c Cocktail
 	var network bytes.Buffer        // Stand-in for a network connection

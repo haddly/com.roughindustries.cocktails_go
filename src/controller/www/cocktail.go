@@ -99,6 +99,4 @@ func (cocktail *Cocktail) Init() {
 	http.HandleFunc("/", cocktail.CocktailLandingHandler)
 	http.HandleFunc("/cocktail", cocktail.CocktailHandler)
 	http.HandleFunc("/cocktails", cocktail.CocktailsHandler)
-	http.HandleFunc("/search", cocktail.CocktailSearchHandler)
-
 }

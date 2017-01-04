@@ -15,6 +15,7 @@ import (
 var d = www.Database{}
 var c = www.Cocktail{}
 var p = www.Product{}
+var s = www.Search{}
 
 func init() {
 	// wanted it to be more random so i seed it time now
@@ -22,6 +23,7 @@ func init() {
 	d.Init()
 	c.Init()
 	p.Init()
+	s.Init()
 }
 
 func main() {
