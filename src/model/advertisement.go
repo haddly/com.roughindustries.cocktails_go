@@ -8,6 +8,7 @@ type Advertisement struct {
 	Article        string
 	Blurb          string
 	Image          string
+	ImagePath      string
 	Cocktails      []Cocktail
 	Products       []ProdcutAdvertisement
 }

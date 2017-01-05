@@ -31,6 +31,7 @@ type Cocktail struct {
 	Comment         template.HTML
 	Recipe          Recipe
 	Garnish         []Product
+	ImagePath       string
 	Image           string
 	ImageSourceName string
 	ImageSourceLink string

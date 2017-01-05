@@ -41,13 +41,19 @@
 						<div align="center" style="position: relative; width: 100%;">
 							{{with .Cocktail.Advertisement}} {{if .AdvertiserName}} {{if .Image}}
 							<div align="center" style="position: relative; width: 100%;">
+								{{if .ImagePath}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="{{.ImagePath}}/{{.Image}}" alt="{{.AdvertiserName}}" /></a>
+								{{else}}
 								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image}}" alt="{{.AdvertiserName}}" /></a>
+								{{end}}
 							</div>
 							{{else}}
 							<h6 align="center">Sponsored by: <a class="external" target="_blank" href="{{.AdvertiserLink}}">{{.AdvertiserName}}</a></h6>
-							{{end}}{{end}}{{end}}
-							<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" />
-							<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: <a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}</a></h6>
+							{{end}}{{end}}{{end}} {{if .Cocktail.ImagePath}}
+							<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{else}}
+							<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}}
+							<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0
+.0); width: 100%;">Source: <a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}</a></h6>
 						</div>
 					</div>
 					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
@@ -107,13 +113,21 @@
 									{{with .Cocktail.Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
 									<div>
 										<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
-											<img  border="0" class="img-responsive" src="images/{{.AdIngredient.Image}}">
+											{{if .AdIngredient.ImagePath}}
+											<img border="0" class="img-responsive" src="{{.AdIngredient.ImagePath}}/{{.AdIngredient.Image}}">
+											{{else}}
+											<img border="0" class="img-responsive" src="images/{{.AdIngredient.Image}}">
+											{{end}}
 										</a>
 									</div>
 									{{else}}
 									<div>
 										<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
-											<img  border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
+											{{if .OriginalIngredient.ImagePath}}
+											<img border="0" class="img-responsive" src="{{.OriginalIngredient.ImagePath}}/{{.OriginalIngredient.Image}}">
+											{{else}}
+											<img border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
+											{{end}}
 										</a>
 									</div>
 									{{end}} {{end}}{{end}}
@@ -313,7 +327,7 @@
 			<div class="col-md-4">
 				<div align="center" class="row">
 					<div style="width:200px;">
-						<img class="img-responsive" src="images/jackdaniels.jpg" alt="{{.Cocktail.Name}}" />
+						<img class="img-responsive" src="https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/jackdaniels.jpg" alt="{{.Cocktail.Name}}" />
 					</div>
 				</div>
 				<br>

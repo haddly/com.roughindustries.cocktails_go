@@ -56,6 +56,7 @@ type Product struct {
 	ProductType     ProductType
 	Description     template.HTML
 	Details         template.HTML
+	ImagePath       string
 	Image           string
 	ImageSourceName string
 	ImageSourceLink string
