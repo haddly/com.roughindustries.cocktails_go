@@ -72,8 +72,8 @@ var Products = []Product{
 		BDG:             Base,
 		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:           "cream.jpg",
-		ImageSourceName: "CreamLine.co.uk",
-		ImageSourceLink: "http://www.creamline.co.uk/media/products/568mlpint-channel-island-milk-glass-bottle.jpg",
+		ImageSourceName: "PngImg.com",
+		ImageSourceLink: "http://pngimg.com/upload/bottle_PNG2934.png",
 	},
 	Product{
 		ID:          10,
@@ -191,8 +191,8 @@ var Products = []Product{
 		Details:         "<p>ReaLemon Lemon Juice From Concentrate was first introduced in 1934 by Irving Swartzburg. ReaLime Juice From Concentrate followed in 1947. Since then, people have come to trust ReaLemon and ReaLime because they provide all the great taste of premium-quality lemons and limes, but are more convenient, more economical and more consistent in taste and strength than fresh fruit. </p><p>By the year 2000, these two brands had grown to dominate their category. In August 2001, ReaLemon and ReaLime became part of the Mott's family when they were acquired from Eagle Family Foods.</p><p>ReaLemon Lemon Juice From Concentrate is regular-strength juice and convenient to use with no slicing or squeezing required. ReaLemon is an easy way to add perfect lemon flavor to all your favorite dishes with consistent taste from bottle to bottle.</p><p>Similar to ReaLemon, ReaLime Lime Juice From Concentrate is regular-strength juice made from fresh, quality limes. ReaLime adds a perfect citrusy zing to beverages, marinades, meats, seafood and salads.</p><p>Today, ReaLemon and ReaLime are part of Plano, Texas-based Dr Pepper Snapple Group, an integrated refreshment beverage business marketing more than 50 beverage brands throughout North America.</p>",
 		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:           "realemon.png",
-		ImageSourceName: "Dr Pepper Snapple Group",
-		ImageSourceLink: "https://www.drpeppersnapplegroup.com/smedia/images/201610201611img-realemon-group-shot_124152725567.png",
+		ImageSourceName: "Walmart",
+		ImageSourceLink: "https://i5.walmartimages.com/asr/970ff170-2686-4083-97d2-592b034f893a_1.f688f66fe61a5574f1240c711867bb65.jpeg",
 	},
 	Product{
 		ID:          27,

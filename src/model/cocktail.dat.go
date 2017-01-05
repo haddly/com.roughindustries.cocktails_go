@@ -13,7 +13,7 @@ var Cocktails = []Cocktail{
 		ImageSourceLink: "",
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
-		Rating:          5,
+		Rating:          4,
 		IsFamilyRoot:    false,
 		AKA: []Name{
 			Name{Name: "Jamaican Milkshake"},

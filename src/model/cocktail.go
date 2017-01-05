@@ -125,6 +125,13 @@ func GetCocktail() FamilyCocktail {
 	return processCocktailRequest(c)
 }
 
+func GetCocktails() []Cocktail {
+	var c []Cocktail
+	c = Cocktails
+	//c := &Cocktails[rand.Intn(len(Cocktails))]
+	return c
+}
+
 func processCocktailRequest(c Cocktail) FamilyCocktail {
 	var fc FamilyCocktail
 
