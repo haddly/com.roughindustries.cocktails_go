@@ -20,13 +20,13 @@
 
 		<div class="row">
 			<div class="page-header">
-				<h1 align="center">Cocktails</h1>
+				<h1 align="center">Products</h1>
 			</div>
 			<div class="col-md-12">
 				<div class="row">
 					{{range .}}
-					<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">
-						<a href="/cocktail?ID={{.ID}}" style="text-decoration : none; color : #555;">
+					<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+						<a href="/product?ID={{.ID}}" style="text-decoration : none; color : #555;">
 							<span style="display: block;">
 								<div align="center">
 								{{if .ImagePath}}
@@ -36,12 +36,14 @@
 								{{end}}
 								</div>
 								<h3>
-									{{.Name}}
+									{{.ProductName}}
 								</h3>
+								{{if .Rating}}
 								<h5>
 									<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
 								</h5>
-								<p style="max-height: 100px; overflow:hidden;">{{.Description}}</p>
+								{{end}}
+							<div style="height: 100px; overflow:hidden;">{{.Description}}</div>
 							</span>
 						</a>
 					</div>
