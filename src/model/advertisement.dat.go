@@ -7,6 +7,7 @@ var Advertisements = []Advertisement{
 		AdvertiserLink: "http://www.breckenridgedistillery.com/",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "breckenridgedistillery-02.png",
 		Cocktails: []Cocktail{
 			Cocktails[1],
@@ -23,6 +24,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Pappy Van Winkle's™ Distillery",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -36,6 +38,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "ReaLemon™",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -49,6 +52,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Tropicana™",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -62,6 +66,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Bailey and Co™",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -76,6 +81,7 @@ var Advertisements = []Advertisement{
 		AdvertiserLink: "http://frangelico.com/",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "frangelico_logo.jpg",
 		Cocktails: []Cocktail{
 			Cocktails[2],
@@ -92,6 +98,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Frangelico™",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -105,6 +112,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Stonewall Kitchen™",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -118,6 +126,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Pernod Ricard",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -136,6 +145,7 @@ var Advertisements = []Advertisement{
 		AdvertiserLink: "http://www.kahlua.com/",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "kahlua_logo.png",
 		Cocktails: []Cocktail{
 			Cocktails[0],
@@ -152,6 +162,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "ILLVA SARONNO S.p.A",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -165,6 +176,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Taylor'd Milestones",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -178,6 +190,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "OXO",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -191,6 +204,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "The Absolut™ Company",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -204,6 +218,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "Anchor Distilling Company",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
@@ -217,6 +232,7 @@ var Advertisements = []Advertisement{
 		AdvertiserName: "",
 		Article:        "",
 		Blurb:          "",
+		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:          "",
 		Products: []ProdcutAdvertisement{
 			ProdcutAdvertisement{
