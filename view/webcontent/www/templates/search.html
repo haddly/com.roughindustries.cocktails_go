@@ -1,0 +1,202 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{template "navbar" .}}
+	<div class="container">
+		<!-- Portfolio Item Heading -->
+		<div class="page-header">
+			<h1 align="center">Cocktail Search</h1>
+		</div>
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						&nbsp;
+					</div>
+					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+						&nbsp;
+					</div>
+					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						&nbsp;
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Instructions</h3>
+						<p><span style="font-weight: bold;" class="glyphicon glyphicon-ok" aria-hidden="true"></span> = Include in search or <span style="font-weight: bold;" class="glyphicon glyphicon-remove" aria-hidden="true"></span> = Exclude from search. If you don't
+							select include or exclude then the item will be include but not searched for exclusively.</p>
+					</div>
+				</div>
+				<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+					<div class="row">
+
+						<div class="col-sm-12">
+							<h3>Ingredients</h3>
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom: 15px;">
+										<div class="panel-heading" role="tab" id="headingOne">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Spirits</a>
+											</h4>
+										</div>
+										<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+											<div class="panel-body" align="center">
+												{{range .Products}} {{if eq .ProductType 1}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<button id="{{.ID}}button" type="button" class="btn btn-default" style="font-weight: bold;">{{.ProductName}}</button>
+													<button id="{{.ID}}include" title="Include" onclick="search_item_include('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+													<button id="{{.ID}}exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+												</div><br> {{end}}{{end}}
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom: 15px;">
+										<div class="panel-heading" role="tab" id="headingTwo">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Liqueur
+        </a>
+											</h4>
+										</div>
+										<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+											<div class="panel-body" align="center">
+												{{range .Products}} {{if eq .ProductType 2}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<button id="hidden_button" type="button" style="display: none;" />
+													<button id="{{.ID}}button" type="button" class="btn btn-default" style="font-weight: bold;">{{.ProductName}}</button>
+													<button id="{{.ID}}include" title="Include" onclick="search_item_include('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+													<button id="{{.ID}}exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+												</div><br> {{end}}{{end}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom: 15px;">
+										<div class="panel-heading" role="tab" id="headingThree">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Mixer</a>
+											</h4>
+										</div>
+										<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+											<div class="panel-body" align="center">
+												{{range .Products}} {{if eq .ProductType 4}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<button id="hidden_button" type="button" style="display: none;" />
+													<button id="{{.ID}}button" type="button" class="btn btn-default" style="font-weight: bold;">{{.ProductName}}</button>
+													<button id="{{.ID}}include" title="Include" onclick="search_item_include('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+													<button id="{{.ID}}exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+												</div><br> {{end}}{{end}}
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom: 15px;">
+										<div class="panel-heading" role="tab" id="headingFour">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">Garnish</a>
+											</h4>
+										</div>
+										<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+											<div class="panel-body" align="center">
+												{{range .Products}} {{if eq .ProductType 6}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<button id="hidden_button" type="button" style="display: none;" />
+													<button id="{{.ID}}button" type="button" class="btn btn-default" style="font-weight: bold;">{{.ProductName}}</button>
+													<button id="{{.ID}}include" title="Include" onclick="search_item_include('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+													<button id="{{.ID}}exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+												</div><br> {{end}}{{end}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<h3>Metadata</h3>
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom: 15px;">
+										<div class="panel-heading" role="tab" id="heading_Meta_10">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapse_Meta_10" aria-expanded="false" aria-controls="collapse_Meta_10">Difficulty</a>
+											</h4>
+										</div>
+										<div id="collapse_Meta_10" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_Meta_10">
+											<div class="panel-body" align="center">
+												{{range .Metadata}} {{if eq .MetaType 10}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<button id="{{.ID}}_Meta_button" type="button" class="btn btn-default" style="font-weight: bold;">{{.MetaName}}</button>
+													<button id="{{.ID}}_Meta_include" title="Include" onclick="search_item_include('{{.ID}}_Meta_include', '{{.ID}}_Meta_exclude', '{{.ID}}_Meta_button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+													<button id="{{.ID}}_Meta_exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}_Meta_include', '{{.ID}}_Meta_exclude', '{{.ID}}_Meta_button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+												</div><br> {{end}}{{end}}
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom: 15px;">
+										<div class="panel-heading" role="tab" id="heading_Meta_9">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapse_Meta_9" aria-expanded="false" aria-controls="collapse_Meta_9">Strength</a>
+											</h4>
+										</div>
+										<div id="collapse_Meta_9" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_Meta_9">
+											<div class="panel-body" align="center">
+												{{range .Metadata}} {{if eq .MetaType 9}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<button id="{{.ID}}_Meta_button" type="button" class="btn btn-default" style="font-weight: bold;">{{.MetaName}}</button>
+													<button id="{{.ID}}_Meta_include" title="Include" onclick="search_item_include('{{.ID}}_Meta_include', '{{.ID}}_Meta_exclude', '{{.ID}}_Meta_button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+													<button id="{{.ID}}_Meta_exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}_Meta_include', '{{.ID}}_Meta_exclude', '{{.ID}}_Meta_button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+												</div><br> {{end}}{{end}}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<hr style="border-color: #FFF;">
+			<div class="col-md-4">
+				<div align="center" class="row">
+					<div style="width:200px;">
+						<img class="img-responsive" src="https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/jackdaniels.jpg" />
+					</div>
+				</div>
+				<br>
+			</div>
+		</div>
+	</div>
+
+	{{template "footer" .}}
+
+	<!-- /.container -->
+	</div>
+
+
+</body>
+
+</html>
+{{end}}
