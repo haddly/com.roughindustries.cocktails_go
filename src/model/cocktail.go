@@ -1,6 +1,14 @@
 //model/cocktail.go
 package model
 
+import (
+	"bytes"
+	"encoding/gob"
+	"html/template"
+	"log"
+	"math/rand"
+)
+
 // recipe:
 //   - !recipeStep
 //       ingredient:
@@ -19,11 +27,11 @@ type Cocktail struct {
 	SpokenName      string
 	Origin          string
 	AKA             []Name
-	Description     string
-	Comment         string
+	Description     template.HTML
+	Comment         template.HTML
 	Recipe          Recipe
-	Method          string
 	Garnish         []Product
+	ImagePath       string
 	Image           string
 	ImageSourceName string
 	ImageSourceLink string
@@ -31,7 +39,7 @@ type Cocktail struct {
 	Tool            []Product
 	SourceName      string
 	SourceLink      string
-	Rating          float32
+	Rating          int
 	Flavor          []Meta
 	Type            []Meta
 	BaseSpirit      []Meta
@@ -40,114 +48,194 @@ type Cocktail struct {
 	Strength        []Meta
 	Difficulty      []Meta
 	TOD             []Meta
+	Ratio           []Meta
+	Family          Meta
+	IsFamilyRoot    bool
+
+	//Advertiser Info
+	Advertisement Advertisement
 }
 
 type Name struct {
 	Name string
 }
 
-type Recipe struct {
-	RecipeSteps []RecipeStep
+func InitCocktailTable() string {
+	log.Println("CocktailTable Init")
+	return "CocktailTable Init"
 }
 
-type RecipeStep struct {
-	Ingredient     Product
-	RecipeCardinal float64
-	RecipeDoze     Doze
-	RecipeOrdinal  int
+type FamilyCocktail struct {
+	ChildCocktails []Cocktail
+	RootCocktail   Cocktail
+	Cocktail       Cocktail
 }
 
-type Doze int
-
-const (
-	Shot = 1 + iota
-	Ounce
-	Whole
-	Dash
-	Slice
-)
-
-var Dozes = [...]string{
-	"shot",
-	"oz.",
-	"whole",
-	"dash",
-	"slice",
+type CocktailSearch struct {
+	Products []Product
+	Metadata []Meta
 }
 
-// String returns the English name of the doze ("Shot", "Ounce", ...).
-func (d Doze) String() string { return Dozes[d-1] }
-
-type ProductType int
-
-const (
-	Spirit = 1 + iota
-	Liqueur
-	Wine
-	Mixer
-	Beer
-	Garnish
-	Drinkware
-	Tool
-)
-
-var ProductTypeStrings = [...]string{
-	"Spirit",
-	"Liqueur",
-	"Wine",
-	"Mixer",
-	"Beer",
-	"Garnish",
-	"Drinkware",
-	"Tool",
+func GetCocktailSearch() CocktailSearch {
+	var cs CocktailSearch
+	for _, element := range Products {
+		if element.BDG == Base {
+			cs.Products = append(cs.Products, element)
+		}
+	}
+	cs.Metadata = Metadata
+	return cs
 }
 
-// String returns the English name of the Producttype ("Spirit", "Liqueur", ...).
-func (ct ProductType) String() string { return ProductTypeStrings[ct-1] }
+func copyCocktail(ID int) Cocktail {
+	var c Cocktail
+	var network bytes.Buffer        // Stand-in for a network connection
+	enc := gob.NewEncoder(&network) // Will write to network.
+	dec := gob.NewDecoder(&network) // Will read from network.
+	var err error
+	// Encode (send) the value.
+	if ID <= 0 {
+		err = enc.Encode(Cocktails[rand.Intn(len(Cocktails))])
+	} else {
+		err = enc.Encode(Cocktails[ID-1])
+	}
 
-type Product struct {
-	ProductName string
-	ProductType ProductType
-	Article     string
-	Blurb       string
+	if err != nil {
+		log.Fatal("encode error:", err)
+	}
+	// Decode (receive) the value.
+	err = dec.Decode(&c)
+	if err != nil {
+		log.Fatal("decode error:", err)
+	}
+
+	return c
 }
 
-type MetaType int
-
-const (
-	Flavor = 1 + iota
-	BaseSpirit
-	Type
-	Occasion
-	Family
-	Formula
-	Served
-	Technique
-	Strength
-	Difficulty
-	TOD
-)
-
-var MetaTypeStrings = [...]string{
-	"Flavor",      //Fruity, Bitter, Creamy, ...
-	"Base Spirit", //Vodka, Gin, Bourbon, ...
-	"Type",        //Tiki,
-	"Occasion",    //Christmas, 4th of July, Halloween, ...
-	"Family",      //Margarita, Martini, ...
-	"Formula",
-	"Served",      //Highball, Martini, Old Fashioned, ...
-	"Technique",   //Shaking, Stirring, Straining
-	"Strength",    //Weak, Medium, Strong
-	"Difficulty",  //Easy, Medium, Hard
-	"Time of Day", //Evening, Dessert, Brunch, ...
+func GetCocktailByID(ID int) FamilyCocktail {
+	var c Cocktail
+	c = copyCocktail(ID)
+	return processCocktailRequest(c)
 }
 
-// String returns the English name of the metatype ("Flavor", "Base Spirit", ...).
-func (mt MetaType) String() string { return MetaTypeStrings[mt-1] }
+func GetCocktail() FamilyCocktail {
+	var c Cocktail
+	c = copyCocktail(-1)
+	//c := &Cocktails[rand.Intn(len(Cocktails))]
+	return processCocktailRequest(c)
+}
 
-type Meta struct {
-	MetaName string
-	MetaType MetaType
-	Article  string
-	Blurb    string
+func GetCocktails() []Cocktail {
+	var c []Cocktail
+	c = Cocktails
+	//c := &Cocktails[rand.Intn(len(Cocktails))]
+	return c
+}
+
+func processCocktailRequest(c Cocktail) FamilyCocktail {
+	var fc FamilyCocktail
+
+	prod_ignore := []int{}
+
+	for index, element := range c.Recipe.RecipeSteps {
+		c.Recipe.RecipeSteps[index].BDG = *GetSpecificProductsFromGroup(element.OriginalIngredient.ID)
+	}
+
+	for ad_index, ad_element := range Advertisements {
+		for _, adcocktails_element := range ad_element.Cocktails {
+			if c.ID == adcocktails_element.ID {
+				c.Advertisement = Advertisements[ad_index]
+				for index, element := range c.Recipe.RecipeSteps {
+					// element is the element from someSlice for where we are
+					// is this a base product
+					for _, adprod_element := range ad_element.Products {
+						if element.OriginalIngredient.ID == adprod_element.BaseProduct.ID {
+							c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct
+							prod_ignore = append(prod_ignore, element.OriginalIngredient.ID)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//recipe OriginalIngredient ad replacement
+	for index, element := range c.Recipe.RecipeSteps {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.OriginalIngredient.ID == adprod_element.BaseProduct.ID {
+					if !intInSlice(element.OriginalIngredient.ID, prod_ignore) {
+						c.Recipe.RecipeSteps[index].AdIngredient = adprod_element.AdvertisedProduct
+					}
+				}
+			}
+		}
+	}
+	//drinkware ad replacement
+	for index, element := range c.Drinkware {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.ID == adprod_element.BaseProduct.ID {
+					c.Drinkware[index] = adprod_element.AdvertisedProduct
+				}
+			}
+		}
+	}
+	//tool ad replacement
+	for index, element := range c.Tool {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.ID == adprod_element.BaseProduct.ID {
+					c.Tool[index] = adprod_element.AdvertisedProduct
+				}
+			}
+		}
+	}
+	//garnish ad replacement
+	for index, element := range c.Garnish {
+		// element is the element from someSlice for where we are
+		// is this a base product
+		for _, ad_element := range Advertisements {
+			for _, adprod_element := range ad_element.Products {
+				if element.ID == adprod_element.BaseProduct.ID {
+					c.Garnish[index] = adprod_element.AdvertisedProduct
+				}
+			}
+		}
+	}
+
+	//put the the cocktails in a family structf
+	if c.IsFamilyRoot {
+		for _, element := range FamilyCocktails {
+			if element.RootCocktail.ID == c.ID {
+				fc.ChildCocktails = element.ChildCocktails
+			}
+		}
+		fc.Cocktail = c
+	} else {
+		for _, cocktail := range FamilyCocktails {
+			for _, element := range cocktail.ChildCocktails {
+				if element.ID == c.ID {
+					fc.RootCocktail = cocktail.RootCocktail
+				}
+			}
+		}
+		fc.Cocktail = c
+	}
+	return fc
+}
+
+func intInSlice(a int, list []int) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }

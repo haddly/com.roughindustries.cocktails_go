@@ -3,42 +3,32 @@ package model
 
 var Cocktails = []Cocktail{
 	Cocktail{
-		ID:              0,
+		ID:              1,
 		Title:           "Jamaican Quaalude",
 		Name:            "Jamaican Quaalude",
 		Description:     "I'll assume that this delicious cocktail's name is derived from its tropical flavors (Jamaican), and its mind numbing effects (Quaalude). With five spirits, and a bit of cream to blend it all together, this rich drink is a great dessert cocktail that will definitely keep the evening going. We hope you'll try our featured cocktail, the Jamaican Quaalude!",
-		Method:          "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:           "jamaican_quaalude_750_750.png",
 		ImageSourceName: "Unknown",
 		ImageSourceLink: "",
 		SourceName:      "Hampton Roads Happy Hour",
 		SourceLink:      "http://hamptonroadshappyhour.com/jamaican-quaalude",
-		// Rating:          2.5 / 5.0 * 100,
-		Rating: 5,
-		AKA:    []Name{},
+		Rating:          4,
+		IsFamilyRoot:    false,
+		AKA: []Name{
+			Name{Name: "Jamaican Milkshake"},
+		},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
+			Products[14],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Evening",
-				MetaType: TOD,
-			},
+			Metadata[10],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -59,133 +49,45 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
+			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
 		Garnish: []Product{
-			Product{
-				ProductName: "Cherry",
-				ProductType: Garnish,
-			},
-			Product{
-				ProductName: "Slice of Starfruit",
-				ProductType: Garnish,
-			},
+			Products[15],
+			Products[16],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
+			Products[17],
 		},
-		Recipe: Recipe{
-			RecipeSteps: []RecipeStep{
-				//1 oz. Kahlua
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Kahlua",
-						ProductType: Liqueur,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  0,
-				},
-				//1 oz. Coconut Rum
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Coconut Rum",
-						ProductType: Spirit,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  1,
-				},
-				//1 oz. Baileys Irish Cream
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Irish Cream",
-						ProductType: Liqueur,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  2,
-				},
-				//.5 oz Amaretto
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Amaretto",
-						ProductType: Liqueur,
-					},
-					RecipeCardinal: 0.5,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  3,
-				},
-				//.5 oz Frangelico
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Frangelico",
-						ProductType: Liqueur,
-					},
-					RecipeCardinal: 0.5,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  4,
-				},
-				//1 oz Cream
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Cream",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  5,
-				},
-			},
-		},
+		Recipe: Recipes[0],
 	},
 	Cocktail{
-		ID:              1,
+		ID:              2,
 		Title:           "Devil's Share",
 		Name:            "Devil's Share",
 		Description:     "This cocktail is really smooth on the toungue because of the maple syrup.  The citrus from the lemon and sugar from the maple syrup give a great sour flavor profile.  One of my favorites, mostly because of the maple syrup.",
-		Method:          "Muddle ginger in base of shaker. Add other ingredients, shake with ice and fine strain into ice-filled glass.",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:           "devils_share.jpg",
 		ImageSourceName: "Difford's Guide",
 		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
 		SourceName:      "Difford's Guide",
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/2376/devils-share",
+		Comment:         "A little more OJ won't hurt it.",
 		Rating:          5,
+		IsFamilyRoot:    false,
 		AKA:             []Name{},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
-			Product{
-				ProductName: "Muddler",
-				ProductType: Tool,
-			},
+			Products[14],
+			Products[18],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Afternoon",
-				MetaType: TOD,
-			},
+			Metadata[7],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -204,130 +106,48 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Served: []Meta{
-			Meta{
-				MetaName: "On the Rocks",
-				MetaType: Served,
-			},
+			Metadata[12],
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
-			Meta{
-				MetaName: "Muddled",
-				MetaType: Technique,
-			},
+			Metadata[14],
+			Metadata[15],
 		},
 		BaseSpirit: []Meta{
-			Meta{
-				MetaName: "Bourbon Whiskey",
-				MetaType: BaseSpirit,
-			},
+			Metadata[16],
 		},
 		Garnish: []Product{
-			Product{
-				ProductName: "Orange Zest Twist",
-				ProductType: Garnish,
-			},
+			Products[21],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
+			Products[17],
 		},
-		Recipe: Recipe{
-			RecipeSteps: []RecipeStep{
-				//2 slice Fresh root ginger
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Ginger Root",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 2.0,
-					RecipeDoze:     Slice,
-					RecipeOrdinal:  0,
-				},
-				//2 oz. Bourbon Whiskey
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Bourbon Whiskey",
-						ProductType: Spirit,
-					},
-					RecipeCardinal: 2.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  1,
-				},
-				//.75 oz. Orange Juice
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Orange Juice",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: .75,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  2,
-				},
-				//1 oz Lemon Juice
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Lemon Juice",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  3,
-				},
-				//.5 oz Maple Syrup
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Maple Syrup",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 0.5,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  4,
-				},
-			},
-		},
+		Recipe: Recipes[1],
 	},
 	Cocktail{
-		ID:              2,
+		ID:              3,
 		Title:           "Mad Monk Milkshake",
 		Name:            "Mad Monk Milkshake",
 		Description:     "This was one of my really first adventures into creamy cocktails.  It was and still is one of my favorite cocktails ever.  It is smooth, really easy ot drink, and frankly just fun.",
-		Method:          "Shake all ingredients with ice and strain into ice-filled glass.",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:           "mad_monk_milkshake.jpg",
 		ImageSourceName: "Difford's Guide",
 		ImageSourceLink: "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
 		SourceName:      "Difford's Guide",
 		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1215/mad-monk-milkshake",
 		Rating:          5,
+		IsFamilyRoot:    false,
 		AKA:             []Name{},
 		Tool: []Product{
-			Product{
-				ProductName: "Shaker",
-				ProductType: Tool,
-			},
+			Products[14],
 		},
 		Strength: []Meta{
-			Meta{
-				MetaName: "Medium",
-				MetaType: Flavor,
-			},
+			Metadata[4],
 		},
 		Difficulty: []Meta{
-			Meta{
-				MetaName: "Easy",
-				MetaType: Difficulty,
-			},
+			Metadata[0],
 		},
 		TOD: []Meta{
-			Meta{
-				MetaName: "Dessert",
-				MetaType: TOD,
-			},
+			Metadata[9],
 		},
 		Flavor: []Meta{
 			Meta{
@@ -342,91 +162,159 @@ var Cocktails = []Cocktail{
 			},
 		},
 		Served: []Meta{
-			Meta{
-				MetaName: "On the Rocks",
-				MetaType: Served,
-			},
+			Metadata[12],
 		},
 		Technique: []Meta{
-			Meta{
-				MetaName: "Shaken",
-				MetaType: Technique,
-			},
+			Metadata[14],
 		},
 		BaseSpirit: []Meta{},
 		Garnish: []Product{
-			Product{
-				ProductName: "Cherry",
-				ProductType: Garnish,
-			},
+			Products[15],
 		},
 		Drinkware: []Product{
-			Product{
-				ProductName: "Collins",
-				ProductType: Drinkware,
+			Products[20],
+			Products[17],
+			Products[19],
+		},
+		Recipe: Recipes[2],
+	},
+	Cocktail{
+		ID:              4,
+		Title:           "Sour",
+		Name:            "Sour",
+		Description:     "Sours are aptly named drinks. Their flavour comes from either lemon or lime juice, which is balanced with sugar.<br><br>Sours can be based on practically any spirit but the bourbon based Whiskey Sour is by far the most popular. Many (including us) believe this drink is only properly made when smoothed with a little egg white.<br><br>Sours are served either straight-up in a sour glass (rather like a small flute) or on the rocks in an old-fashioned glass. They are traditionally garnished with a cherry and an orange slice, or sometimes a lemon slice.",
+		Image:           "24-sour.jpg",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
+		ImageSourceName: "Liquor.com",
+		ImageSourceLink: "http://liquor.s3.amazonaws.com/wp-content/uploads/2010/02/24-sour.jpeg",
+		SourceName:      "Difford's Guide",
+		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/1795/sour-generic-name",
+		Comment:         "This 4:2:8 formula is a tad sourer than the classic 3:4:8 which translates as: three quarter part of the sour ingredient (lemon juice), one part of the sweet ingredient (sugar syrup) and two parts of the strong ingredient (spirit). So if you find my formula too sour than best follow the classic proportions in future.",
+		Rating:          4,
+		AKA:             []Name{},
+		Tool: []Product{
+			Products[14],
+		},
+		Strength: []Meta{
+			Metadata[4],
+		},
+		Difficulty: []Meta{
+			Metadata[0],
+		},
+		TOD: []Meta{
+			Metadata[8],
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Sour",
+				MetaType: Flavor,
 			},
-			Product{
-				ProductName: "Old Fashioned",
-				ProductType: Drinkware,
-			},
-			Product{
-				ProductName: "Highball",
-				ProductType: Drinkware,
+			Meta{
+				MetaName: "Sweet",
+				MetaType: Flavor,
 			},
 		},
-		Recipe: Recipe{
-			RecipeSteps: []RecipeStep{
-				//1 ounce irish cream
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Irish Cream",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Liqueur,
-					RecipeOrdinal:  0,
-				},
-				//2 oz. Frangelico
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Frangelico",
-						ProductType: Liqueur,
-					},
-					RecipeCardinal: 2.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  1,
-				},
-				//.5 oz. Orange Juice
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Kahlua",
-						ProductType: Liqueur,
-					},
-					RecipeCardinal: .5,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  2,
-				},
-				//2 oz Milk
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Milk",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 2.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  3,
-				},
-				//1 oz Cream
-				RecipeStep{
-					Ingredient: Product{
-						ProductName: "Cream",
-						ProductType: Mixer,
-					},
-					RecipeCardinal: 1.0,
-					RecipeDoze:     Ounce,
-					RecipeOrdinal:  4,
-				},
+		Type: []Meta{
+			Meta{
+				MetaName: "Recommended",
+				MetaType: Type,
 			},
 		},
+		Served: []Meta{
+			Metadata[12],
+		},
+		Technique: []Meta{
+			Metadata[14],
+		},
+		Ratio: []Meta{
+			Meta{
+				MetaName: "4:2:8",
+				MetaType: Ratio,
+			},
+		},
+		Family: Meta{
+			MetaName: "Sour",
+			MetaType: Family,
+		},
+		IsFamilyRoot: true,
+		BaseSpirit:   []Meta{},
+		Garnish: []Product{
+			Products[15],
+		},
+		Drinkware: []Product{
+			Products[17],
+		},
+		Recipe: Recipes[3],
+	},
+	Cocktail{
+		ID:              5,
+		Title:           "Amaretto Sour",
+		Name:            "Amaretto Sour",
+		Description:     "Sweet 'n' sour - frothy with an almond buzz. Three dashes (12 drops) of Angostura bitters help balance the drink and add an extra burst of flavour",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
+		Image:           "amaretto_sour.jpg",
+		ImageSourceName: "Difford's Guide",
+		ImageSourceLink: "https://d3d9kvjpisqjte.cloudfront.net/stock-images/2015/8/55/2015bed5b504e209d7e292dceaaf470b64b4.jpg",
+		SourceName:      "Difford's Guide",
+		SourceLink:      "https://www.diffordsguide.com/cocktails/recipe/53/amaretto-sour",
+		Rating:          3,
+		AKA:             []Name{},
+		Tool: []Product{
+			Products[14],
+		},
+		Strength: []Meta{
+			Metadata[4],
+		},
+		Difficulty: []Meta{
+			Metadata[0],
+		},
+		TOD: []Meta{
+			Metadata[8],
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Sour",
+				MetaType: Flavor,
+			},
+			Meta{
+				MetaName: "Sweet",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Recommended",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Metadata[12],
+		},
+		Technique: []Meta{
+			Metadata[14],
+		},
+		Ratio: []Meta{},
+		Family: Meta{
+			MetaName: "Sour",
+			MetaType: Family,
+		},
+		IsFamilyRoot: false,
+		BaseSpirit:   []Meta{},
+		Garnish: []Product{
+			Products[15],
+		},
+		Drinkware: []Product{
+			Products[17],
+		},
+		Recipe: Recipes[4],
+	},
+}
+
+var FamilyCocktails = []FamilyCocktail{
+	FamilyCocktail{
+		ChildCocktails: []Cocktail{
+			Cocktails[4],
+		},
+		RootCocktail: Cocktails[3],
 	},
 }

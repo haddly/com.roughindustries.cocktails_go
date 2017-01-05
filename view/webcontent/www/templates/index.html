@@ -1,0 +1,194 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+
+    <!-- Header -->
+    <div class="intro-header">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-message">
+                        <h1 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Commonwealth Cocktails</h1>
+                        <h4 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Est. 2016</h4>
+                        <h2 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Libations for Everyone</h2>
+                        <hr class="intro-divider">
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
+                                    <i class="fa fa-facebook fa-fw"></i>
+                                    <span class="network-name">Facebook</span></a>
+                            </li>
+                            <li>
+                                <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
+                                    <i class="fa fa-github fa-fw"></i>
+                                    <span class="network-name">Github</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.intro-header -->
+
+    <!-- Page Content -->
+
+    <a name="cocktails"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Cocktails</h2>
+                    <a href="/cocktails" class="btn btn-default btn-lg">
+                        <i class="glyphicon glyphicon-glass"></i>
+                        <span class="network-name">Cocktails</span>
+                    </a>
+                </div>
+                <div class="col-md-1 col-sm-0">
+                    &nbsp; </div>
+                <div class="col-md-6 col-sm-6 network-name">
+                    There's a drink for every mood or occasion. Find your favorite cocktail recipes here. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away.
+                </div>
+
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+
+    <a name="products"></a>
+    <div class="content-section-b">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-3 col-md-push-9 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Prodcuts</h2>
+                    <a href="/products" class="btn btn-default btn-lg">
+                        <i class="glyphicon glyphicon-tag"></i>
+                        <span class="network-name">Products</span>
+                    </a>
+                </div>
+                <div class="col-md-3  col-sm-0">
+                    &nbsp; </div>
+
+                <div class="col-md-6 col-md-pull-6 col-sm-6 network-name">
+                    We’ve compiled an extensive library of information about an array of liquor brands and spirits. Whether you're reading about a favorite bourbon or a new craft gin, you just might learn a thing or two.
+                </div>
+
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+
+    <a name="search"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-5 col-sm-0" style="text-align: center;">&nbsp;</div>
+                <div class="col-md-4 col-sm-12">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Search</h2>
+                    <a href="/search" class="btn btn-default btn-lg">
+                        <i class="glyphicon glyphicon-search"></i>
+                        <span class="network-name">Search</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-0" style="text-align: center;">&nbsp;</div>
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="banner">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 style="color:#FFF; font-family: 'Poiret One'">The Commonwealth:</h2>
+                </div>
+                <div class="col-lg-6">
+                    <ul class="list-inline banner-social-buttons">
+                        <li>
+                            <a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
+                                <i class="fa fa-facebook fa-fw"></i>
+                                <span class="network-name">Facebook</span></a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
+                                <i class="fa fa-github fa-fw"></i>
+                                <span class="network-name">Github</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.banner -->
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12" align="center">
+                    <ul class="list-inline">
+                        <li>
+                            <a style="text-decoration : none; color : #555;" href="#">Home</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a style="text-decoration : none; color : #555;" href="#cocktails">Cocktails</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a style="text-decoration : none; color : #555;" href="#products">Products</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a style="text-decoration : none; color : #555;" href="#search">Search</a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted small">Copyright &copy; Commonwealth Cocktails 2016. All Rights Reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
+{{end}}
