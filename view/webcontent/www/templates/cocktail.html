@@ -33,31 +33,49 @@
 			<div class="col-md-8">
 				<!--<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" />-->
 				<div class="row">
-					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+					<div class="col-xs-0 col-sm-3 col-md-3 col-lg-3">
 						&nbsp;
 					</div>
-					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 
 						<div align="center" style="position: relative; width: 100%;">
 							{{with .Cocktail.Advertisement}} {{if .AdvertiserName}} {{if .Image}}
 							<div align="center" style="position: relative; width: 100%;">
-								{{if .ImagePath}}
-								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="{{.ImagePath}}/{{.Image}}" alt="{{.AdvertiserName}}" /></a>
-								{{else}}
-								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image}}" alt="{{.AdvertiserName}}" /></a>
-								{{end}}
+								{{if .Image}} {{if .ImagePath}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="{{.ImagePath}}/{{.Image}}" alt="{{.AdvertiserName}}" /></a>{else}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image}}" alt="{{.AdvertiserName}}" /></a>{{end}} {{else}}
+								<img class="img-responsive" style="max-height:150px" src="http://placehold.it/600x600"> {{end}}
 							</div>
 							{{else}}
 							<h6 align="center">Sponsored by: <a class="external" target="_blank" href="{{.AdvertiserLink}}">{{.AdvertiserName}}</a></h6>
-							{{end}}{{end}}{{end}} {{if .Cocktail.ImagePath}}
+							{{end}}{{end}}{{end}} {{if .Image}} {{if .Cocktail.ImagePath}}
 							<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{else}}
-							<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}}
-							<h6 align="left" style="color: #555; background: rgba(0, 0, 0, 0
-.0); width: 100%;">Source: <a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}</a></h6>
+							<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}} {{else}}
+							<img class="img-responsive" style="max-height:150px" src="http://placehold.it/600x600"> {{end}}
+							<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: <a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}</a></h6>
 						</div>
 					</div>
-					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+					<div class="col-xs-0 col-sm-3 col-md-3 col-lg-3">
 						&nbsp;
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12" align="center">
+						<a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-sm" title="Facebook">
+							<i class="fa fa-facebook"></i>
+						</a>
+						<a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-sm" title="GitHub">
+							<i class="fa fa-github"></i>
+						</a>
+						<a href="#" class="btn btn-default btn-sm" title="Google Plus">
+							<i class="fa fa-google-plus"></i>
+						</a>
+						<a href="#" class="btn btn-default btn-sm" title="Twitter">
+							<i class="fa fa-twitter"></i>
+						</a>
+						<a href="mailto:someone@example.com?subject=Great Cocktail from Commonwealth Cocktails&body=Hi,I found this website and thought you might like it http://www.commonwealthcocktails.com/" class="btn btn-default btn-sm" title="Email">
+							<i class="fa fa-envelope"></i>
+						</a>
 					</div>
 				</div>
 				<div class="row">
@@ -318,11 +336,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<!--Social Media Links-->
-					</div>
-				</div>
+
 			</div>
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">

@@ -89,6 +89,12 @@ type BaseProductWithBDG struct {
 	BaseProduct     Product
 }
 
+func GetProducts() []Product {
+	var p []Product
+	p = Products
+	return p
+}
+
 func GetBaseProductWithBDG() *BaseProductWithBDG {
 	p := Products[rand.Intn(len(Products))]
 	ID := p.ID
