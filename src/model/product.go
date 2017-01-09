@@ -3,6 +3,7 @@ package model
 
 import (
 	"html/template"
+	"log"
 	"math/rand"
 )
 
@@ -70,6 +71,9 @@ type Product struct {
 	Rating          int
 	SourceName      string
 	SourceLink      string
+
+	//Advertiser Info
+	Advertisement Advertisement
 }
 
 type DerivedProduct struct {
@@ -163,6 +167,19 @@ func GetBaseProductByIDWithBDG(ID int) *BaseProductWithBDG {
 		}
 		bpwbdg.ProductGroups = gp
 	}
+
+	//need to check the ad type
+	for ad_index, ad_element := range Advertisements {
+		if ad_element.AdType == ProductAds {
+			for _, adprodcuts_element := range ad_element.Products {
+				if p.ID == adprodcuts_element.BaseProduct.ID {
+					log.Println(ad_element.AdvertiserName)
+					bpwbdg.Product.Advertisement = Advertisements[ad_index]
+				}
+			}
+		}
+	}
+
 	return &bpwbdg
 }
 
