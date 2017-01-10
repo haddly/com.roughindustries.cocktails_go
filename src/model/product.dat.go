@@ -50,7 +50,8 @@ var Products = []Product{
 		BDG:             Base,
 		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
 		Image:           "Maple_Leaf_Bottle.jpg",
-		ImageSourceName: "Unknown",
+		ImageSourceName: "McCamus Maple Syrup",
+		ImageSourceLink: "http://cdn.shopify.com/s/files/1/0628/8453/products/Leaf_Bottle.jpg?v=1415141353",
 	},
 	Product{
 		ID:          7,

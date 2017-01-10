@@ -204,8 +204,24 @@ var Advertisements = []Advertisement{
 		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
-				BaseProduct:       Products[30],
-				AdvertisedProduct: Products[30],
+				BaseProduct: Products[30],
+			},
+		},
+		AdType: ProductAds,
+	},
+	Advertisement{
+		ID:                17,
+		AdvertiserCompany: "ILLVA SARONNO S.p.A",
+		AdvertiserName:    "Disaronno",
+		AdvertiserLink:    "http://www.disaronno.com/",
+		HeaderSnippet:     "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
+		VertRecSnippet:    "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
+				BaseProduct: Products[33],
+			},
+			ProductAdvertisement{
+				BaseProduct: Products[10],
 			},
 		},
 		AdType: ProductAds,
