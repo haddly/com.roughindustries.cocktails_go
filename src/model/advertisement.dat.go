@@ -2,11 +2,11 @@ package model
 
 var Advertisements = []Advertisement{
 	Advertisement{
-		ID:               1,
-		AdvertiserName:   "Breckenridge™ Distillery",
-		AdvertiserLink:   "http://www.breckenridgedistillery.com/",
-		ImagePath600x150: "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image600x150:     "breckenridgedistillery-02.png",
+		ID:             1,
+		AdvertiserName: "Breckenridge™ Distillery",
+		AdvertiserLink: "http://www.breckenridgedistillery.com/",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.breckenridgedistillery.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/breckenridgedistillery-02.png\" alt=\"Breckenridge™ Distillery\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/BreckDistillery_ad.png\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[1],
 		},
@@ -21,8 +21,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             2,
 		AdvertiserName: "Pappy Van Winkle's™ Distillery",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[2],
@@ -33,8 +31,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             3,
 		AdvertiserName: "ReaLemon™",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[1],
@@ -45,8 +41,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             4,
 		AdvertiserName: "Tropicana™",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[0],
@@ -57,8 +51,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             5,
 		AdvertiserName: "Bailey and Co™",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[3],
@@ -70,8 +62,8 @@ var Advertisements = []Advertisement{
 		ID:             6,
 		AdvertiserName: "Frangelico™",
 		AdvertiserLink: "http://frangelico.com/",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "frangelico_logo.jpg",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://frangelico.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_logo.jpg\" alt=\"Frangelico™\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_ad.jpg\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[2],
 		},
@@ -81,12 +73,11 @@ var Advertisements = []Advertisement{
 				AdvertisedProduct: DerivedProducts[5].Product,
 			},
 		},
+		AdType: CocktailAds,
 	},
 	Advertisement{
 		ID:             7,
 		AdvertiserName: "Frangelico™",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[4],
@@ -97,6 +88,8 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             8,
 		AdvertiserName: "Stonewall Kitchen™",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.stonewallkitchen.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_header.png\" alt=\"Stonewall Kitchen™\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[5],
@@ -108,8 +101,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             9,
 		AdvertiserName: "Pernod Ricard",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[6],
@@ -123,11 +114,10 @@ var Advertisements = []Advertisement{
 		AdType: ProductAds,
 	},
 	Advertisement{
-		ID:               10,
-		AdvertiserName:   "The Kahlúa™ Company",
-		AdvertiserLink:   "http://www.kahlua.com/",
-		ImagePath600x150: "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image600x150:     "kahlua_logo.png",
+		ID:             10,
+		AdvertiserName: "The Kahlúa™ Company",
+		AdvertiserLink: "http://www.kahlua.com/",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.kahlua.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/kahlua_logo.png\" alt=\"The Kahlúa™ Company\" /></a>",
 		Cocktails: []Cocktail{
 			Cocktails[0],
 		},
@@ -144,8 +134,8 @@ var Advertisements = []Advertisement{
 		AdvertiserCompany: "ILLVA SARONNO S.p.A",
 		AdvertiserName:    "Disaronno",
 		AdvertiserLink:    "http://www.disaronno.com/",
-		ImagePath:         "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:             "",
+		HeaderSnippet:     "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
+		VertRecSnippet:    "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[4],
 		},
@@ -160,8 +150,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             12,
 		AdvertiserName: "Taylor'd Milestones",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[17],
@@ -172,8 +160,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             12,
 		AdvertiserName: "OXO",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[14],
@@ -184,8 +170,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             13,
 		AdvertiserName: "The Absolut™ Company",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[12],
@@ -196,8 +180,6 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             14,
 		AdvertiserName: "Anchor Distilling Company",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[15],
@@ -208,13 +190,24 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             15,
 		AdvertiserName: "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[40],
 				AdvertisedProduct: DerivedProducts[14].Product,
 			},
 		},
+	},
+	Advertisement{
+		ID:             16,
+		AdvertiserName: "Stonewall Kitchen™",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.stonewallkitchen.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_header.png\" alt=\"Stonewall Kitchen™\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
+				BaseProduct:       Products[30],
+				AdvertisedProduct: Products[30],
+			},
+		},
+		AdType: ProductAds,
 	},
 }

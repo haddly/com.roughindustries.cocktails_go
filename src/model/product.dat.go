@@ -44,10 +44,13 @@ var Products = []Product{
 		BDG:         Base,
 	},
 	Product{
-		ID:          6,
-		ProductName: "Maple Syrup",
-		ProductType: Liqueur,
-		BDG:         Base,
+		ID:              6,
+		ProductName:     "Maple Syrup",
+		ProductType:     Liqueur,
+		BDG:             Base,
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
+		Image:           "Maple_Leaf_Bottle.jpg",
+		ImageSourceName: "Unknown",
 	},
 	Product{
 		ID:          7,

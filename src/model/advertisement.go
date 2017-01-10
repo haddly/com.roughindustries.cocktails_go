@@ -1,6 +1,10 @@
 //model/advertisement.go
 package model
 
+import (
+	"html/template"
+)
+
 type AdType int
 
 const (
@@ -25,12 +29,9 @@ type Advertisement struct {
 	AdvertiserCompany string
 	AdvertiserName    string
 	AdvertiserLink    string
-	Image             string
-	ImagePath         string
-	Image600x150      string
-	ImagePath600x150  string
-	ImageBanner       string
-	ImagePathBanner   string
+	HeaderSnippet     template.HTML
+	BannerAdSnippet   template.HTML
+	VertRecSnippet    template.HTML
 	Cocktails         []Cocktail
 	Products          []ProductAdvertisement
 	AdType            AdType
