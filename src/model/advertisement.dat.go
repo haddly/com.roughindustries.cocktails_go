@@ -95,6 +95,9 @@ var Advertisements = []Advertisement{
 				BaseProduct:       Products[5],
 				AdvertisedProduct: DerivedProducts[6].Product,
 			},
+			ProductAdvertisement{
+				BaseProduct: Products[30],
+			},
 		},
 		AdType: ProductAds,
 	},
@@ -158,7 +161,7 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             12,
+		ID:             13,
 		AdvertiserName: "OXO",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
@@ -168,7 +171,7 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             13,
+		ID:             14,
 		AdvertiserName: "The Absolut™ Company",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
@@ -178,7 +181,7 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             14,
+		ID:             15,
 		AdvertiserName: "Anchor Distilling Company",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
@@ -188,7 +191,7 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             15,
+		ID:             16,
 		AdvertiserName: "",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
@@ -196,18 +199,6 @@ var Advertisements = []Advertisement{
 				AdvertisedProduct: DerivedProducts[14].Product,
 			},
 		},
-	},
-	Advertisement{
-		ID:             16,
-		AdvertiserName: "Stonewall Kitchen™",
-		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.stonewallkitchen.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_header.png\" alt=\"Stonewall Kitchen™\" /></a>",
-		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
-		Products: []ProductAdvertisement{
-			ProductAdvertisement{
-				BaseProduct: Products[30],
-			},
-		},
-		AdType: ProductAds,
 	},
 	Advertisement{
 		ID:                17,
