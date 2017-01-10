@@ -39,16 +39,14 @@
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 
 						<div align="center" style="position: relative; width: 100%;">
-							{{with .Cocktail.Advertisement}} {{if .AdvertiserName}} {{if .Image}}
+							{{with .Cocktail.Advertisement}} {{if .AdvertiserName}} 
 							<div align="center" style="position: relative; width: 100%;">
-								{{if .Image}} {{if .ImagePath}}
-								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="{{.ImagePath}}/{{.Image}}" alt="{{.AdvertiserName}}" /></a>{else}}
-								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image}}" alt="{{.AdvertiserName}}" /></a>{{end}} {{else}}
-								<img class="img-responsive" style="max-height:150px" src="http://placehold.it/600x600"> {{end}}
+								{{if .Image600x150}} {{if .ImagePath600x150}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="{{.ImagePath600x150}}/{{.Image600x150}}" alt="{{.AdvertiserName}}" /></a>{{else}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image600x150}}" alt="{{.AdvertiserName}}" /></a>{{end}} {{else}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.AdvertiserName}}&w=600&h=150&txttrack=0"/></a>{{end}}
 							</div>
-							{{else}}
-							<h6 align="center">Sponsored by: <a class="external" target="_blank" href="{{.AdvertiserLink}}">{{.AdvertiserName}}</a></h6>
-							{{end}}{{end}}{{end}} {{if .Image}} {{if .Cocktail.ImagePath}}
+							{{end}}{{end}} {{if .Cocktail.Image}} {{if .Cocktail.ImagePath}}
 							<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{else}}
 							<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}} {{else}}
 							<img class="img-responsive" style="max-height:150px" src="http://placehold.it/600x600"> {{end}}

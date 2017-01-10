@@ -33,6 +33,15 @@
 					</div>
 					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 						<div align="center" style="position: relative; width: 100%;">
+							{{with .Product.Advertisement}} {{if .AdvertiserName}} 
+							<div align="center" style="position: relative; width: 100%;">
+								{{if .Image600x150}} {{if .ImagePath600x150}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="{{.ImagePath600x150}}/{{.Image600x150}}" alt="{{.AdvertiserName}}" /></a>{{else}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="images/{{.Image600x150}}" alt="{{.AdvertiserName}}" /></a>{{end}} {{else}}
+								<a target="_blank" href="{{.AdvertiserLink}}"><img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.AdvertiserName}}&w=600&h=150&txttrack=0"/></a>{{end}}
+							</div>
+							{{end}}{{end}}
+							
 							{{if and .Product.Image}} {{if .Product.ImagePath}}
 							<img class="img-responsive" src="{{.Product.ImagePath}}/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{else}}
 							<img class="img-responsive" src="images/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{end}}
