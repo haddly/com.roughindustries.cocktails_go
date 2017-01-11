@@ -424,6 +424,120 @@ var Cocktails = []Cocktail{
 		},
 		Recipe: Recipes[6],
 	},
+	Cocktail{
+		ID:              8,
+		Title:           "Angel Face",
+		Name:            "Angel Face",
+		Description:     "Rich apricot and apple with a backbone of botanical gin. Balanced rather than dry or sweet.<br><br>This drink looks better when stirred but the original 1930 recipe is shaken and we think it tastes better for it - that is unless you add some water to increase the dilution of the stirred recipe.",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
+		Image:           "angel_face.jpg",
+		ImageSourceName: "Difford's Guide",
+		ImageSourceLink: "https://cdn.diffordsguide.com/contrib/stock-images/2015/8/02/2015646aef827a2f03d90f7f520ed97dc295.jpg",
+		SourceName:      "International Bartenders Association",
+		SourceLink:      "http://iba-world.com/iba-official-cocktails/angel-face/",
+		Rating:          3,
+		AKA:             []Name{},
+		Tool: []Product{
+			Products[14],
+		},
+		Strength: []Meta{
+			Metadata[4],
+		},
+		Difficulty: []Meta{
+			Metadata[0],
+		},
+		TOD: []Meta{
+			Metadata[6],
+			Metadata[7],
+			Metadata[10],
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Fruity",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Top 100",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Metadata[13],
+		},
+		Technique: []Meta{
+			Metadata[14],
+		},
+		Ratio:        []Meta{},
+		Family:       Meta{},
+		IsFamilyRoot: false,
+		BaseSpirit:   []Meta{},
+		Garnish: []Product{
+			Products[59],
+		},
+		Drinkware: []Product{
+			Products[49],
+		},
+		Recipe: Recipes[7],
+	},
+	Cocktail{
+		ID:              9,
+		Title:           "Aviation",
+		Name:            "Aviation",
+		Description:     "This is a fantastic, tangy cocktail and dangerously easy to drink - too many of these and you really will be flying.",
+		ImagePath:       "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
+		Image:           "aviation.jpg",
+		ImageSourceName: "Secret Gin Club",
+		ImageSourceLink: "https://secretginclub.files.wordpress.com/2012/11/secret-gin-club-no-3-aviation-cocktail.jpg",
+		SourceName:      "International Bartenders Association",
+		SourceLink:      "http://iba-world.com/iba-official-cocktails/aviation/",
+		Rating:          4,
+		AKA:             []Name{},
+		Tool: []Product{
+			Products[14],
+		},
+		Strength: []Meta{
+			Metadata[4],
+		},
+		Difficulty: []Meta{
+			Metadata[0],
+		},
+		TOD: []Meta{
+			Metadata[6],
+			Metadata[7],
+			Metadata[10],
+		},
+		Flavor: []Meta{
+			Meta{
+				MetaName: "Fruity",
+				MetaType: Flavor,
+			},
+		},
+		Type: []Meta{
+			Meta{
+				MetaName: "Top 100",
+				MetaType: Type,
+			},
+		},
+		Served: []Meta{
+			Metadata[13],
+		},
+		Technique: []Meta{
+			Metadata[14],
+		},
+		Ratio:        []Meta{},
+		Family:       Meta{},
+		IsFamilyRoot: false,
+		BaseSpirit:   []Meta{},
+		Garnish: []Product{
+			Products[15],
+		},
+		Drinkware: []Product{
+			Products[60],
+		},
+		Recipe: Recipes[8],
+	},
 }
 
 var FamilyCocktails = []FamilyCocktail{

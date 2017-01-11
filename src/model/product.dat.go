@@ -451,6 +451,37 @@ var Products = []Product{
 		PreText:     "Half",
 		PostText:    "Slice",
 	},
+	Product{
+		ID:          58,
+		ProductName: "Calvados",
+		ProductType: Spirit,
+		BDG:         Base,
+	},
+	Product{
+		ID:          59,
+		ProductName: "Apricot brandy",
+		ProductType: Liqueur,
+		BDG:         Base,
+	},
+	Product{
+		ID:          60,
+		ProductName: "Apple",
+		ProductType: Garnish,
+		BDG:         Base,
+		PreText:     "Wedge",
+	},
+	Product{
+		ID:          61,
+		ProductName: "Martini",
+		ProductType: Drinkware,
+		BDG:         Base,
+	},
+	Product{
+		ID:          62,
+		ProductName: "Maraschino Liqueur",
+		ProductType: Liqueur,
+		BDG:         Base,
+	},
 }
 
 var ProductGroups = []GroupProduct{

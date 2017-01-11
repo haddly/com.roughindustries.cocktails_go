@@ -139,10 +139,12 @@
 									{{else}}
 									<div>
 										<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
-											{{if .OriginalIngredient.ImagePath}}
+											{{if .OriginalIngredient.Image}} {{if .OriginalIngredient.ImagePath}}
 											<img border="0" class="img-responsive" src="{{.OriginalIngredient.ImagePath}}/{{.OriginalIngredient.Image}}">
 											{{else}}
 											<img border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
+											{{end}}	{{else}}
+											<img border="0" class="img-responsive" src="http://placehold.it/900x1200"> 
 											{{end}}
 										</a>
 									</div>
