@@ -169,7 +169,7 @@ var Recipes = []Recipe{
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeOrdinal:        1,
 			},
 			//1/2 oz Simple Syrup
 			RecipeStep{
@@ -215,7 +215,7 @@ var Recipes = []Recipe{
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeOrdinal:        1,
 			},
 			//1 dashes bittes
 			RecipeStep{
@@ -223,7 +223,7 @@ var Recipes = []Recipe{
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
 				RecipeDoze:           Dash,
-				RecipeOrdinal:        1,
+				RecipeOrdinal:        2,
 			},
 			//.5 fresh egg white
 			RecipeStep{
@@ -231,7 +231,65 @@ var Recipes = []Recipe{
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
 				RecipeDoze:           Fresh,
-				RecipeOrdinal:        4,
+				RecipeOrdinal:        3,
+			},
+		},
+	},
+	Recipe{
+		ID:     6,
+		Method: "Shake and strain into a chilled cocktail glass.",
+		RecipeSteps: []RecipeStep{
+			//1 oz cognac
+			RecipeStep{
+				OriginalIngredient:   Products[46],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 oz Créme de Cacao
+			RecipeStep{
+				OriginalIngredient:   Products[47],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        1,
+			},
+			//1 oz cream
+			RecipeStep{
+				OriginalIngredient:   Products[8],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        2,
+			},
+		},
+	},
+	Recipe{
+		ID:     7,
+		Method: "Mix the first two ingredients directly in an old-fashioned glass filled with ice-cubes, then add a splash of soda water.",
+		RecipeSteps: []RecipeStep{
+			//1 oz campari bitter
+			RecipeStep{
+				OriginalIngredient:   Products[51],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        0,
+			},
+			//1 oz sweet vermouth
+			RecipeStep{
+				OriginalIngredient:   Products[52],
+				RecipeCardinalFloat:  1.0,
+				RecipeCardinalString: "1",
+				RecipeDoze:           Ounce,
+				RecipeOrdinal:        1,
+			},
+			//1 oz cream
+			RecipeStep{
+				OriginalIngredient: Products[53],
+				RecipeDoze:         TopOffWith,
+				RecipeOrdinal:      2,
 			},
 		},
 	},

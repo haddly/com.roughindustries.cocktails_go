@@ -382,6 +382,75 @@ var Products = []Product{
 			Metadata[19],
 		},
 	},
+	Product{
+		ID:          47,
+		ProductName: "Cognac",
+		ProductType: Spirit,
+		BDG:         Base,
+	},
+	Product{
+		ID:          48,
+		ProductName: "Créme de Cacao - Dark",
+		ProductType: Spirit,
+		BDG:         Base,
+	},
+	Product{
+		ID:          49,
+		ProductName: "Nutmeg",
+		ProductType: Garnish,
+		BDG:         Base,
+		PreText:     "Fresh Ground",
+	},
+	Product{
+		ID:          50,
+		ProductName: "Coupe",
+		ProductType: Drinkware,
+		BDG:         Base,
+	},
+	Product{
+		ID:          51,
+		ProductName: "Grater",
+		ProductType: Tool,
+		BDG:         Base,
+	},
+	Product{
+		ID:          52,
+		ProductName: "Campari Bitter",
+		ProductType: Liqueur,
+		BDG:         Base,
+	},
+	Product{
+		ID:          53,
+		ProductName: "Vermouth - Sweet",
+		ProductType: Wine,
+		BDG:         Base,
+	},
+	Product{
+		ID:          54,
+		ProductName: "Soda Water",
+		ProductType: Mixer,
+		BDG:         Base,
+	},
+	Product{
+		ID:          55,
+		ProductName: "Bar Spoon",
+		ProductType: Tool,
+		BDG:         Base,
+	},
+	Product{
+		ID:          56,
+		ProductName: "Siphon",
+		ProductType: Tool,
+		BDG:         Base,
+	},
+	Product{
+		ID:          57,
+		ProductName: "Orange",
+		ProductType: Garnish,
+		BDG:         Base,
+		PreText:     "Half",
+		PostText:    "Slice",
+	},
 }
 
 var ProductGroups = []GroupProduct{
