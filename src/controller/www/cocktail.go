@@ -36,7 +36,8 @@ func (cocktail *Cocktail) RenderCocktailsTemplate(w http.ResponseWriter, tmpl st
 }
 
 func parseTempFiles(tmpl string) (*template.Template, error) {
-	return template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
+	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
+	return t, e
 }
 
 func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request) {
