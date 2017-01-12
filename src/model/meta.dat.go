@@ -102,4 +102,14 @@ var Metadata = []Meta{
 		MetaName: "In Cocktails",
 		MetaType: Drink,
 	},
+	Meta{
+		ID:       21,
+		MetaName: "Cognac",
+		MetaType: BaseSpirit,
+	},
+	Meta{
+		ID:       22,
+		MetaName: "Stirred",
+		MetaType: Technique,
+	},
 }
