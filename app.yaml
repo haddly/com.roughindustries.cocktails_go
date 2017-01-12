@@ -23,3 +23,13 @@ handlers:
   static_dir: view/webcontent/www/libs/slick
 - url: /.*
   script: _go_app
+
+#ENV VARS
+env_variables:
+  DBADDR: 'commonwealthcocktails.c2hmd6oyqsiy.us-east-1.rds.amazonaws.com'
+  DBPASSWD: 'commonwealthcocktails'
+  DBUSERNAME: 'ccuser'
+  DBPROTOCOL: 'tcp'
+  DBPORT: '3306'
+  DBNAME: 'commonwealthcocktails'
+  DataSource: 'Internal'

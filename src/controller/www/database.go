@@ -14,7 +14,7 @@ type Database struct {
 }
 
 type Status struct {
-	Status string
+	Status template.HTML
 }
 
 //render the page based on the name of the file provided
@@ -33,14 +33,16 @@ func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Reque
 	log.Println("DBValidateHandler: " + r.URL.Path[1:])
 
 	var buffer bytes.Buffer
-	buffer.WriteString(model.GetCurrentDB() + "/<br/>")
-	buffer.WriteString(model.InitCocktailTable() + "/<br/>")
+	buffer.WriteString("<b>Database</b>:<br/>")
+	buffer.WriteString(model.GetCurrentDB() + "<br/>")
+	buffer.WriteString("<br/><b>Tables</b>: ")
+	buffer.WriteString(model.InitCocktailTable() + "<br/>")
 	//apply the template page info to the index page
-	status := Status{buffer.String()}
+	statStr := buffer.String()
+	status := Status{template.HTML(statStr)}
 	database.RenderTemplate(w, "dbindex", &status)
 }
 
 func (database *Database) Init() {
-	log.Println("Init in db/Database.go")
 	http.HandleFunc("/db_validate", database.DBValidateHandler)
 }
