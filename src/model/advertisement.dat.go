@@ -5,29 +5,24 @@ var Advertisements = []Advertisement{
 		ID:             1,
 		AdvertiserName: "Breckenridge™ Distillery",
 		AdvertiserLink: "http://www.breckenridgedistillery.com/",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "breckenridgedistillery-02.png",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.breckenridgedistillery.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/breckenridgedistillery-02.png\" alt=\"Breckenridge™ Distillery\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/BreckDistillery_ad.png\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[1],
 		},
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[2],
 				AdvertisedProduct: DerivedProducts[3].Product,
 			},
 		},
+		AdType: CocktailAds,
 	},
 	Advertisement{
 		ID:             2,
 		AdvertiserName: "Pappy Van Winkle's™ Distillery",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[2],
 				AdvertisedProduct: DerivedProducts[2].Product,
 			},
@@ -36,12 +31,8 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             3,
 		AdvertiserName: "ReaLemon™",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[1],
 				AdvertisedProduct: DerivedProducts[1].Product,
 			},
@@ -50,12 +41,8 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             4,
 		AdvertiserName: "Tropicana™",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[0],
 				AdvertisedProduct: DerivedProducts[0].Product,
 			},
@@ -64,12 +51,8 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             5,
 		AdvertiserName: "Bailey and Co™",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[3],
 				AdvertisedProduct: DerivedProducts[4].Product,
 			},
@@ -79,29 +62,24 @@ var Advertisements = []Advertisement{
 		ID:             6,
 		AdvertiserName: "Frangelico™",
 		AdvertiserLink: "http://frangelico.com/",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "frangelico_logo.jpg",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://frangelico.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_logo.jpg\" alt=\"Frangelico™\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_ad.jpg\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[2],
 		},
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[4],
 				AdvertisedProduct: DerivedProducts[5].Product,
 			},
 		},
+		AdType: CocktailAds,
 	},
 	Advertisement{
 		ID:             7,
 		AdvertiserName: "Frangelico™",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[4],
 				AdvertisedProduct: DerivedProducts[5].Product,
 			},
@@ -110,135 +88,133 @@ var Advertisements = []Advertisement{
 	Advertisement{
 		ID:             8,
 		AdvertiserName: "Stonewall Kitchen™",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.stonewallkitchen.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_header.png\" alt=\"Stonewall Kitchen™\" /></a>",
+		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[5],
 				AdvertisedProduct: DerivedProducts[6].Product,
 			},
+			ProductAdvertisement{
+				BaseProduct: Products[30],
+			},
 		},
+		AdType: ProductAds,
 	},
 	Advertisement{
 		ID:             9,
 		AdvertiserName: "Pernod Ricard",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[6],
 				AdvertisedProduct: DerivedProducts[7].Product,
 			},
-			ProdcutAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[9],
 				AdvertisedProduct: DerivedProducts[8].Product,
 			},
 		},
+		AdType: ProductAds,
 	},
 	Advertisement{
 		ID:             10,
 		AdvertiserName: "The Kahlúa™ Company",
 		AdvertiserLink: "http://www.kahlua.com/",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "kahlua_logo.png",
+		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.kahlua.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/kahlua_logo.png\" alt=\"The Kahlúa™ Company\" /></a>",
 		Cocktails: []Cocktail{
 			Cocktails[0],
 		},
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[6],
 				AdvertisedProduct: DerivedProducts[7].Product,
 			},
 		},
+		AdType: CocktailAds,
 	},
 	Advertisement{
-		ID:             11,
-		AdvertiserName: "ILLVA SARONNO S.p.A",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		ID:                11,
+		AdvertiserCompany: "ILLVA SARONNO S.p.A",
+		AdvertiserName:    "Disaronno",
+		AdvertiserLink:    "http://www.disaronno.com/",
+		HeaderSnippet:     "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
+		VertRecSnippet:    "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
+		Cocktails: []Cocktail{
+			Cocktails[4],
+		},
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[10],
 				AdvertisedProduct: DerivedProducts[9].Product,
 			},
 		},
+		AdType: CocktailAds,
 	},
 	Advertisement{
 		ID:             12,
 		AdvertiserName: "Taylor'd Milestones",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[17],
 				AdvertisedProduct: DerivedProducts[10].Product,
 			},
 		},
 	},
 	Advertisement{
-		ID:             12,
+		ID:             13,
 		AdvertiserName: "OXO",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[14],
 				AdvertisedProduct: DerivedProducts[11].Product,
 			},
 		},
 	},
 	Advertisement{
-		ID:             13,
+		ID:             14,
 		AdvertiserName: "The Absolut™ Company",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[12],
 				AdvertisedProduct: DerivedProducts[12].Product,
 			},
 		},
 	},
 	Advertisement{
-		ID:             14,
+		ID:             15,
 		AdvertiserName: "Anchor Distilling Company",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[15],
 				AdvertisedProduct: DerivedProducts[13].Product,
 			},
 		},
 	},
 	Advertisement{
-		ID:             15,
+		ID:             16,
 		AdvertiserName: "",
-		Article:        "",
-		Blurb:          "",
-		ImagePath:      "https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages",
-		Image:          "",
-		Products: []ProdcutAdvertisement{
-			ProdcutAdvertisement{
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
 				BaseProduct:       Products[40],
 				AdvertisedProduct: DerivedProducts[14].Product,
 			},
 		},
+	},
+	Advertisement{
+		ID:                17,
+		AdvertiserCompany: "ILLVA SARONNO S.p.A",
+		AdvertiserName:    "Disaronno",
+		AdvertiserLink:    "http://www.disaronno.com/",
+		HeaderSnippet:     "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
+		VertRecSnippet:    "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
+		Products: []ProductAdvertisement{
+			ProductAdvertisement{
+				BaseProduct: Products[33],
+			},
+			ProductAdvertisement{
+				BaseProduct: Products[10],
+			},
+		},
+		AdType: ProductAds,
 	},
 }

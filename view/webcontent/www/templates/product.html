@@ -33,7 +33,14 @@
 					</div>
 					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 						<div align="center" style="position: relative; width: 100%;">
-							{{if and .Product.Image}} {{if .Product.ImagePath}}
+							{{with .Product.Advertisement}} {{if .AdvertiserName}}
+							<div align="center" style="position: relative; width: 100%;">
+								{{if .HeaderSnippet}} {{.HeaderSnippet}} {{else}}
+								<a target="_blank" href="{{.AdvertiserLink}}">
+									<img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.AdvertiserName}}&w=600&h=150&txttrack=0" />
+								</a>{{end}}
+							</div>
+							{{end}}{{end}} {{if and .Product.Image}} {{if .Product.ImagePath}}
 							<img class="img-responsive" src="{{.Product.ImagePath}}/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{else}}
 							<img class="img-responsive" src="images/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{end}}
 							<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source:
@@ -137,9 +144,11 @@
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
 				<div align="center" class="row">
-					<div style="width:200px;">
-						<img class="img-responsive" src="https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/jackdaniels.jpg" />
+					{{with .Product.Advertisement}} {{if .AdvertiserName}}
+					<div align="center" style="position: relative; width: 100%; max-width:400px">
+						{{if .VertRecSnippet}} {{.VertRecSnippet}} {{end}}
 					</div>
+					{{end}}{{end}}
 				</div>
 				<br>
 				<div class="row">
