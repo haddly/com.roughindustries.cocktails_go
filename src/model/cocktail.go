@@ -51,6 +51,8 @@ type Cocktail struct {
 	Ratio           []Meta
 	Family          Meta
 	IsFamilyRoot    bool
+	About           Post
+	Articles        []Post
 
 	//Advertiser Info
 	Advertisement Advertisement
