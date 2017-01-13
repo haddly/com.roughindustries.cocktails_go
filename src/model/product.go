@@ -62,7 +62,6 @@ type Product struct {
 	ImageSourceName string
 	ImageSourceLink string
 	Article         string
-	Blurb           string
 	Recipe          Recipe
 	BDG             BDGCategory
 	PreText         string
@@ -71,6 +70,7 @@ type Product struct {
 	Rating          int
 	SourceName      string
 	SourceLink      string
+	About           Post
 
 	//Advertiser Info
 	Advertisement Advertisement
