@@ -42,6 +42,6 @@ type Meta struct {
 	ID       int
 	MetaName string
 	MetaType MetaType
-	Article  string
-	Blurb    string
+	Article  Post
+	Blurb    Post
 }

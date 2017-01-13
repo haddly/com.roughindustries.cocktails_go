@@ -51,6 +51,8 @@ type Cocktail struct {
 	Ratio           []Meta
 	Family          Meta
 	IsFamilyRoot    bool
+	About           Post
+	Articles        []Post
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -58,11 +60,6 @@ type Cocktail struct {
 
 type Name struct {
 	Name string
-}
-
-func InitCocktailTable() string {
-	log.Println("CocktailTable Init")
-	return "CocktailTable Init"
 }
 
 type FamilyCocktail struct {
@@ -121,18 +118,29 @@ func GetCocktailByID(ID int) FamilyCocktail {
 func GetCocktail() FamilyCocktail {
 	var c Cocktail
 	c = copyCocktail(-1)
-	//c := &Cocktails[rand.Intn(len(Cocktails))]
 	return processCocktailRequest(c)
 }
 
 func GetCocktails() []Cocktail {
 	var c []Cocktail
 	c = Cocktails
-	//c := &Cocktails[rand.Intn(len(Cocktails))]
 	return c
 }
 
 func processCocktailRequest(c Cocktail) FamilyCocktail {
+	dst := GetDataSourceType()
+	switch dst {
+	case Internal:
+		return processInternalCocktailRequest(c)
+	default:
+		var fc FamilyCocktail
+		return fc
+
+	}
+}
+
+func processInternalCocktailRequest(c Cocktail) FamilyCocktail {
+
 	var fc FamilyCocktail
 
 	prod_ignore := []int{}
