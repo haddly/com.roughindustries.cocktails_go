@@ -19,6 +19,7 @@ var d = www.Database{}
 var c = www.Cocktail{}
 var p = www.Product{}
 var s = www.Search{}
+var post = www.Post{}
 
 func init() {
 
@@ -63,6 +64,7 @@ func init() {
 	c.Init()
 	p.Init()
 	s.Init()
+	post.Init()
 }
 
 func main() {
