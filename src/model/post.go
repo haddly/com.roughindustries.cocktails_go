@@ -3,6 +3,7 @@ package model
 
 import (
 	"html/template"
+	"strconv"
 	"time"
 )
 
@@ -54,6 +55,18 @@ type Post struct {
 	PostExcerptImage           string
 	PostExcerptImageSourceName string
 	PostExcerptImageSourceLink string
+
+	//Advertiser Info
+	Advertisement Advertisement
+}
+
+func (post *Post) FormattedDate() string {
+	return post.PostDate.Month().String()[:3] + " " + strconv.Itoa(post.PostDate.Day()) + " " + strconv.Itoa(post.PostDate.Year())
+}
+
+func GetPost(ID int) *Post {
+	p := Posts[ID]
+	return &p
 }
 
 func GetPosts() []Post {
