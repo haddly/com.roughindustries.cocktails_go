@@ -33,3 +33,4 @@ env_variables:
   DBPORT: '3306'
   DBNAME: 'commonwealthcocktails'
   DataSource: 'Internal'
+  # DataSource: 'DB'
