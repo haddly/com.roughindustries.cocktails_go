@@ -4,6 +4,7 @@ package www
 import (
 	//"database/sql"
 	"bytes"
+	"db"
 	"html/template"
 	"log"
 	"model"
@@ -36,7 +37,16 @@ func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Reque
 	buffer.WriteString("<b>Database</b>:<br/>")
 	buffer.WriteString(model.GetCurrentDB() + "<br/>")
 	buffer.WriteString("<br/><b>Tables</b>: ")
-	buffer.WriteString(model.InitCocktailTable() + "<br/>")
+	model.InitCocktailTables()
+	model.InitPostTables()
+	model.InitMetaTables()
+	conn, _ := db.GetDB()
+	rows, _ := conn.Query("SHOW TABLES;")
+	for rows.Next() {
+		var temp string
+		rows.Scan(&temp)
+		buffer.WriteString("<br>" + temp)
+	}
 	//apply the template page info to the index page
 	statStr := buffer.String()
 	status := Status{template.HTML(statStr)}

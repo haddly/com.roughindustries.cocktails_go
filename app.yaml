@@ -32,5 +32,5 @@ env_variables:
   DBPROTOCOL: 'tcp'
   DBPORT: '3306'
   DBNAME: 'commonwealthcocktails'
-  DataSource: 'Internal'
-  # DataSource: 'DB'
+  # DataSource: 'Internal'
+  DataSource: 'DB'
