@@ -39,6 +39,15 @@ h6 {
     background-size: cover;
 }
 
+.ad_banner {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    text-align: center;
+    color: #f8f8f8;
+    background: url(https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/banner_ad.jpg) no-repeat center center;
+    background-size: cover;
+}
+
 .intro-message {
     position: relative;
     padding-top: 20%;

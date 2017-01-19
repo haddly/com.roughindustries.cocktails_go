@@ -35,7 +35,7 @@
 						<div align="center" style="position: relative; width: 100%;">
 							{{with .Product.Advertisement}} {{if .AdvertiserName}}
 							<div align="center" style="position: relative; width: 100%;">
-								{{if .HeaderSnippet}} {{.HeaderSnippet}} {{else}}
+								{{if .MediumHorSnippet}} {{.MediumHorSnippet}} {{else}}
 								<a target="_blank" href="{{.AdvertiserLink}}">
 									<img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.AdvertiserName}}&w=600&h=150&txttrack=0" />
 								</a>{{end}}
@@ -146,7 +146,7 @@
 				<div align="center" class="row">
 					{{with .Product.Advertisement}} {{if .AdvertiserName}}
 					<div align="center" style="position: relative; width: 100%; max-width:400px">
-						{{if .VertRecSnippet}} {{.VertRecSnippet}} {{end}}
+						{{if .MediumVertSnippet}} {{.MediumVertSnippet}} {{end}}
 					</div>
 					{{end}}{{end}}
 				</div>

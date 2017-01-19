@@ -3,20 +3,21 @@ package model
 
 import (
 	"html/template"
+	"strconv"
 	"time"
 )
 
 type PostType int
 
 const (
-	AboutPost = 1 + iota
-	ArticlePost
+	InnerPost = 1 + iota
+	FullPost
 	Blurb
 )
 
 var PostTypeStrings = [...]string{
-	"AboutPost",
-	"ArticlePost",
+	"InnerPost",
+	"FullPost",
 	"Blurb",
 }
 
@@ -41,13 +42,39 @@ var PostStatusStrings = [...]string{
 func (ps PostStatus) String() string { return PostStatusStrings[ps-1] }
 
 type Post struct {
-	ID           int
-	post_author  string
-	post_date    time.Time
-	post_content template.HTML
-	post_title   string
-	post_excerpt template.HTML
-	post_status  PostStatus //status of the post, e.g. ‘draft’, ‘pending’, ‘private’, ‘publish’. Also a great WordPress news site.
-	post_name    string
-	post_type    PostType
+	ID                         int
+	PostAuthor                 string
+	PostDate                   time.Time
+	PostContent                template.HTML
+	PostTitle                  string
+	PostExcerpt                template.HTML
+	PostStatus                 PostStatus //status of the post, e.g. ‘draft’, ‘pending’, ‘private’, ‘publish’. Also a great WordPress news site.
+	PostName                   string
+	PostType                   PostType
+	PostExcerptImagePath       string
+	PostExcerptImage           string
+	PostExcerptImageSourceName string
+	PostExcerptImageSourceLink string
+
+	//Advertiser Info
+	Advertisement Advertisement
+}
+
+func (post *Post) FormattedDate() string {
+	return post.PostDate.Month().String()[:3] + " " + strconv.Itoa(post.PostDate.Day()) + " " + strconv.Itoa(post.PostDate.Year())
+}
+
+func GetPost(ID int) *Post {
+	p := Posts[ID]
+	return &p
+}
+
+func GetPosts() []Post {
+	var p []Post
+	for _, element := range Posts {
+		if element.PostType == FullPost {
+			p = append(p, element)
+		}
+	}
+	return p
 }
