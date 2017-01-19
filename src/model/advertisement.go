@@ -29,11 +29,16 @@ type Advertisement struct {
 	AdvertiserCompany string
 	AdvertiserName    string
 	AdvertiserLink    string
-	HeaderSnippet     template.HTML
+	LargeHorSnippet   template.HTML
+	MediumHorSnippet  template.HTML
+	SmallHorSnippet   template.HTML
 	BannerAdSnippet   template.HTML
-	VertRecSnippet    template.HTML
+	LargeVertSnippet  template.HTML
+	MediumVertSnippet template.HTML
+	SmallVertSnippet  template.HTML
 	Cocktails         []Cocktail
 	Products          []ProductAdvertisement
+	Articles          []Post
 	AdType            AdType
 	Page              string
 }

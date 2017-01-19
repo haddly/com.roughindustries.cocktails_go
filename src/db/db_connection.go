@@ -34,6 +34,7 @@ func GetDB() (*sql.DB, error) {
 		}
 		db = d
 	}
+	log.Println("Got DB")
 
 	return db, nil
 }

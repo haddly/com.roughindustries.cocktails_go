@@ -2,11 +2,11 @@ package model
 
 var Advertisements = []Advertisement{
 	Advertisement{
-		ID:             1,
-		AdvertiserName: "Breckenridge™ Distillery",
-		AdvertiserLink: "http://www.breckenridgedistillery.com/",
-		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.breckenridgedistillery.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/breckenridgedistillery-02.png\" alt=\"Breckenridge™ Distillery\" /></a>",
-		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/BreckDistillery_ad.png\"/>",
+		ID:                1,
+		AdvertiserName:    "Breckenridge™ Distillery",
+		AdvertiserLink:    "http://www.breckenridgedistillery.com/",
+		MediumHorSnippet:  "<a target=\"_blank\" href=\"http://www.breckenridgedistillery.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/breckenridgedistillery-02.png\" alt=\"Breckenridge™ Distillery\" /></a>",
+		MediumVertSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/BreckDistillery_ad.png\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[1],
 		},
@@ -59,11 +59,11 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             6,
-		AdvertiserName: "Frangelico™",
-		AdvertiserLink: "http://frangelico.com/",
-		HeaderSnippet:  "<a target=\"_blank\" href=\"http://frangelico.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_logo.jpg\" alt=\"Frangelico™\" /></a>",
-		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_ad.jpg\"/>",
+		ID:                6,
+		AdvertiserName:    "Frangelico™",
+		AdvertiserLink:    "http://frangelico.com/",
+		MediumHorSnippet:  "<a target=\"_blank\" href=\"http://frangelico.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_logo.jpg\" alt=\"Frangelico™\" /></a>",
+		MediumVertSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/frangelico_ad.jpg\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[2],
 		},
@@ -86,10 +86,10 @@ var Advertisements = []Advertisement{
 		},
 	},
 	Advertisement{
-		ID:             8,
-		AdvertiserName: "Stonewall Kitchen™",
-		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.stonewallkitchen.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_header.png\" alt=\"Stonewall Kitchen™\" /></a>",
-		VertRecSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
+		ID:                8,
+		AdvertiserName:    "Stonewall Kitchen™",
+		MediumHorSnippet:  "<a target=\"_blank\" href=\"http://www.stonewallkitchen.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_header.png\" alt=\"Stonewall Kitchen™\" /></a>",
+		MediumVertSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/stonewall-kitchen-logo_vertrec.png\"/>",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct:       Products[5],
@@ -117,10 +117,10 @@ var Advertisements = []Advertisement{
 		AdType: ProductAds,
 	},
 	Advertisement{
-		ID:             10,
-		AdvertiserName: "The Kahlúa™ Company",
-		AdvertiserLink: "http://www.kahlua.com/",
-		HeaderSnippet:  "<a target=\"_blank\" href=\"http://www.kahlua.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/kahlua_logo.png\" alt=\"The Kahlúa™ Company\" /></a>",
+		ID:               10,
+		AdvertiserName:   "The Kahlúa™ Company",
+		AdvertiserLink:   "http://www.kahlua.com/",
+		MediumHorSnippet: "<a target=\"_blank\" href=\"http://www.kahlua.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/kahlua_logo.png\" alt=\"The Kahlúa™ Company\" /></a>",
 		Cocktails: []Cocktail{
 			Cocktails[0],
 		},
@@ -137,8 +137,8 @@ var Advertisements = []Advertisement{
 		AdvertiserCompany: "ILLVA SARONNO S.p.A",
 		AdvertiserName:    "Disaronno",
 		AdvertiserLink:    "http://www.disaronno.com/",
-		HeaderSnippet:     "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
-		VertRecSnippet:    "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
+		MediumHorSnippet:  "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
+		MediumVertSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
 		Cocktails: []Cocktail{
 			Cocktails[4],
 		},
@@ -205,8 +205,8 @@ var Advertisements = []Advertisement{
 		AdvertiserCompany: "ILLVA SARONNO S.p.A",
 		AdvertiserName:    "Disaronno",
 		AdvertiserLink:    "http://www.disaronno.com/",
-		HeaderSnippet:     "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
-		VertRecSnippet:    "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
+		MediumHorSnippet:  "<a target=\"_blank\" href=\"http://www.disaronno.com/\"><img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/Disaronno-Logo.png\" alt=\"Disaronno\" /></a>",
+		MediumVertSnippet: "<img class=\"img-responsive\" src=\"https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/disaronno_ad.jpg\"/>",
 		Products: []ProductAdvertisement{
 			ProductAdvertisement{
 				BaseProduct: Products[33],
