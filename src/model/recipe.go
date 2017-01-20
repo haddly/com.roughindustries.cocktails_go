@@ -35,7 +35,7 @@ const (
 	Fresh
 )
 
-var Dozes = [...]string{
+var DozeStrings = [...]string{
 	"shot",
 	"oz.",
 	"whole",
@@ -46,4 +46,4 @@ var Dozes = [...]string{
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).
-func (d Doze) String() string { return Dozes[d-1] }
+func (d Doze) String() string { return DozeStrings[d-1] }

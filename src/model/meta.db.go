@@ -14,7 +14,7 @@ func InitMetaTables() {
 		log.Println("metatype Table Exists")
 	} else if err == sql.ErrNoRows {
 		log.Println("Creating metatype Table")
-		conn.Query("CREATE TABLE `commonwealthcocktails`.`metatype` (`idmetatype` INT NOT NULL AUTO_INCREMENT,  PRIMARY KEY (`idmetatype`));")
+		conn.Query("CREATE TABLE `commonwealthcocktails`.`metatype` (`idMetaType` INT NOT NULL AUTO_INCREMENT,  PRIMARY KEY (`idMetaType`));")
 	}
 
 	if err := conn.QueryRow("SHOW TABLES LIKE 'meta';").Scan(&temp); err == nil {

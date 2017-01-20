@@ -14,6 +14,6 @@ func InitCocktailTables() {
 		log.Println("cocktail Table Exists")
 	} else if err == sql.ErrNoRows {
 		log.Println("Creating cocktail Table")
-		conn.Query("CREATE TABLE `commonwealthcocktails`.`cocktail` (`idcocktail` INT NOT NULL AUTO_INCREMENT,PRIMARY KEY (`idcocktail`));")
+		conn.Query("CREATE TABLE `commonwealthcocktails`.`cocktail` (`idCocktail` INT NOT NULL AUTO_INCREMENT,PRIMARY KEY (`idCocktail`));")
 	}
 }
