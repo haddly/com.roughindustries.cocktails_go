@@ -36,9 +36,22 @@ func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Reque
 	buffer.WriteString("<b>Database</b>:<br/>")
 	buffer.WriteString(model.GetCurrentDB() + "<br/>")
 	buffer.WriteString("<br/><b>Tables</b>: ")
+	model.InitProductTables()
 	model.InitCocktailTables()
 	model.InitPostTables()
 	model.InitMetaTables()
+	model.InitRecipeTables()
+	model.InitAdvertisementTables()
+	model.InitCocktailReferences()
+	model.InitAdvertisementReferences()
+	model.InitMetaReferences()
+	model.InitProductReferences()
+	model.InitRecipeReferences()
+
+	model.ProcessProducts()
+	model.ProcessMetas()
+	model.ProcessRecipes()
+
 	conn, _ := db.GetDB()
 	rows, _ := conn.Query("SHOW TABLES;")
 	for rows.Next() {

@@ -61,7 +61,7 @@ type Product struct {
 	Image           string
 	ImageSourceName string
 	ImageSourceLink string
-	Article         string
+	Article         Post
 	Recipe          Recipe
 	BDG             BDGCategory
 	PreText         string
