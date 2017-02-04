@@ -2,9 +2,13 @@
 package model
 
 import (
+	"bytes"
 	"database/sql"
 	"db"
 	"log"
+	"strconv"
+	"strings"
+	"time"
 )
 
 func InitPostTables() {
@@ -40,18 +44,67 @@ func InitPostTables() {
 		log.Println("Creating Post Table")
 		conn.Query("CREATE TABLE `commonwealthcocktails`.`post` (`idPost` INT NOT NULL AUTO_INCREMENT,PRIMARY KEY (`idPost`));")
 		conn.Query("ALTER TABLE `commonwealthcocktails`.`post`" +
-			"ADD COLUMN `postAuthor` VARCHAR(150) NULL AFTER `idPost`," + //PostAuthor
+			"ADD COLUMN `postAuthor` VARCHAR(150) NOT NULL AFTER `idPost`," + //PostAuthor
 			"ADD COLUMN `postTitle` VARCHAR(250) NOT NULL AFTER `postAuthor`," + //PostTitle
-			"ADD COLUMN `postContent` VARCHAR(1500) NOT NULL AFTER `postTitle`," + //PostContent
-			"ADD COLUMN `postExcerpt` VARCHAR(750) NOT NULL AFTER `postContent`," + //PostExcerpt
-			"ADD COLUMN `PostName` VARCHAR(750) NOT NULL AFTER `postExcerpt`," + //PostName
-			"ADD COLUMN `PostExcerptImagePath` VARCHAR(750) NOT NULL AFTER `PostName`," + //PostExcerptImagePath
-			"ADD COLUMN `PostExcerptImage` VARCHAR(750) NOT NULL AFTER `PostExcerptImagePath`," + //PostExcerptImage
-			"ADD COLUMN `PostExcerptImageSourceName` VARCHAR(750) NOT NULL AFTER `PostExcerptImage`," + //PostExcerptImageSourceName
-			"ADD COLUMN `PostExcerptImageSourceLink` VARCHAR(750) NOT NULL AFTER `PostExcerptImageSourceName`," + //PostExcerptImageSourceLink
-			"ADD COLUMN `postDate` DATETIME NOT NULL AFTER `PostExcerptImageSourceLink`," + //PostDate
+			"ADD COLUMN `postContent` VARCHAR(1500) AFTER `postTitle`," + //PostContent
+			"ADD COLUMN `postExcerpt` VARCHAR(750) AFTER `postContent`," + //PostExcerpt
+			"ADD COLUMN `postName` VARCHAR(750) AFTER `postExcerpt`," + //PostName
+			"ADD COLUMN `postExcerptImagePath` VARCHAR(750) AFTER `postName`," + //PostExcerptImagePath
+			"ADD COLUMN `postExcerptImage` VARCHAR(750) AFTER `postExcerptImagePath`," + //PostExcerptImage
+			"ADD COLUMN `postExcerptImageSourceName` VARCHAR(750) AFTER `postExcerptImage`," + //PostExcerptImageSourceName
+			"ADD COLUMN `postExcerptImageSourceLink` VARCHAR(750) AFTER `postExcerptImageSourceName`," + //PostExcerptImageSourceLink
+			"ADD COLUMN `postDate` DATETIME NOT NULL AFTER `postExcerptImageSourceLink`," + //PostDate
 			"ADD COLUMN `postStatus` INT NOT NULL, ADD CONSTRAINT post_poststatus_id_fk FOREIGN KEY(postStatus) REFERENCES poststatus(idPostStatus)," + //PostStatus
 			"ADD COLUMN `postType` INT NOT NULL, ADD CONSTRAINT post_posttype_id_fk FOREIGN KEY(postType) REFERENCES posttype(idPostType);") //PostType
 
+	}
+}
+
+func ProcessPosts() {
+	conn, _ := db.GetDB()
+
+	for _, post := range Posts {
+		log.Println(post.PostTitle)
+		var buffer bytes.Buffer
+		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`post` SET ")
+		if post.PostTitle != "" {
+			buffer.WriteString("`postTitle`=\"" + post.PostTitle + "\",")
+		}
+		if post.PostName != "" {
+			buffer.WriteString("`postName`=\"" + post.PostName + "\",")
+		}
+		if post.PostAuthor != "" {
+			buffer.WriteString("`postAuthor`=\"" + post.PostAuthor + "\",")
+		}
+		if post.PostContent != "" {
+			sqlString := strings.Replace(string(post.PostContent), "\\", "\\\\", -1)
+			sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
+			buffer.WriteString("`postContent`=\"" + sqlString + "\",")
+		}
+		if post.PostExcerpt != "" {
+			sqlString := strings.Replace(string(post.PostExcerpt), "\\", "\\\\", -1)
+			sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
+			buffer.WriteString("`postExcerpt`=\"" + sqlString + "\",")
+		}
+		buffer.WriteString(" `postDate`=\"" + post.PostDate.Format(time.RFC3339) + "\",")
+		buffer.WriteString(" `postStatus`=" + strconv.Itoa(int(post.PostStatus)) + ",")
+		buffer.WriteString(" `postType`=" + strconv.Itoa(int(post.PostType)) + ",")
+		if post.PostExcerptImagePath != "" {
+			buffer.WriteString("`postExcerptImagePath`=\"" + post.PostExcerptImagePath + "\",")
+		}
+		if post.PostExcerptImage != "" {
+			buffer.WriteString("`postExcerptImage`=\"" + post.PostExcerptImage + "\",")
+		}
+		if post.PostExcerptImageSourceName != "" {
+			buffer.WriteString("`postExcerptImageSourceName`=\"" + post.PostExcerptImageSourceName + "\",")
+		}
+		if post.PostExcerptImageSourceLink != "" {
+			buffer.WriteString("`postExcerptImageSourceLink`=\"" + post.PostExcerptImageSourceLink + "\",")
+		}
+		query := buffer.String()
+		query = strings.TrimRight(query, ",")
+		query = query + ";"
+		log.Println(query)
+		conn.Exec(query)
 	}
 }

@@ -31,22 +31,13 @@ var Cocktails = []Cocktail{
 			Metadata[10],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Creamy",
-				MetaType: Flavor,
-			},
+			Metadata[22],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Creamy",
-				MetaType: Type,
-			},
+			Metadata[23],
 		},
 		Served: []Meta{
-			Meta{
-				MetaName: "On the Rocks",
-				MetaType: Served,
-			},
+			Metadata[12],
 		},
 		Technique: []Meta{
 			Metadata[14],
@@ -90,20 +81,11 @@ var Cocktails = []Cocktail{
 			Metadata[7],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Fruity/Citrus",
-				MetaType: Flavor,
-			},
-			Meta{
-				MetaName: "Sour",
-				MetaType: Flavor,
-			},
+			Metadata[24],
+			Metadata[25],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Recommended",
-				MetaType: Type,
-			},
+			Metadata[26],
 		},
 		Served: []Meta{
 			Metadata[12],
@@ -150,16 +132,10 @@ var Cocktails = []Cocktail{
 			Metadata[9],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Creamy",
-				MetaType: Flavor,
-			},
+			Metadata[22],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Recommended",
-				MetaType: Type,
-			},
+			Metadata[26],
 		},
 		Served: []Meta{
 			Metadata[12],
@@ -205,20 +181,11 @@ var Cocktails = []Cocktail{
 			Metadata[8],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Sour",
-				MetaType: Flavor,
-			},
-			Meta{
-				MetaName: "Sweet",
-				MetaType: Flavor,
-			},
+			Metadata[25],
+			Metadata[27],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Recommended",
-				MetaType: Type,
-			},
+			Metadata[26],
 		},
 		Served: []Meta{
 			Metadata[12],
@@ -227,15 +194,9 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		Ratio: []Meta{
-			Meta{
-				MetaName: "4:2:8",
-				MetaType: Ratio,
-			},
+			Metadata[29],
 		},
-		Family: Meta{
-			MetaName: "Sour",
-			MetaType: Family,
-		},
+		Family:       Metadata[28],
 		IsFamilyRoot: true,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -272,20 +233,11 @@ var Cocktails = []Cocktail{
 			Metadata[8],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Sour",
-				MetaType: Flavor,
-			},
-			Meta{
-				MetaName: "Sweet",
-				MetaType: Flavor,
-			},
+			Metadata[25],
+			Metadata[27],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Recommended",
-				MetaType: Type,
-			},
+			Metadata[26],
 		},
 		Served: []Meta{
 			Metadata[12],
@@ -293,11 +245,8 @@ var Cocktails = []Cocktail{
 		Technique: []Meta{
 			Metadata[14],
 		},
-		Ratio: []Meta{},
-		Family: Meta{
-			MetaName: "Sour",
-			MetaType: Family,
-		},
+		Ratio:        []Meta{},
+		Family:       Metadata[28],
 		IsFamilyRoot: false,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -336,16 +285,10 @@ var Cocktails = []Cocktail{
 			Metadata[10],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Creamy",
-				MetaType: Flavor,
-			},
+			Metadata[22],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Top 100",
-				MetaType: Type,
-			},
+			Metadata[30],
 		},
 		Served: []Meta{
 			Metadata[13],
@@ -395,16 +338,10 @@ var Cocktails = []Cocktail{
 			Metadata[8],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Bitter",
-				MetaType: Flavor,
-			},
+			Metadata[31],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Top 100",
-				MetaType: Type,
-			},
+			Metadata[30],
 		},
 		Served: []Meta{
 			Metadata[12],
@@ -452,16 +389,10 @@ var Cocktails = []Cocktail{
 			Metadata[10],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Fruity",
-				MetaType: Flavor,
-			},
+			Metadata[32],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Top 100",
-				MetaType: Type,
-			},
+			Metadata[30],
 		},
 		Served: []Meta{
 			Metadata[13],
@@ -509,16 +440,10 @@ var Cocktails = []Cocktail{
 			Metadata[10],
 		},
 		Flavor: []Meta{
-			Meta{
-				MetaName: "Fruity",
-				MetaType: Flavor,
-			},
+			Metadata[32],
 		},
 		Type: []Meta{
-			Meta{
-				MetaName: "Top 100",
-				MetaType: Type,
-			},
+			Metadata[30],
 		},
 		Served: []Meta{
 			Metadata[13],

@@ -63,7 +63,8 @@ func InitProductTables() {
 			"ADD COLUMN `productRating` INT(1) AFTER `productPostText`," + //Rating
 			"ADD COLUMN `productSourceName` VARCHAR(1500) AFTER `productRating`," + //SourceName
 			"ADD COLUMN `productSourceLink` VARCHAR(1500) AFTER `productSourceName`," + //SourceLink
-			"ADD COLUMN `productAbout` INT AFTER `productSourceLink`;") //About
+			"ADD COLUMN `productAbout` INT AFTER `productSourceLink`," +
+			"ADD UNIQUE INDEX `productName_UNIQUE` (`productName` ASC);") //About
 
 	}
 }
@@ -152,7 +153,7 @@ func ProcessProducts() {
 			buffer.WriteString("`productDescription`=\"" + sqlString + "\",")
 		}
 		if product.Details != "" {
-			sqlString := strings.Replace(string(product.Description), "\\", "\\\\", -1)
+			sqlString := strings.Replace(string(product.Details), "\\", "\\\\", -1)
 			sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 			buffer.WriteString("`productDetails`=\"" + sqlString + "\",")
 		}
@@ -189,4 +190,104 @@ func ProcessProducts() {
 		log.Println(query)
 		conn.Exec(query)
 	}
+}
+
+func ProcessProductGroups() {
+	conn, _ := db.GetDB()
+	for _, productgroup := range ProductGroups {
+		groupproduct := SelectProduct(productgroup.GroupProduct)
+		for _, productItem := range productgroup.Products {
+			product := SelectProduct(productItem)
+			query := "INSERT INTO `commonwealthcocktails`.`groupProduct` (`idProductToGroup`, `idProduct`) VALUES ('" + strconv.Itoa(groupproduct.ID) + "', '" + strconv.Itoa(product.ID) + "');"
+			log.Println(query)
+			conn.Exec(query)
+		}
+	}
+}
+
+func ProcessDerivedProducts() {
+	conn, _ := db.GetDB()
+
+	for _, derivedproduct := range DerivedProducts {
+		baseproduct := SelectProduct(derivedproduct.BaseProduct)
+		product := SelectProduct(derivedproduct.Product)
+		query := "INSERT INTO `commonwealthcocktails`.`derivedProduct` (`idBaseProduct`, `idProduct`) VALUES ('" + strconv.Itoa(baseproduct.ID) + "', '" + strconv.Itoa(product.ID) + "');"
+		log.Println(query)
+		conn.Exec(query)
+	}
+}
+
+func SelectProduct(product Product) Product {
+	var ret Product
+	conn, _ := db.GetDB()
+	log.Println(product.ProductName)
+	var buffer bytes.Buffer
+	buffer.WriteString("SELECT `idProduct`, `productName`, `productType` FROM `commonwealthcocktails`.`product` WHERE ")
+	if product.ProductName != "" {
+		sqlString := strings.Replace(string(product.ProductName), "\\", "\\\\", -1)
+		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
+		buffer.WriteString("`productName`=\"" + sqlString + "\" AND")
+	}
+	buffer.WriteString(" `productType`=" + strconv.Itoa(int(product.ProductType)) + " AND")
+	buffer.WriteString(" `productBDGType`=" + strconv.Itoa(int(product.BDG)) + " AND")
+	if product.Description != "" {
+		sqlString := strings.Replace(string(product.Description), "\\", "\\\\", -1)
+		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
+		buffer.WriteString("`productDescription`=\"" + sqlString + "\" AND")
+	}
+	if product.Details != "" {
+		sqlString := strings.Replace(string(product.Details), "\\", "\\\\", -1)
+		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
+		buffer.WriteString("`productDetails`=\"" + sqlString + "\" AND")
+	}
+	if product.PreText != "" {
+		buffer.WriteString("`productPreText`=\"" + product.PreText + "\" AND")
+	}
+	if product.PostText != "" {
+		buffer.WriteString("`productPostText`=\"" + product.PostText + "\" AND")
+	}
+	if product.Rating != 0 {
+		buffer.WriteString(" `productRating`=" + strconv.Itoa(product.Rating) + " AND")
+	}
+	if product.ImagePath != "" {
+		buffer.WriteString("`productImagePath`=\"" + product.ImagePath + "\" AND")
+	}
+	if product.Image != "" {
+		buffer.WriteString("`productImage`=\"" + product.Image + "\" AND")
+	}
+	if product.ImageSourceName != "" {
+		buffer.WriteString("`productImageSourceName`=\"" + product.ImageSourceName + "\" AND")
+	}
+	if product.ImageSourceLink != "" {
+		buffer.WriteString("`productImageSourceLink`=\"" + product.ImageSourceLink + "\" AND")
+	}
+	if product.SourceName != "" {
+		buffer.WriteString("`productSourceName`=\"" + product.SourceName + "\" AND")
+	}
+	if product.SourceLink != "" {
+		buffer.WriteString("`productSourceLink`=\"" + product.SourceLink + "\" AND")
+	}
+	query := buffer.String()
+	query = strings.TrimRight(query, " AND")
+	query = query + ";"
+	log.Println(query)
+	rows, err := conn.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&ret.ID, &ret.ProductName, &ret.ProductType)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(ret.ID, ret.ProductName, ret.ProductType)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return ret
+
 }

@@ -112,4 +112,59 @@ var Metadata = []Meta{
 		MetaName: "Stirred",
 		MetaType: Technique,
 	},
+	Meta{
+		ID:       23,
+		MetaName: "Creamy",
+		MetaType: Flavor,
+	},
+	Meta{
+		ID:       24,
+		MetaName: "Creamy",
+		MetaType: Type,
+	},
+	Meta{
+		ID:       25,
+		MetaName: "Fruity/Citrus",
+		MetaType: Flavor,
+	},
+	Meta{
+		ID:       26,
+		MetaName: "Sour",
+		MetaType: Flavor,
+	},
+	Meta{
+		ID:       27,
+		MetaName: "Recommended",
+		MetaType: Type,
+	},
+	Meta{
+		ID:       28,
+		MetaName: "Sweet",
+		MetaType: Flavor,
+	},
+	Meta{
+		ID:       29,
+		MetaName: "Sour",
+		MetaType: Family,
+	},
+	Meta{
+		ID:       30,
+		MetaName: "4:2:8",
+		MetaType: Ratio,
+	},
+	Meta{
+		ID:       31,
+		MetaName: "Top 100",
+		MetaType: Type,
+	},
+	Meta{
+		ID:       32,
+		MetaName: "Bitter",
+		MetaType: Flavor,
+	},
+	Meta{
+		ID:       33,
+		MetaName: "Fruity",
+		MetaType: Flavor,
+	},
 }

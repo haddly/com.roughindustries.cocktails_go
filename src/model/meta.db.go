@@ -75,3 +75,39 @@ func ProcessMetas() {
 		conn.Exec(query)
 	}
 }
+
+func SelectMeta(meta Meta) Meta {
+	var ret Meta
+	conn, _ := db.GetDB()
+
+	log.Println(meta.MetaName)
+	var buffer bytes.Buffer
+	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType` FROM `commonwealthcocktails`.`meta` WHERE ")
+	if meta.MetaName != "" {
+		buffer.WriteString("`metaName`=\"" + meta.MetaName + "\" AND")
+	}
+	buffer.WriteString(" `metaType`=" + strconv.Itoa(int(meta.MetaType)) + " AND")
+
+	query := buffer.String()
+	query = strings.TrimRight(query, " AND")
+	query = query + ";"
+	log.Println(query)
+	rows, err := conn.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&ret.ID, &ret.MetaName, &ret.MetaType)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(ret.ID, ret.MetaName, ret.MetaType)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return ret
+}

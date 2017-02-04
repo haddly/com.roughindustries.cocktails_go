@@ -29,8 +29,8 @@ func (database *Database) RenderTemplate(w http.ResponseWriter, tmpl string, s *
 	}
 }
 
-func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("DBValidateHandler: " + r.URL.Path[1:])
+func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("DBTablesHandler: " + r.URL.Path[1:])
 
 	var buffer bytes.Buffer
 	buffer.WriteString("<b>Database</b>:<br/>")
@@ -48,10 +48,6 @@ func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Reque
 	model.InitProductReferences()
 	model.InitRecipeReferences()
 
-	model.ProcessProducts()
-	model.ProcessMetas()
-	model.ProcessRecipes()
-
 	conn, _ := db.GetDB()
 	rows, _ := conn.Query("SHOW TABLES;")
 	for rows.Next() {
@@ -65,6 +61,30 @@ func (database *Database) DBValidateHandler(w http.ResponseWriter, r *http.Reque
 	database.RenderTemplate(w, "dbindex", &status)
 }
 
+func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("DBValidateHandler: " + r.URL.Path[1:])
+
+	var buffer bytes.Buffer
+	buffer.WriteString("<b>Database</b>:<br/>")
+	buffer.WriteString(model.GetCurrentDB() + "<br/>")
+
+	model.ProcessPosts()
+	model.ProcessProducts()
+	model.ProcessMetas()
+	model.ProcessCocktails()
+	model.ProcessRecipes()
+	model.ProcessDerivedProducts()
+	model.ProcessProductGroups()
+
+	buffer.WriteString("<br/><b>Data Loaded!</b> ")
+
+	//apply the template page info to the index page
+	statStr := buffer.String()
+	status := Status{template.HTML(statStr)}
+	database.RenderTemplate(w, "dbindex", &status)
+}
+
 func (database *Database) Init() {
-	http.HandleFunc("/db_validate", database.DBValidateHandler)
+	http.HandleFunc("/db_tables", database.DBTablesHandler)
+	http.HandleFunc("/db_data", database.DBDataHandler)
 }

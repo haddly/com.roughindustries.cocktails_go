@@ -99,34 +99,78 @@ func addRecipeStepToAltIngredientTables() {
 }
 
 func ProcessRecipes() {
-	conn, _ := db.GetDB()
 	for _, recipe := range Recipes {
-		var buffer bytes.Buffer
-		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipe` SET ")
-		if recipe.Method != "" {
-			sqlString := strings.Replace(string(recipe.Method), "\\", "\\\\", -1)
-			sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
-			buffer.WriteString("`recipeMethod`=\"" + sqlString + "\",")
+		ProcessRecipe(recipe)
+	}
+}
+
+func ProcessRecipe(recipe Recipe) int {
+	conn, _ := db.GetDB()
+	var buffer bytes.Buffer
+	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipe` SET ")
+	if recipe.Method != "" {
+		sqlString := strings.Replace(string(recipe.Method), "\\", "\\\\", -1)
+		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
+		buffer.WriteString("`recipeMethod`=\"" + sqlString + "\",")
+	}
+	query := buffer.String()
+	query = strings.TrimRight(query, ",")
+	query = query + ";"
+	log.Println(query)
+	res, err := conn.Exec(query)
+	lastRecipeId, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Recipe ID = %d, affected = %d\n", lastRecipeId, rowCnt)
+
+	for _, recipestep := range recipe.RecipeSteps {
+		buffer.Reset()
+		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipestep` SET ")
+		buffer.WriteString("`recipestepRecipeCardinalFloat`=" + strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32) + ",")
+		if recipestep.RecipeCardinalString != "" {
+			buffer.WriteString("`recipestepRecipeCardinalString`=\"" + recipestep.RecipeCardinalString + "\",")
 		}
+		buffer.WriteString("`recipestepRecipeOrdinal`=" + strconv.Itoa(recipestep.RecipeOrdinal) + ",")
+		buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze)) + ",")
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
 		query = query + ";"
 		log.Println(query)
-		conn.Exec(query)
-		for _, recipestep := range recipe.RecipeSteps {
-			buffer.Reset()
-			buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipestep` SET ")
-			buffer.WriteString("`recipestepRecipeCardinalFloat`=" + strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32) + ",")
-			if recipestep.RecipeCardinalString != "" {
-				buffer.WriteString("`recipestepRecipeCardinalString`=\"" + recipestep.RecipeCardinalString + "\",")
-			}
-			buffer.WriteString("`recipestepRecipeOrdinal`=" + strconv.Itoa(recipestep.RecipeOrdinal) + ",")
-			buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze)) + ",")
-			query := buffer.String()
-			query = strings.TrimRight(query, ",")
-			query = query + ";"
-			log.Println(query)
-			conn.Exec(query)
+		res, err := conn.Exec(query)
+		lastStepId, err := res.LastInsertId()
+		if err != nil {
+			log.Fatal(err)
 		}
+		rowCnt, err := res.RowsAffected()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("Step ID = %d, affected = %d\n", lastStepId, rowCnt)
+		rows, _ := conn.Query("SELECT idProduct, productName FROM commonwealthcocktails.product where productName = '" + recipestep.OriginalIngredient.ProductName + "';")
+		defer rows.Close()
+		var (
+			id   int
+			name string
+		)
+		for rows.Next() {
+			err := rows.Scan(&id, &name)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println(id, name)
+		}
+		//TODO: Add alt ingredients
+		for _, altingredient := range recipestep.AltIngredient {
+			product := SelectProduct(altingredient)
+			conn.Exec("INSERT INTO `commonwealthcocktails`.`altIngredient` (`idProduct`, `idRecipeStep`) VALUES ('" + strconv.Itoa(product.ID) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")
+		}
+		conn.Exec("UPDATE `commonwealthcocktails`.`recipestep` SET `recipestepOriginalIngredient`='" + strconv.Itoa(id) + "' WHERE `idRecipeStep`='" + strconv.FormatInt(lastStepId, 10) + "';")
+		conn.Exec("INSERT INTO `commonwealthcocktails`.`recipeToRecipeSteps` (`idRecipe`, `idRecipeStep`) VALUES ('" + strconv.FormatInt(lastRecipeId, 10) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")
 	}
+	return int(lastRecipeId)
 }
