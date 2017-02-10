@@ -45,3 +45,13 @@ type Meta struct {
 	Article  Post
 	Blurb    Post
 }
+
+type MetaByTypes struct {
+	MBT []MetaByType
+}
+
+type MetaByType struct {
+	MetaType     MetaType
+	MetaTypeName string
+	Metas        []Meta
+}

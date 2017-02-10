@@ -196,11 +196,15 @@ func ProcessProductGroups() {
 	conn, _ := db.GetDB()
 	for _, productgroup := range ProductGroups {
 		groupproduct := SelectProduct(productgroup.GroupProduct)
-		for _, productItem := range productgroup.Products {
-			product := SelectProduct(productItem)
-			query := "INSERT INTO `commonwealthcocktails`.`groupProduct` (`idProductToGroup`, `idProduct`) VALUES ('" + strconv.Itoa(groupproduct.ID) + "', '" + strconv.Itoa(product.ID) + "');"
-			log.Println(query)
-			conn.Exec(query)
+		if len(groupproduct) > 0 {
+			for _, productItem := range productgroup.Products {
+				product := SelectProduct(productItem)
+				if len(product) > 0 {
+					query := "INSERT INTO `commonwealthcocktails`.`groupProduct` (`idProductToGroup`, `idProduct`) VALUES ('" + strconv.Itoa(groupproduct[0].ID) + "', '" + strconv.Itoa(product[0].ID) + "');"
+					log.Println(query)
+					conn.Exec(query)
+				}
+			}
 		}
 	}
 }
@@ -211,83 +215,203 @@ func ProcessDerivedProducts() {
 	for _, derivedproduct := range DerivedProducts {
 		baseproduct := SelectProduct(derivedproduct.BaseProduct)
 		product := SelectProduct(derivedproduct.Product)
-		query := "INSERT INTO `commonwealthcocktails`.`derivedProduct` (`idBaseProduct`, `idProduct`) VALUES ('" + strconv.Itoa(baseproduct.ID) + "', '" + strconv.Itoa(product.ID) + "');"
-		log.Println(query)
-		conn.Exec(query)
+		if len(baseproduct) > 0 && len(product) > 0 {
+			query := "INSERT INTO `commonwealthcocktails`.`derivedProduct` (`idBaseProduct`, `idProduct`) VALUES ('" + strconv.Itoa(baseproduct[0].ID) + "', '" + strconv.Itoa(product[0].ID) + "');"
+			log.Println(query)
+			conn.Exec(query)
+		}
 	}
 }
 
-func SelectProduct(product Product) Product {
-	var ret Product
+func SelectProduct(product Product) []Product {
+	var ret []Product
 	conn, _ := db.GetDB()
+	var canQuery = false
 	log.Println(product.ProductName)
 	var buffer bytes.Buffer
-	buffer.WriteString("SELECT `idProduct`, `productName`, `productType` FROM `commonwealthcocktails`.`product` WHERE ")
+	buffer.WriteString("SELECT `idProduct`, `productName`, `productType`, `productBDGType` FROM `commonwealthcocktails`.`product` WHERE ")
+	if product.ID != 0 {
+		buffer.WriteString(" `idProduct`=" + strconv.Itoa(product.ID) + " AND")
+		canQuery = true
+	}
 	if product.ProductName != "" {
 		sqlString := strings.Replace(string(product.ProductName), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 		buffer.WriteString("`productName`=\"" + sqlString + "\" AND")
+		canQuery = true
 	}
-	buffer.WriteString(" `productType`=" + strconv.Itoa(int(product.ProductType)) + " AND")
-	buffer.WriteString(" `productBDGType`=" + strconv.Itoa(int(product.BDG)) + " AND")
+	if int(product.ProductType) != 0 {
+		buffer.WriteString(" `productType`=" + strconv.Itoa(int(product.ProductType)) + " AND")
+		canQuery = true
+	}
+	if int(product.BDG) != 0 {
+		buffer.WriteString(" `productBDGType`=" + strconv.Itoa(int(product.BDG)) + " AND")
+		canQuery = true
+	}
 	if product.Description != "" {
 		sqlString := strings.Replace(string(product.Description), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 		buffer.WriteString("`productDescription`=\"" + sqlString + "\" AND")
+		canQuery = true
 	}
 	if product.Details != "" {
 		sqlString := strings.Replace(string(product.Details), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 		buffer.WriteString("`productDetails`=\"" + sqlString + "\" AND")
+		canQuery = true
 	}
 	if product.PreText != "" {
 		buffer.WriteString("`productPreText`=\"" + product.PreText + "\" AND")
+		canQuery = true
 	}
 	if product.PostText != "" {
 		buffer.WriteString("`productPostText`=\"" + product.PostText + "\" AND")
+		canQuery = true
 	}
 	if product.Rating != 0 {
 		buffer.WriteString(" `productRating`=" + strconv.Itoa(product.Rating) + " AND")
+		canQuery = true
 	}
 	if product.ImagePath != "" {
 		buffer.WriteString("`productImagePath`=\"" + product.ImagePath + "\" AND")
+		canQuery = true
 	}
 	if product.Image != "" {
 		buffer.WriteString("`productImage`=\"" + product.Image + "\" AND")
+		canQuery = true
 	}
 	if product.ImageSourceName != "" {
 		buffer.WriteString("`productImageSourceName`=\"" + product.ImageSourceName + "\" AND")
+		canQuery = true
 	}
 	if product.ImageSourceLink != "" {
 		buffer.WriteString("`productImageSourceLink`=\"" + product.ImageSourceLink + "\" AND")
+		canQuery = true
 	}
 	if product.SourceName != "" {
 		buffer.WriteString("`productSourceName`=\"" + product.SourceName + "\" AND")
+		canQuery = true
 	}
 	if product.SourceLink != "" {
 		buffer.WriteString("`productSourceLink`=\"" + product.SourceLink + "\" AND")
+		canQuery = true
 	}
-	query := buffer.String()
-	query = strings.TrimRight(query, " AND")
-	query = query + ";"
-	log.Println(query)
-	rows, err := conn.Query(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(&ret.ID, &ret.ProductName, &ret.ProductType)
+
+	if canQuery {
+		query := buffer.String()
+		query = strings.TrimRight(query, " AND")
+		query = query + ";"
+		log.Println(query)
+		rows, err := conn.Query(query)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(ret.ID, ret.ProductName, ret.ProductType)
+		defer rows.Close()
+		for rows.Next() {
+			var prod Product
+			err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType, &prod.BDG)
+			if err != nil {
+				log.Fatal(err)
+			}
+			ret = append(ret, prod)
+			log.Println(prod.ID, prod.ProductName, prod.ProductType, prod.BDG)
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	return ret
 
+}
+
+func GetBaseProductByTypes() ProductByTypes {
+	var ret ProductByTypes
+	conn, _ := db.GetDB()
+
+	rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `commonwealthcocktails`.`producttype`;")
+	count := checkCount(rows)
+	log.Println("Product Types Found " + strconv.Itoa(count))
+	rows.Close()
+	for i := 0; i < count; i++ {
+		var pbt ProductByType
+		pbt_rows, _ := conn.Query("SELECT `idProductType`, `productTypeName` FROM  `commonwealthcocktails`.`producttype` WHERE idProductType='" + strconv.Itoa(i+1) + "';")
+		defer pbt_rows.Close()
+		for pbt_rows.Next() {
+			err := pbt_rows.Scan(&pbt.ProductType, &pbt.ProductName)
+			if err != nil {
+				log.Fatal(err)
+			}
+			var inProduct Product
+			inProduct.ProductType = pbt.ProductType
+			inProduct.BDG = Base
+			outProduct := SelectProduct(inProduct)
+			pbt.Products = outProduct
+			for _, element := range outProduct {
+				GetBaseProductByIDWithBDGFromDB(element.ID)
+			}
+		}
+		ret.pbt = append(ret.pbt, pbt)
+	}
+	return ret
+}
+
+func GetBaseProductByIDWithBDGFromDB(ID int) *BaseProductWithBDG {
+	conn, _ := db.GetDB()
+	var bpwbdg BaseProductWithBDG
+	var inProduct Product
+	inProduct.ID = ID
+	p := SelectProduct(inProduct)
+	bpwbdg.Product = p[0]
+	var dp []Product
+	var bp Product
+	var gp []Product
+	log.Println("Product With ID for BDG return " + strconv.Itoa(ID))
+	if p[0].BDG == Base {
+		bdg_rows, _ := conn.Query("SELECT `idProduct` FROM  `commonwealthcocktails`.`derivedProduct` WHERE idBaseProduct='" + strconv.Itoa(p[0].ID) + "';")
+		defer bdg_rows.Close()
+		for bdg_rows.Next() {
+			var derivedProductID int
+			err := bdg_rows.Scan(&derivedProductID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println("Found Derived of " + strconv.Itoa(derivedProductID))
+			inProduct.ID = derivedProductID
+			derivedProduct := SelectProduct(inProduct)
+			dp = append(dp, derivedProduct[0])
+		}
+		bpwbdg.DerivedProducts = dp
+	} else if p[0].BDG == Derived {
+		bdg_rows, _ := conn.Query("SELECT `idBaseProduct` FROM  `commonwealthcocktails`.`derivedProduct` WHERE idProduct='" + strconv.Itoa(p[0].ID) + "';")
+		defer bdg_rows.Close()
+		for bdg_rows.Next() {
+			var baseProductID int
+			err := bdg_rows.Scan(&baseProductID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println("Found Base of " + strconv.Itoa(baseProductID))
+			inProduct.ID = baseProductID
+			baseProduct := SelectProduct(inProduct)
+			bp = baseProduct[0]
+		}
+		bpwbdg.BaseProduct = bp
+	} else {
+		bdg_rows, _ := conn.Query("SELECT `idProduct` FROM  `commonwealthcocktails`.`derivedProduct` WHERE idProductToGroup='" + strconv.Itoa(p[0].ID) + "';")
+		defer bdg_rows.Close()
+		for bdg_rows.Next() {
+			var productID int
+			err := bdg_rows.Scan(&productID)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println("Found Group of " + strconv.Itoa(productID))
+			inProduct.ID = productID
+			prod := SelectProduct(inProduct)
+			gp = append(gp, prod[0])
+		}
+		bpwbdg.ProductGroups = gp
+	}
+	return &bpwbdg
 }

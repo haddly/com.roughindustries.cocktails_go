@@ -167,7 +167,9 @@ func ProcessRecipe(recipe Recipe) int {
 		//TODO: Add alt ingredients
 		for _, altingredient := range recipestep.AltIngredient {
 			product := SelectProduct(altingredient)
-			conn.Exec("INSERT INTO `commonwealthcocktails`.`altIngredient` (`idProduct`, `idRecipeStep`) VALUES ('" + strconv.Itoa(product.ID) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")
+			if len(product) > 0 {
+				conn.Exec("INSERT INTO `commonwealthcocktails`.`altIngredient` (`idProduct`, `idRecipeStep`) VALUES ('" + strconv.Itoa(product[0].ID) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")
+			}
 		}
 		conn.Exec("UPDATE `commonwealthcocktails`.`recipestep` SET `recipestepOriginalIngredient`='" + strconv.Itoa(id) + "' WHERE `idRecipeStep`='" + strconv.FormatInt(lastStepId, 10) + "';")
 		conn.Exec("INSERT INTO `commonwealthcocktails`.`recipeToRecipeSteps` (`idRecipe`, `idRecipeStep`) VALUES ('" + strconv.FormatInt(lastRecipeId, 10) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")

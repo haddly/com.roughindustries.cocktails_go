@@ -260,6 +260,7 @@ func ProcessCocktail(cocktail Cocktail) int {
 	ProcessCocktailToProducts(cocktail.Drinkware, lastCocktailId)
 	ProcessCocktailToProducts(cocktail.Tool, lastCocktailId)
 
+	log.Println("Processing Cocktail to Metas")
 	ProcessCocktailToMetas(cocktail.Flavor, lastCocktailId)
 	ProcessCocktailToMetas(cocktail.Type, lastCocktailId)
 	ProcessCocktailToMetas(cocktail.BaseSpirit, lastCocktailId)
@@ -326,29 +327,34 @@ func ProcessAltNames(names []Name, cocktailID int64) {
 func ProcessCocktailToMeta(meta Meta, cocktailID int64) {
 	conn, _ := db.GetDB()
 	metaTo := SelectMeta(meta)
-	query := "UPDATE `commonwealthcocktails`.`cocktail` SET `cocktailFamily`='" + strconv.Itoa(metaTo.ID) + "' WHERE `idCocktail`='" + strconv.FormatInt(cocktailID, 10) + "';"
-	log.Println(query)
-	conn.Exec(query)
+	if len(metaTo) > 0 {
+		query := "UPDATE `commonwealthcocktails`.`cocktail` SET `cocktailFamily`='" + strconv.Itoa(metaTo[0].ID) + "' WHERE `idCocktail`='" + strconv.FormatInt(cocktailID, 10) + "';"
+		log.Println(query)
+		conn.Exec(query)
+	}
 }
 
 func ProcessCocktailToProducts(products []Product, cocktailID int64) {
 	conn, _ := db.GetDB()
 	for _, product := range products {
 		prodTo := SelectProduct(product)
-		query := "INSERT INTO `commonwealthcocktails`.`cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.Itoa(prodTo.ID) + "', '" + strconv.Itoa(int(prodTo.ProductType)) + "');"
-		log.Println(query)
-		conn.Exec(query)
+		if len(prodTo) > 0 {
+			query := "INSERT INTO `commonwealthcocktails`.`cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.Itoa(prodTo[0].ID) + "', '" + strconv.Itoa(int(prodTo[0].ProductType)) + "');"
+			log.Println(query)
+			conn.Exec(query)
+		}
 	}
-
 }
 
 func ProcessCocktailToMetas(metas []Meta, cocktailID int64) {
 	conn, _ := db.GetDB()
 	for _, meta := range metas {
 		metaTo := SelectMeta(meta)
-		query := "INSERT INTO `commonwealthcocktails`.`cocktailToMetas` (`idCocktail`, `idMeta`, `idMetaType`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.Itoa(metaTo.ID) + "', '" + strconv.Itoa(int(metaTo.MetaType)) + "');"
-		log.Println(query)
-		conn.Exec(query)
+		if len(metaTo) > 0 {
+			query := "INSERT INTO `commonwealthcocktails`.`cocktailToMetas` (`idCocktail`, `idMeta`, `idMetaType`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.Itoa(metaTo[0].ID) + "', '" + strconv.Itoa(int(metaTo[0].MetaType)) + "');"
+			log.Println(query)
+			conn.Exec(query)
+		}
 	}
 
 }

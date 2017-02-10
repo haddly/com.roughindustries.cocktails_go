@@ -84,7 +84,24 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 	database.RenderTemplate(w, "dbindex", &status)
 }
 
+func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("DBValidateHandler: " + r.URL.Path[1:])
+
+	var buffer bytes.Buffer
+	buffer.WriteString("<b>Database</b>:<br/>")
+	buffer.WriteString(model.GetCurrentDB() + "<br/>")
+
+	model.GetMetaByTypes()
+	model.GetBaseProductByTypes()
+
+	//apply the template page info to the index page
+	statStr := buffer.String()
+	status := Status{template.HTML(statStr)}
+	database.RenderTemplate(w, "dbindex", &status)
+}
+
 func (database *Database) Init() {
 	http.HandleFunc("/db_tables", database.DBTablesHandler)
 	http.HandleFunc("/db_data", database.DBDataHandler)
+	http.HandleFunc("/db_test", database.DBTestHandler)
 }

@@ -35,6 +35,17 @@ func (cocktail *Cocktail) RenderCocktailsTemplate(w http.ResponseWriter, tmpl st
 	}
 }
 
+func (cocktail *Cocktail) RenderCocktailIndexTemplate(w http.ResponseWriter, tmpl string, m model.MetaByTypes) {
+	t, err := parseTempFiles(tmpl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = t.ExecuteTemplate(w, "base", m)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func parseTempFiles(tmpl string) (*template.Template, error) {
 	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
 	return t, e
@@ -83,6 +94,18 @@ func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Reques
 }
 
 //handle / requests to the server
+func (cocktail *Cocktail) CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
+	//log.Println("indexHandler: " + r.URL.Path[1:])
+
+	var m model.MetaByTypes
+	m = model.GetMetaByTypes()
+
+	//log.Println(c)
+	//apply the template page info to the index page
+	cocktail.RenderCocktailIndexTemplate(w, "cocktailsindex", m)
+}
+
+//handle / requests to the server
 func (cocktail *Cocktail) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Println("indexHandler: " + r.URL.Path[1:])
 
@@ -110,4 +133,5 @@ func (cocktail *Cocktail) Init() {
 	http.HandleFunc("/", cocktail.CocktailLandingHandler)
 	http.HandleFunc("/cocktail", cocktail.CocktailHandler)
 	http.HandleFunc("/cocktails", cocktail.CocktailsHandler)
+	http.HandleFunc("/cocktailsindex", cocktail.CocktailsIndexHandler)
 }

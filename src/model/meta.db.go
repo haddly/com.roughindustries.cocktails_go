@@ -76,38 +76,85 @@ func ProcessMetas() {
 	}
 }
 
-func SelectMeta(meta Meta) Meta {
-	var ret Meta
+func SelectMeta(meta Meta) []Meta {
+	var ret []Meta
 	conn, _ := db.GetDB()
 
 	log.Println(meta.MetaName)
 	var buffer bytes.Buffer
+	var canQuery = false
 	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType` FROM `commonwealthcocktails`.`meta` WHERE ")
+	if meta.ID != 0 {
+		buffer.WriteString("`idMeta`=" + strconv.Itoa(meta.ID) + " AND")
+		canQuery = true
+	}
 	if meta.MetaName != "" {
 		buffer.WriteString("`metaName`=\"" + meta.MetaName + "\" AND")
+		canQuery = true
 	}
-	buffer.WriteString(" `metaType`=" + strconv.Itoa(int(meta.MetaType)) + " AND")
+	if meta.MetaType != 0 {
+		buffer.WriteString(" `metaType`=" + strconv.Itoa(int(meta.MetaType)) + " AND")
+		canQuery = true
+	}
 
-	query := buffer.String()
-	query = strings.TrimRight(query, " AND")
-	query = query + ";"
-	log.Println(query)
-	rows, err := conn.Query(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		err := rows.Scan(&ret.ID, &ret.MetaName, &ret.MetaType)
+	if canQuery {
+		query := buffer.String()
+		query = strings.TrimRight(query, " AND")
+		query = query + ";"
+		log.Println(query)
+		rows, err := conn.Query(query)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(ret.ID, ret.MetaName, ret.MetaType)
+		defer rows.Close()
+		for rows.Next() {
+			var meta Meta
+			err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType)
+			if err != nil {
+				log.Fatal(err)
+			}
+			ret = append(ret, meta)
+			log.Println(meta.ID, meta.MetaName, meta.MetaType)
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	return ret
+}
+
+func GetMetaByTypes() MetaByTypes {
+	var ret MetaByTypes
+	conn, _ := db.GetDB()
+
+	rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `commonwealthcocktails`.`metatype`;")
+	count := checkCount(rows)
+	log.Println("Meta Types Found " + strconv.Itoa(count))
+	rows.Close()
+	for i := 0; i < count; i++ {
+		var mbt MetaByType
+		mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metaTypeName` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType='" + strconv.Itoa(i+1) + "';")
+		defer mbt_rows.Close()
+		for mbt_rows.Next() {
+			err := mbt_rows.Scan(&mbt.MetaType, &mbt.MetaTypeName)
+			if err != nil {
+				log.Fatal(err)
+			}
+			var inMeta Meta
+			inMeta.MetaType = mbt.MetaType
+			outMeta := SelectMeta(inMeta)
+			mbt.Metas = outMeta
+		}
+		ret.MBT = append(ret.MBT, mbt)
+	}
+	return ret
+
+}
+
+func checkCount(rows *sql.Rows) (count int) {
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	return count
 }

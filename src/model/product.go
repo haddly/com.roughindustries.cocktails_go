@@ -93,6 +93,16 @@ type BaseProductWithBDG struct {
 	BaseProduct     Product
 }
 
+type ProductByTypes struct {
+	pbt []ProductByType
+}
+
+type ProductByType struct {
+	ProductType ProductType
+	ProductName string
+	Products    []Product
+}
+
 func GetProducts() []Product {
 	var p []Product
 	p = Products
