@@ -330,7 +330,7 @@ func GetBaseProductByTypes() ProductByTypes {
 	conn, _ := db.GetDB()
 
 	rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `commonwealthcocktails`.`producttype`;")
-	count := checkCount(rows)
+	count, err := checkCount(rows)
 	log.Println("Product Types Found " + strconv.Itoa(count))
 	rows.Close()
 	for i := 0; i < count; i++ {
@@ -338,7 +338,7 @@ func GetBaseProductByTypes() ProductByTypes {
 		pbt_rows, _ := conn.Query("SELECT `idProductType`, `productTypeName` FROM  `commonwealthcocktails`.`producttype` WHERE idProductType='" + strconv.Itoa(i+1) + "';")
 		defer pbt_rows.Close()
 		for pbt_rows.Next() {
-			err := pbt_rows.Scan(&pbt.ProductType, &pbt.ProductName)
+			err = pbt_rows.Scan(&pbt.ProductType, &pbt.ProductName)
 			if err != nil {
 				log.Fatal(err)
 			}

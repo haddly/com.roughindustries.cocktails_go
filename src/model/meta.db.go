@@ -129,15 +129,23 @@ func GetMetaByTypes() MetaByTypes {
 	conn, _ := db.GetDB()
 
 	rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `commonwealthcocktails`.`metatype`;")
-	count := checkCount(rows)
+	var count int
+	var err error
+	if rows == nil {
+		count = 0
+	} else {
+		count, err = checkCount(rows)
+	}
 	log.Println("Meta Types Found " + strconv.Itoa(count))
-	rows.Close()
+	if rows != nil {
+		rows.Close()
+	}
 	for i := 0; i < count; i++ {
 		var mbt MetaByType
 		mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metaTypeName` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType='" + strconv.Itoa(i+1) + "';")
 		defer mbt_rows.Close()
 		for mbt_rows.Next() {
-			err := mbt_rows.Scan(&mbt.MetaType, &mbt.MetaTypeName)
+			err = mbt_rows.Scan(&mbt.MetaType, &mbt.MetaTypeName)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -152,9 +160,13 @@ func GetMetaByTypes() MetaByTypes {
 
 }
 
-func checkCount(rows *sql.Rows) (count int) {
+func checkCount(rows *sql.Rows) (count int, err error) {
 	for rows.Next() {
-		rows.Scan(&count)
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Fatal(err)
+			return 0, err
+		}
 	}
-	return count
+	return count, nil
 }
