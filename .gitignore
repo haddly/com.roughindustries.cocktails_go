@@ -1,4 +1,5 @@
 bin/
+Packages/pkg
 Packages/src/github.com
 Packages/src/cloud.google.com
 Packages/src/golang.org
