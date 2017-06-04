@@ -1,7 +1,7 @@
 bin/
-src/github.com
-src/cloud.google.com
-src/golang.org
-src/google.golang.org
-pkg/*
+Packages/src/github.com
+Packages/src/cloud.google.com
+Packages/src/golang.org
+Packages/src/google.golang.org
+Packages/pkg/*
 !pkg/.gitkeep
