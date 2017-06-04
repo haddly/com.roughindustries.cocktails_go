@@ -2,7 +2,6 @@
 package main
 
 import (
-	"controller/alexa"
 	"controller/www"
 	"db"
 	"flag"
@@ -11,7 +10,7 @@ import (
 	"model"
 	"net/http"
 	"os"
-	//"path/filepath"
+	"path/filepath"
 	"time"
 )
 
@@ -21,7 +20,6 @@ var c = www.Cocktail{}
 var p = www.Product{}
 var s = www.Search{}
 var post = www.Post{}
-var a = alexa.Hello{}
 
 func init() {
 
@@ -69,22 +67,20 @@ func init() {
 	c.Init()
 	p.Init()
 	s.Init()
-	a.Init()
 	post.Init()
-	log.Println("End Init")
 }
 
 func main() {
-	// log.Println("Starting ... \n")
-	// //print out the current directory
-	// dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// log.Println(dir)
+	log.Println("Starting ... \n")
+	//print out the current directory
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(dir)
 
-	// // Mandatory root-based resources and redirects for other resources
-	// // This is handled in the app.yaml for google cloud platform deployments
+	// Mandatory root-based resources and redirects for other resources
+	// This is handled in the app.yaml for google cloud platform deployments
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./view/webcontent/www/images"))))
 	http.Handle("/font-awesome/", http.StripPrefix("/font-awesome/", http.FileServer(http.Dir("./view/webcontent/www/font-awesome"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./view/webcontent/www/css"))))

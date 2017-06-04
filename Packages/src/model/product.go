@@ -3,7 +3,6 @@ package model
 
 import (
 	"html/template"
-	"log"
 	"math/rand"
 )
 
@@ -34,43 +33,26 @@ var ProductTypeStrings = [...]string{
 // String returns the English name of the Producttype ("Spirit", "Liqueur", ...).
 func (ct ProductType) String() string { return ProductTypeStrings[ct-1] }
 
-type BDGCategory int
-
-const (
-	Base = 1 + iota
-	Derived
-	Group
-)
-
-var BDGCategoryStrings = [...]string{
-	"Base",
-	"Derived",
-	"Group",
-}
-
-// String returns the English name of the Producttype ("Base", "Derived", "Group).
-func (bdg BDGCategory) String() string { return BDGCategoryStrings[bdg-1] }
-
 type Product struct {
-	ID              int
-	ProductName     string
-	ProductType     ProductType
-	Description     template.HTML
-	Details         template.HTML
-	ImagePath       string
-	Image           string
-	ImageSourceName string
-	ImageSourceLink string
-	Article         string
-	Recipe          Recipe
-	BDG             BDGCategory
-	PreText         string
-	PostText        string
-	Drink           []Meta
-	Rating          int
-	SourceName      string
-	SourceLink      string
-	About           Post
+	ID               int
+	ProductName      string
+	ProductType      ProductType
+	Description      template.HTML
+	Details          template.HTML
+	ImagePath        string
+	Image            string
+	ImageSourceName  string
+	ImageSourceLink  string
+	Article          Post
+	Recipe           Recipe
+	ProductGroupType GroupType
+	PreText          string
+	PostText         string
+	Drink            []Meta
+	Rating           int
+	SourceName       string
+	SourceLink       string
+	About            Post
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -85,12 +67,20 @@ type GroupProduct struct {
 	Products     []Product
 	GroupProduct Product
 }
-
-type BaseProductWithBDG struct {
+type BaseProductWithBD struct {
 	Product         Product
 	DerivedProducts []Product
-	ProductGroups   []Product
 	BaseProduct     Product
+}
+
+type ProductByTypes struct {
+	pbt []ProductByType
+}
+
+type ProductByType struct {
+	ProductType ProductType
+	ProductName string
+	Products    []Product
 }
 
 func GetProducts() []Product {
@@ -99,73 +89,53 @@ func GetProducts() []Product {
 	return p
 }
 
-func GetBaseProductWithBDG() *BaseProductWithBDG {
+func GetBaseProductWithBD() *BaseProductWithBD {
 	p := Products[rand.Intn(len(Products))]
 	ID := p.ID
-	var bpwbdg BaseProductWithBDG
-	bpwbdg.Product = p
+	var bpwbd BaseProductWithBD
+	bpwbd.Product = p
 	var dp []Product
 	var bp Product
-	var gp []Product
-	if p.BDG == Base {
+	if p.ProductGroupType == Base {
 		for _, dps_element := range DerivedProducts {
 			if dps_element.BaseProduct.ID == ID {
 				dp = append(dp, dps_element.Product)
 			}
 		}
-		bpwbdg.DerivedProducts = dp
-	} else if p.BDG == Derived {
+		bpwbd.DerivedProducts = dp
+	} else {
 		for _, dps_element := range DerivedProducts {
 			if dps_element.Product.ID == ID {
 				bp = dps_element.BaseProduct
 				break
 			}
 		}
-		bpwbdg.BaseProduct = bp
-	} else {
-		for _, gps_element := range ProductGroups {
-			if gps_element.GroupProduct.ID == ID {
-				for _, prod := range gps_element.Products {
-					gp = append(gp, prod)
-				}
-			}
-		}
-		bpwbdg.ProductGroups = gp
+		bpwbd.BaseProduct = bp
 	}
-	return &bpwbdg
+	return &bpwbd
 }
 
-func GetBaseProductByIDWithBDG(ID int) *BaseProductWithBDG {
+func GetBaseProductByIDWithBD(ID int) *BaseProductWithBD {
 	p := Products[ID-1]
-	var bpwbdg BaseProductWithBDG
-	bpwbdg.Product = p
+	var bpwbd BaseProductWithBD
+	bpwbd.Product = p
 	var dp []Product
 	var bp Product
-	var gp []Product
-	if p.BDG == Base {
+	if p.ProductGroupType == Base {
 		for _, dps_element := range DerivedProducts {
 			if dps_element.BaseProduct.ID == ID {
 				dp = append(dp, dps_element.Product)
 			}
 		}
-		bpwbdg.DerivedProducts = dp
-	} else if p.BDG == Derived {
+		bpwbd.DerivedProducts = dp
+	} else {
 		for _, dps_element := range DerivedProducts {
 			if dps_element.Product.ID == ID {
 				bp = dps_element.BaseProduct
 				break
 			}
 		}
-		bpwbdg.BaseProduct = bp
-	} else {
-		for _, gps_element := range ProductGroups {
-			if gps_element.GroupProduct.ID == ID {
-				for _, prod := range gps_element.Products {
-					gp = append(gp, prod)
-				}
-			}
-		}
-		bpwbdg.ProductGroups = gp
+		bpwbd.BaseProduct = bp
 	}
 
 	//need to check the ad type
@@ -173,30 +143,11 @@ func GetBaseProductByIDWithBDG(ID int) *BaseProductWithBDG {
 		if ad_element.AdType == ProductAds {
 			for _, adprodcuts_element := range ad_element.Products {
 				if p.ID == adprodcuts_element.BaseProduct.ID {
-					log.Println(ad_element.AdvertiserName)
-					bpwbdg.Product.Advertisement = Advertisements[ad_index]
+					bpwbd.Product.Advertisement = Advertisements[ad_index]
 				}
 			}
 		}
 	}
 
-	return &bpwbdg
-}
-
-func GetSpecificProductsFromGroup(ID int) *BaseProductWithBDG {
-	p := Products[ID-1]
-	var bpwbdg BaseProductWithBDG
-	bpwbdg.Product = p
-	var gp []Product
-	if p.BDG == Group {
-		for _, gps_element := range ProductGroups {
-			if gps_element.GroupProduct.ID == ID {
-				for _, prod := range gps_element.Products {
-					gp = append(gp, prod)
-				}
-			}
-		}
-		bpwbdg.ProductGroups = gp
-	}
-	return &bpwbdg
+	return &bpwbd
 }

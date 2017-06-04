@@ -1,1 +1,0 @@
-{{define "base"}}Hello {{.Description}}. <prosody volume="x-loud">BOOM</prosody>!{{end}}
