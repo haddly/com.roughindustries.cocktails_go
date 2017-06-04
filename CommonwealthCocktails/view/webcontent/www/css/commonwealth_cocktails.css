@@ -39,6 +39,17 @@ footer {
     background-color: rgba(125, 125, 125, 0.5);
 }
 
+.brightness {
+    background-color: black;
+    display: inline-block;
+}
+.brightness img {
+    opacity: 1;
+}
+.brightness img:hover {
+    opacity: .95;
+}
+
 
 
 #accordion .panel-heading {

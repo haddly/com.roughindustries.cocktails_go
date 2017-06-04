@@ -33,11 +33,11 @@
 					</div>
 					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 						<div align="center" style="position: relative; width: 100%;">
-							{{with .Product.Advertisement}} {{if .AdvertiserName}}
+							{{with .Product.Advertisement}} {{if .Advertiser.AdvertiserName}}
 							<div align="center" style="position: relative; width: 100%;">
 								{{if .MediumHorSnippet}} {{.MediumHorSnippet}} {{else}}
-								<a target="_blank" href="{{.AdvertiserLink}}">
-									<img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.AdvertiserName}}&w=600&h=150&txttrack=0" />
+								<a target="_blank" href="{{.Advertiser.AdvertiserLink}}">
+									<img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.Advertiser.AdvertiserName}}&w=600&h=150&txttrack=0" />
 								</a>{{end}}
 							</div>
 							{{end}}{{end}} {{if and .Product.Image}} {{if .Product.ImagePath}}
@@ -144,7 +144,7 @@
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
 				<div align="center" class="row">
-					{{with .Product.Advertisement}} {{if .AdvertiserName}}
+					{{with .Product.Advertisement}} {{if .Advertiser.AdvertiserName}}
 					<div align="center" style="position: relative; width: 100%; max-width:400px">
 						{{if .MediumVertSnippet}} {{.MediumVertSnippet}} {{end}}
 					</div>

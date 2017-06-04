@@ -49,9 +49,9 @@
 											</h4>
 										</div>
 										<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-											<div class="panel-body" align="center">
+											<div class="panel-body" align="center" style="height : 150px; overflow-y : scroll; ">
 												{{range .Products}} {{if eq .ProductType 1}}
-												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 0px;width:100%">
 													<button id="{{.ID}}button" type="button" class="btn btn-default" style="font-weight: bold;">{{.ProductName}}</button>
 													<button id="{{.ID}}include" title="Include" onclick="search_item_include('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
 													<button id="{{.ID}}exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
@@ -70,9 +70,9 @@
 											</h4>
 										</div>
 										<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-											<div class="panel-body" align="center">
+											<div class="panel-body" align="center" style="height : 150px; overflow-y : scroll; ">
 												{{range .Products}} {{if eq .ProductType 2}}
-												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 0px;width:100%">
 													<button id="hidden_button" type="button" style="display: none;" />
 													<button id="{{.ID}}button" type="button" class="btn btn-default" style="font-weight: bold;">{{.ProductName}}</button>
 													<button id="{{.ID}}include" title="Include" onclick="search_item_include('{{.ID}}include', '{{.ID}}exclude', '{{.ID}}button')" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
@@ -136,7 +136,7 @@
 							<h3>Metadata</h3>
 							<div class="row">
 								<div class="col-sm-6">
-									<div class="panel panel-default" style="margin-bottom: 15px;">
+									<div class="panel panel-default" style="margin-bottom : 50px;">
 										<div class="panel-heading" role="tab" id="heading_Meta_10">
 											<h4 class="panel-title">
 												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapse_Meta_10" aria-expanded="false" aria-controls="collapse_Meta_10">Difficulty</a>
