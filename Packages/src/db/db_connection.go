@@ -3,7 +3,7 @@ package db
 
 import (
 	"database/sql"
-	//"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
 
@@ -27,14 +27,14 @@ func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto st
 
 func GetDB() (*sql.DB, error) {
 	if db == nil {
-		log.Println("Creating a new connection:")
+		log.Println("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
 		d, err := sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
 		if err != nil {
+			log.Println("Error connecting to database")
+			log.Fatal(err)
 			return nil, err
 		}
 		db = d
 	}
-	log.Println("Got DB")
-
 	return db, nil
 }
