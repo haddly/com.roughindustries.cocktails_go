@@ -15,5 +15,6 @@ var Posts = []Post{
 		PostExcerpt: "First Article - Excerpt Test",
 		PostName:    "Internal Name",
 		PostType:    FullPost,
+		PostStatus:  Publish,
 	},
 }

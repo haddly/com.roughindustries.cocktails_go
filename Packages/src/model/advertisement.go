@@ -26,9 +26,7 @@ func (at AdType) String() string { return AdTypeStrings[at-1] }
 
 type Advertisement struct {
 	ID                int
-	AdvertiserCompany string
-	AdvertiserName    string
-	AdvertiserLink    string
+	Advertiser        Advertiser
 	LargeHorSnippet   template.HTML
 	MediumHorSnippet  template.HTML
 	SmallHorSnippet   template.HTML
@@ -41,6 +39,13 @@ type Advertisement struct {
 	Articles          []Post
 	AdType            AdType
 	Page              string
+}
+
+type Advertiser struct {
+	ID                int
+	AdvertiserCompany string
+	AdvertiserName    string
+	AdvertiserLink    string
 }
 
 type ProductAdvertisement struct {

@@ -4,7 +4,7 @@ package model
 var Recipes = []Recipe{
 	Recipe{
 		ID:     1,
-		Method: "Combine all of the OriginalIngredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
+		Method: "Combine all of the ingredients in an ice filled cocktail shaker.  Cover, shake well, and pour into a Rocks glass.  Add a couple of sipping straws, garnish accordingly.",
 		RecipeSteps: []RecipeStep{
 			//1 oz. Kahlua
 			RecipeStep{
@@ -58,7 +58,7 @@ var Recipes = []Recipe{
 	},
 	Recipe{
 		ID:     2,
-		Method: "Muddle ginger in base of shaker. Add other OriginalIngredients, shake with ice and fine strain into ice-filled glass.",
+		Method: "Muddle ginger in base of shaker. Add other ingredients, shake with ice and fine strain into ice-filled glass.",
 		RecipeSteps: []RecipeStep{
 			//2 slice Fresh root ginger
 			RecipeStep{
@@ -107,7 +107,7 @@ var Recipes = []Recipe{
 	},
 	Recipe{
 		ID:     3,
-		Method: "Shake all OriginalIngredients with ice and strain into ice-filled glass.",
+		Method: "Shake all ingredients with ice and strain into ice-filled glass.",
 		RecipeSteps: []RecipeStep{
 			//1 ounce irish cream
 			RecipeStep{

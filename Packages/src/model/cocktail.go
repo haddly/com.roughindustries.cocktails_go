@@ -53,6 +53,7 @@ type Cocktail struct {
 	IsFamilyRoot    bool
 	About           Post
 	Articles        []Post
+	IsBase          bool
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -76,7 +77,7 @@ type CocktailSearch struct {
 func GetCocktailSearch() CocktailSearch {
 	var cs CocktailSearch
 	for _, element := range Products {
-		if element.BDG == Base {
+		if element.ProductGroupType == Base {
 			cs.Products = append(cs.Products, element)
 		}
 	}
@@ -111,8 +112,16 @@ func copyCocktail(ID int) Cocktail {
 
 func GetCocktailByID(ID int) FamilyCocktail {
 	var c Cocktail
-	c = copyCocktail(ID)
-	return processCocktailRequest(c)
+	dst := GetDataSourceType()
+	switch dst {
+	case Internal:
+		c = copyCocktail(ID)
+		return processCocktailRequest(c)
+	default:
+		c.ID = ID
+		return processCocktailRequest(c)
+
+	}
 }
 
 func GetCocktail() FamilyCocktail {
@@ -134,6 +143,7 @@ func processCocktailRequest(c Cocktail) FamilyCocktail {
 		return processInternalCocktailRequest(c)
 	default:
 		var fc FamilyCocktail
+		fc = SelectCocktailsByID(c.ID)
 		return fc
 
 	}
@@ -145,9 +155,10 @@ func processInternalCocktailRequest(c Cocktail) FamilyCocktail {
 
 	prod_ignore := []int{}
 
-	for index, element := range c.Recipe.RecipeSteps {
-		c.Recipe.RecipeSteps[index].BDG = *GetSpecificProductsFromGroup(element.OriginalIngredient.ID)
-	}
+	//This will have to be gotten through derived products I think TCH
+	//for index, element := range c.Recipe.RecipeSteps {
+	//	c.Recipe.RecipeSteps[index].AltIngredient = *GetSpecificProductsFromGroup(element.OriginalIngredient.ID)
+	//}
 
 	for ad_index, ad_element := range Advertisements {
 		for _, adcocktails_element := range ad_element.Cocktails {
