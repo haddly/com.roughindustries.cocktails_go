@@ -36,7 +36,7 @@
 								{{end}}
 								</div>
 								<h3>
-									{{.Name}}
+									{{.Name}}{{if .IsFamilyRoot}}&nbsp;(Root Recipe){{end}}
 								</h3>
 								<h5>
 									<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>

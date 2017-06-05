@@ -133,6 +133,58 @@ func (cocktail *Cocktail) CocktailsByMetaIDHandler(w http.ResponseWriter, r *htt
 	}
 }
 
+func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
+	var fc model.FamilyCocktail
+	u, err := url.Parse(r.URL.String())
+	if err != nil {
+		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+	}
+	m, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+	}
+	if len(m["ID"]) == 0 {
+		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+	} else {
+		id, _ := strconv.Atoi(m["ID"][0])
+		log.Println("Product ID: " + m["ID"][0])
+		if len(model.Products) <= id-1 {
+			cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		} else {
+			var inProduct model.Product
+			inProduct.ID = id
+			var c []model.Cocktail
+			c = model.SelectCocktailsByProduct(inProduct)
+			cocktail.RenderCocktailsTemplate(w, "cocktails", c)
+		}
+	}
+}
+
+func (cocktail *Cocktail) CocktailsByFamilyHandler(w http.ResponseWriter, r *http.Request) {
+	var fc model.FamilyCocktail
+	u, err := url.Parse(r.URL.String())
+	if err != nil {
+		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+	}
+	m, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+	}
+	if len(m["ID"]) == 0 {
+		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+	} else {
+		id, _ := strconv.Atoi(m["ID"][0])
+		log.Println("Family ID: " + m["ID"][0])
+		if len(model.Products) <= id-1 {
+			cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		} else {
+			var c []model.Cocktail
+			c = model.SelectCocktailsByFamily(id)
+			cocktail.RenderCocktailsTemplate(w, "cocktails", c)
+		}
+	}
+}
+
 //handle / requests to the server
 func (cocktail *Cocktail) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Println("indexHandler: " + r.URL.Path[1:])
@@ -163,4 +215,6 @@ func (cocktail *Cocktail) Init() {
 	http.HandleFunc("/cocktails", cocktail.CocktailsHandler)
 	http.HandleFunc("/cocktailsindex", cocktail.CocktailsIndexHandler)
 	http.HandleFunc("/cocktailsByMetaID", cocktail.CocktailsByMetaIDHandler)
+	http.HandleFunc("/cocktailsByProductID", cocktail.CocktailsByProductIDHandler)
+	http.HandleFunc("/cocktailsByFamily", cocktail.CocktailsByFamilyHandler)
 }
