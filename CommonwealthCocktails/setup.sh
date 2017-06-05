@@ -8,3 +8,7 @@ export DBPORT='3306'
 export DBNAME='commonwealthcocktails'
 #export  DataSource='Internal'
 export DataSource='DB'
+go get github.com/mikeflynn/go-alexa
+go get github.com/gorilla/mux
+go get github.com/codegangsta/negroni
+go get github.com/go-sql-driver/mysql
