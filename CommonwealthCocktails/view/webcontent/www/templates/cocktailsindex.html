@@ -82,7 +82,12 @@
 							<section class="regular slider">
 								{{range .Metas}}
 								<div align="center" style="position: relative; width: 100%;">
-									<a href="cocktailsByMetaID?ID={{.ID}}">
+									<!--29 is the meta type id for family-->
+									{{if eq .ID 29}}
+										<a href="cocktailsByFamily?ID={{.ID}}"> 
+									{{else}}
+										<a href="cocktailsByMetaID?ID={{.ID}}"> 
+									{{end}}
 										<img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&txt={{.MetaName}}&w=1200&h=900&txttrack=0">
 									</a>
 								</div>
