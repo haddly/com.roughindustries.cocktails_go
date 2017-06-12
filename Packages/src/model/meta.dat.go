@@ -36,7 +36,8 @@ var MetaTypes = []MetaType{
 		ID:                   Formula,
 		MetaTypeName:         "Formula",
 		ShowInCocktailsIndex: false,
-		Ordinal:              6,
+
+		Ordinal: 6,
 	},
 	MetaType{
 		ID:                   Served,
@@ -227,6 +228,7 @@ var Metadata = []Meta{
 		ID:       29,
 		MetaName: "Sour",
 		MetaType: MetaTypes[Family-1],
+		Blurb:    "<font size='4'>Sours</font><br>Sours are aptly named drinks. Their flavour comes from either lemon or lime juice, which is balanced with sugar.<br><br>Sours can be based on practically any spirit but the bourbon based Whiskey Sour is by far the most popular. Many (including us) believe this drink is only properly made when smoothed with a little egg white.",
 	},
 	Meta{
 		ID:       30,

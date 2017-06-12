@@ -1,6 +1,10 @@
 //model/meta.go
 package model
 
+import (
+	"html/template"
+)
+
 type MetaType struct {
 	ID                   int
 	ShowInCocktailsIndex bool
@@ -78,7 +82,7 @@ type Meta struct {
 	MetaName string
 	MetaType MetaType
 	Article  Post
-	Blurb    Post
+	Blurb    template.HTML
 }
 
 type MetasByTypes struct {

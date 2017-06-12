@@ -12,35 +12,12 @@ import (
 type Cocktail struct {
 }
 
-//render the page based on the name of the file provided
-func (cocktail *Cocktail) RenderFamilyCocktailTemplate(w http.ResponseWriter, tmpl string, fc *model.FamilyCocktail) {
+func (cocktail *Cocktail) RenderPageTemplate(w http.ResponseWriter, tmpl string, page *Page) {
 	t, err := parseTempFiles(tmpl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = t.ExecuteTemplate(w, "base", fc)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func (cocktail *Cocktail) RenderCocktailsTemplate(w http.ResponseWriter, tmpl string, c []model.Cocktail) {
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = t.ExecuteTemplate(w, "base", c)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func (cocktail *Cocktail) RenderCocktailIndexTemplate(w http.ResponseWriter, tmpl string, m model.MetasByTypes) {
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = t.ExecuteTemplate(w, "base", m)
+	err = t.ExecuteTemplate(w, "base", page)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,31 +29,33 @@ func parseTempFiles(tmpl string) (*template.Template, error) {
 }
 
 func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request) {
-	var fc model.FamilyCocktail
+	var cs model.CocktailSet
+	var page Page
+	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	}
 	//log.Println("Product: " + r.URL.Path[1:])
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	}
 	if len(m["ID"]) == 0 {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	} else {
 		//log.Println("ID: " + m["ID"][0])
 
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
 		if len(model.Products) <= id-1 {
-			cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+			cocktail.RenderPageTemplate(w, "404", &page)
 		} else {
-			fc = model.GetCocktailByID(id)
-
+			cs = model.GetCocktailByID(id)
+			page.CocktailSet = cs
 			//log.Println(c)
 			//apply the template page info to the index page
-			cocktail.RenderFamilyCocktailTemplate(w, "cocktail", &fc)
+			cocktail.RenderPageTemplate(w, "cocktail", &page)
 		}
 	}
 }
@@ -84,13 +63,16 @@ func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request
 //handle / requests to the server
 func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Println("indexHandler: " + r.URL.Path[1:])
-
+	var cs model.CocktailSet
 	var c []model.Cocktail
 	c = model.GetCocktails()
-
+	cs.ChildCocktails = c
+	var page Page
+	page.CocktailSet = cs
+	page.Username = GetUserName(r)
 	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderCocktailsTemplate(w, "cocktails", c)
+	cocktail.RenderPageTemplate(w, "cocktails", &page)
 }
 
 //handle / requests to the server
@@ -100,111 +82,96 @@ func (cocktail *Cocktail) CocktailsIndexHandler(w http.ResponseWriter, r *http.R
 	var m model.MetasByTypes
 	m = model.GetMetaByTypes(true, true)
 
+	var page Page
+	page.MetasByTypes = m
+	page.Username = GetUserName(r)
 	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderCocktailIndexTemplate(w, "cocktailsindex", m)
+	cocktail.RenderPageTemplate(w, "cocktailsindex", &page)
 }
 
 //handle / requests to the server
 func (cocktail *Cocktail) CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
-	var fc model.FamilyCocktail
+	var cs model.CocktailSet
+	var page Page
+	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	}
 	if len(m["ID"]) == 0 {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
 		log.Println("Meta ID: " + m["ID"][0])
-		if len(model.Products) <= id-1 {
-			cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
-		} else {
-			var inMeta model.Meta
-			inMeta.ID = id
-			var c []model.Cocktail
-			c = model.SelectCocktailsByMeta(inMeta)
-			cocktail.RenderCocktailsTemplate(w, "cocktails", c)
-		}
+		var inMeta model.Meta
+		inMeta.ID = id
+		var c []model.Cocktail
+		c = model.SelectCocktailsByMeta(inMeta)
+		cs.ChildCocktails = c
+		meta := model.SelectMeta(inMeta)
+		cs.Metadata = meta[0]
+		page.CocktailSet = cs
+		cocktail.RenderPageTemplate(w, "cocktails", &page)
 	}
 }
 
 func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
-	var fc model.FamilyCocktail
+	var cs model.CocktailSet
+	var page Page
+	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	}
 	if len(m["ID"]) == 0 {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+		cocktail.RenderPageTemplate(w, "404", &page)
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
 		log.Println("Product ID: " + m["ID"][0])
 		if len(model.Products) <= id-1 {
-			cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
+			cocktail.RenderPageTemplate(w, "404", &page)
 		} else {
 			var inProduct model.Product
 			inProduct.ID = id
 			var c []model.Cocktail
 			c = model.SelectCocktailsByProduct(inProduct)
-			cocktail.RenderCocktailsTemplate(w, "cocktails", c)
-		}
-	}
-}
-
-func (cocktail *Cocktail) CocktailsByFamilyHandler(w http.ResponseWriter, r *http.Request) {
-	var fc model.FamilyCocktail
-	u, err := url.Parse(r.URL.String())
-	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
-	}
-	m, err := url.ParseQuery(u.RawQuery)
-	if err != nil {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
-	}
-	if len(m["ID"]) == 0 {
-		cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
-	} else {
-		id, _ := strconv.Atoi(m["ID"][0])
-		log.Println("Family ID: " + m["ID"][0])
-		if len(model.Products) <= id-1 {
-			cocktail.RenderFamilyCocktailTemplate(w, "404", &fc)
-		} else {
-			var c []model.Cocktail
-			c = model.SelectCocktailsByFamily(id)
-			cocktail.RenderCocktailsTemplate(w, "cocktails", c)
+			cs.ChildCocktails = c
+			page.CocktailSet = cs
+			cocktail.RenderPageTemplate(w, "cocktails", &page)
 		}
 	}
 }
 
 //handle / requests to the server
 func (cocktail *Cocktail) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
-	//log.Println("indexHandler: " + r.URL.Path[1:])
-
-	var fc model.FamilyCocktail
-
+	var page Page
+	page.Username = GetUserName(r)
 	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderFamilyCocktailTemplate(w, "search", &fc)
+	cocktail.RenderPageTemplate(w, "search", &page)
 }
 
 //handle / requests to the server
 func (cocktail *Cocktail) CocktailLandingHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Println("indexHandler: " + r.URL.Path[1:])
 
-	var fc model.FamilyCocktail
+	var cs model.CocktailSet
 
+	var page Page
+	page.CocktailSet = cs
+	page.Username = GetUserName(r)
 	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderFamilyCocktailTemplate(w, "index", &fc)
+	cocktail.RenderPageTemplate(w, "index", &page)
 }
 
 func (cocktail *Cocktail) Init() {
@@ -216,5 +183,4 @@ func (cocktail *Cocktail) Init() {
 	http.HandleFunc("/cocktailsindex", cocktail.CocktailsIndexHandler)
 	http.HandleFunc("/cocktailsByMetaID", cocktail.CocktailsByMetaIDHandler)
 	http.HandleFunc("/cocktailsByProductID", cocktail.CocktailsByProductIDHandler)
-	http.HandleFunc("/cocktailsByFamily", cocktail.CocktailsByFamilyHandler)
 }

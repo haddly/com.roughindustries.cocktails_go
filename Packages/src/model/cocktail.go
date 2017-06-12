@@ -49,7 +49,7 @@ type Cocktail struct {
 	Difficulty      []Meta
 	TOD             []Meta
 	Ratio           []Meta
-	Family          Meta
+	Family          []Meta
 	IsFamilyRoot    bool
 	About           Post
 	Articles        []Post
@@ -63,10 +63,11 @@ type Name struct {
 	Name string
 }
 
-type FamilyCocktail struct {
+type CocktailSet struct {
 	ChildCocktails []Cocktail
 	RootCocktail   Cocktail
 	Cocktail       Cocktail
+	Metadata       Meta
 }
 
 type CocktailSearch struct {
@@ -110,7 +111,7 @@ func copyCocktail(ID int) Cocktail {
 	return c
 }
 
-func GetCocktailByID(ID int) FamilyCocktail {
+func GetCocktailByID(ID int) CocktailSet {
 	var c Cocktail
 	dst := GetDataSourceType()
 	switch dst {
@@ -124,7 +125,7 @@ func GetCocktailByID(ID int) FamilyCocktail {
 	}
 }
 
-func GetCocktail() FamilyCocktail {
+func GetCocktail() CocktailSet {
 	var c Cocktail
 	c = copyCocktail(-1)
 	return processCocktailRequest(c)
@@ -136,22 +137,22 @@ func GetCocktails() []Cocktail {
 	return c
 }
 
-func processCocktailRequest(c Cocktail) FamilyCocktail {
+func processCocktailRequest(c Cocktail) CocktailSet {
 	dst := GetDataSourceType()
 	switch dst {
 	case Internal:
 		return processInternalCocktailRequest(c)
 	default:
-		var fc FamilyCocktail
-		fc = SelectCocktailsByID(c.ID)
-		return fc
+		var cs CocktailSet
+		cs = SelectCocktailsByID(c.ID)
+		return cs
 
 	}
 }
 
-func processInternalCocktailRequest(c Cocktail) FamilyCocktail {
+func processInternalCocktailRequest(c Cocktail) CocktailSet {
 
-	var fc FamilyCocktail
+	var cs CocktailSet
 
 	prod_ignore := []int{}
 
@@ -229,25 +230,25 @@ func processInternalCocktailRequest(c Cocktail) FamilyCocktail {
 		}
 	}
 
-	//put the the cocktails in a family structf
+	//put the the cocktails in a set struct
 	if c.IsFamilyRoot {
-		for _, element := range FamilyCocktails {
+		for _, element := range CS {
 			if element.RootCocktail.ID == c.ID {
-				fc.ChildCocktails = element.ChildCocktails
+				cs.ChildCocktails = element.ChildCocktails
 			}
 		}
-		fc.Cocktail = c
+		cs.Cocktail = c
 	} else {
-		for _, cocktail := range FamilyCocktails {
+		for _, cocktail := range CS {
 			for _, element := range cocktail.ChildCocktails {
 				if element.ID == c.ID {
-					fc.RootCocktail = cocktail.RootCocktail
+					cs.RootCocktail = cocktail.RootCocktail
 				}
 			}
 		}
-		fc.Cocktail = c
+		cs.Cocktail = c
 	}
-	return fc
+	return cs
 }
 
 func intInSlice(a int, list []int) bool {

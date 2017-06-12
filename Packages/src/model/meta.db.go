@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"database/sql"
 	"db"
+	"fmt"
+	"html/template"
 	"log"
 	"strconv"
 	"strings"
@@ -21,7 +23,7 @@ func InitMetaTables() {
 		conn.Query("CREATE TABLE `commonwealthcocktails`.`metatype` (`idMetaType` INT NOT NULL AUTO_INCREMENT,  PRIMARY KEY (`idMetaType`));")
 		conn.Query("ALTER TABLE `commonwealthcocktails`.`metatype`" +
 			"ADD COLUMN `metatypeShowInCocktailsIndex` BOOLEAN AFTER `idMetaType`," + //ShowInCocktailsIndex
-			"ADD COLUMN `metatypeName`  VARCHAR(150) NOT NULL AFTER `metatypeShowInCocktailsIndex`," + //MetaTypeName
+			"ADD COLUMN `metatypeName`  VARCHAR(150) NOT NULL AFTER `metatypeShowInCocktailsIndex`," + //IsSetType
 			"ADD COLUMN `metatypeOrdinal` INT AFTER `metatypeName`;") //Ordinal
 	}
 
@@ -34,7 +36,7 @@ func InitMetaTables() {
 			"ADD COLUMN `metaName` VARCHAR(150) NOT NULL AFTER `idMeta`," + //MetaName
 			"ADD COLUMN `metaType`  INT NOT NULL AFTER `metaName`," + //MetaType
 			"ADD COLUMN `metaArticle` INT AFTER `metaType`," + //Article
-			"ADD COLUMN `metaBlurb` INT AFTER `metaArticle`;") //Blurb
+			"ADD COLUMN `metaBlurb` VARCHAR(500) AFTER `metaArticle`;") //Blurb
 	}
 
 	if err := conn.QueryRow("SHOW TABLES LIKE 'grouptype';").Scan(&temp); err == nil {
@@ -95,6 +97,9 @@ func ProcessMetas() {
 		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`meta` SET ")
 		if meta.MetaName != "" {
 			buffer.WriteString("`metaName`=\"" + meta.MetaName + "\",")
+		}
+		if meta.Blurb != "" {
+			buffer.WriteString(" `metaBlurb`=\"" + string(meta.Blurb) + "\",")
 		}
 		//TO DO: Select by MetaType to get ID
 		metatype := SelectMetaType(meta.MetaType)
@@ -169,7 +174,7 @@ func SelectMeta(meta Meta) []Meta {
 	log.Println(meta.MetaName)
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType` FROM `commonwealthcocktails`.`meta` WHERE ")
+	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType`, COALESCE(`metaBlurb`, '') FROM `commonwealthcocktails`.`meta` WHERE ")
 	if meta.ID != 0 {
 		buffer.WriteString("`idMeta`=" + strconv.Itoa(meta.ID) + " AND")
 		canQuery = true
@@ -179,7 +184,7 @@ func SelectMeta(meta Meta) []Meta {
 		canQuery = true
 	}
 	if meta.MetaType.ID != 0 {
-		buffer.WriteString(" `metaType`=" + strconv.Itoa(meta.MetaType.ID) + " AND")
+		buffer.WriteString(" `metaType` IN (" + strconv.Itoa(meta.MetaType.ID) + ") AND")
 		canQuery = true
 	}
 
@@ -195,12 +200,14 @@ func SelectMeta(meta Meta) []Meta {
 		defer rows.Close()
 		for rows.Next() {
 			var meta Meta
-			err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID)
+			var blurb string
+			err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &blurb)
 			if err != nil {
 				log.Fatal(err)
 			}
+			meta.Blurb = template.HTML(blurb)
 			ret = append(ret, meta)
-			log.Println(meta.ID, meta.MetaName, meta.MetaType.ID)
+			log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, meta.Blurb)
 		}
 		err = rows.Err()
 		if err != nil {
@@ -242,22 +249,24 @@ func GetMetaByTypes(byShowInCocktailsIndex bool, orderBy bool) MetasByTypes {
 	if rows != nil {
 		rows.Close()
 	}
-	for _, i := range mtList {
-		var mbt MetasByType
-		mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metatypeName`, `metatypeShowInCocktailsIndex`, `metatypeOrdinal` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType='" + strconv.Itoa(i) + "';")
-		defer mbt_rows.Close()
-		for mbt_rows.Next() {
-			err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal)
-			if err != nil {
-				log.Fatal(err)
-			}
-			var inMeta Meta
-			inMeta.MetaType = mbt.MetaType
-			outMeta := SelectMeta(inMeta)
-			mbt.Metas = outMeta
+	mtListString := strings.Trim(strings.Replace(fmt.Sprint(mtList), " ", ",", -1), "[]")
+	//for _, i := range mtList {
+	var mbt MetasByType
+	mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metatypeName`, `metatypeShowInCocktailsIndex`, `metatypeOrdinal` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType IN (" + mtListString + ");")
+	defer mbt_rows.Close()
+	for mbt_rows.Next() {
+		err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal)
+		if err != nil {
+			log.Fatal(err)
 		}
+		var inMeta Meta
+		inMeta.MetaType = mbt.MetaType
+		outMeta := SelectMeta(inMeta)
+		mbt.Metas = outMeta
 		ret.MBT = append(ret.MBT, mbt)
 	}
+
+	//}
 	return ret
 
 }

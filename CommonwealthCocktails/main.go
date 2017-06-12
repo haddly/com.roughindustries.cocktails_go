@@ -6,6 +6,7 @@ import (
 	"controller/www"
 	"db"
 	"flag"
+	//"io/ioutil"
 	"log"
 	"math/rand"
 	"model"
@@ -20,7 +21,9 @@ var d = www.Database{}
 var c = www.Cocktail{}
 var p = www.Product{}
 var s = www.Search{}
+var l = www.Login{}
 var post = www.Post{}
+
 var a = alexa.Hello{}
 
 func init() {
@@ -68,10 +71,12 @@ func init() {
 	s.Init()
 	a.Init()
 	post.Init()
+	l.Init()
 	log.Println("End Init")
 }
 
 func main() {
+	//log.SetOutput(ioutil.Discard)
 	log.Println("Starting ... \n")
 	//print out the current directory
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))

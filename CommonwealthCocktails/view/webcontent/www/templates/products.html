@@ -16,6 +16,7 @@
 
 
 	<!-- Page Content -->
+	{{with .Products}}
 	<div class="container">
 
 		<div class="row">
@@ -31,7 +32,7 @@
 								{{if .Image}} {{if .ImagePath}}
 								<img class="img-responsive" style="max-height:150px" src="{{.ImagePath}}/{{.Image}}" /> {{else}}
 								<img class="img-responsive" style="max-height:150px" src="images/{{.Image}}" /> {{end}} {{else}}
-								<img class="img-responsive" style="max-height:150px" src="http://placehold.it/900x1200"> {{end}}
+								<img class="img-responsive" style="max-height:150px" src="https://placehold.it/900x1200"> {{end}}
 							</div>
 							<h3>
 								{{.ProductName}}
@@ -52,7 +53,7 @@
 
 
 	{{template "footer" .}}
-
+	{{end}}
 	<!-- /.container -->
 </body>
 

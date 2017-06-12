@@ -11,21 +11,29 @@
 <body>
 	{{template "navbar" .}}
 
-	<!-- Page Content -->
-
-
-
+	{{with .CocktailSet}}
 	<!-- Page Content -->
 	<div class="container">
 
 		<div class="row">
 			<div class="page-header">
-				<h1 align="center">Cocktails</h1>
+				<h1 align="center">Cocktails{{if .Metadata.MetaName}} - {{.Metadata.MetaName}}{{end}}</h1>
 			</div>
 			<div class="col-md-12" >
 				<div class="row">
-					{{range .}}
-					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-2">
+					
+					{{if .Metadata.Blurb}}
+					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" style="background-color: rgba(100, 100, 100, 0.1); height: 350px;">
+							<span style="display: block;">
+								<!--<div height="100%">-->
+								<p style="max-height: 350px; overflow:hidden;">{{.Metadata.Blurb}}</p>
+								<!--</div>-->
+							</span>
+					</div>
+					{{end}}
+					
+					{{range .ChildCocktails}}
+					<div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 350px; margin-bottom: 50px;">
 						<a href="/cocktail?ID={{.ID}}" style="text-decoration : none; color : #555;">
 							<span style="display: block;">
 								<div align="center">
@@ -36,7 +44,7 @@
 								{{end}}
 								</div>
 								<h3>
-									{{.Name}}{{if .IsFamilyRoot}}&nbsp;(Root Recipe){{end}}
+									{{.Name}}
 								</h3>
 								<h5>
 									<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
@@ -53,7 +61,7 @@
 
 
 	{{template "footer" .}}
-
+	{{end}}
 	<!-- /.container -->
 </body>
 

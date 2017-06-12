@@ -196,7 +196,9 @@ var Cocktails = []Cocktail{
 		Ratio: []Meta{
 			Metadata[29],
 		},
-		Family:       Metadata[28],
+		Family: []Meta{
+			Metadata[28],
+		},
 		IsFamilyRoot: true,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -245,8 +247,10 @@ var Cocktails = []Cocktail{
 		Technique: []Meta{
 			Metadata[14],
 		},
-		Ratio:        []Meta{},
-		Family:       Metadata[28],
+		Ratio: []Meta{},
+		Family: []Meta{
+			Metadata[28],
+		},
 		IsFamilyRoot: false,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -297,7 +301,7 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		Ratio:        []Meta{},
-		Family:       Meta{},
+		Family:       []Meta{},
 		IsFamilyRoot: false,
 		BaseSpirit: []Meta{
 			Metadata[20],
@@ -350,7 +354,7 @@ var Cocktails = []Cocktail{
 			Metadata[21],
 		},
 		Ratio:        []Meta{},
-		Family:       Meta{},
+		Family:       []Meta{},
 		IsFamilyRoot: false,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -401,7 +405,7 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		Ratio:        []Meta{},
-		Family:       Meta{},
+		Family:       []Meta{},
 		IsFamilyRoot: false,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -452,7 +456,7 @@ var Cocktails = []Cocktail{
 			Metadata[14],
 		},
 		Ratio:        []Meta{},
-		Family:       Meta{},
+		Family:       []Meta{},
 		IsFamilyRoot: false,
 		BaseSpirit:   []Meta{},
 		Garnish: []Product{
@@ -465,8 +469,8 @@ var Cocktails = []Cocktail{
 	},
 }
 
-var FamilyCocktails = []FamilyCocktail{
-	FamilyCocktail{
+var CS = []CocktailSet{
+	CocktailSet{
 		ChildCocktails: []Cocktail{
 			Cocktails[4],
 		},

@@ -10,6 +10,7 @@
 
 <body>
 	{{template "navbar" .}}
+	{{with .CocktailSet}}
 	<!-- Page Content -->
 	<div class="container">
 		 Portfolio Item Heading 
@@ -172,7 +173,7 @@
 
 	{{template "footer" .}}
 
-
+	{{end}}
 
 </body>
 
@@ -181,7 +182,7 @@
 
 <!--Cocktail Page Header-->
 {{define "cocktailpageheader"}}
-<h1 align="center">{{.Cocktail.Name}}{{if .Cocktail.IsFamilyRoot}}&nbsp;(Root Recipe){{end}}</h1>
+<h1 align="center">{{.Cocktail.Name}}</h1>
 {{if .Cocktail.AKA}}
 <h6 align="center">{{range .Cocktail.AKA}}({{.Name}}){{end}}</h6>{{end}}
 <h5 align="center">
@@ -208,7 +209,7 @@
 	{{if .Cocktail.Image}} {{if .Cocktail.ImagePath}}
 	<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{else}}
 	<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}} {{else}}
-	<img class="img-responsive" style="max-height:150px" src="http://placehold.it/600x600" /> {{end}}
+	<img class="img-responsive" style="max-height:150px" src="https://placehold.it/600x600" /> {{end}}
 	<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: 
 		<a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}  
 			<i class="fa fa-external-link"></i>
@@ -299,7 +300,7 @@
 		{{else}}
 		<img border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
 		{{end}}	{{else}}
-		<img border="0" class="img-responsive" src="http://placehold.it/900x1200"> 
+		<img border="0" class="img-responsive" src="https://placehold.it/900x1200"> 
 		{{end}}
 	</a>
 </div>
@@ -514,17 +515,8 @@
 	<p>Family:</p>
 </div>
 <div class="col-xs-7 x-recipe-preparation">
-	{{with .Cocktail.Family}}
-		<div class="btn-group" role="group">
-			{{if .MetaName}}
-			<span class="btn btn-default btn-xs" style="font-weight: bold; text-decoration : none">
-					{{.MetaName}}
-			</span>
-			<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByFamily?ID={{.ID}}">
-				<i class="fa fa-glass"></i>
-			</a>
-	{{end}}
-</div>
+	{{range .Cocktail.Family}}
+		{{template "metadatabutton" .}}
 	{{end}}
 </div>
 {{end}}

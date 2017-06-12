@@ -47,6 +47,7 @@ func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request
 	model.InitMetaReferences()
 	model.InitProductReferences()
 	model.InitRecipeReferences()
+	model.InitUserTables()
 
 	conn, _ := db.GetDB()
 	rows, _ := conn.Query("SHOW TABLES;")
@@ -76,6 +77,7 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 	model.ProcessRecipes()
 	model.ProcessDerivedProducts()
 	model.ProcessProductGroups()
+	model.ProcessUsers()
 
 	buffer.WriteString("<br/><b>Data Loaded!</b> ")
 

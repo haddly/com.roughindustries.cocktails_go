@@ -13,24 +13,12 @@ type Product struct {
 }
 
 //render the page based on the name of the file provided
-func (product *Product) RenderBaseProductWithBDTemplate(w http.ResponseWriter, tmpl string, p *model.BaseProductWithBD) {
+func (product *Product) RenderPageTemplate(w http.ResponseWriter, tmpl string, page *Page) {
 	t, err := parseTempFiles(tmpl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = t.ExecuteTemplate(w, "base", p)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-//render the page based on the name of the file provided
-func (product *Product) RenderProductsTemplate(w http.ResponseWriter, tmpl string, p []model.Product) {
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = t.ExecuteTemplate(w, "base", p)
+	err = t.ExecuteTemplate(w, "base", page)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,36 +26,41 @@ func (product *Product) RenderProductsTemplate(w http.ResponseWriter, tmpl strin
 
 func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	var p *model.BaseProductWithBD
+	var page Page
+	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		product.RenderBaseProductWithBDTemplate(w, "404", p)
+		product.RenderPageTemplate(w, "404", &page)
 	}
 	//log.Println("Product: " + r.URL.Path[1:])
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		product.RenderBaseProductWithBDTemplate(w, "404", p)
+		product.RenderPageTemplate(w, "404", &page)
 	}
 	if len(m["ID"]) == 0 {
-		product.RenderBaseProductWithBDTemplate(w, "404", p)
+		product.RenderPageTemplate(w, "404", &page)
 	} else {
 		//log.Println("ID: " + m["ID"][0])
 
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
 		if len(model.Products) <= id-1 {
-			product.RenderBaseProductWithBDTemplate(w, "404", p)
+			product.RenderPageTemplate(w, "404", &page)
 		} else {
 			p = model.GetBaseProductByIDWithBD(id)
-			product.RenderBaseProductWithBDTemplate(w, "product", p)
+			page.BaseProductWithBD = *p
+			product.RenderPageTemplate(w, "product", &page)
 		}
 	}
 }
 
 func (product *Product) ProductsHandler(w http.ResponseWriter, r *http.Request) {
 	var p []model.Product
-
+	var page Page
+	page.Username = GetUserName(r)
 	p = model.GetProducts()
-	product.RenderProductsTemplate(w, "products", p)
+	page.Products = p
+	product.RenderPageTemplate(w, "products", &page)
 }
 
 func (product *Product) Init() {
