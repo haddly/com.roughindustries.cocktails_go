@@ -15,78 +15,17 @@
     <!-- Header -->
     <div class="intro-header">
         <div class="container">
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="intro-message">
-                        <h1 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Commonwealth Cocktails</h1>
-                        <h4 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Est. 2016</h4>
-                        <h2 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Libations for Everyone</h2>
-                        <hr class="intro-divider">
-                        <ul class="list-inline intro-social-buttons">
-                            <li>
-                                <a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
-                                    <i class="fa fa-facebook fa-fw"></i>
-                                    <span class="network-name">Facebook</span></a>
-                            </li>
-                            <li>
-                                <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
-                                    <i class="fa fa-github fa-fw"></i>
-                                    <span class="network-name">Github</span></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
+            {{template "headerbanner" .}}
         </div>
         <!-- /.container -->
-
     </div>
     <!-- /.intro-header -->
 
     <!-- Page Content -->
-
     <a name="splash"></a>
     <div class="content-section-b">
         <div class="container">
-
-            <div class="row">
-                <div class="col-xs-1">
-                    &nbsp;
-                </div>
-                <div class="col-xs-10" align="center">
-                    <section class="header slider">
-                        <div class="brightness" align="center" style="position: relative; width: 100%;">
-                            <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Cocktail+Mega+Search&w=1200&h=900&txttrack=0">
-                        </div>
-                        <div class="brightness" align="center" style="position: relative; width: 100%;">
-                            <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Valentine's Day Cocktails&w=1200&h=900&txttrack=0">
-                        </div>
-                        <div class="brightness" align="center" style="position: relative; width: 100%;">
-                            <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Most Romantic Bars in Washington D.C.&w=1200&h=900&txttrack=0">
-                        </div>
-                    </section>
-                    <script type="text/javascript">
-                        $(document).on('ready', function() {
-                            $(".header").slick({
-                                dots: true,
-                                infinite: true,
-                                slidesToShow: 1,
-                                slidesToScroll: 1,
-                                centerMode: false,
-                                variableWidth: false,
-                                autoplay: true,
-                                autoplaySpeed: 2000
-                            });
-                        });
-                    </script>
-                </div>
-                <div class="col-xs-1">
-                    &nbsp;
-                </div>
-            </div>
-
+            {{template "introcarousel" .}}
         </div>
         <!-- /.container -->
 
@@ -96,24 +35,7 @@
     <div class="content-section-a">
 
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">Cocktails</h2>
-                    <a href="/cocktails" class="btn btn-default btn-lg">
-                        <i class="glyphicon glyphicon-glass"></i>
-                        <span class="network-name">Cocktails</span>
-                    </a>
-                </div>
-                <div class="col-md-1 col-sm-0">
-                    &nbsp; </div>
-                <div class="col-md-6 col-sm-6 network-name">
-                    There's a drink for every mood or occasion. Find your favorite cocktail recipes here. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away.
-                </div>
-
-            </div>
-
+            {{template "cocktailrow" .}}
         </div>
         <!-- /.container -->
 
@@ -125,26 +47,7 @@
     <div class="content-section-b">
 
         <div class="container">
-
-            <div class="row">
-                <div class="col-md-3 col-md-push-9 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">Prodcuts</h2>
-                    <a href="/products" class="btn btn-default btn-lg">
-                        <i class="glyphicon glyphicon-tag"></i>
-                        <span class="network-name">Products</span>
-                    </a>
-                </div>
-                <div class="col-md-3  col-sm-0">
-                    &nbsp; </div>
-
-                <div class="col-md-6 col-md-pull-6 col-sm-6 network-name">
-                    We’ve compiled an extensive library of information about an array of liquor brands and spirits. Whether you're reading about a favorite bourbon or a new craft gin, you just might learn a thing or two.
-                </div>
-
-            </div>
-
+           {{template "productrow" .}}
         </div>
         <!-- /.container -->
 
@@ -156,24 +59,7 @@
     <div class="content-section-a">
 
         <div class="container">
-
-            <div class="row">
-                <div class="col-md-4 col-sm-6">
-                    <hr class="section-heading-spacer">
-                    <div class="clearfix"></div>
-                    <h2 class="section-heading">Search</h2>
-                    <a href="/cocktails" class="btn btn-default btn-lg">
-                        <i class="glyphicon glyphicon-search"></i>
-                        <span class="network-name">Search</span>
-                    </a>
-                </div>
-                <div class="col-md-1 col-sm-0">
-                    &nbsp; </div>
-                <div class="col-md-6 col-sm-6 network-name">
-                    This is what it is all about. The Super Mega Cocktail Search. It all started because of this. We wanted a way to find the right cocktail. At the right time. With the right ingredients, that we had on hand.
-                </div>
-
-            </div>
+            {{template "searchrow" .}}
         </div>
         <!-- /.container -->
 
@@ -184,25 +70,7 @@
 
         <div class="container">
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <h2 style="color:#FFF; font-family: 'Poiret One'">The Commonwealth:</h2>
-                </div>
-                <div class="col-lg-6">
-                    <ul class="list-inline banner-social-buttons">
-                        <li>
-                            <a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
-                                <i class="fa fa-facebook fa-fw"></i>
-                                <span class="network-name">Facebook</span></a>
-                        </li>
-                        <li>
-                            <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
-                                <i class="fa fa-github fa-fw"></i>
-                                <span class="network-name">Github</span></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            {{template "bottombannerrow" .}}
 
         </div>
         <!-- /.container -->
@@ -212,27 +80,7 @@
     <hr style="border-color: #FFF;">
 
     <div class="container">
-        <div class="row">
-            <div class="col-lg-12" align="center">
-                <ul class="list-inline">
-                    <li>
-                        <a style="text-decoration : none; color : #555;" href="#">Home</a>
-                    </li>
-                    <li class="footer-menu-divider">&sdot;</li>
-                    <li>
-                        <a style="text-decoration : none; color : #555;" href="#cocktails">Cocktails</a>
-                    </li>
-                    <li class="footer-menu-divider">&sdot;</li>
-                    <li>
-                        <a style="text-decoration : none; color : #555;" href="#products">Products</a>
-                    </li>
-                    <li class="footer-menu-divider">&sdot;</li>
-                    <li>
-                        <a style="text-decoration : none; color : #555;" href="#search">Search</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        {{template "bottomshortcuts" .}}
     </div>
     <!-- Footer -->
     {{template "footer" .}}
@@ -240,4 +88,175 @@
 </body>
 
 </html>
+{{end}}
+
+{{define "headerbanner"}}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="intro-message">
+            <h1 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Commonwealth Cocktails</h1>
+            <h4 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Est. 2016</h4>
+            <h2 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Libations for Everyone</h2>
+            <hr class="intro-divider">
+            <ul class="list-inline intro-social-buttons">
+                <li>
+                    <a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
+                        <i class="fa fa-facebook fa-fw"></i>
+                        <span class="network-name">Facebook</span></a>
+                </li>
+                <li>
+                    <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
+                        <i class="fa fa-github fa-fw"></i>
+                        <span class="network-name">Github</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "introcarousel"}}
+<div class="row">
+    <div class="col-xs-1">
+        &nbsp;
+    </div>
+    <div class="col-xs-10" align="center">
+        <section class="header slider">
+            <div class="brightness" align="center" style="position: relative; width: 100%;">
+                <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Cocktail+Mega+Search&w=1200&h=900&txttrack=0">
+            </div>
+            <div class="brightness" align="center" style="position: relative; width: 100%;">
+                <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Valentine's Day Cocktails&w=1200&h=900&txttrack=0">
+            </div>
+            <div class="brightness" align="center" style="position: relative; width: 100%;">
+                <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Most Romantic Bars in Washington D.C.&w=1200&h=900&txttrack=0">
+            </div>
+        </section>
+        <script type="text/javascript">
+            $(document).on('ready', function() {
+                $(".header").slick({
+                    dots: true,
+                    infinite: true,
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    centerMode: false,
+                    variableWidth: false,
+                    autoplay: true,
+                    autoplaySpeed: 2000
+                });
+            });
+        </script>
+    </div>
+    <div class="col-xs-1">
+        &nbsp;
+    </div>
+</div>
+{{end}}
+
+
+{{define "cocktailrow"}}
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 class="section-heading">Cocktails</h2>
+        <a href="/cocktails" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-glass"></i>
+            <span class="network-name">Cocktails</span>
+        </a>
+    </div>
+    <div class="col-md-1 col-sm-0">
+        &nbsp; </div>
+    <div class="col-md-6 col-sm-6 network-name">
+        There's a drink for every mood or occasion. Find your favorite cocktail recipes here. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away.
+    </div>
+
+</div>
+{{end}}
+
+{{define "productrow"}}
+<div class="row">
+    <div class="col-md-3 col-md-push-9 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 class="section-heading">Prodcuts</h2>
+        <a href="/products" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-tag"></i>
+            <span class="network-name">Products</span>
+        </a>
+    </div>
+    <div class="col-md-3  col-sm-0">
+        &nbsp; </div>
+
+    <div class="col-md-6 col-md-pull-6 col-sm-6 network-name">
+        We’ve compiled an extensive library of information about an array of liquor brands and spirits. Whether you're reading about a favorite bourbon or a new craft gin, you just might learn a thing or two.
+    </div>
+
+</div>
+{{end}}
+
+{{define "searchrow"}}
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 class="section-heading">Search</h2>
+        <a href="/cocktails" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-search"></i>
+            <span class="network-name">Search</span>
+        </a>
+    </div>
+    <div class="col-md-1 col-sm-0">
+        &nbsp; </div>
+    <div class="col-md-6 col-sm-6 network-name">
+        This is what it is all about. The Super Mega Cocktail Search. It all started because of this. We wanted a way to find the right cocktail. At the right time. With the right ingredients, that we had on hand.
+    </div>
+
+</div>
+{{end}}
+
+{{define "bottombannerrow"}}
+<div class="row">
+    <div class="col-lg-6">
+        <h2 style="color:#FFF; font-family: 'Poiret One'">The Commonwealth:</h2>
+    </div>
+    <div class="col-lg-6">
+        <ul class="list-inline banner-social-buttons">
+            <li>
+                <a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
+                    <i class="fa fa-facebook fa-fw"></i>
+                    <span class="network-name">Facebook</span></a>
+            </li>
+            <li>
+                <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
+                    <i class="fa fa-github fa-fw"></i>
+                    <span class="network-name">Github</span></a>
+            </li>
+        </ul>
+    </div>
+</div>
+{{end}}
+
+{{define "bottomshortcuts"}}
+<div class="row">
+    <div class="col-lg-12" align="center">
+        <ul class="list-inline">
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#">Home</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#cocktails">Cocktails</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#products">Products</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#search">Search</a>
+            </li>
+        </ul>
+    </div>
+</div>
 {{end}}
