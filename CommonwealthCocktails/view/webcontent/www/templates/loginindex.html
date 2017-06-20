@@ -1,0 +1,40 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+    
+	<div class="container">
+
+		<div class="row">
+			<div class="page-header">
+				<h1 align="center">Login</h1>
+			</div>
+			<div class="col-md-12" align="center" >
+				<div class="row">
+                    {{template "loginForm" .}}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{{end}}
+
+{{define "loginForm"}}
+<form method="post" action="/login">
+    <label for="name">Username</label>
+    <input type="text" id="name" name="name"><br><br>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password"><br><br>
+    <button type="submit">Login</button>
+</form>
+{{end}}
