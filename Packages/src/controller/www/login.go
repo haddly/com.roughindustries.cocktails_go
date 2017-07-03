@@ -29,7 +29,7 @@ var (
 	//Endpoint: google.Endpoint,
 	//}
 	// Some random string, random for each request
-	oauthStateString = "random"
+	oauthStateString  = "random"
 )
 
 var cookieHandler = securecookie.New(

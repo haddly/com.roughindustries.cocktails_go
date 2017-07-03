@@ -34,37 +34,37 @@ func init() {
 	if datasource == model.DB {
 		//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 		var dbaddr string
+		var dbpasswd string
+		var user string
+		var proto string
+		var port string
+		var dbname string
 		//dbaddr = ??
+		//dbpasswd = ??
+		//user = ??
+		//proto = ??
+		//port = ??
+		//dbname = ??
 		if dbaddr == "" {
 			log.Println("No DB Address set.")
 			os.Exit(0)
 		}
-		var dbpasswd string
-		//dbpasswd = ??
 		if dbpasswd == "" {
 			log.Println("No DB password set.")
 			os.Exit(0)
 		}
-		var user string
-		//user = ??
 		if user == "" {
 			log.Println("No DB user set.")
 			os.Exit(0)
 		}
-		var proto string
-		//proto = ??
 		if proto == "" {
 			log.Println("No DB protocol set.")
 			os.Exit(0)
 		}
-		var port string
-		//port = ??
 		if port == "" {
 			log.Println("No DB port set.")
 			os.Exit(0)
 		}
-		var dbname string
-		//dbname = ??
 		if dbname == "" {
 			log.Println("No DB name set.")
 			os.Exit(0)
