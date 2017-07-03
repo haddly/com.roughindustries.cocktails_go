@@ -1,0 +1,93 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <!-- Page Content -->
+    <div class="container">
+        <div class="page-header">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1 align="center">Meta Add Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <form action="/metaAdd" id="metaAddForm" autocomplete="nope">
+                        {{template "metaName" .}}
+                        <!---->
+                        {{template "metaType" .}}
+                        <!---->
+                        {{template "metaBlurb" .}}
+                        <!---->
+                    </form>
+                    <script>
+                        $(window).bind("pageshow", function() {
+                            $('#metaAddForm')[0].reset();
+                        });
+                    </script>
+                    <div style="text-align: center;">
+                        <button type="submit" form="metaAddForm" class="btn btn-default">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+{{end}}
+
+<!--MetaName string-->
+{{define "metaName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="metaName">Meta Name</label>
+        <input type="text" class="form-control" id="metaName" name="metaName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--MetaType MetaType-->
+{{define "metaType"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="metaType">Meta Type</label>
+        <select class="form-control" name="metaType">
+            <option selected></option>
+            {{range .MetasByTypes.MBT}}
+            <option>{{.MetaType.MetaTypeName}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--Article  Post-->
+<!--Blurb    template.HTML-->
+{{define "metaBlurb"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="metaBlurb">Meta Blurb</label>
+        <textarea id="metaBlurb" class="form-control" rows="3" name="metaBlurb"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}

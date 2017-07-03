@@ -22,7 +22,10 @@ type RecipeStep struct {
 	RecipeOrdinal        int
 }
 
-type Doze int
+type Doze struct {
+	ID       int
+	DozeName string
+}
 
 const (
 	Shot = 1 + iota
@@ -45,4 +48,4 @@ var DozeStrings = [...]string{
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).
-func (d Doze) String() string { return DozeStrings[d-1] }
+func (d Doze) String() string { return DozeStrings[d.ID-1] }

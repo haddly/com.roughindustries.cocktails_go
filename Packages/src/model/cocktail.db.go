@@ -338,7 +338,7 @@ func ProcessCocktailToProducts(products []Product, cocktailID int64) {
 	for _, product := range products {
 		prodTo := SelectProduct(product)
 		if len(prodTo) > 0 {
-			query := "INSERT INTO `commonwealthcocktails`.`cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.Itoa(prodTo[0].ID) + "', '" + strconv.Itoa(int(prodTo[0].ProductType)) + "');"
+			query := "INSERT INTO `commonwealthcocktails`.`cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.Itoa(prodTo[0].ID) + "', '" + strconv.Itoa(int(prodTo[0].ProductType.ID)) + "');"
 			log.Println(query)
 			conn.Exec(query)
 		}
@@ -437,8 +437,8 @@ func SelectCocktailsByProduct(product Product) []Cocktail {
 		buffer.WriteString(" `cocktailToProducts`.`idProduct`=" + strconv.Itoa(product.ID) + " AND")
 		canQuery = true
 	}
-	if int(product.ProductType) != 0 {
-		buffer.WriteString(" `cocktailToProducts`.`idProductType`=" + strconv.Itoa(int(product.ProductType)) + " AND")
+	if int(product.ProductType.ID) != 0 {
+		buffer.WriteString(" `cocktailToProducts`.`idProductType`=" + strconv.Itoa(int(product.ProductType.ID)) + " AND")
 		canQuery = true
 	}
 

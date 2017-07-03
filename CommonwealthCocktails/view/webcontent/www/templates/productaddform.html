@@ -1,0 +1,379 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <!-- Page Content -->
+    <div class="container">
+        <div class="page-header">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1 align="center">Product Add Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <form action="/productAdd" id="productAddForm" autocomplete="nope">
+                        {{template "productName" .}}
+                        <!---->
+                        {{template "productType" .}}
+                        <!---->
+                        {{template "productDescription" .}}
+                        <!---->
+                        {{template "productDetails" .}}
+                        <!---->
+                        {{template "productImage" .}}
+                        <!---->
+                        {{template "productImageSourceName" .}}
+                        <!---->
+                        {{template "productImageSourceLink" .}}
+                        <!---->
+                        {{template "productPreText" .}}
+                        <!---->
+                        {{template "productPostText" .}}
+                        <!---->
+                        {{template "productRating" .}}
+                        <!---->
+                        {{template "productSourceName" .}}
+                        <!---->
+                        {{template "productSourceLink" .}}
+                        <!---->
+                    </form>
+                    <script>
+                        $(window).bind("pageshow", function() {
+                            $('#productAddForm')[0].reset();
+                            {{range .ProductsByTypes.PBT}}
+                            $('#productGroupType{{.ProductType.ProductTypeName}}')
+                                .addClass('hide');
+                            var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                            derived
+                                .addClass('hide');
+                            var group = $('#group{{.ProductType.ProductTypeName}}');
+                            group
+                                .addClass('hide');
+                            {{end}}
+                        });
+                    </script>
+                    <div style="text-align: center;">
+                        <button type="submit" form="productAddForm" class="btn btn-default">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+{{end}}
+
+
+<!--ProductName      string-->
+{{define "productName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productName">Product Name</label>
+        <input type="text" class="form-control" id="productName" name="productName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ProductType      ProductType-->
+{{define "productType"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">Product Type / Product Group Type</h2>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <label for="productType">Product Type</label>
+                        <select class="form-control" id="productType" name="productType">
+                            <option selected>&nbsp;</option>
+                            <!--loop over all types and add option-->
+                            {{range .ProductsByTypes.PBT}}
+                            <option>{{.ProductType.ProductTypeName}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="col-xs-12">&nbsp;</div>
+                </div>
+                
+                <!--loop over all type and add a group type for that type-->
+                {{template "productGroupType" .}}
+                <!---->
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                $('#productType')
+                    // Add change handler
+                    .change(function() {
+                        // Hide all the group types for all types
+                        // loop over all types
+                        {{range .ProductsByTypes.PBT}}
+                            $('#productGroupType{{.ProductType.ProductTypeName}}')
+                                .addClass('hide');
+                            var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                            derived
+                                .addClass('hide');
+                            var group = $('#group{{.ProductType.ProductTypeName}}');
+                            group
+                                .addClass('hide');
+                        {{end}}
+                        //check for the type and unhide the group type
+                        //each if is a type, loop over all types and create
+                        //an if for each type
+                        {{range .ProductsByTypes.PBT}}
+                        if ($("#productType :selected").text() == "{{.ProductType.ProductTypeName}}") {
+                            $('#productGroupType{{.ProductType.ProductTypeName}}')
+                                .removeClass('hide');
+                        }
+                       {{end}}
+                    });
+            });
+        </script>
+
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Description      template.HTML-->
+{{define "productDescription"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productDescription">Product Description</label>
+        <textarea id="productDescription" class="form-control" rows="3" name="productDescription"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Details          template.HTML-->
+{{define "productDetails"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productDetails">Product Details</label>
+        <textarea id="productDetails" class="form-control" rows="3" name="productDetails"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImagePath        string-->
+<!--Image            string-->
+{{define "productImage"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productImage">Product Image</label>
+        <input type="text" class="form-control" id="productImage" name="productImage">
+        <div style="text-align: center;"><img style="display: none;" height="200" width="200" id='productImagePreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value != null) {
+                        $('#productImagePreview').attr('src', input.value);
+                        $('#productImagePreview').toggle();
+                    }
+                    else {
+                        $('#productImagePreview').toggle();
+                    }
+                }
+                $("#productImage").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImageSourceName string-->
+{{define "productImageSourceName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productImageSourceName">Product Image Source Name</label>
+        <input type="text" class="form-control" id="productImageSourceName" name="productImageSourceName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImageSourceLink string-->
+{{define "productImageSourceLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productImageSourceLink">Product Image Source Link</label>
+        <input type="text" class="form-control" id="productImageSourceLink" name="productImageSourceLink">
+        <div style="text-align: center;"><img style="display: none;" height="200" width="200" id='productImageSourceLinkPreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value != null) {
+                        $('#productImageSourceLinkPreview').attr('src', input.value);
+                        $('#productImageSourceLinkPreview').toggle();
+                    }
+                    else {
+                        $('#productImageSourceLinkPreview').toggle();
+                    }
+                }
+                $("#productImageSourceLink").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Article          Post-->
+<!--Recipe           Recipe-->
+<!--ProductGroupType GroupType-->
+{{define "productGroupType"}}
+{{range .ProductsByTypes.PBT}}
+<div class="form-group hide" id="productGroupType{{.ProductType.ProductTypeName}}">
+    <div class="col-xs-12">
+        <label for="productGroupType{{.ProductType.ProductTypeName}}">Product Group Type</label>
+        <select class="form-control" name="productGroupType{{.ProductType.ProductTypeName}}">
+            <option selected>Base</option>
+            <option>Derived</option>
+            <option>Group</option>
+        </select>
+    </div>
+</div>
+
+<!-- The template for adding new field -->
+<div class="form-group hide" id="derived{{.ProductType.ProductTypeName}}">
+    <div class="col-xs-12">&nbsp;</div>
+    <div class="col-xs-12">
+        <select class="form-control" name="derived{{.ProductType.ProductTypeName}}">
+            {{range .Products}}
+            <option value="{{.ID}},">{{.ProductName}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class="col-xs-12">&nbsp;</div>
+</div>
+
+<div class="form-group hide" id="group{{.ProductType.ProductTypeName}}">
+    <div class="col-xs-12">&nbsp;</div>
+    <div class="col-xs-12">
+        <select class="form-control" name="group{{.ProductType.ProductTypeName}}" multiple="multiple" size="5">
+            {{range .Products}}
+            <option value="{{.ID}},">{{.ProductName}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class="col-xs-12">&nbsp;</div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#productGroupType{{.ProductType.ProductTypeName}}')
+            // Add change handler
+            .change(function() {
+                if ($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text() == "Base") {
+                    var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                    derived
+                        .addClass('hide');
+                    var group = $('#group{{.ProductType.ProductTypeName}}');
+                    group
+                        .addClass('hide');
+                }
+                else if ($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text() == "Derived") {
+                    var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                    derived
+                        .removeClass('hide');
+                    var group = $('#group{{.ProductType.ProductTypeName}}');
+                    group
+                        .addClass('hide');
+                }
+                else if ($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text() == "Group") {
+                    var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                    derived
+                        .addClass('hide');
+                    var group = $('#group{{.ProductType.ProductTypeName}}');
+                    group
+                        .removeClass('hide');
+                }
+                console.log($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text());
+            });
+    });
+</script>
+<div class=" col-xs-1"></div>
+{{end}}
+{{end}}
+<!--PreText          string-->
+{{define "productPreText"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productPreText">Product Name Pre-Text</label>
+        <input type="text" class="form-control" id="productPreText" name="productPreText">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--PostText         string-->
+{{define "productPostText"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productPostText">Product Name Post-Text</label>
+        <input type="text" class="form-control" id="productPostText" name="productPostText">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Drink            []Meta-->
+<!--Rating           int-->
+{{define "productRating"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productRating">Product Rating</label>
+        <input type="text" class="form-control" id="productRating" name="productRating">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SourceName      string-->
+{{define "productSourceName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productSourceName">Product Source Name</label>
+        <input type="text" class="form-control" id="productSourceName" name="productSourceName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SourceLink      string-->
+{{define "productSourceLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productSourceLink">Product Source Link</label>
+        <input type="text" class="form-control" id="productSourceLink" name="productSourceLink">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--About            Post-->

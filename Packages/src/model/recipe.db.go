@@ -142,7 +142,7 @@ func ProcessRecipe(recipe Recipe) int {
 			buffer.WriteString("`recipestepRecipeCardinalString`=\"" + recipestep.RecipeCardinalString + "\",")
 		}
 		buffer.WriteString("`recipestepRecipeOrdinal`=" + strconv.Itoa(recipestep.RecipeOrdinal) + ",")
-		buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze)) + ",")
+		buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze.ID)) + ",")
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
 		query = query + ";"
@@ -258,8 +258,8 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 				log.Fatal(err)
 			}
 			rs.OriginalIngredient = SelectProductByID(oiID)
-			rs.RecipeDoze = Doze(doze)
-			log.Println(rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze))
+			rs.RecipeDoze = Doze{ID: doze}
+			log.Println(rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze.ID))
 			ret = append(ret, rs)
 		}
 		err = rows.Err()
@@ -269,4 +269,35 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 	}
 	return ret
 
+}
+
+func SelectDoze() []Doze {
+	var ret []Doze
+	conn, _ := db.GetDB()
+
+	var buffer bytes.Buffer
+	buffer.WriteString("SELECT doze.idDoze, doze.dozeName FROM commonwealthcocktails.doze;")
+
+	query := buffer.String()
+	log.Println(query)
+	rows, err := conn.Query(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var doze Doze
+		err := rows.Scan(&doze.ID, &doze.DozeName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(doze.ID, doze.DozeName)
+		ret = append(ret, doze)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return ret
 }

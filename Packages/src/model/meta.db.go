@@ -24,7 +24,9 @@ func InitMetaTables() {
 		conn.Query("ALTER TABLE `commonwealthcocktails`.`metatype`" +
 			"ADD COLUMN `metatypeShowInCocktailsIndex` BOOLEAN AFTER `idMetaType`," + //ShowInCocktailsIndex
 			"ADD COLUMN `metatypeName`  VARCHAR(150) NOT NULL AFTER `metatypeShowInCocktailsIndex`," + //IsSetType
-			"ADD COLUMN `metatypeOrdinal` INT AFTER `metatypeName`;") //Ordinal
+			"ADD COLUMN `metatypeOrdinal` INT AFTER `metatypeName`," + //Ordinal
+			"ADD COLUMN `metatypeHasRoot` TINYINT(1) NULL AFTER `metatypeOrdinal`," + //HasRoot
+			"ADD COLUMN `metatypeIsOneToMany` TINYINT(1) NULL AFTER `metatypeHasRoot`;") //IsOneToMany
 	}
 
 	if err := conn.QueryRow("SHOW TABLES LIKE 'meta';").Scan(&temp); err == nil {
@@ -80,6 +82,16 @@ func ProcessMetaTypes() {
 		} else {
 			buffer.WriteString(" `metatypeShowInCocktailsIndex`='0',")
 		}
+		if metatype.HasRoot {
+			buffer.WriteString(" `metatypeHasRoot`='1',")
+		} else {
+			buffer.WriteString(" `metatypeHasRoot`='0',")
+		}
+		if metatype.IsOneToMany {
+			buffer.WriteString(" `metatypeIsOneToMany`='1',")
+		} else {
+			buffer.WriteString(" `metatypeIsOneToMany`='0',")
+		}
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
 		query = query + ";"
@@ -121,7 +133,7 @@ func SelectMetaType(metatype MetaType) []MetaType {
 	log.Println(metatype.MetaTypeName)
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT `idMetaType`, `metatypeName`, `metatypeOrdinal`, `metatypeShowInCocktailsIndex` FROM `commonwealthcocktails`.`metatype` WHERE ")
+	buffer.WriteString("SELECT `idMetaType`, `metatypeName`, `metatypeOrdinal`, `metatypeShowInCocktailsIndex`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM `commonwealthcocktails`.`metatype` WHERE ")
 	if metatype.ID != 0 {
 		buffer.WriteString("`idMetaType`=" + strconv.Itoa(metatype.ID) + " AND")
 		canQuery = true
@@ -140,6 +152,18 @@ func SelectMetaType(metatype MetaType) []MetaType {
 		buffer.WriteString(" `metatypeShowInCocktailsIndex`='0' AND")
 	}
 
+	if metatype.HasRoot {
+		buffer.WriteString(" `metatypeHasRoot`='1' AND")
+	} else {
+		buffer.WriteString(" `metatypeHasRoot`='0' AND")
+	}
+
+	if metatype.IsOneToMany {
+		buffer.WriteString(" `metatypeIsOneToMany`='1' AND")
+	} else {
+		buffer.WriteString(" `metatypeIsOneToMany`='0' AND")
+	}
+
 	if canQuery {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
@@ -152,12 +176,12 @@ func SelectMetaType(metatype MetaType) []MetaType {
 		defer rows.Close()
 		for rows.Next() {
 			var metatype MetaType
-			err := rows.Scan(&metatype.ID, &metatype.MetaTypeName, &metatype.Ordinal, &metatype.ShowInCocktailsIndex)
+			err := rows.Scan(&metatype.ID, &metatype.MetaTypeName, &metatype.Ordinal, &metatype.ShowInCocktailsIndex, &metatype.HasRoot, &metatype.IsOneToMany)
 			if err != nil {
 				log.Fatal(err)
 			}
 			ret = append(ret, metatype)
-			log.Println(metatype.ID, metatype.MetaTypeName, metatype.Ordinal, metatype.ShowInCocktailsIndex)
+			log.Println(metatype.ID, metatype.MetaTypeName, metatype.Ordinal, metatype.ShowInCocktailsIndex, metatype.HasRoot, metatype.IsOneToMany)
 		}
 		err = rows.Err()
 		if err != nil {
@@ -252,13 +276,14 @@ func GetMetaByTypes(byShowInCocktailsIndex bool, orderBy bool) MetasByTypes {
 	mtListString := strings.Trim(strings.Replace(fmt.Sprint(mtList), " ", ",", -1), "[]")
 	//for _, i := range mtList {
 	var mbt MetasByType
-	mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metatypeName`, `metatypeShowInCocktailsIndex`, `metatypeOrdinal` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType IN (" + mtListString + ");")
+	mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metatypeName`, `metatypeShowInCocktailsIndex`, `metatypeOrdinal`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType IN (" + mtListString + ");")
 	defer mbt_rows.Close()
 	for mbt_rows.Next() {
-		err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal)
+		err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal, &mbt.MetaType.HasRoot, &mbt.MetaType.IsOneToMany)
 		if err != nil {
 			log.Fatal(err)
 		}
+		mbt.MetaType.MetaTypeNameNoSpaces = strings.Join(strings.Fields(mbt.MetaType.MetaTypeName), "")
 		var inMeta Meta
 		inMeta.MetaType = mbt.MetaType
 		outMeta := SelectMeta(inMeta)

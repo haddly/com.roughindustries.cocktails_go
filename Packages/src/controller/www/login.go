@@ -1,17 +1,24 @@
 package www
 
 import (
+	//"bytes"
 	"fmt"
 	"github.com/gorilla/securecookie"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"io/ioutil"
 	"log"
 	"model"
 	"net/http"
+	"strings"
 )
 
 // cookie handling
 
 type Login struct {
 }
+
+var ()
 
 var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(64),
@@ -137,6 +144,41 @@ func (login *Login) secondPageHandler(response http.ResponseWriter, request *htt
 	}
 }
 
+func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+	state := r.FormValue("state")
+	if state != oauthStateString {
+		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	code := r.FormValue("code")
+	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		fmt.Println("Code exchange failed with '%s'\n", err)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	//log.Printf("Content: %s\n", contents)
+	s := string(contents[:])
+	results := strings.Replace(strings.Replace(strings.Split(strings.Split(s, ",")[1], ":")[1], "\"", "", -1), " ", "", -1)
+	//results := strings.Split(s, ",")
+	log.Println(results)
+
+	SetSession("hestert", w)
+	http.Redirect(w, r, "/", 302)
+}
+
 // server main method
 
 func (login *Login) Init() {
@@ -146,4 +188,6 @@ func (login *Login) Init() {
 	http.HandleFunc("/second", login.secondPageHandler)
 	http.HandleFunc("/login", login.loginHandler)
 	http.HandleFunc("/logout", login.logoutHandler)
+	http.HandleFunc("/GoogleLogin", handleGoogleLogin)
+	http.HandleFunc("/GoogleCallback", handleGoogleCallback)
 }

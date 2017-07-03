@@ -11,48 +11,66 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[6],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 0,
 			},
 			//1 oz. Coconut Rum
 			RecipeStep{
 				OriginalIngredient:   Products[9],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 1,
 			},
 			//1 oz. Baileys Irish Cream
 			RecipeStep{
 				OriginalIngredient:   Products[3],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 2,
 			},
 			//.5 oz Amaretto
 			RecipeStep{
 				OriginalIngredient:   Products[10],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        3,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 3,
 			},
 			//.5 oz Frangelico
 			RecipeStep{
 				OriginalIngredient:   Products[4],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        4,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 4,
 			},
 			//1 oz Cream
 			RecipeStep{
 				OriginalIngredient:   Products[8],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        5,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 5,
 			},
 		},
 	},
@@ -65,8 +83,11 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[11],
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
-				RecipeDoze:           Slice,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       5,
+					DozeName: "Slice",
+				},
+				RecipeOrdinal: 0,
 			},
 			//2 oz. Bourbon Whiskey
 			RecipeStep{
@@ -76,32 +97,44 @@ var Recipes = []Recipe{
 				},
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 1,
 			},
 			//.75 oz. Orange Juice
 			RecipeStep{
 				OriginalIngredient:   Products[0],
 				RecipeCardinalFloat:  .75,
 				RecipeCardinalString: "¾",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 2,
 			},
 			//1 oz Lemon Juice
 			RecipeStep{
 				OriginalIngredient:   Products[1],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        3,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 3,
 			},
 			//.5 oz Maple Syrup
 			RecipeStep{
 				OriginalIngredient:   Products[5],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        4,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 4,
 			},
 		},
 	},
@@ -114,40 +147,55 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[3],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Liqueur,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 0,
 			},
 			//2 oz. Frangelico
 			RecipeStep{
 				OriginalIngredient:   Products[4],
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 1,
 			},
 			//.5 oz. coffee liqueur
 			RecipeStep{
 				OriginalIngredient:   Products[6],
 				RecipeCardinalFloat:  .5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 2,
 			},
 			//2 oz Milk
 			RecipeStep{
 				OriginalIngredient:   Products[7],
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        3,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 3,
 			},
 			//1 oz Cream
 			RecipeStep{
 				OriginalIngredient:   Products[8],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        4,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 4,
 			},
 		},
 	},
@@ -160,40 +208,55 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[38],
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 0,
 			},
 			//1 oz lemon juice
 			RecipeStep{
 				OriginalIngredient:   Products[1],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 1,
 			},
 			//1/2 oz Simple Syrup
 			RecipeStep{
 				OriginalIngredient:   Products[39],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				},
+				RecipeOrdinal: 2,
 			},
 			//3 dashes bittes
 			RecipeStep{
 				OriginalIngredient:   Products[40],
 				RecipeCardinalFloat:  3.0,
 				RecipeCardinalString: "3",
-				RecipeDoze:           Dash,
-				RecipeOrdinal:        3,
+				RecipeDoze: Doze{
+					ID:       4,
+					DozeName: "Dash",
+				},
+				RecipeOrdinal: 3,
 			},
 			//.5 fresh egg white
 			RecipeStep{
 				OriginalIngredient:   Products[41],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Fresh,
-				RecipeOrdinal:        4,
+				RecipeDoze: Doze{
+					ID:       7,
+					DozeName: "Fresh",
+				},
+				RecipeOrdinal: 4,
 			},
 		},
 	},
@@ -206,32 +269,42 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[10],
 				RecipeCardinalFloat:  2.0,
 				RecipeCardinalString: "2",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 0,
 			},
 			//1 oz lemon juice
 			RecipeStep{
 				OriginalIngredient:   Products[1],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 1,
 			},
 			//1 dashes bittes
 			RecipeStep{
 				OriginalIngredient:   Products[40],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Dash,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       4,
+					DozeName: "Dash",
+				},
+				RecipeOrdinal: 2,
 			},
 			//.5 fresh egg white
 			RecipeStep{
 				OriginalIngredient:   Products[41],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Fresh,
-				RecipeOrdinal:        3,
+				RecipeDoze: Doze{
+					ID:       7,
+					DozeName: "Fresh",
+				},
+				RecipeOrdinal: 3,
 			},
 		},
 	},
@@ -244,24 +317,30 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[46],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 0,
 			},
 			//1 oz Créme de Cacao
 			RecipeStep{
 				OriginalIngredient:   Products[47],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 1,
 			},
 			//1 oz cream
 			RecipeStep{
 				OriginalIngredient:   Products[8],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 2,
 			},
 		},
 	},
@@ -274,22 +353,29 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[51],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 0,
 			},
 			//1 oz sweet vermouth
 			RecipeStep{
 				OriginalIngredient:   Products[52],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 1,
 			},
 			//top off with soda
 			RecipeStep{
 				OriginalIngredient: Products[53],
-				RecipeDoze:         TopOffWith,
-				RecipeOrdinal:      2,
+				RecipeDoze: Doze{
+					ID:       6,
+					DozeName: "Top Off With",
+				},
+				RecipeOrdinal: 2,
 			},
 		},
 	},
@@ -302,24 +388,30 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[57],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 0,
 			},
 			//1 oz Gin
 			RecipeStep{
 				OriginalIngredient:   Products[42],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 1,
 			},
 			//1 oz Apricot brandy
 			RecipeStep{
 				OriginalIngredient:   Products[58],
 				RecipeCardinalFloat:  1.0,
 				RecipeCardinalString: "1",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 2,
 			},
 		},
 	},
@@ -332,24 +424,30 @@ var Recipes = []Recipe{
 				OriginalIngredient:   Products[42],
 				RecipeCardinalFloat:  1.5,
 				RecipeCardinalString: "1½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        0,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 0,
 			},
 			//.5 oz Maraschino Liqueur
 			RecipeStep{
 				OriginalIngredient:   Products[61],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        1,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 1,
 			},
 			//.5 oz Lemon Juice
 			RecipeStep{
 				OriginalIngredient:   Products[1],
 				RecipeCardinalFloat:  0.5,
 				RecipeCardinalString: "½",
-				RecipeDoze:           Ounce,
-				RecipeOrdinal:        2,
+				RecipeDoze: Doze{
+					ID:       2,
+					DozeName: "Ounce",
+				}, RecipeOrdinal: 2,
 			},
 		},
 	},

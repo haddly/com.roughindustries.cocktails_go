@@ -95,7 +95,7 @@ func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) 
 	buffer.WriteString(model.GetCurrentDB() + "<br/>")
 
 	model.GetMetaByTypes(false, false)
-	model.GetBaseProductByTypes()
+	model.GetProductsByTypes(true, true)
 
 	//apply the template page info to the index page
 	statStr := buffer.String()

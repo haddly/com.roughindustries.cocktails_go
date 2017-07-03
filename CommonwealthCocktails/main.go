@@ -20,6 +20,7 @@ import (
 var d = www.Database{}
 var c = www.Cocktail{}
 var p = www.Product{}
+var m = www.Meta{}
 var s = www.Search{}
 var l = www.Login{}
 var post = www.Post{}
@@ -28,36 +29,16 @@ var a = alexa.Hello{}
 
 func init() {
 
-	var datasource = model.DSTtoi(*flag.String("DataSource", "Internal", "DataSource Type"))
-	if os.Getenv("DataSource") != "" {
-		datasource = model.DSTtoi(os.Getenv("DataSource"))
-	}
+	var datasource = model.DSTtoi("DB")
 
 	if datasource == model.DB {
-		var dbaddr = *flag.String("DBADDR", "0.0.0.0", "Database IP Address")
-		if os.Getenv("DBADDR") != "" {
-			dbaddr = os.Getenv("DBADDR")
-		}
-		var dbpasswd = *flag.String("DBPASSWD", "password", "Database password")
-		if os.Getenv("DBPASSWD") != "" {
-			dbpasswd = os.Getenv("DBPASSWD")
-		}
-		var user = *flag.String("DBUSERNAME", "user", "Database username to login as")
-		if os.Getenv("DBUSERNAME") != "" {
-			user = os.Getenv("DBUSERNAME")
-		}
-		var proto = *flag.String("DBPROTOCOL", "tcp", "Database protocol to use to connect over")
-		if os.Getenv("DBPROTOCOL") != "" {
-			proto = os.Getenv("DBPROTOCOL")
-		}
-		var port = *flag.String("DBPORT", "3306", "Database port to connect over")
-		if os.Getenv("DBPORT") != "" {
-			port = os.Getenv("DBPORT")
-		}
-		var dbname = *flag.String("DBNAME", "db", "Database name")
-		if os.Getenv("DBNAME") != "" {
-			dbname = os.Getenv("DBNAME")
-		}
+		//SET THESE VALUES
+		var dbaddr string
+		var dbpasswd string
+		var user string
+		var proto string
+		var port string
+		var dbname string
 		db.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
 	}
 
@@ -68,6 +49,7 @@ func init() {
 	d.Init()
 	c.Init()
 	p.Init()
+	m.Init()
 	s.Init()
 	a.Init()
 	post.Init()

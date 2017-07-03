@@ -76,6 +76,47 @@ func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Reques
 }
 
 //handle / requests to the server
+func (cocktail *Cocktail) CocktailAddFormHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("In Add Cocktail Form handler")
+	userName := GetUserName(r)
+	if userName != "" {
+		var page Page
+		page.Username = GetUserName(r)
+		page.Doze = model.SelectDoze()
+		var mbt model.MetasByTypes
+		mbt = model.GetMetaByTypes(false, true)
+		page.MetasByTypes = mbt
+		var ingredients model.ProductsByTypes
+		ingredients = model.GetProductsByTypes(true, false)
+		page.Ingredients = ingredients
+		var nonIngredients model.ProductsByTypes
+		nonIngredients = model.GetProductsByTypes(false, true)
+		page.NonIngredients = nonIngredients
+		//log.Println(c)
+		//apply the template page info to the index page
+		cocktail.RenderPageTemplate(w, "cocktailaddform", &page)
+	} else {
+		cocktail.RenderPageTemplate(w, "404", nil)
+	}
+}
+
+//handle / requests to the server
+func (cocktail *Cocktail) CocktailAddHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("In Add Cocktail handler")
+	u, err := url.Parse(r.URL.String())
+	log.Println(u)
+	if err != nil {
+		cocktail.RenderPageTemplate(w, "404", nil)
+	}
+	m, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		cocktail.RenderPageTemplate(w, "404", nil)
+	}
+	log.Println(m)
+	cocktail.RenderPageTemplate(w, "404", nil)
+}
+
+//handle / requests to the server
 func (cocktail *Cocktail) CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Println("indexHandler: " + r.URL.Path[1:])
 
@@ -145,6 +186,8 @@ func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *
 			var c []model.Cocktail
 			c = model.SelectCocktailsByProduct(inProduct)
 			cs.ChildCocktails = c
+			prod := model.SelectProduct(inProduct)
+			cs.Product = prod[0]
 			page.CocktailSet = cs
 			cocktail.RenderPageTemplate(w, "cocktails", &page)
 		}
@@ -183,4 +226,6 @@ func (cocktail *Cocktail) Init() {
 	http.HandleFunc("/cocktailsindex", cocktail.CocktailsIndexHandler)
 	http.HandleFunc("/cocktailsByMetaID", cocktail.CocktailsByMetaIDHandler)
 	http.HandleFunc("/cocktailsByProductID", cocktail.CocktailsByProductIDHandler)
+	http.HandleFunc("/cocktailAddForm", cocktail.CocktailAddFormHandler)
+	http.HandleFunc("/cocktailAdd", cocktail.CocktailAddHandler)
 }

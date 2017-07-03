@@ -6,7 +6,14 @@ import (
 	"math/rand"
 )
 
-type ProductType int
+type ProductType struct {
+	ID                      int
+	IsIngredient            bool
+	ProductTypeName         string
+	ProductTypeNameNoSpaces string
+}
+
+type ProductTypeConst int
 
 const (
 	Spirit = 1 + iota
@@ -31,7 +38,18 @@ var ProductTypeStrings = [...]string{
 }
 
 // String returns the English name of the Producttype ("Spirit", "Liqueur", ...).
-func (ct ProductType) String() string { return ProductTypeStrings[ct-1] }
+func (pt ProductTypeConst) String() string { return ProductTypeStrings[pt-1] }
+
+func ProductTypeStringToInt(a string) int {
+	var i = 1
+	for _, b := range ProductTypeStrings {
+		if b == a {
+			return i
+		}
+		i++
+	}
+	return 0
+}
 
 type Product struct {
 	ID               int
@@ -73,13 +91,12 @@ type BaseProductWithBD struct {
 	BaseProduct     Product
 }
 
-type ProductByTypes struct {
-	pbt []ProductByType
+type ProductsByTypes struct {
+	PBT []ProductsByType
 }
 
-type ProductByType struct {
+type ProductsByType struct {
 	ProductType ProductType
-	ProductName string
 	Products    []Product
 }
 

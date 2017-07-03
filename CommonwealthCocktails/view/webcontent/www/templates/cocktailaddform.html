@@ -1,0 +1,460 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <!-- Page Content -->
+    <div class="container">
+        <div class="page-header">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1 align="center">Cocktail Add Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <form action="/cocktailAdd" id="cocktailAddForm">
+                        {{template "cocktailTitle" .}}
+                        <!---->
+                        {{template "cocktailName" .}}
+                        <!---->
+                        {{template "cocktailDisplayName" .}}
+                        <!---->
+                        {{template "cocktailAlternateName" .}}
+                        <!---->
+                        {{template "cocktailSpokenName" .}}
+                        <!---->
+                        {{template "cocktailOrigin" .}}
+                        <!---->
+                        {{template "cocktailAKA" .}}
+                        <!---->
+                        {{template "cocktailDescription".}}
+                        <!---->
+                        {{template "cocktailComment" .}}
+                        <!---->
+                        {{template "recipeForm" .}}
+                        <!---->
+                        {{template "cocktailImage" .}}
+                        <!---->
+                        {{template "cocktailImageSourceName" .}}
+                        <!---->
+                        {{template "cocktailImageSourceLink" .}}
+                        <!---->
+                        {{template "cocktailSourceName" .}}
+                        <!---->
+                        {{template "cocktailSourceLink".}}
+                        <!---->
+                        {{template "cocktailNonIngredients" .}}
+                        <!---->
+                        {{template "cocktailMetas" .}}
+                    </form>
+                    <div style="text-align: center;">
+                        <button type="submit" form="cocktailAddForm" class="btn btn-default">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+{{end}}
+
+<!--ID              int-->
+<!--Title           string-->
+{{define "cocktailTitle"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailTitle">Cocktail Title</label>
+        <input type="text" class="form-control" id="cocktailTitle" name="cocktailTitle">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Name            string-->
+{{define "cocktailName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailName">Cocktail Name</label>
+        <input type="text" class="form-control" id="cocktailName" name="cocktailName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--DisplayName     string-->
+{{define "cocktailDisplayName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailDisplayName">Cocktail Display Name</label>
+        <input type="text" class="form-control" id="cocktailDisplayName" name="cocktailDisplayName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--AlternateName   []Name-->
+{{define "cocktailAlternateName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailAlternateNames">Cocktail Alternate Names</label>
+        <textarea id="cocktailAlternateNames" class="form-control" rows="2" name="cocktailAlternateNames"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SpokenName      string-->
+{{define "cocktailSpokenName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSpokenName">Cocktail Spoken Name</label>
+        <input type="text" class="form-control" id="cocktailSpokenName" name="cocktailSpokenName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Origin          string-->
+{{define "cocktailOrigin"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailOrigin">Cocktail Origin</label>
+        <textarea id="cocktailOrigin" class="form-control" rows="3" name="cocktailOrigin"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--AKA             []Name-->
+{{define "cocktailAKA"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailAKA">Cocktail Also Known As</label>
+        <textarea id="cocktailAKA" class="form-control" rows="3" name="cocktailAKA"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Description     template.HTML-->
+{{define "cocktailDescription"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailDescription">Cocktail Description</label>
+        <textarea id="cocktailDescription" class="form-control" rows="3" name="cocktailDescription"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Comment         template.HTML-->
+{{define "cocktailComment"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailComment">Cocktail Comment</label>
+        <textarea id="cocktailComment" class="form-control" rows="3" name="cocktailComment"></textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Recipe          Recipe-->
+{{define "recipeForm"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">Recipe</h2>
+            </div>
+            <div class="panel-body">
+                <label class="col-xs-12">Recipe Steps</label>
+                <div id="primaryRecipeStep" class="col-xs-5">
+                    <select class="form-control" name="'recipestep[0].Ingredient">
+                        {{range .Ingredients.PBT}}
+                        <optgroup label="{{.ProductType.ProductTypeName}}">
+                            {{range .Products}}
+                            <option value="{{.ProductName}}">{{.ProductName}}</option>
+                            {{end}}
+                        </optgroup>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="col-xs-4">
+                    <input type="text" class="form-control" name="recipestep[0].Quantity" placeholder="Quantity" />
+                </div>
+                <div class="col-xs-2">
+                    <select class="form-control" name="recipestep[0].Doze">
+                        {{range .Doze}}
+                        <option value="{{.DozeName}}">{{.DozeName}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="col-xs-1">
+                    <button type="button" class="btn btn-default addRecipeStepButton"><i class="fa fa-plus"></i></button>
+                </div>
+                <div class="col-xs-12">&nbsp;</div>
+                <!-- The template for adding new field -->
+                <div class="form-group hide" id="recipestepTemplate">
+                    <div class="col-xs-5">
+                        <select class="form-control" name="Ingredient">
+                            {{range .Ingredients.PBT}}
+                            <optgroup label="{{.ProductType.ProductTypeName}}">
+                                {{range .Products}}
+                                <option>{{.ProductName}}</option>
+                                {{end}}
+                            </optgroup>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="col-xs-4">
+                        <input type="text" class="form-control" name="Quantity" placeholder="Quantity" />
+                    </div>
+                    <div class="col-xs-2">
+                        <select class="form-control" name="Doze">
+                            {{range .Doze}}
+                            <option>{{.DozeName}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="col-xs-1">
+                        <button type="button" class="btn btn-default removeRecipeStepButton"><i class="fa fa-minus"></i></button>
+                    </div>
+                    <div class="col-xs-12">&nbsp;</div>
+                </div>
+                <script>
+                    $(document).ready(function() {
+                        recipestepIndex = 0;
+                        $('#cocktailAddForm')
+                            // Add button click handler
+                            .on('click', '.addRecipeStepButton', function() {
+                                recipestepIndex++;
+                                var $template = $('#recipestepTemplate'),
+                                    $clone = $template
+                                    .clone()
+                                    .removeClass('hide')
+                                    .removeAttr('id')
+                                    .attr('data-recipestep-index', recipestepIndex)
+                                    .insertBefore($template);
+                                // Update the name attributes
+                                $clone
+                                    .find('[name="Ingredient"]').attr('name', 'recipestep[' + recipestepIndex + '].Ingredient').end()
+                                    .find('[name="Quantity"]').attr('name', 'recipestep[' + recipestepIndex + '].Quantity').end()
+                                    .find('[name="Doze"]').attr('name', 'recipestep[' + recipestepIndex + '].Doze').end();
+                            })
+                            // Remove button click handler
+                            .on('click', '.removeRecipeStepButton', function() {
+                                var $row = $(this).parents('.form-group'),
+                                    index = $row.attr('data-recipestep-index');
+                                // Remove element containing the fields
+                                $row.remove();
+                            });
+                    });
+                </script>
+                <div class="col-xs-12">
+                    <label for="recipeMethod">Recipe Method</label>
+                    <textarea id="recipeMethod" class="form-control" rows="3" name="recipeMethod"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Garnish         []Product-->
+<!--Drinkware       []Product-->
+<!--Tool            []Product-->
+{{define "cocktailNonIngredients"}}
+<!---->
+{{range .NonIngredients.PBT}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{.ProductType.ProductTypeName}}</h2>
+            </div>
+            <div class="panel-body">
+                <div id="primary{{.ProductType.ProductTypeName}}" class="col-xs-12">
+                    <select class="form-control" name="{{.ProductType.ProductTypeName}}" multiple="multiple" size="5">
+                        {{range .Products}}
+                        <option value="{{.ProductName}}">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}} {{end}}
+<!--ImagePath       string-->
+<!--Image           string-->
+{{define "cocktailImage"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailImage">Cocktail Image</label>
+        <input type="text" class="form-control" id="cocktailImage" name="cocktailImage">
+        <div style="text-align: center;"><img style="display: none;" height="200" width="200" id='cocktailImagePreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value != null) {
+                        $('#cocktailImagePreview').attr('src', input.value);
+                        $('#cocktailImagePreview').toggle();
+                    }
+                    else {
+                        $('#cocktailImagePreview').toggle();
+                    }
+                }
+                $("#cocktailImage").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImageSourceName string-->
+{{define "cocktailImageSourceName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailImageSourceName">Cocktail Image Source Name</label>
+        <input type="text" class="form-control" id="cocktailImageSourceName" name="cocktailImageSourceName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImageSourceLink string-->
+{{define "cocktailImageSourceLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailImageSourceLink">Cocktail Image Source Link</label>
+        <input type="text" class="form-control" id="cocktailImageSourceLink" name="cocktailImageSourceLink">
+        <div style="text-align: center;"><img style="display: none;" height="200" width="200" id='cocktailImageSourceLinkPreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value != null) {
+                        $('#cocktailImageSourceLinkPreview').attr('src', input.value);
+                        $('#cocktailImageSourceLinkPreview').toggle();
+                    }
+                    else {
+                        $('#cocktailImageSourceLinkPreview').toggle();
+                    }
+                }
+                $("#cocktailImageSourceLink").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SourceName      string-->
+{{define "cocktailSourceName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSourceName">Cocktail Source Name</label>
+        <input type="text" class="form-control" id="cocktailSourceName" name="cocktailSourceName">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SourceLink      string-->
+{{define "cocktailSourceLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSourceLink">Cocktail Source Link</label>
+        <input type="text" class="form-control" id="cocktailSourceLink" name="cocktailSourceLink">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Rating          int-->
+{{define "cocktailRating"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailRating">Cocktail Rating</label>
+        <input type="text" class="form-control" id="cocktailRating" name="cocktailRating">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!---->
+
+<!--Flavor          []Meta-->
+<!--Type            []Meta-->
+<!--BaseSpirit      []Meta-->
+<!--Served          []Meta-->
+<!--Technique       []Meta-->
+<!--Strength        []Meta-->
+<!--Difficulty      []Meta-->
+<!--TOD             []Meta-->
+<!--Ratio           []Meta-->
+<!--Family          []Meta-->
+{{define "cocktailMetas"}}
+<!---->
+{{range .MetasByTypes.MBT}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{.MetaType.MetaTypeName}}</h2>
+            </div>
+            <div class="panel-body">
+                <div id="primary{{.MetaType.MetaTypeNameNoSpaces}}" class="col-xs-12">
+                    {{if .MetaType.IsOneToMany}}
+                     <select class="form-control" name="{{.MetaType.MetaTypeNameNoSpaces}}" multiple="multiple" size="5">
+                        {{range .Metas}}
+                        <option value="{{.MetaName}},">{{.MetaName}}</option>
+                        {{end}}
+                    {{else}}
+                    <select class="form-control" name="{{.MetaType.MetaTypeNameNoSpaces}}">
+                        <option selected></option>
+                         {{range .Metas}}
+                        <option>{{.MetaName}}</option>
+                        {{end}}
+                    {{end}}
+                    </select>
+                </div>
+                <div class="col-xs-12">&nbsp;</div>
+                {{if .MetaType.HasRoot}}
+                <div class="checkbox col-xs-11">
+                    <label><input type="checkbox" id="Is{{.MetaType.MetaTypeNameNoSpaces}}Root" name="Is{{.MetaType.MetaTypeNameNoSpaces}}Root" value="true">Is this a root cocktail for {{.MetaType.MetaTypeName}}</label>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}} {{end}}
+
+<!--IsFamilyRoot    bool-->
+<!--About           Post-->
+<!--Articles        []Post-->

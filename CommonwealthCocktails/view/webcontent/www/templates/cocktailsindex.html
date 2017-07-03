@@ -23,10 +23,14 @@
 				<h1 align="center">Cocktails</h1>
 			</div>
 			<div class="row">
+				<div class=" col-xs-1"></div>
+				<div class=" col-xs-10">
 				{{template "top100" .}}
 				{{template "cocktailsByIngredient" .}}
 				{{template "cocktailOfTheDay" .}}
 				{{template "cocktailsByStyle" .}}
+				</div>
+				<div class=" col-xs-1"></div>
 			</div>
 		</div>
 		<div class="row">

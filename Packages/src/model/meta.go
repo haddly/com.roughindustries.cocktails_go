@@ -9,7 +9,10 @@ type MetaType struct {
 	ID                   int
 	ShowInCocktailsIndex bool
 	MetaTypeName         string
+	MetaTypeNameNoSpaces string
 	Ordinal              int
+	HasRoot              bool
+	IsOneToMany          bool
 }
 
 type MetaTypesConst int
@@ -76,6 +79,17 @@ var GroupTypeStrings = [...]string{
 
 // String returns the English name of the Grouptype ("Base", "Derived", ...).
 func (ct GroupType) String() string { return GroupTypeStrings[ct-1] }
+
+func GroupTypeStringToInt(a string) int {
+	var i = 1
+	for _, b := range GroupTypeStrings {
+		if b == a {
+			return i
+		}
+		i++
+	}
+	return 0
+}
 
 type Meta struct {
 	ID       int

@@ -53,7 +53,6 @@ type Cocktail struct {
 	IsFamilyRoot    bool
 	About           Post
 	Articles        []Post
-	IsBase          bool
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -68,6 +67,7 @@ type CocktailSet struct {
 	RootCocktail   Cocktail
 	Cocktail       Cocktail
 	Metadata       Meta
+	Product        Product
 }
 
 type CocktailSearch struct {
