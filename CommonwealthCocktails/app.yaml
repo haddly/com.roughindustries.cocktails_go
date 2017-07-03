@@ -24,16 +24,3 @@ handlers:
   static_dir: view/webcontent/www/libs/slick
 - url: /.*
   script: _go_app
-
-#ENV VARS
-# uncomment the lines to setup the database and add the correct values
-# add #gitignore to the end of line so that your sensitive info isn't added to a repo
-env_variables:
-  #DBADDR: 
-  #DBPASSWD:
-  #DBUSERNAME:
-  #DBPROTOCOL:
-  #DBPORT:
-  #DBNAME:
-  #DataSource:
-  #DataSource:
