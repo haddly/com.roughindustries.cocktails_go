@@ -5,4 +5,5 @@ Packages/src/cloud.google.com
 Packages/src/golang.org
 Packages/src/google.golang.org
 Packages/pkg/*
+sensitive.config
 !pkg/.gitkeep
