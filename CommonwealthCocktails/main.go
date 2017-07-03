@@ -32,7 +32,7 @@ func init() {
 	var datasource = model.DSTtoi("DB")
 
 	if datasource == model.DB {
-		//SET THESE VALUES
+		//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 		var dbaddr string
 		//dbaddr = ??
 		if dbaddr == "" {

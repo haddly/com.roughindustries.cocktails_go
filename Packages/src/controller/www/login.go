@@ -19,7 +19,7 @@ type Login struct {
 }
 
 var (
-	//SET THESE LINES
+	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 	//googleOauthConfig = &oauth2.Config{
 	//RedirectURL:  ??,
 	//ClientID:     ??,
@@ -116,46 +116,6 @@ func (login *Login) loginIndexHandler(response http.ResponseWriter, request *htt
 	login.RenderLoginIndexTemplate(response, "loginindex", &page)
 }
 
-// internal page
-
-const internalPage = `
-<h1>Internal</h1>
-<hr>
-<small>User: %s</small>
-<form method="post" action="/logout">
-    <button type="submit">Logout</button>
-</form>
-`
-
-func (login *Login) internalPageHandler(response http.ResponseWriter, request *http.Request) {
-	userName := GetUserName(request)
-	if userName != "" {
-		fmt.Fprintf(response, internalPage, userName)
-	} else {
-		login.RenderLoginIndexTemplate(response, "404", nil)
-	}
-}
-
-// internal page
-
-const secondPage = `
-<h1>Second Internal</h1>
-<hr>
-<small>User: %s</small>
-<form method="post" action="/logout">
-    <button type="submit">Logout</button>
-</form>
-`
-
-func (login *Login) secondPageHandler(response http.ResponseWriter, request *http.Request) {
-	userName := GetUserName(request)
-	if userName != "" {
-		fmt.Fprintf(response, secondPage, userName)
-	} else {
-		http.Redirect(response, request, "/", 404)
-	}
-}
-
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -196,8 +156,6 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 func (login *Login) Init() {
 	log.Println("Init in www/login.go")
 	http.HandleFunc("/loginIndex", login.loginIndexHandler)
-	http.HandleFunc("/internal", login.internalPageHandler)
-	http.HandleFunc("/second", login.secondPageHandler)
 	http.HandleFunc("/login", login.loginHandler)
 	http.HandleFunc("/logout", login.logoutHandler)
 	http.HandleFunc("/GoogleLogin", handleGoogleLogin)
