@@ -34,11 +34,41 @@ func init() {
 	if datasource == model.DB {
 		//SET THESE VALUES
 		var dbaddr string
+		//dbaddr = ??
+		if dbaddr == "" {
+			log.Println("No DB Address set.")
+			os.Exit(0)
+		}
 		var dbpasswd string
+		//dbpasswd = ??
+		if dbpasswd == "" {
+			log.Println("No DB password set.")
+			os.Exit(0)
+		}
 		var user string
+		//user = ??
+		if user == "" {
+			log.Println("No DB user set.")
+			os.Exit(0)
+		}
 		var proto string
+		//proto = ??
+		if proto == "" {
+			log.Println("No DB protocol set.")
+			os.Exit(0)
+		}
 		var port string
+		//port = ??
+		if port == "" {
+			log.Println("No DB port set.")
+			os.Exit(0)
+		}
 		var dbname string
+		//dbname = ??
+		if dbname == "" {
+			log.Println("No DB name set.")
+			os.Exit(0)
+		}
 		db.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
 	}
 

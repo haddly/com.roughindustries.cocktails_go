@@ -18,7 +18,19 @@ import (
 type Login struct {
 }
 
-var ()
+var (
+	//SET THESE LINES
+	//googleOauthConfig = &oauth2.Config{
+	//RedirectURL:  ??,
+	//ClientID:     ??,
+	//ClientSecret: ??,
+	//Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
+	//	"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/plus.me"},
+	//Endpoint: google.Endpoint,
+	//}
+	// Some random string, random for each request
+	oauthStateString = "random"
+)
 
 var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(64),

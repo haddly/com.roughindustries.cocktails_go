@@ -27,8 +27,8 @@ handlers:
 
 #ENV VARS
 # uncomment the lines to setup the database and add the correct values
+# add #gitignore to the end of line so that your sensitive info isn't added to a repo
 env_variables:
-  
   #DBADDR: 
   #DBPASSWD:
   #DBUSERNAME:
