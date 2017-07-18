@@ -1,5 +1,5 @@
-//model/db_connection.go
-package db
+//connectors/db_connection.go
+package connectors
 
 import (
 	"database/sql"

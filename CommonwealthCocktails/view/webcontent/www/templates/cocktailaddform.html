@@ -112,8 +112,9 @@
 <div class="row">
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
-        <label for="cocktailAlternateNames">Cocktail Alternate Names</label>
-        <textarea id="cocktailAlternateNames" class="form-control" rows="2" name="cocktailAlternateNames"></textarea>
+        <label for="cocktailAlternateNames">Cocktail Alternate Names (comma seperated value list)</label>
+        <div class=" col-xs-12"></div>
+        <textarea style="resize: vertical;" id="cocktailAlternateNames" class="form-control" rows="2" name="cocktailAlternateNames"></textarea>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -135,7 +136,21 @@
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
         <label for="cocktailOrigin">Cocktail Origin</label>
+        <div class=" col-xs-12"></div>        
         <textarea id="cocktailOrigin" class="form-control" rows="3" name="cocktailOrigin"></textarea>
+        <script>
+            $(document).ready(function() {
+                $('#cocktailOrigin').summernote({
+                  toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['para', ['paragraph']],
+                    ['view', ['fullscreen', 'codeview']],
+                  ]
+                });
+            });
+        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -145,8 +160,9 @@
 <div class="row">
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
-        <label for="cocktailAKA">Cocktail Also Known As</label>
-        <textarea id="cocktailAKA" class="form-control" rows="3" name="cocktailAKA"></textarea>
+        <label for="cocktailAKA">Cocktail Also Known As (comma seperated value list)</label>
+        <div class=" col-xs-12"></div>        
+        <textarea style="resize: vertical;" id="cocktailAKA" class="form-control" rows="3" name="cocktailAKA"></textarea>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -157,7 +173,21 @@
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
         <label for="cocktailDescription">Cocktail Description</label>
+        <div class=" col-xs-12"></div>        
         <textarea id="cocktailDescription" class="form-control" rows="3" name="cocktailDescription"></textarea>
+        <script>
+            $(document).ready(function() {
+                $('#cocktailDescription').summernote({
+                  toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['para', ['paragraph']],
+                    ['view', ['fullscreen', 'codeview']],
+                  ]
+                });
+            });
+        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -168,7 +198,21 @@
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
         <label for="cocktailComment">Cocktail Comment</label>
+        <div class=" col-xs-12"></div>        
         <textarea id="cocktailComment" class="form-control" rows="3" name="cocktailComment"></textarea>
+        <script>
+            $(document).ready(function() {
+                $('#cocktailComment').summernote({
+                  toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['para', ['paragraph']],
+                    ['view', ['fullscreen', 'codeview']],
+                  ]
+                });
+            });
+        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -269,6 +313,19 @@
                 <div class="col-xs-12">
                     <label for="recipeMethod">Recipe Method</label>
                     <textarea id="recipeMethod" class="form-control" rows="3" name="recipeMethod"></textarea>
+                    <script>
+                        $(document).ready(function() {
+                            $('#recipeMethod').summernote({
+                              toolbar: [
+                                ['style', ['style']],
+                                ['font', ['bold', 'italic', 'underline', 'clear']],
+                                ['fontsize', ['fontsize']],
+                                ['para', ['paragraph']],
+                                ['view', ['fullscreen', 'codeview']],
+                              ]
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>

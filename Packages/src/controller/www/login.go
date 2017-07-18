@@ -1,10 +1,10 @@
+// Package login
 package www
 
 import (
-	//"bytes"
-	"fmt"
-	"github.com/gorilla/securecookie"
+	"encoding/json"
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
 	"log"
@@ -18,6 +18,12 @@ import (
 type Login struct {
 }
 
+type FBOauth struct {
+	id    string
+	email string
+	name  string
+}
+
 var (
 	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 	//googleOauthConfig = &oauth2.Config{
@@ -29,110 +35,110 @@ var (
 	//Endpoint: google.Endpoint,
 	//}
 	// Some random string, random for each request
-	oauthStateString  = "random"
+	// this way could create a memory leak sense I don't clear out the map ever, just a heads up
+	oauthStateString  = make(map[string]bool)
+	}
 )
 
-var cookieHandler = securecookie.New(
-	securecookie.GenerateRandomKey(64),
-	securecookie.GenerateRandomKey(32))
-
-func (login *Login) RenderLoginIndexTemplate(w http.ResponseWriter, tmpl string, page *Page) {
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = t.ExecuteTemplate(w, "base", page)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func GetUserName(request *http.Request) (userName string) {
-	if cookie, err := request.Cookie("session"); err == nil {
-		cookieValue := make(map[string]string)
-		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
-			userName = cookieValue["name"]
+// loginHandler
+func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
 		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
+	name := r.FormValue("name")
+	pass := r.FormValue("password")
+	log.Println(r)
+	user := model.User{
+		Username: name,
+		Password: pass,
 	}
-	return userName
-}
-
-func SetSession(userName string, response http.ResponseWriter) {
-	value := map[string]string{
-		"name": userName,
-	}
-	if encoded, err := cookieHandler.Encode("session", value); err == nil {
-		cookie := &http.Cookie{
-			Name:  "session",
-			Value: encoded,
-			Path:  "/",
+	page.User = user
+	if page.User.Validate() {
+		usr := model.SelectUserForLogin(user, false)
+		if len(usr.Username) > 0 {
+			SetSession(w, r, usr.Username)
+			http.Redirect(w, r, "/", 302)
+			return
+		} else {
+			log.Println("Bad username or password: " + name)
+			page.Errors["loginErrors"] = "Bad Username and/or Password!"
+			page.RenderPageTemplate(w, "/loginindex")
+			return
 		}
-		http.SetCookie(response, cookie)
+	} else {
+		log.Println("Bad username or password: " + name)
+		page.Errors["loginErrors"] = "Invalid Username and/or Password"
+		page.RenderPageTemplate(w, "/loginindex")
+		return
 	}
 }
 
-func ClearSession(response http.ResponseWriter) {
-	cookie := &http.Cookie{
-		Name:   "session",
-		Value:  "",
-		Path:   "/",
-		MaxAge: -1,
-	}
-	http.SetCookie(response, cookie)
+// logoutHandler
+func (login *Login) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	ClearSession(w, r)
+	http.Redirect(w, r, "/", 302)
 }
 
-// login handler
-
-func (login *Login) loginHandler(response http.ResponseWriter, request *http.Request) {
-	name := request.FormValue("name")
-	pass := request.FormValue("password")
-	if name != "" && pass != "" {
-		user := model.User{
-			Username: name,
-			Password: pass,
+func (login *Login) loginIndexHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
 		}
-		usr := model.SelectUserForLogin(user)
-		// usr := model.GetUser(name)
-		if usr != nil {
-			if usr.Password == pass {
-				SetSession(name, response)
-				http.Redirect(response, request, "/", 302)
-			}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
+	page.RenderPageTemplate(w, "loginindex")
+}
+
+func (login *Login) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
 		}
-	}
-	login.RenderLoginIndexTemplate(response, "404", nil)
-}
-
-// logout handler
-
-func (login *Login) logoutHandler(response http.ResponseWriter, request *http.Request) {
-	ClearSession(response)
-	http.Redirect(response, request, "/", 302)
-}
-
-func (login *Login) loginIndexHandler(response http.ResponseWriter, request *http.Request) {
-	//fmt.Fprintf(response, indexPage)
-	var page Page
-	login.RenderLoginIndexTemplate(response, "loginindex", &page)
-}
-
-func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	}()
+	// CATCH ONLY HEADER START
+	str := randSeq(64)
+	oauthStateString[str] = true
+	url := googleOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+func (login *Login) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	// CATCH ONLY HEADER START
 	state := r.FormValue("state")
-	if state != oauthStateString {
-		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+	if !oauthStateString[state] {
+		log.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
+	} else {
+		delete(oauthStateString, state)
 	}
 
 	code := r.FormValue("code")
 	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		fmt.Println("Code exchange failed with '%s'\n", err)
+		log.Println("Code exchange failed with '%s'\n", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -143,11 +149,71 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	contents, err := ioutil.ReadAll(response.Body)
 	//log.Printf("Content: %s\n", contents)
 	s := string(contents[:])
-	results := strings.Replace(strings.Replace(strings.Split(strings.Split(s, ",")[1], ":")[1], "\"", "", -1), " ", "", -1)
-	//results := strings.Split(s, ",")
-	log.Println(results)
+	//Get the email address
+	email := strings.Replace(strings.Replace(strings.Split(strings.Split(s, ",")[1], ":")[1], "\"", "", -1), " ", "", -1)
+	log.Println(email)
+	var user model.User
+	user.Email = email
+	usr := model.SelectUserForLogin(user, true)
+	SetSession(w, r, usr.Username)
+	http.Redirect(w, r, "/", 302)
+}
 
-	SetSession("hestert", w)
+func (login *Login) handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	// CATCH ONLY HEADER START
+	str := randSeq(64)
+	oauthStateString[str] = true
+	url := facebookOauthConfig.AuthCodeURL(str)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+func (login *Login) handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	// CATCH ONLY HEADER START
+	state := r.FormValue("state")
+	if !oauthStateString[state] {
+		log.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	} else {
+		delete(oauthStateString, state)
+	}
+
+	code := r.FormValue("code")
+	//_, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
+	token, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		log.Println("Code exchange failed with '%s'\n", err)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	response, err := http.Get("https://graph.facebook.com/v2.9/me?fields=id%2Cemail%2Cname&access_token=" + token.AccessToken)
+
+	defer response.Body.Close()
+	contents, err := ioutil.ReadAll(response.Body)
+	var dat map[string]interface{}
+	json.Unmarshal([]byte(contents), &dat)
+	log.Println(dat)
+	// //Get the email address
+	email := dat["email"]
+	var user model.User
+	user.Email = email.(string)
+	usr := model.SelectUserForLogin(user, true)
+	SetSession(w, r, usr.Username)
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -158,6 +224,8 @@ func (login *Login) Init() {
 	http.HandleFunc("/loginIndex", login.loginIndexHandler)
 	http.HandleFunc("/login", login.loginHandler)
 	http.HandleFunc("/logout", login.logoutHandler)
-	http.HandleFunc("/GoogleLogin", handleGoogleLogin)
-	http.HandleFunc("/GoogleCallback", handleGoogleCallback)
+	http.HandleFunc("/GoogleLogin", login.handleGoogleLogin)
+	http.HandleFunc("/GoogleCallback", login.handleGoogleCallback)
+	http.HandleFunc("/FacebookLogin", login.handleFacebookLogin)
+	http.HandleFunc("/FacebookCallback", login.handleFacebookCallback)
 }

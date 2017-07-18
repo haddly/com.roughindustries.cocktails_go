@@ -8,8 +8,9 @@ import (
 var Users = []User{
 	User{
 		ID:        0,
-		Username:  "hestert",
+		Username:  "test",
 		Password:  "password",
+		Email:     "",
 		LastLogin: time.Now(),
 	},
 }

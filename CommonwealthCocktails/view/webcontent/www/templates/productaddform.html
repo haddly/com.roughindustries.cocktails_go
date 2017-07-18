@@ -17,7 +17,14 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="row">
-                    <h1 align="center">Product Add Form</h1>
+                    <h1 align="center">Product Modification Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "productSelect" .}}
                 </div>
             </div>
         </div>
@@ -54,14 +61,17 @@
                         $(window).bind("pageshow", function() {
                             $('#productAddForm')[0].reset();
                             {{range .ProductsByTypes.PBT}}
-                            $('#productGroupType{{.ProductType.ProductTypeName}}')
+                            {{if ne .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName }}
+                            $('#productGroupType{{.ProductType.ProductTypeName}}').val('Base');
+                            $('#productGroupType{{.ProductType.ProductTypeName}}div')
                                 .addClass('hide');
-                            var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                            var derived = $('#derived{{.ProductType.ProductTypeName}}div');
                             derived
                                 .addClass('hide');
-                            var group = $('#group{{.ProductType.ProductTypeName}}');
+                            var group = $('#group{{.ProductType.ProductTypeName}}div');
                             group
                                 .addClass('hide');
+                            {{end}}
                             {{end}}
                         });
                     </script>
@@ -80,13 +90,51 @@
 {{end}}
 
 
+{{define "productSelect"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="metaSelect">Select Product</label>
+        <select class="form-control" id="productSelect" name="metaSelect">
+            <option></option>
+            {{range .ProductsByTypes.PBT}}
+            {{$prodType:=.ProductType}}
+            {{range .Products}}
+            <option value="{{.ID}}">{{$prodType.ProductTypeName}} - {{.ProductName}}</option>
+            {{end}}
+            {{end}}
+        </select>
+    </div>
+    <script>
+        $(function() {
+            // bind change event to select
+            $('#productSelect').on('change', function() {
+                var id = $(this).val(); // get selected value
+                if (id) { // require a URL
+                    window.location = "/productAddForm?ID="+id; // redirect
+                }
+                return false;
+            });
+        });
+    </script>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
 <!--ProductName      string-->
 {{define "productName"}}
 <div class="row">
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
         <label for="productName">Product Name</label>
-        <input type="text" class="form-control" id="productName" name="productName">
+        {{ with .Errors.productName }}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {{.}}
+        </div>
+        {{ end }}
+        <input type="text" class="form-control" id="productName" name="productName" value="{{$.Product.ProductName}}">
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -108,7 +156,11 @@
                             <option selected>&nbsp;</option>
                             <!--loop over all types and add option-->
                             {{range .ProductsByTypes.PBT}}
+                            {{if eq .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName }}
+                            <option selected>{{.ProductType.ProductTypeName}}</option>
+                            {{else}}
                             <option>{{.ProductType.ProductTypeName}}</option>
+                            {{end}}
                             {{end}}
                         </select>
                     </div>
@@ -128,21 +180,24 @@
                         // Hide all the group types for all types
                         // loop over all types
                         {{range .ProductsByTypes.PBT}}
-                            $('#productGroupType{{.ProductType.ProductTypeName}}')
+                            $('#productGroupType{{.ProductType.ProductTypeName}}').val('Base');
+                            $('#productGroupType{{.ProductType.ProductTypeName}}div')
                                 .addClass('hide');
-                            var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                            var derived = $('#derived{{.ProductType.ProductTypeName}}div');
                             derived
                                 .addClass('hide');
-                            var group = $('#group{{.ProductType.ProductTypeName}}');
+                            $('#derived{{.ProductType.ProductTypeName}} option').prop('selected', false);
+                            var group = $('#group{{.ProductType.ProductTypeName}}div');
                             group
                                 .addClass('hide');
+                            $('#group{{.ProductType.ProductTypeName}} option').prop('selected', false);
                         {{end}}
                         //check for the type and unhide the group type
                         //each if is a type, loop over all types and create
                         //an if for each type
                         {{range .ProductsByTypes.PBT}}
                         if ($("#productType :selected").text() == "{{.ProductType.ProductTypeName}}") {
-                            $('#productGroupType{{.ProductType.ProductTypeName}}')
+                            $('#productGroupType{{.ProductType.ProductTypeName}}div')
                                 .removeClass('hide');
                         }
                        {{end}}
@@ -160,7 +215,20 @@
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
         <label for="productDescription">Product Description</label>
+        <div class=" col-xs-12"></div>
         <textarea id="productDescription" class="form-control" rows="3" name="productDescription"></textarea>
+        <script>
+            $(document).ready(function() {
+                $('#productDescription').summernote({
+                  toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['view', ['fullscreen', 'codeview']],
+                  ]
+                });
+            });
+        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -171,7 +239,20 @@
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
         <label for="productDetails">Product Details</label>
+        <div class=" col-xs-12"></div>
         <textarea id="productDetails" class="form-control" rows="3" name="productDetails"></textarea>
+        <script>
+            $(document).ready(function() {
+                $('#productDetails').summernote({
+                  toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontsize', ['fontsize']],
+                    ['view', ['fullscreen', 'codeview']],
+                  ]
+                });
+            });
+        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -249,22 +330,39 @@
 <!--ProductGroupType GroupType-->
 {{define "productGroupType"}}
 {{range .ProductsByTypes.PBT}}
-<div class="form-group hide" id="productGroupType{{.ProductType.ProductTypeName}}">
+{{if eq .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName}}
+<div class="form-group" id="productGroupType{{.ProductType.ProductTypeName}}div">
+{{else}}
+<div class="form-group hide" id="productGroupType{{.ProductType.ProductTypeName}}div">
+{{end}}
     <div class="col-xs-12">
         <label for="productGroupType{{.ProductType.ProductTypeName}}">Product Group Type</label>
-        <select class="form-control" name="productGroupType{{.ProductType.ProductTypeName}}">
-            <option selected>Base</option>
-            <option>Derived</option>
-            <option>Group</option>
+        <select class="form-control" id="productGroupType{{.ProductType.ProductTypeName}}" name="productGroupType{{.ProductType.ProductTypeName}}">
+            <option value='Base' selected>Base</option>
+            {{if and (eq .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName) (eq 2 $.Product.ProductGroupType)}}
+            <option value='Derived' selected>Derived</option>
+            {{else}}
+            <option value='Derived'>Derived</option>
+            {{end}}
+            {{if and (eq .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName) (eq 3 $.Product.ProductGroupType)}}
+            <option value='Group' selected>Group</option>
+            {{else}}
+            <option value='Group'>Group</option>
+            {{end}}
         </select>
     </div>
 </div>
 
+
 <!-- The template for adding new field -->
-<div class="form-group hide" id="derived{{.ProductType.ProductTypeName}}">
+{{if and (eq .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName) (eq 2 $.Product.ProductGroupType)}}
+<div class="form-group" id="derived{{.ProductType.ProductTypeName}}div">
+{{else}}
+<div class="form-group hide" id="derived{{.ProductType.ProductTypeName}}div">
+{{end}}
     <div class="col-xs-12">&nbsp;</div>
     <div class="col-xs-12">
-        <select class="form-control" name="derived{{.ProductType.ProductTypeName}}">
+        <select class="form-control" id="derived{{.ProductType.ProductTypeName}}" name="derived{{.ProductType.ProductTypeName}}">
             {{range .Products}}
             <option value="{{.ID}},">{{.ProductName}}</option>
             {{end}}
@@ -273,10 +371,14 @@
     <div class="col-xs-12">&nbsp;</div>
 </div>
 
-<div class="form-group hide" id="group{{.ProductType.ProductTypeName}}">
+{{if and (eq .ProductType.ProductTypeName $.Product.ProductType.ProductTypeName) (eq 3 $.Product.ProductGroupType)}}
+<div class="form-group" id="group{{.ProductType.ProductTypeName}}div">
+{{else}}
+<div class="form-group hide" id="group{{.ProductType.ProductTypeName}}div">
+{{end}}
     <div class="col-xs-12">&nbsp;</div>
     <div class="col-xs-12">
-        <select class="form-control" name="group{{.ProductType.ProductTypeName}}" multiple="multiple" size="5">
+        <select class="form-control" id="group{{.ProductType.ProductTypeName}}" name="group{{.ProductType.ProductTypeName}}" multiple="multiple" size="5">
             {{range .Products}}
             <option value="{{.ID}},">{{.ProductName}}</option>
             {{end}}
@@ -290,26 +392,26 @@
             // Add change handler
             .change(function() {
                 if ($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text() == "Base") {
-                    var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                    var derived = $('#derived{{.ProductType.ProductTypeName}}div');
                     derived
                         .addClass('hide');
-                    var group = $('#group{{.ProductType.ProductTypeName}}');
+                    var group = $('#group{{.ProductType.ProductTypeName}}div');
                     group
                         .addClass('hide');
                 }
                 else if ($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text() == "Derived") {
-                    var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                    var derived = $('#derived{{.ProductType.ProductTypeName}}div');
                     derived
                         .removeClass('hide');
-                    var group = $('#group{{.ProductType.ProductTypeName}}');
+                    var group = $('#group{{.ProductType.ProductTypeName}}div');
                     group
                         .addClass('hide');
                 }
                 else if ($("#productGroupType{{.ProductType.ProductTypeName}} :selected").text() == "Group") {
-                    var derived = $('#derived{{.ProductType.ProductTypeName}}');
+                    var derived = $('#derived{{.ProductType.ProductTypeName}}div');
                     derived
                         .addClass('hide');
-                    var group = $('#group{{.ProductType.ProductTypeName}}');
+                    var group = $('#group{{.ProductType.ProductTypeName}}div');
                     group
                         .removeClass('hide');
                 }

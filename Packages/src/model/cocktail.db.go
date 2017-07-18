@@ -1,10 +1,10 @@
-//model/cocktail.db.go
+//model/cocktail.connectors.go
 package model
 
 import (
 	"bytes"
+	"connectors"
 	"database/sql"
-	"db"
 	"html/template"
 	"log"
 	"strconv"
@@ -12,7 +12,7 @@ import (
 )
 
 func InitCocktailTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 
@@ -51,7 +51,7 @@ func InitCocktailTables() {
 }
 
 func InitCocktailReferences() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	query := "ALTER TABLE `commonwealthcocktails`.`cocktail`" +
 		" ADD CONSTRAINT cocktail_cocktailFamily_id_fk FOREIGN KEY(cocktailFamily) REFERENCES meta(idMeta);"
 	log.Println(query)
@@ -66,7 +66,7 @@ func InitCocktailReferences() {
 
 func addCocktailToRecipeReference() {
 	//Recipe
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'cocktailToRecipe';").Scan(&temp); err == nil {
 		log.Println("cocktailToRecipe Table Exists")
@@ -84,7 +84,7 @@ func addCocktailToRecipeReference() {
 
 func addCocktailToAltNamesTable() {
 	//AlternateName
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'cocktailToAltNames';").Scan(&temp); err == nil {
 		log.Println("CocktailToAltNames Table Exists")
@@ -124,7 +124,7 @@ func addCocktailToMetasTable() {
 	//Ratio
 	//Family
 
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'cocktailToMetas';").Scan(&temp); err == nil {
@@ -147,7 +147,7 @@ func addCocktailToProductsTable() {
 	//Garnish
 	//Drinkware
 	//Tool
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'cocktailToProducts';").Scan(&temp); err == nil {
@@ -168,7 +168,7 @@ func addCocktailToProductsTable() {
 func addCocktailToPostsTable() {
 	//About
 	//Articles
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'cocktailToPosts';").Scan(&temp); err == nil {
@@ -191,7 +191,7 @@ func ProcessCocktails() {
 }
 
 func ProcessCocktail(cocktail Cocktail) int {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`cocktail` SET ")
@@ -296,19 +296,19 @@ func ProcessAKAs(names []Name, cocktailID int64) {
 		query = strings.TrimRight(query, ",")
 		query = query + ";"
 		log.Println(query)
-		conn, _ := db.GetDB()
+		conn, _ := connectors.GetDB()
 		res, err := conn.Exec(query)
 		lastAltNameId, err := res.LastInsertId()
 		if err != nil {
 			log.Fatal(err)
 		}
-		conn, _ = db.GetDB()
+		conn, _ = connectors.GetDB()
 		conn.Exec("INSERT INTO `commonwealthcocktails`.`cocktailToAKAs` (`idCocktail`, `idAKAName`) VALUES ('" + strconv.FormatInt(cocktailID, 10) + "', '" + strconv.FormatInt(lastAltNameId, 10) + "');")
 	}
 }
 
 func ProcessAltNames(names []Name, cocktailID int64) {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	for _, name := range names {
@@ -333,7 +333,7 @@ func ProcessAltNames(names []Name, cocktailID int64) {
 }
 
 func ProcessCocktailToProducts(products []Product, cocktailID int64) {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	for _, product := range products {
 		prodTo := SelectProduct(product)
@@ -346,7 +346,7 @@ func ProcessCocktailToProducts(products []Product, cocktailID int64) {
 }
 
 func ProcessCocktailToMetas(metas []Meta, cocktailID int64, isRootCocktailForMeta int) {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	for _, meta := range metas {
 		metaTo := SelectMeta(meta)
@@ -369,7 +369,7 @@ func ProcessCocktailToMetas(metas []Meta, cocktailID int64, isRootCocktailForMet
 
 func SelectCocktailsByMeta(meta Meta) []Cocktail {
 	var ret []Cocktail
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	log.Println(meta.MetaName)
 	var buffer bytes.Buffer
@@ -422,7 +422,7 @@ func SelectCocktailsByMeta(meta Meta) []Cocktail {
 
 func SelectCocktailsByProduct(product Product) []Cocktail {
 	var ret []Cocktail
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	log.Println(product.ProductName)
 	var buffer bytes.Buffer
@@ -475,7 +475,7 @@ func SelectCocktailsByProduct(product Product) []Cocktail {
 
 func SelectCocktailsByID(ID int) CocktailSet {
 	var cs CocktailSet
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	var canQuery = false

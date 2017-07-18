@@ -25,7 +25,7 @@ type Cocktail struct {
 	DisplayName     string
 	AlternateName   []Name
 	SpokenName      string
-	Origin          string
+	Origin          template.HTML
 	AKA             []Name
 	Description     template.HTML
 	Comment         template.HTML

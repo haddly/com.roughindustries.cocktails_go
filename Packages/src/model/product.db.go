@@ -1,10 +1,12 @@
-//model/product.db.go
+//model/product.connectors.go
 package model
 
 import (
 	"bytes"
+	"connectors"
 	"database/sql"
-	"db"
+	"encoding/gob"
+	"github.com/bradfitz/gomemcache/memcache"
 	"html/template"
 	"log"
 	"strconv"
@@ -12,7 +14,7 @@ import (
 )
 
 func InitProductTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'producttype';").Scan(&temp); err == nil {
@@ -62,7 +64,7 @@ func InitProductTables() {
 }
 
 func InitProductReferences() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	conn.Query("ALTER TABLE `commonwealthcocktails`.`product`" +
 		"ADD CONSTRAINT product_producttype_id_fk FOREIGN KEY(productType) REFERENCES producttype(idProductType)," +
@@ -76,7 +78,7 @@ func InitProductReferences() {
 }
 
 func addDerivedProductTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'derivedProduct';").Scan(&temp); err == nil {
@@ -94,7 +96,7 @@ func addDerivedProductTables() {
 }
 
 func addGroupProductTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'groupProduct';").Scan(&temp); err == nil {
@@ -119,7 +121,7 @@ func ProcessProducts() {
 }
 
 func ProcessProduct(product Product) int {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
 	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`product` SET ")
 	if product.ProductName != "" {
@@ -178,7 +180,7 @@ func ProcessProduct(product Product) int {
 
 //going to have to update this a bit TCH
 func ProcessProductGroups() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	for _, productgroup := range ProductGroups {
 		groupproduct := SelectProduct(productgroup.GroupProduct)
@@ -205,7 +207,7 @@ func ProcessDerivedProducts() {
 }
 
 func ProcessDerivedProduct(derivedproduct DerivedProduct) {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	baseproduct := SelectProduct(derivedproduct.BaseProduct)
 	product := SelectProduct(derivedproduct.Product)
@@ -218,161 +220,171 @@ func ProcessDerivedProduct(derivedproduct DerivedProduct) {
 
 func SelectProduct(product Product) []Product {
 	var ret []Product
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
-	var canQuery = false
 	log.Println(product.ProductName)
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT `idProduct`, `productName`, `productType`, `productGroupType`, COALESCE(`productPreText`, ''), COALESCE(`productPostText`, '') FROM `commonwealthcocktails`.`product` WHERE ")
 	if product.ID != 0 {
 		buffer.WriteString(" `idProduct`=" + strconv.Itoa(product.ID) + " AND")
-		canQuery = true
 	}
 	if product.ProductName != "" {
 		sqlString := strings.Replace(string(product.ProductName), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 		buffer.WriteString("`productName`=\"" + sqlString + "\" AND")
-		canQuery = true
 	}
 	if int(product.ProductType.ID) != 0 {
 		buffer.WriteString(" `productType`=" + strconv.Itoa(int(product.ProductType.ID)) + " AND")
-		canQuery = true
 	}
 	if int(product.ProductGroupType) != 0 {
 		buffer.WriteString(" `productGroupType`=" + strconv.Itoa(int(product.ProductGroupType)) + " AND")
-		canQuery = true
 	}
 	if product.Description != "" {
 		sqlString := strings.Replace(string(product.Description), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 		buffer.WriteString("`productDescription`=\"" + sqlString + "\" AND")
-		canQuery = true
 	}
 	if product.Details != "" {
 		sqlString := strings.Replace(string(product.Details), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
 		buffer.WriteString("`productDetails`=\"" + sqlString + "\" AND")
-		canQuery = true
 	}
 	if product.PreText != "" {
 		buffer.WriteString("`productPreText`=\"" + product.PreText + "\" AND")
-		canQuery = true
 	}
 	if product.PostText != "" {
 		buffer.WriteString("`productPostText`=\"" + product.PostText + "\" AND")
-		canQuery = true
 	}
 	if product.Rating != 0 {
 		buffer.WriteString(" `productRating`=" + strconv.Itoa(product.Rating) + " AND")
-		canQuery = true
 	}
 	if product.ImagePath != "" {
 		buffer.WriteString("`productImagePath`=\"" + product.ImagePath + "\" AND")
-		canQuery = true
 	}
 	if product.Image != "" {
 		buffer.WriteString("`productImage`=\"" + product.Image + "\" AND")
-		canQuery = true
 	}
 	if product.ImageSourceName != "" {
 		buffer.WriteString("`productImageSourceName`=\"" + product.ImageSourceName + "\" AND")
-		canQuery = true
 	}
 	if product.ImageSourceLink != "" {
 		buffer.WriteString("`productImageSourceLink`=\"" + product.ImageSourceLink + "\" AND")
-		canQuery = true
 	}
 	if product.SourceName != "" {
 		buffer.WriteString("`productSourceName`=\"" + product.SourceName + "\" AND")
-		canQuery = true
 	}
 	if product.SourceLink != "" {
 		buffer.WriteString("`productSourceLink`=\"" + product.SourceLink + "\" AND")
-		canQuery = true
 	}
 
-	if canQuery {
-		query := buffer.String()
-		query = strings.TrimRight(query, " AND")
-		query = query + " ORDER BY `productName`;"
-		log.Println(query)
-		rows, err := conn.Query(query)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-		for rows.Next() {
-			var prod Product
-			err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &prod.PreText, &prod.PostText)
-			if err != nil {
-				log.Fatal(err)
-			}
-			ret = append(ret, prod)
-			log.Println(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.PreText, prod.PostText)
-		}
-		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
+	query := buffer.String()
+	query = strings.TrimRight(query, " WHERE")
+	query = strings.TrimRight(query, " AND")
+	query = query + " ORDER BY `productName`;"
+	log.Println(query)
+	rows, err := conn.Query(query)
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer rows.Close()
+	for rows.Next() {
+		var prod Product
+		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &prod.PreText, &prod.PostText)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ret = append(ret, prod)
+		log.Println(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.PreText, prod.PostText)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return ret
 
 }
 
-func GetProductsByTypes(includeIngredients bool, includeNonIngredients bool) ProductsByTypes {
-	var ret ProductsByTypes
-	conn, _ := db.GetDB()
-
-	rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `commonwealthcocktails`.`producttype`;")
-	count, err := checkCount(rows)
-	log.Println("Product Types Found " + strconv.Itoa(count))
-	rows.Close()
-	for i := 0; i < count; i++ {
-		var pbt ProductsByType
-		var buffer bytes.Buffer
-		buffer.WriteString("SELECT `idProductType`, `productTypeName`, `productTypeIsIngredient` FROM  `commonwealthcocktails`.`producttype` WHERE idProductType='" + strconv.Itoa(i+1) + "' AND")
-		buffer.WriteString(" (")
-		if includeIngredients {
-			buffer.WriteString("`productTypeIsIngredient`=1 OR ")
-		}
-		if includeNonIngredients {
-			buffer.WriteString("`productTypeIsIngredient`=0")
-		}
-		query := buffer.String()
-		query = strings.TrimRight(query, " OR")
-		query = query + ")"
-		query = strings.TrimRight(query, " AND")
-		query = query + ";"
-		log.Println(query)
-		pbt_rows, _ := conn.Query(query)
-
-		defer pbt_rows.Close()
-		for pbt_rows.Next() {
-			err = pbt_rows.Scan(&pbt.ProductType.ID, &pbt.ProductType.ProductTypeName, &pbt.ProductType.IsIngredient)
-			if err != nil {
-				log.Fatal(err)
+func GetProductsByTypes(includeIngredients bool, includeNonIngredients bool, ignoreCache bool) ProductsByTypes {
+	ret := new(ProductsByTypes)
+	ret = nil
+	if !ignoreCache {
+		mc, _ := connectors.GetMC()
+		if mc != nil {
+			item := new(memcache.Item)
+			item = nil
+			if includeIngredients && includeNonIngredients {
+				item, _ = mc.Get("pbt_tt")
+			} else if includeIngredients && !includeNonIngredients {
+				item, _ = mc.Get("pbt_tf")
+			} else if !includeIngredients && includeNonIngredients {
+				item, _ = mc.Get("pbt_ft")
 			}
-			if pbt.ProductType.ID != 0 {
-				var inProduct Product
-				inProduct.ProductType = pbt.ProductType
-				inProduct.ProductGroupType = Base
-				outProduct := SelectProduct(inProduct)
-				pbt.Products = outProduct
-				for _, element := range outProduct {
-					GetProductByIDWithBD(element.ID)
+
+			if item != nil {
+				if len(item.Value) > 0 {
+					read := bytes.NewReader(item.Value)
+					dec := gob.NewDecoder(read)
+					dec.Decode(&ret)
 				}
 			}
 		}
-		if pbt.ProductType.ID != 0 {
-			ret.PBT = append(ret.PBT, pbt)
-		}
 	}
 
-	return ret
+	if ret == nil {
+		ret = new(ProductsByTypes)
+		conn, _ := connectors.GetDB()
+
+		rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `commonwealthcocktails`.`producttype`;")
+		count, err := checkCount(rows)
+		log.Println("Product Types Found " + strconv.Itoa(count))
+		rows.Close()
+		for i := 0; i < count; i++ {
+			var pbt ProductsByType
+			var buffer bytes.Buffer
+			buffer.WriteString("SELECT `idProductType`, `productTypeName`, `productTypeIsIngredient` FROM  `commonwealthcocktails`.`producttype` WHERE idProductType='" + strconv.Itoa(i+1) + "' AND")
+			buffer.WriteString(" (")
+			if includeIngredients {
+				buffer.WriteString("`productTypeIsIngredient`=1 OR ")
+			}
+			if includeNonIngredients {
+				buffer.WriteString("`productTypeIsIngredient`=0")
+			}
+			query := buffer.String()
+			query = strings.TrimRight(query, " OR")
+			query = query + ")"
+			query = strings.TrimRight(query, " AND")
+			query = query + ";"
+			log.Println(query)
+			pbt_rows, _ := conn.Query(query)
+
+			defer pbt_rows.Close()
+			for pbt_rows.Next() {
+				err = pbt_rows.Scan(&pbt.ProductType.ID, &pbt.ProductType.ProductTypeName, &pbt.ProductType.IsIngredient)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if pbt.ProductType.ID != 0 {
+					var inProduct Product
+					inProduct.ProductType = pbt.ProductType
+					inProduct.ProductGroupType = Base
+					outProduct := SelectProduct(inProduct)
+					pbt.Products = outProduct
+					for _, element := range outProduct {
+						GetProductByIDWithBD(element.ID)
+					}
+				}
+			}
+			if pbt.ProductType.ID != 0 {
+				ret.PBT = append(ret.PBT, pbt)
+			}
+		}
+	}
+	return *ret
 }
 
 func GetProductByIDWithBD(ID int) *BaseProductWithBD {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var bpwbd BaseProductWithBD
 	var inProduct Product
@@ -425,7 +437,7 @@ func GetProductByIDWithBD(ID int) *BaseProductWithBD {
 
 func SelectProductByID(ID int) Product {
 	var ret Product
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	var canQuery = false
@@ -464,7 +476,7 @@ func SelectProductByID(ID int) Product {
 
 func SelectProductsByCocktailAndProductType(ID int, pt int) []Product {
 	var ret []Product
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	var canQuery = false

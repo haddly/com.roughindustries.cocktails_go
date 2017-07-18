@@ -1,7 +1,7 @@
+// Package cocktail
 package www
 
 import (
-	"html/template"
 	"log"
 	"model"
 	"net/http"
@@ -9,143 +9,173 @@ import (
 	"strconv"
 )
 
+// Cocktail
 type Cocktail struct {
 }
 
-func (cocktail *Cocktail) RenderPageTemplate(w http.ResponseWriter, tmpl string, page *Page) {
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = t.ExecuteTemplate(w, "base", page)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func parseTempFiles(tmpl string) (*template.Template, error) {
-	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
-	return t, e
-}
-
+// CocktailHandler
 func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
-	var page Page
-	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
-	//log.Println("Product: " + r.URL.Path[1:])
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	if len(m["ID"]) == 0 {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	} else {
-		//log.Println("ID: " + m["ID"][0])
-
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
 		if len(model.Products) <= id-1 {
-			cocktail.RenderPageTemplate(w, "404", &page)
+			page.RenderPageTemplate(w, "404")
 		} else {
 			cs = model.GetCocktailByID(id)
 			page.CocktailSet = cs
-			//log.Println(c)
 			//apply the template page info to the index page
-			cocktail.RenderPageTemplate(w, "cocktail", &page)
+			page.RenderPageTemplate(w, "cocktail")
 		}
 	}
 }
 
-//handle / requests to the server
+// CocktailsHandler
 func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Request) {
-	//log.Println("indexHandler: " + r.URL.Path[1:])
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	var c []model.Cocktail
 	c = model.GetCocktails()
 	cs.ChildCocktails = c
-	var page Page
 	page.CocktailSet = cs
-	page.Username = GetUserName(r)
-	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderPageTemplate(w, "cocktails", &page)
+	page.RenderPageTemplate(w, "cocktails")
 }
 
-//handle / requests to the server
+// CocktailAddFormHandler
 func (cocktail *Cocktail) CocktailAddFormHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	log.Println("In Add Cocktail Form handler")
-	userName := GetUserName(r)
-	if userName != "" {
-		var page Page
-		page.Username = GetUserName(r)
+	if page.Username != "" {
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
-		mbt = model.GetMetaByTypes(false, true)
+		mbt = model.GetMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
-		ingredients = model.GetProductsByTypes(true, false)
+		ingredients = model.GetProductsByTypes(true, false, false)
 		page.Ingredients = ingredients
 		var nonIngredients model.ProductsByTypes
-		nonIngredients = model.GetProductsByTypes(false, true)
+		nonIngredients = model.GetProductsByTypes(false, true, false)
 		page.NonIngredients = nonIngredients
-		//log.Println(c)
 		//apply the template page info to the index page
-		cocktail.RenderPageTemplate(w, "cocktailaddform", &page)
+		page.RenderPageTemplate(w, "cocktailaddform")
 	} else {
-		cocktail.RenderPageTemplate(w, "404", nil)
+		page.RenderPageTemplate(w, "404")
 	}
 }
 
-//handle / requests to the server
+// CocktailAddHandler
 func (cocktail *Cocktail) CocktailAddHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	log.Println("In Add Cocktail handler")
 	u, err := url.Parse(r.URL.String())
 	log.Println(u)
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", nil)
+		page.RenderPageTemplate(w, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", nil)
+		page.RenderPageTemplate(w, "404")
 	}
 	log.Println(m)
-	cocktail.RenderPageTemplate(w, "404", nil)
+	page.RenderPageTemplate(w, "404")
 }
 
-//handle / requests to the server
+// CocktailsIndexHandler
 func (cocktail *Cocktail) CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
-	//log.Println("indexHandler: " + r.URL.Path[1:])
-
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var m model.MetasByTypes
-	m = model.GetMetaByTypes(true, true)
-
-	var page Page
+	m = model.GetMetaByTypes(true, true, false)
 	page.MetasByTypes = m
-	page.Username = GetUserName(r)
-	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderPageTemplate(w, "cocktailsindex", &page)
+	page.RenderPageTemplate(w, "cocktailsindex")
 }
 
-//handle / requests to the server
+// CocktailsByMetaIDHandler
 func (cocktail *Cocktail) CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
-	var page Page
-	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	if len(m["ID"]) == 0 {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
 		log.Println("Meta ID: " + m["ID"][0])
@@ -157,29 +187,39 @@ func (cocktail *Cocktail) CocktailsByMetaIDHandler(w http.ResponseWriter, r *htt
 		meta := model.SelectMeta(inMeta)
 		cs.Metadata = meta[0]
 		page.CocktailSet = cs
-		cocktail.RenderPageTemplate(w, "cocktails", &page)
+		page.RenderPageTemplate(w, "cocktails")
 	}
 }
 
+// CocktailsByProductIDHandler
 func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
-	var page Page
-	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	if len(m["ID"]) == 0 {
-		cocktail.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
 		log.Println("Product ID: " + m["ID"][0])
 		if len(model.Products) <= id-1 {
-			cocktail.RenderPageTemplate(w, "404", &page)
+			page.RenderPageTemplate(w, "404")
 		} else {
 			var inProduct model.Product
 			inProduct.ID = id
@@ -189,34 +229,48 @@ func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *
 			prod := model.SelectProduct(inProduct)
 			cs.Product = prod[0]
 			page.CocktailSet = cs
-			cocktail.RenderPageTemplate(w, "cocktails", &page)
+			page.RenderPageTemplate(w, "cocktails")
 		}
 	}
 }
 
-//handle / requests to the server
+// CocktailSearchHandler
 func (cocktail *Cocktail) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
-	var page Page
-	page.Username = GetUserName(r)
-	//log.Println(c)
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	//apply the template page info to the index page
-	cocktail.RenderPageTemplate(w, "search", &page)
+	page.RenderPageTemplate(w, "search")
 }
 
-//handle / requests to the server
+// CocktailLandingHandler
 func (cocktail *Cocktail) CocktailLandingHandler(w http.ResponseWriter, r *http.Request) {
-	//log.Println("indexHandler: " + r.URL.Path[1:])
-
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
-
-	var page Page
 	page.CocktailSet = cs
-	page.Username = GetUserName(r)
-	//log.Println(c)
 	//apply the template page info to the index page
-	cocktail.RenderPageTemplate(w, "index", &page)
+	page.RenderPageTemplate(w, "index")
 }
 
+// Init
 func (cocktail *Cocktail) Init() {
 	//Web Service and Web Page Handlers
 	log.Println("Init in www/Cocktail.go")

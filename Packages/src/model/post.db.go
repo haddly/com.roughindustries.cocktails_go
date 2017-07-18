@@ -1,10 +1,10 @@
-//model/post.db.go
+//model/post.connectors.go
 package model
 
 import (
 	"bytes"
+	"connectors"
 	"database/sql"
-	"db"
 	"log"
 	"strconv"
 	"strings"
@@ -12,7 +12,7 @@ import (
 )
 
 func InitPostTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'posttype';").Scan(&temp); err == nil {
@@ -62,7 +62,7 @@ func InitPostTables() {
 }
 
 func ProcessPosts() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	for _, post := range Posts {
 		log.Println(post.PostTitle)

@@ -2,15 +2,16 @@
 package main
 
 import (
+	"connectors"
 	"controller/alexa"
 	"controller/www"
-	"db"
 	"flag"
-	//"io/ioutil"
+	"github.com/gorilla/context"
 	"log"
 	"math/rand"
 	"model"
 	"net/http"
+	//"net/url"
 	"os"
 	"path/filepath"
 	"time"
@@ -18,12 +19,14 @@ import (
 
 //The controllers
 var d = www.Database{}
+var mem = www.Memcache{}
 var c = www.Cocktail{}
 var p = www.Product{}
 var m = www.Meta{}
 var s = www.Search{}
 var l = www.Login{}
 var post = www.Post{}
+var page = www.NewPage()
 
 var a = alexa.Hello{}
 
@@ -45,6 +48,10 @@ func init() {
 		//proto = ??
 		//port = ??
 		//dbname = ??
+
+		var mc_server string
+		//mc_server = ??
+
 		if dbaddr == "" {
 			log.Println("No DB Address set.")
 			os.Exit(0)
@@ -69,7 +76,13 @@ func init() {
 			log.Println("No DB name set.")
 			os.Exit(0)
 		}
-		db.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
+		connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
+		if mc_server != "" {
+			connectors.SetMCVars(mc_server)
+		} else {
+			log.Println("No Memcache server set. If you want to use memcaching you will " +
+				"have to set this value in main.go.")
+		}
 	}
 
 	model.SetDataSourceType(datasource)
@@ -77,6 +90,7 @@ func init() {
 	// wanted it to be more random so i seed it time now
 	rand.Seed(time.Now().UnixNano())
 	d.Init()
+	mem.Init()
 	c.Init()
 	p.Init()
 	m.Init()
@@ -84,6 +98,7 @@ func init() {
 	a.Init()
 	post.Init()
 	l.Init()
+	page.Init()
 	log.Println("End Init")
 }
 
@@ -108,8 +123,11 @@ func main() {
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
 	})
-
+	http.HandleFunc("/memcache", func(w http.ResponseWriter, r *http.Request) {
+		model.LoadMCWithProductData()
+		model.LoadMCWithMetaData()
+	})
 	log.Println("Added Handlers ... Starting Server\n")
 	//this starts up the server
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }

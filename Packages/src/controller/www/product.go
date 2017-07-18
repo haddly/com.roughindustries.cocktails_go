@@ -14,75 +14,94 @@ import (
 type Product struct {
 }
 
-//render the page based on the name of the file provided
-func (product *Product) RenderPageTemplate(w http.ResponseWriter, tmpl string, page *Page) {
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = t.ExecuteTemplate(w, "base", page)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var p *model.BaseProductWithBD
-	var page Page
-	page.Username = GetUserName(r)
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		product.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	//log.Println("Product: " + r.URL.Path[1:])
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		product.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	}
 	if len(m["ID"]) == 0 {
-		product.RenderPageTemplate(w, "404", &page)
+		page.RenderPageTemplate(w, "404")
 	} else {
-		//log.Println("ID: " + m["ID"][0])
-
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
 		if len(model.Products) <= id-1 {
-			product.RenderPageTemplate(w, "404", &page)
+			page.RenderPageTemplate(w, "404")
 		} else {
 			p = model.GetBaseProductByIDWithBD(id)
 			page.BaseProductWithBD = *p
-			product.RenderPageTemplate(w, "product", &page)
+			page.RenderPageTemplate(w, "product")
 		}
 	}
 }
 
 func (product *Product) ProductAddFormHandler(w http.ResponseWriter, r *http.Request) {
-	userName := GetUserName(r)
-	if userName != "" {
-		var page Page
-		page.Username = GetUserName(r)
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
+	if page.Username != "" {
 		var pbt model.ProductsByTypes
-		pbt = model.GetProductsByTypes(true, true)
+		pbt = model.GetProductsByTypes(true, true, false)
+		var prods []model.Product
+		var prod model.Product
+		prods = model.SelectProduct(prod)
+		page.Products = prods
 		page.ProductsByTypes = pbt
 		//apply the template page info to the index page
-		product.RenderPageTemplate(w, "productaddform", &page)
+		page.RenderPageTemplate(w, "productaddform")
 	} else {
-		product.RenderPageTemplate(w, "404", nil)
+		page.RenderPageTemplate(w, "404")
 	}
 }
 
 //handle / requests to the server
 func (product *Product) ProductAddHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	u, err := url.Parse(r.URL.String())
 	log.Println(u)
 	if err != nil {
-		product.RenderPageTemplate(w, "404", nil)
+		page.RenderPageTemplate(w, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		product.RenderPageTemplate(w, "404", nil)
+		page.RenderPageTemplate(w, "404")
 	}
 	log.Println(m)
+	log.Println(r.FormValue("productType"))
 	log.Println(m["productType"][0])
 	log.Println(strconv.Itoa(model.ProductTypeStringToInt(m["productType"][0])))
 	pgt := "productGroupType" + m["productType"][0]
@@ -91,14 +110,16 @@ func (product *Product) ProductAddHandler(w http.ResponseWriter, r *http.Request
 	log.Println(strconv.Itoa(model.GroupTypeStringToInt(m[pgt][0])))
 	var prod model.Product
 	prod.ProductName = m["productName"][0]
+	page.Errors["productName"] = "Please enter a valid name"
 	prod.ProductType.ID = model.ProductTypeStringToInt(m["productType"][0])
+	prod.ProductType.ProductTypeName = m["productType"][0]
 	prod.ProductGroupType = model.GroupType(model.GroupTypeStringToInt(m[pgt][0]))
 	prod.Description = template.HTML(m["productDescription"][0])
 	prod.Details = template.HTML(m["productDetails"][0])
 	log.Println(prod)
-	id := model.ProcessProduct(prod)
-	log.Println(strconv.Itoa(id))
-	prod.ID = id
+	//id := model.ProcessProduct(prod)
+	//log.Println(strconv.Itoa(id))
+	//prod.ID = id
 	var derProd model.DerivedProduct
 	derProd.Product = prod
 	if m[pgt][0] == "Derived" {
@@ -106,18 +127,31 @@ func (product *Product) ProductAddHandler(w http.ResponseWriter, r *http.Request
 		log.Println(d)
 		log.Println(strings.TrimRight(m[d][0], ","))
 		derProd.BaseProduct.ID, _ = strconv.Atoi(strings.TrimRight(m[d][0], ","))
-		model.ProcessDerivedProduct(derProd)
+		//model.ProcessDerivedProduct(derProd)
 	}
-	product.RenderPageTemplate(w, "404", nil)
+	var pbt model.ProductsByTypes
+	pbt = model.GetProductsByTypes(true, true, false)
+	page.ProductsByTypes = pbt
+	page.Product = prod
+	page.RenderPageTemplate(w, "productaddform")
 }
 
 func (product *Product) ProductsHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
 	var p []model.Product
-	var page Page
-	page.Username = GetUserName(r)
 	p = model.GetProducts()
 	page.Products = p
-	product.RenderPageTemplate(w, "products", &page)
+	page.RenderPageTemplate(w, "products")
 }
 
 func (product *Product) Init() {

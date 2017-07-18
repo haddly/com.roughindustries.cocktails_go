@@ -1,10 +1,10 @@
-//model/recipe.db.go
+//model/recipe.connectors.go
 package model
 
 import (
 	"bytes"
+	"connectors"
 	"database/sql"
-	"db"
 	"html/template"
 	"log"
 	"strconv"
@@ -12,7 +12,7 @@ import (
 )
 
 func InitRecipeTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 
@@ -57,7 +57,7 @@ func InitRecipeTables() {
 }
 
 func InitRecipeReferences() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	conn.Query("ALTER TABLE `commonwealthcocktails`.`recipestep`" +
 		"ADD CONSTRAINT recipestep_recipesteporiginalingredient_id_fk FOREIGN KEY(recipestepOriginalIngredient) REFERENCES product(idProduct)," +
@@ -68,7 +68,7 @@ func InitRecipeReferences() {
 }
 
 func addRecipeToRecipeStepTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'recipeToRecipeSteps';").Scan(&temp); err == nil {
@@ -86,7 +86,7 @@ func addRecipeToRecipeStepTables() {
 }
 
 func addRecipeStepToAltIngredientTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'altIngredient';").Scan(&temp); err == nil {
@@ -110,7 +110,7 @@ func ProcessRecipes() {
 }
 
 func ProcessRecipe(recipe Recipe) int {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipe` SET ")
@@ -186,7 +186,7 @@ func ProcessRecipe(recipe Recipe) int {
 func SelectRecipeByCocktail(cocktail Cocktail) Recipe {
 
 	var ret Recipe
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	var canQuery = false
@@ -226,7 +226,7 @@ func SelectRecipeByCocktail(cocktail Cocktail) Recipe {
 func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 
 	var ret []RecipeStep
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	var canQuery = false
@@ -273,7 +273,7 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 
 func SelectDoze() []Doze {
 	var ret []Doze
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT doze.idDoze, doze.dozeName FROM commonwealthcocktails.doze;")

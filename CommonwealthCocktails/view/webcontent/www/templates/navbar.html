@@ -26,20 +26,36 @@
                     </a>
                 </li>
                 <li>
-                    {{if .Username}}
+                    {{if .Authenticated}}
                     <li class="dropdown">
                         <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{.Username}} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/cocktailAddForm">Add Cocktail</a></li>
-                            <li><a href="/productAddForm">Add Product</a></li>
-                            <li><a href="/metaAddForm">Add Meta</a></li>
+                            <li class="dropdown-header">Modify</li>
+                            <li><a href="/cocktailAddForm">Modify Cocktail</a></li>
+                            <li><a href="/productAddForm">Modify Product</a></li>
+                            <li><a href="/metaModForm">Modify Meta</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Data Stores</li>
+                            <li><a href="/">Load DB Tables</a></li>
+                            <li><a href="/">Load DB Data</a></li>
+                            <li><a href="/load/db_test">Verify DB</a></li>
+                            <li><a href="/mc_delete">Delete Memcache</a></li>
+                            <li><a href="/mc_load">Add Memcache</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Admin</li>
+                            <li role="separator" class="divider"></li>
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </li>
                     {{else}}
-                    <a style="color:#FFF;" href="/loginIndex">
-                            Login
-                        </a> {{end}}
+                    <li class="dropdown">
+                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Login <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/loginIndex">Login</a></li>
+                            <li><a href="/GoogleLogin">Login with Google</a></li>
+                            <li><a href="/FacebookLogin">Login with Facebook</a></li>
+                        </ul>
+                    </li> {{end}}
                 </li>
             </ul>
         </div>

@@ -1,14 +1,14 @@
-//model/advertisement.db.go
+//model/advertisement.connectors.go
 package model
 
 import (
+	"connectors"
 	"database/sql"
-	"db"
 	"log"
 )
 
 func InitAdvertisementTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'adtype';").Scan(&temp); err == nil {
 		log.Println("adtype Table Exists")
@@ -62,7 +62,7 @@ func InitAdvertisementReferences() {
 }
 
 func addAdToCocktailsTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'adToCocktails';").Scan(&temp); err == nil {
 		log.Println("adToCocktails Table Exists")
@@ -80,7 +80,7 @@ func addAdToCocktailsTables() {
 }
 
 func addAdProductToProductTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'adProductToProduct';").Scan(&temp); err == nil {
 		log.Println("adProductToProduct Table Exists")
@@ -98,7 +98,7 @@ func addAdProductToProductTables() {
 }
 
 func addAdToPostsTables() {
-	conn, _ := db.GetDB()
+	conn, _ := connectors.GetDB()
 	var temp string
 	if err := conn.QueryRow("SHOW TABLES LIKE 'adToPosts';").Scan(&temp); err == nil {
 		log.Println("adToPosts Table Exists")
