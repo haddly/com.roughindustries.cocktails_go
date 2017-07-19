@@ -8,14 +8,14 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
-func DeleteAll() {
+func DeleteAllMemcache() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		mc.DeleteAll()
 	}
 }
 
-func LoadAll() {
+func LoadAllMemcache() {
 	LoadMCWithProductData()
 	LoadMCWithMetaData()
 }

@@ -26,7 +26,8 @@ func (memcache *Memcache) MCDeleteHandler(w http.ResponseWriter, r *http.Request
 	if page.Username != "" {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Memcache Delete</b>:<br/>")
-		model.DeleteAll()
+		model.DeleteAllMemcache()
+		page.Username, page.Authenticated = GetSession(r)
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
@@ -49,7 +50,7 @@ func (memcache *Memcache) MCAddHandler(w http.ResponseWriter, r *http.Request) {
 	if page.Username != "" {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Memcache Add</b>:<br/>")
-		model.LoadAll()
+		model.LoadAllMemcache()
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)

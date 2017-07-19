@@ -18,3 +18,4 @@ go get github.com/gorilla/sessions
 go get golang.org/x/oauth2
 go get cloud.google.com/go/compute/metadata
 go get github.com/bradfitz/gomemcache/memcache
+go get google.golang.org/appengine

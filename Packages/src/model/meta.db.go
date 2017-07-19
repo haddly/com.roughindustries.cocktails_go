@@ -115,6 +115,7 @@ func ProcessMetaTypes() {
 func ProcessMetas() {
 	for _, meta := range Metadata {
 		log.Println(meta.MetaName)
+		meta.ID = 0
 		ProcessMeta(meta)
 	}
 }
@@ -124,7 +125,11 @@ func ProcessMeta(meta Meta) int {
 	var args []interface{}
 
 	var buffer bytes.Buffer
-	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`meta` SET ")
+	if meta.ID == 0 {
+		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`meta` SET ")
+	} else {
+		buffer.WriteString("UPDATE `commonwealthcocktails`.`meta` SET ")
+	}
 	if meta.MetaName != "" {
 		buffer.WriteString("`metaName`=?,")
 		args = append(args, html.EscapeString(meta.MetaName))
@@ -133,19 +138,32 @@ func ProcessMeta(meta Meta) int {
 		buffer.WriteString(" `metaBlurb`=?,")
 		args = append(args, html.EscapeString(string(meta.Blurb)))
 	}
-	//TO DO: Select by MetaType to get ID
 	metatype := SelectMetaType(meta.MetaType, true, true, true)
 	buffer.WriteString(" `metaType`=?,")
 	args = append(args, strconv.Itoa(metatype[0].ID))
-
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
-	query = query + ";"
+	if meta.ID == 0 {
+		query = query + ";"
+	} else {
+		query = query + " WHERE `idMeta`=?;"
+		args = append(args, meta.ID)
+	}
+
 	log.Println(query)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
 	ret := int(id)
 	return ret
+}
+
+func InsertMeta(meta Meta) int {
+	meta.ID = 0
+	return ProcessMeta(meta)
+}
+
+func UpdateMeta(meta Meta) int {
+	return ProcessMeta(meta)
 }
 
 func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {

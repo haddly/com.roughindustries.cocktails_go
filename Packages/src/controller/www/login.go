@@ -2,7 +2,11 @@
 package www
 
 import (
+	"bytes"
+	"connectors"
+	"encoding/gob"
 	"encoding/json"
+	"github.com/bradfitz/gomemcache/memcache"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
@@ -111,8 +115,37 @@ func (login *Login) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	// CATCH ONLY HEADER START
+
 	str := randSeq(64)
-	oauthStateString[str] = true
+
+	//MEMCACHE OAUTH SET
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		item := new(memcache.Item)
+		item, _ = mc.Get("oauthStateString")
+		if item != nil {
+			if len(item.Value) > 0 {
+				read := bytes.NewReader(item.Value)
+				dec := gob.NewDecoder(read)
+				dec.Decode(&oauthStateString)
+			}
+		}
+		oauthStateString[str] = true
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		enc.Encode(oauthStateString)
+
+		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
+	} else {
+		log.Println("Bad memcache handleGoogleLogin")
+		//Try the database here
+		// if db connection is good {
+		// } else {
+		// 	panic
+		// }
+	}
+	//MEMCACHE OAUTH SET
+
 	url := googleOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -126,6 +159,29 @@ func (login *Login) handleGoogleCallback(w http.ResponseWriter, r *http.Request)
 		}
 	}()
 	// CATCH ONLY HEADER START
+
+	//MEMCACHE OAUTH GET
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		item := new(memcache.Item)
+		item, _ = mc.Get("oauthStateString")
+		if item != nil {
+			if len(item.Value) > 0 {
+				read := bytes.NewReader(item.Value)
+				dec := gob.NewDecoder(read)
+				dec.Decode(&oauthStateString)
+			}
+		}
+	} else {
+		log.Println("Bad memcache handleGoogleCallback")
+		//Try the database here
+		// if db connection is good {
+		// } else {
+		// 	panic
+		// }
+	}
+	//MEMCACHE OAUTH GET
+
 	state := r.FormValue("state")
 	if !oauthStateString[state] {
 		log.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
@@ -134,6 +190,22 @@ func (login *Login) handleGoogleCallback(w http.ResponseWriter, r *http.Request)
 	} else {
 		delete(oauthStateString, state)
 	}
+
+	//MEMCACHE OAUTH SET
+	if mc != nil {
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		enc.Encode(oauthStateString)
+
+		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
+	} else {
+		//Try the database here
+		// if db connection is good {
+		// } else {
+		// 	panic
+		// }
+	}
+	//MEMCACHE OAUTH SET
 
 	code := r.FormValue("code")
 	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
@@ -168,7 +240,36 @@ func (login *Login) handleFacebookLogin(w http.ResponseWriter, r *http.Request) 
 		}
 	}()
 	// CATCH ONLY HEADER START
+
 	str := randSeq(64)
+
+	//MEMCACHE OAUTH SET
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		item := new(memcache.Item)
+		item, _ = mc.Get("oauthStateString")
+		if item != nil {
+			if len(item.Value) > 0 {
+				read := bytes.NewReader(item.Value)
+				dec := gob.NewDecoder(read)
+				dec.Decode(&oauthStateString)
+			}
+		}
+		oauthStateString[str] = true
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		enc.Encode(oauthStateString)
+
+		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
+	} else {
+		log.Println("Bad memcache handleGoogleLogin")
+		//Try the database here
+		// if db connection is good {
+		// } else {
+		// 	panic
+		// }
+	}
+	//MEMCACHE OAUTH SET
 	oauthStateString[str] = true
 	url := facebookOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -183,6 +284,29 @@ func (login *Login) handleFacebookCallback(w http.ResponseWriter, r *http.Reques
 		}
 	}()
 	// CATCH ONLY HEADER START
+
+	//MEMCACHE OAUTH GET
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		item := new(memcache.Item)
+		item, _ = mc.Get("oauthStateString")
+		if item != nil {
+			if len(item.Value) > 0 {
+				read := bytes.NewReader(item.Value)
+				dec := gob.NewDecoder(read)
+				dec.Decode(&oauthStateString)
+			}
+		}
+	} else {
+		log.Println("Bad memcache handleGoogleCallback")
+		//Try the database here
+		// if db connection is good {
+		// } else {
+		// 	panic
+		// }
+	}
+	//MEMCACHE OAUTH GET
+
 	state := r.FormValue("state")
 	if !oauthStateString[state] {
 		log.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
@@ -191,6 +315,22 @@ func (login *Login) handleFacebookCallback(w http.ResponseWriter, r *http.Reques
 	} else {
 		delete(oauthStateString, state)
 	}
+
+	//MEMCACHE OAUTH SET
+	if mc != nil {
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		enc.Encode(oauthStateString)
+
+		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
+	} else {
+		//Try the database here
+		// if db connection is good {
+		// } else {
+		// 	panic
+		// }
+	}
+	//MEMCACHE OAUTH SET
 
 	code := r.FormValue("code")
 	//_, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)

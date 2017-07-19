@@ -3,6 +3,8 @@ package model
 
 import (
 	"html/template"
+	"strconv"
+	"strings"
 )
 
 type MetaType struct {
@@ -47,7 +49,7 @@ var MetaTypeStrings = [...]string{
 	"Base Spirit", //Vodka, Gin, Bourbon, ...
 	"Type",        //Tiki,
 	"Occasion",    //Christmas, 4th of July, Halloween, ...
-	"Family",      //Margarita, Martini, ...
+	"Family",      //Margarita, Martini, Sour, ...
 	"Formula",
 	"Served",      //Highball, Martini, Old Fashioned, ...
 	"Technique",   //Shaking, Stirring, Straining
@@ -55,7 +57,7 @@ var MetaTypeStrings = [...]string{
 	"Difficulty",  //Easy, Medium, Hard
 	"Time of Day", //Evening, Dessert, Brunch, ...
 	"Ratio",       //3:4:8, ...
-	"Drink",
+	"Drink",       //On The Rocks, Neat, ...
 }
 
 // String returns the English name of the metatype ("Flavor", "Base Spirit", ...).
@@ -92,11 +94,12 @@ func GroupTypeStringToInt(a string) int {
 }
 
 type Meta struct {
-	ID       int
-	MetaName string
-	MetaType MetaType
-	Article  Post
-	Blurb    template.HTML
+	ID       int               //valid string in validator map key is metaID
+	MetaName string            //valid string in validator map key is metaName
+	MetaType MetaType          //valid string in validator map key is metaType
+	Article  Post              //TBD
+	Blurb    template.HTML     //valid string in validator map key is metaBlurb
+	Errors   map[string]string //N/A for validator
 }
 
 type MetasByTypes struct {
@@ -106,4 +109,25 @@ type MetasByTypes struct {
 type MetasByType struct {
 	MetaType MetaType
 	Metas    []Meta
+}
+
+func (meta *Meta) Validate(m map[string][]string) bool {
+	meta.Errors = make(map[string]string)
+	if len(m["metaID"]) > 0 {
+		meta.ID, _ = strconv.Atoi(m["metaID"][0])
+	}
+	if len(m["metaName"]) > 0 && strings.TrimSpace(m["metaName"][0]) != "" {
+		meta.MetaName = m["metaName"][0]
+	} else {
+		meta.Errors["MetaName"] = "Please enter a valid meta name"
+	}
+	if len(m["metaType"]) > 0 {
+		meta.MetaType.ID, _ = strconv.Atoi(m["metaType"][0])
+	} else {
+		meta.Errors["MetaType"] = "Please select a valid meta type"
+	}
+	if len(m["metaBlurb"]) > 0 {
+		meta.Blurb = template.HTML(m["metaBlurb"][0])
+	}
+	return len(meta.Errors) == 0
 }

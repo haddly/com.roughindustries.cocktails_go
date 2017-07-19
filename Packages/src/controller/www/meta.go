@@ -2,7 +2,6 @@
 package www
 
 import (
-	"html/template"
 	"log"
 	"model"
 	"net/http"
@@ -80,33 +79,48 @@ func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Println(m)
-		log.Println(m["metaID"][0])
-		log.Println(m["metaName"][0])
-		log.Println(m["metaType"][0])
-		log.Println(m["metaBlurb"][0])
 
-		var inMeta model.Meta
-		inMeta.ID, _ = strconv.Atoi(m["metaID"][0])
-		inMeta.MetaName = m["metaName"][0]
-		inMeta.MetaType.ID, _ = strconv.Atoi(m["metaType"][0])
-		inMeta.Blurb = template.HTML(m["metaBlurb"][0])
-		if len(m["add"]) > 0 {
-			ret_id := model.ProcessMeta(inMeta)
-			inMeta.ID = ret_id
-			outMeta := model.SelectMeta(inMeta)
-			page.Meta = outMeta[0]
+		if page.Meta.Validate(m) {
+			if m["button"][0] == "add" {
+				ret_id := model.InsertMeta(page.Meta)
+				var mbt model.MetasByTypes
+				model.LoadMCWithMetaData()
+				mbt = model.GetMetaByTypes(false, true, false)
+				page.MetasByTypes = mbt
+				page.Meta.ID = ret_id
+				outMeta := model.SelectMeta(page.Meta)
+				page.Meta = outMeta[0]
+				page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
+				page.RenderPageTemplate(w, "metamodform")
+				return
+			} else if m["button"][0] == "update" {
+				rows_updated := model.UpdateMeta(page.Meta)
+				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
+				var mbt model.MetasByTypes
+				model.LoadMCWithMetaData()
+				mbt = model.GetMetaByTypes(false, true, false)
+				page.MetasByTypes = mbt
+				outMeta := model.SelectMeta(page.Meta)
+				page.Meta = outMeta[0]
+				page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
+				page.RenderPageTemplate(w, "metamodform")
+				return
+			} else {
+				var mbt model.MetasByTypes
+				mbt = model.GetMetaByTypes(false, true, false)
+				page.MetasByTypes = mbt
+				outMeta := model.SelectMeta(page.Meta)
+				page.Meta = outMeta[0]
+				page.Messages["metaModifyFail"] = "Metadata modification failed.  You tried to perform an unknown operation!"
+				page.RenderPageTemplate(w, "metamodform")
+				return
+			}
+		} else {
 			var mbt model.MetasByTypes
-			model.LoadMCWithMetaData()
 			mbt = model.GetMetaByTypes(false, true, false)
 			page.MetasByTypes = mbt
-			page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
-			page.RenderPageTemplate(w, "metamodform")
-			return
-		} else {
-			outMeta := model.SelectMeta(inMeta)
-			page.Meta = outMeta[0]
-			page.Messages["metaModifyFail"] = "Metadata modification failed.  You tried to perform an unknown operation!"
-			page.RenderPageTemplate(w, "metamodform")
+			log.Println("Bad meta!")
+			page.RenderPageTemplate(w, "/metamodform")
 			return
 		}
 	} else {

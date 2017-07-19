@@ -71,6 +71,7 @@ type Product struct {
 	SourceName       string
 	SourceLink       string
 	About            Post
+	Errors           map[string]string
 	//Advertiser Info
 	Advertisement Advertisement
 }

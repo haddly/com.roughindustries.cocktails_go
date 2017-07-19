@@ -54,10 +54,10 @@
                         });
                     </script>
                     <div style="text-align: center;">
-                        <button name="add" type="submit" id="addButton" form="metaModForm" class="btn btn-default">Add</button>
+                        <button name="button" type="submit" value="add" id="addButton" form="metaModForm" class="btn btn-default">Add</button>
                         {{if .Meta.ID}}
-                        <button name="update" type="submit" form="metaModForm" class="btn btn-default">Update</button>
-                        <button name="delete" type="submit" form="metaModForm" class="btn btn-default">Delete</button>
+                        <button name="button" type="submit" value="update" id="updateButton" form="metaModForm" class="btn btn-default">Update</button>
+                        <!--<button name="delete" type="submit" form="metaModForm" class="btn btn-default">Delete</button>-->
                         {{end}}
                         <script>
                             $(function() {
@@ -146,8 +146,14 @@
 <div class="row">
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
+        {{ with .Meta.Errors.MetaName }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
         <label for="metaName">Meta Name</label>
-        <input type="text" class="form-control" id="metaName" name="metaName" value="{{if .Meta.MetaName}}{{.Meta.MetaName}}{{end}}" required="true">
+        <input type="text" class="form-control" id="metaName" name="metaName" value="{{if .Meta.MetaName}}{{.Meta.MetaName}}{{end}}">
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -157,11 +163,17 @@
 <div class="row">
     <div class=" col-xs-1"></div>
     <div class=" col-xs-10 form-group">
+        {{ with .Meta.Errors.MetaType }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
         <label for="metaType">Meta Type</label>
         <select class="form-control" name="metaType">
             <option style="display:none" disabled value selected></option>
             {{range .MetasByTypes.MBT}}
-            <option value="{{.MetaType.ID}}"{{if eq $.Meta.MetaType.ID .MetaType.ID}}selected{{end}}>{{.MetaType.MetaTypeName}}</option>
+            <option value="{{.MetaType.ID}}"{{if eq $.Meta.MetaType.ID .MetaType.ID}} selected {{else}}{{if $.Meta.ID}} disabled {{end}}{{end}}>{{.MetaType.MetaTypeName}}</option>
             {{end}}
         </select>
     </div>
