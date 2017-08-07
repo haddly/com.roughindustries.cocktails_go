@@ -86,7 +86,7 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 		model.ProcessCocktails()
 		model.ProcessRecipes()
 		model.ProcessDerivedProducts()
-		model.ProcessProductGroups()
+		model.ProcessGroupProducts()
 		model.ProcessUsers()
 
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")

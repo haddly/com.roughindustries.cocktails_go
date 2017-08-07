@@ -18,6 +18,22 @@ func DeleteAllMemcache() {
 func LoadAllMemcache() {
 	LoadMCWithProductData()
 	LoadMCWithMetaData()
+	LoadMCWithCocktailByAlphaNumsData()
+}
+
+func LoadMCWithCocktailByAlphaNumsData() {
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		mc.Delete("cba")
+
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		var cba CocktailsByAlphaNums
+		cba = GetCocktailsByAlphaNums(true)
+		enc.Encode(cba)
+
+		mc.Set(&memcache.Item{Key: "cba", Value: buf.Bytes()})
+	}
 }
 
 func LoadMCWithProductData() {

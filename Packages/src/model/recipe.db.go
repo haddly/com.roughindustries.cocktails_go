@@ -113,7 +113,11 @@ func ProcessRecipe(recipe Recipe) int {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
-	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipe` SET ")
+	if recipe.ID == 0 {
+		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipe` SET ")
+	} else {
+		buffer.WriteString("UPDATE `commonwealthcocktails`.`recipe` SET ")
+	}
 	if recipe.Method != "" {
 		sqlString := strings.Replace(string(recipe.Method), "\\", "\\\\", -1)
 		sqlString = strings.Replace(sqlString, "\"", "\\\"", -1)
@@ -121,10 +125,122 @@ func ProcessRecipe(recipe Recipe) int {
 	}
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
+	if recipe.ID == 0 {
+		query = query + ";"
+	} else {
+		query = query + " WHERE `idRecipe`=" + strconv.Itoa(recipe.ID) + ";"
+	}
+	log.Println(query)
+	res, err := conn.Exec(query)
+	var recipeID int64
+	if recipe.ID == 0 {
+		recipeID, err = res.LastInsertId()
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		recipeID = int64(recipe.ID)
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Recipe ID = %d, affected = %d\n", recipeID, rowCnt)
+	//We don't bother trying to figure out what we can modify or not
+	//the database is small enough where we can just blow away the rows
+	//and insert new ones
+	ClearRecipeStepsByRecipeID(recipeID)
+	for _, recipestep := range recipe.RecipeSteps {
+		ProcessRecipeStep(recipestep, recipeID)
+	}
+	return int(recipeID)
+}
+
+func ClearRecipeStepsByRecipeID(recipeID int64) {
+	conn, _ := connectors.GetDB()
+
+	var buffer bytes.Buffer
+	var args []interface{}
+	var rsIDs []int
+	//get all recipesteps from recipetorecipestep table
+	buffer.WriteString("SELECT recipeToRecipeSteps.idRecipeStep FROM commonwealthcocktails.recipeToRecipeSteps WHERE idRecipe=?;")
+	args = append(args, recipeID)
+	query := buffer.String()
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var rsID int
+		err := rows.Scan(&rsID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(rsID)
+		rsIDs = append(rsIDs, rsID)
+	}
+
+	//clear all altingredients by stepid
+	for _, stepID := range rsIDs {
+		ClearAltIngredientsByRecipeStepID(int64(stepID))
+	}
+
+	buffer.Reset()
+	args = args[0:0]
+
+	//delete all rows from recipetorecipestep table by recipe id
+	buffer.WriteString("DELETE FROM `commonwealthcocktails`.`recipeToRecipeSteps` WHERE `idRecipe`=?;")
+	args = append(args, recipeID)
+	query = buffer.String()
+	conn.Exec(query, args...)
+
+	buffer.Reset()
+	args = args[0:0]
+
+	//delete all steps from recipesteps table by stepid
+	for _, stepID := range rsIDs {
+		buffer.WriteString("DELETE FROM `commonwealthcocktails`.`recipestep` WHERE `idRecipeStep`=?;")
+		args = append(args, stepID)
+		query = buffer.String()
+		conn.Exec(query, args...)
+	}
+}
+
+func ClearAltIngredientsByRecipeStepID(stepID int64) {
+	conn, _ := connectors.GetDB()
+
+	var buffer bytes.Buffer
+	var args []interface{}
+	//delete all altingredients from altingredients table by stepid
+	buffer.WriteString("DELETE FROM `commonwealthcocktails`.`altIngredient` WHERE `idRecipeStep`=?;")
+	args = append(args, stepID)
+	query := buffer.String()
+	conn.Exec(query, args...)
+}
+
+//This is a helper function, I recommend that you always clear out the
+//recipesteps before you start to process anything
+func ProcessRecipeStep(recipestep RecipeStep, recipeID int64) {
+	conn, _ := connectors.GetDB()
+
+	var buffer bytes.Buffer
+	buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipestep` SET ")
+	if recipestep.OriginalIngredient.ID != 0 {
+		buffer.WriteString("`recipestepOriginalIngredient`=" + strconv.Itoa(recipestep.OriginalIngredient.ID) + " AND")
+	}
+	buffer.WriteString("`recipestepRecipeCardinalFloat`=" + strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32) + ",")
+	if recipestep.RecipeCardinalString != "" {
+		buffer.WriteString("`recipestepRecipeCardinalString`=\"" + recipestep.RecipeCardinalString + "\",")
+	}
+	buffer.WriteString("`recipestepRecipeOrdinal`=" + strconv.Itoa(recipestep.RecipeOrdinal) + ",")
+	buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze.ID)) + ",")
+	query := buffer.String()
+	query = strings.TrimRight(query, ",")
 	query = query + ";"
 	log.Println(query)
 	res, err := conn.Exec(query)
-	lastRecipeId, err := res.LastInsertId()
+	stepID, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -132,31 +248,8 @@ func ProcessRecipe(recipe Recipe) int {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Recipe ID = %d, affected = %d\n", lastRecipeId, rowCnt)
-
-	for _, recipestep := range recipe.RecipeSteps {
-		buffer.Reset()
-		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`recipestep` SET ")
-		buffer.WriteString("`recipestepRecipeCardinalFloat`=" + strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32) + ",")
-		if recipestep.RecipeCardinalString != "" {
-			buffer.WriteString("`recipestepRecipeCardinalString`=\"" + recipestep.RecipeCardinalString + "\",")
-		}
-		buffer.WriteString("`recipestepRecipeOrdinal`=" + strconv.Itoa(recipestep.RecipeOrdinal) + ",")
-		buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze.ID)) + ",")
-		query := buffer.String()
-		query = strings.TrimRight(query, ",")
-		query = query + ";"
-		log.Println(query)
-		res, err := conn.Exec(query)
-		lastStepId, err := res.LastInsertId()
-		if err != nil {
-			log.Fatal(err)
-		}
-		rowCnt, err := res.RowsAffected()
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("Step ID = %d, affected = %d\n", lastStepId, rowCnt)
+	log.Printf("Step ID = %d, affected = %d\n", stepID, rowCnt)
+	if recipestep.OriginalIngredient.ID < 1 {
 		rows, _ := conn.Query("SELECT idProduct, productName FROM commonwealthcocktails.product where productName = '" + recipestep.OriginalIngredient.ProductName + "';")
 		defer rows.Close()
 		var (
@@ -170,17 +263,31 @@ func ProcessRecipe(recipe Recipe) int {
 			}
 			log.Println(id, name)
 		}
-		//TODO: Add alt ingredients
-		for _, altingredient := range recipestep.AltIngredient {
-			product := SelectProduct(altingredient)
-			if len(product) > 0 {
-				conn.Exec("INSERT INTO `commonwealthcocktails`.`altIngredient` (`idProduct`, `idRecipeStep`) VALUES ('" + strconv.Itoa(product[0].ID) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")
-			}
-		}
-		conn.Exec("UPDATE `commonwealthcocktails`.`recipestep` SET `recipestepOriginalIngredient`='" + strconv.Itoa(id) + "' WHERE `idRecipeStep`='" + strconv.FormatInt(lastStepId, 10) + "';")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`recipeToRecipeSteps` (`idRecipe`, `idRecipeStep`) VALUES ('" + strconv.FormatInt(lastRecipeId, 10) + "', '" + strconv.FormatInt(lastStepId, 10) + "');")
+		conn.Exec("UPDATE `commonwealthcocktails`.`recipestep` SET `recipestepOriginalIngredient`='" + strconv.Itoa(id) + "' WHERE `idRecipeStep`='" + strconv.FormatInt(stepID, 10) + "';")
 	}
-	return int(lastRecipeId)
+	for _, altingredient := range recipestep.AltIngredient {
+		ProcessAltIngredient(altingredient, stepID)
+	}
+
+	ProcessRecipeToRecipeStep(recipeID, stepID)
+}
+
+//This is a helper function, I recommend that you always clear out the
+//altingredients before you start to process anything
+func ProcessAltIngredient(altingredient Product, stepID int64) {
+	conn, _ := connectors.GetDB()
+
+	product := SelectProduct(altingredient)
+	if len(product) > 0 {
+		conn.Exec("INSERT INTO `commonwealthcocktails`.`altIngredient` (`idProduct`, `idRecipeStep`) VALUES ('" + strconv.Itoa(product[0].ID) + "', '" + strconv.FormatInt(stepID, 10) + "');")
+	}
+}
+
+//This is a helper function, I recommend that you always clear out the
+//recipesteps before you start to process anything
+func ProcessRecipeToRecipeStep(recipeID int64, stepID int64) {
+	conn, _ := connectors.GetDB()
+	conn.Exec("INSERT INTO `commonwealthcocktails`.`recipeToRecipeSteps` (`idRecipe`, `idRecipeStep`) VALUES ('" + strconv.FormatInt(recipeID, 10) + "', '" + strconv.FormatInt(stepID, 10) + "');")
 }
 
 func SelectRecipeByCocktail(cocktail Cocktail) Recipe {
@@ -230,7 +337,7 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT recipestep.recipestepOriginalIngredient, recipestep.recipestepRecipeCardinalFloat," +
+	buffer.WriteString("SELECT recipestep.idRecipeStep, recipestep.recipestepOriginalIngredient, recipestep.recipestepRecipeCardinalFloat," +
 		" COALESCE(recipestep.recipestepRecipeCardinalString, ''), recipestep.recipestepRecipeDoze" +
 		" FROM commonwealthcocktails.recipestep" +
 		" JOIN commonwealthcocktails.recipeToRecipeSteps ON recipeToRecipeSteps.idRecipeStep=recipestep.idRecipeStep" +
@@ -253,13 +360,14 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 			var rs RecipeStep
 			var oiID int
 			var doze int
-			err := rows.Scan(&oiID, &rs.RecipeCardinalFloat, &rs.RecipeCardinalString, &doze)
+			err := rows.Scan(&rs.ID, &oiID, &rs.RecipeCardinalFloat, &rs.RecipeCardinalString, &doze)
 			if err != nil {
 				log.Fatal(err)
 			}
 			rs.OriginalIngredient = SelectProductByID(oiID)
 			rs.RecipeDoze = Doze{ID: doze}
-			log.Println(rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze.ID))
+			rs.AltIngredient = SelectAltIngredientsByRecipeStepID(rs.ID)
+			log.Println(rs.ID, rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze.ID))
 			ret = append(ret, rs)
 		}
 		err = rows.Err()
@@ -269,6 +377,38 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail) []RecipeStep {
 	}
 	return ret
 
+}
+
+func SelectAltIngredientsByRecipeStepID(id int) []Product {
+	var ret []Product
+	conn, _ := connectors.GetDB()
+
+	var buffer bytes.Buffer
+	var args []interface{}
+	buffer.WriteString("SELECT altIngredient.idProduct FROM commonwealthcocktails.altIngredient WHERE `idRecipeStep`=?;")
+	args = append(args, id)
+	query := buffer.String()
+	log.Println(query)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var prod Product
+		err := rows.Scan(&prod.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		prod = SelectProductByID(prod.ID)
+		ret = append(ret, prod)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return ret
 }
 
 func SelectDoze() []Doze {

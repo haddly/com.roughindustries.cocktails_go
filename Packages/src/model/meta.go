@@ -3,8 +3,6 @@ package model
 
 import (
 	"html/template"
-	"strconv"
-	"strings"
 )
 
 type MetaType struct {
@@ -109,25 +107,4 @@ type MetasByTypes struct {
 type MetasByType struct {
 	MetaType MetaType
 	Metas    []Meta
-}
-
-func (meta *Meta) Validate(m map[string][]string) bool {
-	meta.Errors = make(map[string]string)
-	if len(m["metaID"]) > 0 {
-		meta.ID, _ = strconv.Atoi(m["metaID"][0])
-	}
-	if len(m["metaName"]) > 0 && strings.TrimSpace(m["metaName"][0]) != "" {
-		meta.MetaName = m["metaName"][0]
-	} else {
-		meta.Errors["MetaName"] = "Please enter a valid meta name"
-	}
-	if len(m["metaType"]) > 0 {
-		meta.MetaType.ID, _ = strconv.Atoi(m["metaType"][0])
-	} else {
-		meta.Errors["MetaType"] = "Please select a valid meta type"
-	}
-	if len(m["metaBlurb"]) > 0 {
-		meta.Blurb = template.HTML(m["metaBlurb"][0])
-	}
-	return len(meta.Errors) == 0
 }

@@ -272,7 +272,7 @@ func SelectMeta(meta Meta) []Meta {
 		if err != nil {
 			log.Fatal(err)
 		}
-		meta.Blurb = template.HTML(blurb)
+		meta.Blurb = template.HTML(html.UnescapeString(blurb))
 		ret = append(ret, meta)
 		log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, meta.Blurb)
 	}
@@ -376,13 +376,15 @@ func checkCount(rows *sql.Rows) (count int, err error) {
 	return count, nil
 }
 
-func SelectMetasByCocktailAndMetaType(ID int, mt int) []Meta {
+func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 	var ret []Meta
+	var isRoot bool
+	isRoot = false
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType" +
+	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType, cocktailToMetas.isRootCocktailForMeta" +
 		" FROM commonwealthcocktails.meta" +
 		" JOIN commonwealthcocktails.cocktailToMetas ON meta.idMeta=cocktailToMetas.idMeta" +
 		" JOIN commonwealthcocktails.cocktail ON cocktailToMetas.idCocktail=cocktail.idCocktail" +
@@ -401,17 +403,21 @@ func SelectMetasByCocktailAndMetaType(ID int, mt int) []Meta {
 		defer rows.Close()
 		for rows.Next() {
 			var meta Meta
-			err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID)
+			var root string
+			err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
 			if err != nil {
 				log.Fatal(err)
 			}
+			if !isRoot {
+				isRoot, _ = strconv.ParseBool(root)
+			}
 			ret = append(ret, meta)
-			log.Println(meta.ID, meta.MetaName, meta.MetaType.ID)
+			log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
 		}
 		err = rows.Err()
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	return ret
+	return ret, isRoot
 }

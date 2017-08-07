@@ -2,11 +2,13 @@
 package www
 
 import (
+	"html/template"
 	"log"
 	"model"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type Meta struct {
@@ -42,10 +44,10 @@ func (meta *Meta) MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "metamodform")
 		} else {
 			id, _ := strconv.Atoi(m["ID"][0])
-			var inMeta model.Meta
-			inMeta.ID = id
-			outMeta := model.SelectMeta(inMeta)
-			page.Meta = outMeta[0]
+			var in model.Meta
+			in.ID = id
+			out := model.SelectMeta(in)
+			page.Meta = out[0]
 			page.RenderPageTemplate(w, "metamodform")
 		}
 	} else {
@@ -80,7 +82,7 @@ func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(m)
 
-		if page.Meta.Validate(m) {
+		if ValidateMeta(&page.Meta, m) {
 			if m["button"][0] == "add" {
 				ret_id := model.InsertMeta(page.Meta)
 				var mbt model.MetasByTypes
@@ -127,6 +129,27 @@ func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
 		page.RenderPageTemplate(w, "404")
 		return
 	}
+}
+
+func ValidateMeta(meta *model.Meta, m map[string][]string) bool {
+	meta.Errors = make(map[string]string)
+	if len(m["metaID"]) > 0 {
+		meta.ID, _ = strconv.Atoi(m["metaID"][0])
+	}
+	if len(m["metaName"]) > 0 && strings.TrimSpace(m["metaName"][0]) != "" {
+		meta.MetaName = m["metaName"][0]
+	} else {
+		meta.Errors["MetaName"] = "Please enter a valid meta name"
+	}
+	if len(m["metaType"]) > 0 {
+		meta.MetaType.ID, _ = strconv.Atoi(m["metaType"][0])
+	} else {
+		meta.Errors["MetaType"] = "Please select a valid meta type"
+	}
+	if len(m["metaBlurb"]) > 0 {
+		meta.Blurb = template.HTML(m["metaBlurb"][0])
+	}
+	return len(meta.Errors) == 0
 }
 
 func (meta *Meta) Init() {

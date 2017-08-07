@@ -29,18 +29,20 @@ type Cocktail struct {
 	AKA             []Name
 	Description     template.HTML
 	Comment         template.HTML
-	Recipe          Recipe
-	Garnish         []Product
 	ImagePath       string
 	Image           string
 	ImageSourceName string
 	ImageSourceLink string
-	Drinkware       []Product
-	Tool            []Product
 	SourceName      string
 	SourceLink      string
 	Rating          int
+	Recipe          Recipe
+	Garnish         []Product
+	Drinkware       []Product
+	Tool            []Product
 	Flavor          []Meta
+	Occasion        []Meta
+	Formula         []Meta
 	Type            []Meta
 	BaseSpirit      []Meta
 	Served          []Meta
@@ -50,9 +52,11 @@ type Cocktail struct {
 	TOD             []Meta
 	Ratio           []Meta
 	Family          []Meta
+	Drink           []Meta
 	IsFamilyRoot    bool
 	About           Post
 	Articles        []Post
+	Errors          map[string]string
 
 	//Advertiser Info
 	Advertisement Advertisement
@@ -73,6 +77,10 @@ type CocktailSet struct {
 type CocktailSearch struct {
 	Products []Product
 	Metadata []Meta
+}
+
+type CocktailsByAlphaNums struct {
+	CBA map[string][]Cocktail
 }
 
 func GetCocktailSearch() CocktailSearch {
