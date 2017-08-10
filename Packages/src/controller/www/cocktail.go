@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -47,7 +48,7 @@ func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request
 		if len(model.Products) <= id-1 {
 			page.RenderPageTemplate(w, "404")
 		} else {
-			cs = model.GetCocktailByID(id)
+			cs = model.GetCocktailByID(id, true)
 			page.CocktailSet = cs
 			//apply the template page info to the index page
 			page.RenderPageTemplate(w, "cocktail")
@@ -121,7 +122,7 @@ func (cocktail *Cocktail) CocktailModFormHandler(w http.ResponseWriter, r *http.
 			id, _ := strconv.Atoi(m["ID"][0])
 			var in model.Cocktail
 			in.ID = id
-			out := model.SelectCocktailsByID(id)
+			out := model.SelectCocktailsByID(id, false)
 			page.Cocktail = out.Cocktail
 			page.RenderPageTemplate(w, "cocktailmodform")
 		}
@@ -172,10 +173,18 @@ func (cocktail *Cocktail) CocktailModHandler(w http.ResponseWriter, r *http.Requ
 		page.NonIngredients = nonIngredients
 		if ValidateCocktail(&page.Cocktail, m) {
 			if m["button"][0] == "add" {
+				ret_id := model.InsertCocktail(page.Cocktail)
+				model.LoadMCWithCocktailByAlphaNumsData()
+				outCocktail := model.SelectCocktailsByID(ret_id, false)
+				page.Cocktail = outCocktail.Cocktail
 				page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "cocktailmodform")
 				return
 			} else if m["button"][0] == "update" {
+				ret_id := model.UpdateCocktail(page.Cocktail)
+				model.LoadMCWithCocktailByAlphaNumsData()
+				outCocktail := model.SelectCocktailsByID(ret_id, false)
+				page.Cocktail = outCocktail.Cocktail
 				page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "cocktailmodform")
 				return
@@ -357,16 +366,19 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 		cocktail.SpokenName = m["cocktailSpokenName"][0]
 	}
 	if len(m["cocktailOrigin"]) > 0 {
-		cocktail.Origin = template.HTML(m["cocktailOrigin"][0])
+		re := regexp.MustCompile(`\r?\n`)
+		cocktail.Origin = template.HTML(re.ReplaceAllString(m["cocktailOrigin"][0], " "))
 	}
 	if len(m["cocktailAKA"]) > 0 {
 		//cocktail.AKA = m["cocktailAKA"][0]
 	}
 	if len(m["cocktailDescription"]) > 0 {
-		cocktail.Description = template.HTML(m["cocktailDescription"][0])
+		re := regexp.MustCompile(`\r?\n`)
+		cocktail.Description = template.HTML(re.ReplaceAllString(m["cocktailDescription"][0], " "))
 	}
 	if len(m["cocktailComment"]) > 0 {
-		cocktail.Comment = template.HTML(m["cocktailComment"][0])
+		re := regexp.MustCompile(`\r?\n`)
+		cocktail.Comment = template.HTML(re.ReplaceAllString(m["cocktailComment"][0], " "))
 	}
 	if len(m["cocktailImage"]) > 0 {
 		cocktail.ImagePath, cocktail.Image = filepath.Split(m["cocktailImage"][0])
@@ -388,7 +400,11 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 		cocktail.SourceLink = m["cocktailSourceLink"][0]
 	}
 	if len(m["recipeMethod"]) > 0 {
-		cocktail.Recipe.Method = template.HTML(m["recipeMethod"][0])
+		re := regexp.MustCompile(`\r?\n`)
+		cocktail.Recipe.Method = template.HTML(re.ReplaceAllString(m["recipeMethod"][0], " "))
+	}
+	if len(m["recipeID"]) > 0 {
+		cocktail.Recipe.ID, _ = strconv.Atoi(m["recipeID"][0])
 	}
 	if len(m["recipeSteps"]) > 0 {
 		stepIndexer := m["recipeSteps"][0]
@@ -405,6 +421,7 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 				var doze model.Doze
 				if len(m["recipestep["+result[i]+"].Ingredient"]) > 0 {
 					prod.ID, _ = strconv.Atoi(m["recipestep["+result[i]+"].Ingredient"][0])
+					rs.OriginalIngredient = prod
 				}
 				rs.OriginalIngredient = prod
 				if len(m["recipestep["+result[i]+"].Doze"]) > 0 {
@@ -431,51 +448,68 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 	}
 	if len(m["Garnish"]) > 0 {
 		for _, id := range m["Garnish"] {
-			var p model.Product
-			p.ID, _ = strconv.Atoi(id)
-			cocktail.Garnish = append(cocktail.Garnish, p)
+			if id != "" {
+				var p model.Product
+				p.ID, _ = strconv.Atoi(id)
+				cocktail.Garnish = append(cocktail.Garnish, p)
+			}
 		}
+	} else {
+		cocktail.Garnish = nil
 	}
 	if len(m["Drinkware"]) > 0 {
 		for _, id := range m["Drinkware"] {
-			var p model.Product
-			p.ID, _ = strconv.Atoi(id)
-			cocktail.Drinkware = append(cocktail.Drinkware, p)
+			if id != "" {
+				var p model.Product
+				p.ID, _ = strconv.Atoi(id)
+				cocktail.Drinkware = append(cocktail.Drinkware, p)
+			}
 		}
 	}
 	if len(m["Tool"]) > 0 {
 		for _, id := range m["Tool"] {
-			var p model.Product
-			p.ID, _ = strconv.Atoi(id)
-			cocktail.Tool = append(cocktail.Tool, p)
+			if id != "" {
+				var p model.Product
+				p.ID, _ = strconv.Atoi(id)
+				cocktail.Tool = append(cocktail.Tool, p)
+			}
 		}
 	}
 	if len(m["Flavor"]) > 0 {
 		for _, id := range m["Flavor"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Flavor = append(cocktail.Flavor, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Flavor = append(cocktail.Flavor, m)
+			}
 		}
 	}
 	if len(m["BaseSpirit"]) > 0 {
 		for _, id := range m["BaseSpirit"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.BaseSpirit = append(cocktail.BaseSpirit, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.BaseSpirit = append(cocktail.BaseSpirit, m)
+			}
 		}
 	}
 	if len(m["Type"]) > 0 {
 		for _, id := range m["Type"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Type = append(cocktail.Type, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Type = append(cocktail.Type, m)
+			}
 		}
 	}
 	if len(m["Family"]) > 0 {
 		for _, id := range m["Family"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Family = append(cocktail.Family, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				log.Println("Family id = " + id)
+				cocktail.Family = append(cocktail.Family, m)
+			}
 		}
 	}
 	if m["IsFamilyRoot"] != nil {
@@ -483,51 +517,65 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 	}
 	if len(m["Served"]) > 0 {
 		for _, id := range m["Served"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Served = append(cocktail.Served, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Served = append(cocktail.Served, m)
+			}
 		}
 	}
 	if len(m["Technique"]) > 0 {
 		for _, id := range m["Technique"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Technique = append(cocktail.Technique, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Technique = append(cocktail.Technique, m)
+			}
 		}
 	}
 	if len(m["Strength"]) > 0 {
 		for _, id := range m["Strength"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Strength = append(cocktail.Strength, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Strength = append(cocktail.Strength, m)
+			}
 		}
 	}
 	if len(m["Difficulty"]) > 0 {
 		for _, id := range m["Difficulty"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Difficulty = append(cocktail.Difficulty, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Difficulty = append(cocktail.Difficulty, m)
+			}
 		}
 	}
 	if len(m["TimeofDay"]) > 0 {
 		for _, id := range m["TimeofDay"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.TOD = append(cocktail.TOD, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.TOD = append(cocktail.TOD, m)
+			}
 		}
 	}
 	if len(m["Ratio"]) > 0 {
 		for _, id := range m["Ratio"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Ratio = append(cocktail.Ratio, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Ratio = append(cocktail.Ratio, m)
+			}
 		}
 	}
 	if len(m["Drink"]) > 0 {
 		for _, id := range m["Drink"] {
-			var m model.Meta
-			m.ID, _ = strconv.Atoi(id)
-			cocktail.Drink = append(cocktail.Drink, m)
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				cocktail.Drink = append(cocktail.Drink, m)
+			}
 		}
 	}
 	return len(cocktail.Errors) == 0

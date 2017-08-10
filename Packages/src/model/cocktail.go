@@ -119,24 +119,24 @@ func copyCocktail(ID int) Cocktail {
 	return c
 }
 
-func GetCocktailByID(ID int) CocktailSet {
+func GetCocktailByID(ID int, includeBDG bool) CocktailSet {
 	var c Cocktail
 	dst := GetDataSourceType()
 	switch dst {
 	case Internal:
 		c = copyCocktail(ID)
-		return processCocktailRequest(c)
+		return processCocktailRequest(c, includeBDG)
 	default:
 		c.ID = ID
-		return processCocktailRequest(c)
+		return processCocktailRequest(c, includeBDG)
 
 	}
 }
 
-func GetCocktail() CocktailSet {
+func GetCocktail(includeBDG bool) CocktailSet {
 	var c Cocktail
 	c = copyCocktail(-1)
-	return processCocktailRequest(c)
+	return processCocktailRequest(c, includeBDG)
 }
 
 func GetCocktails() []Cocktail {
@@ -145,14 +145,14 @@ func GetCocktails() []Cocktail {
 	return c
 }
 
-func processCocktailRequest(c Cocktail) CocktailSet {
+func processCocktailRequest(c Cocktail, includeBDG bool) CocktailSet {
 	dst := GetDataSourceType()
 	switch dst {
 	case Internal:
 		return processInternalCocktailRequest(c)
 	default:
 		var cs CocktailSet
-		cs = SelectCocktailsByID(c.ID)
+		cs = SelectCocktailsByID(c.ID, includeBDG)
 		return cs
 
 	}

@@ -101,6 +101,13 @@
 					</div>
 				</div>
 				<div class="row">
+					<div class="col-md-12">
+						{{if .Cocktail.Origin}}
+						<h3>Cocktail Origin</h3>
+						{{.Cocktail.Origin}} {{end}}
+					</div>
+				</div>
+				<div class="row">
 					<div align="center" class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 						<h3>Cocktail Metadata</h3>
 					</div>
@@ -341,11 +348,11 @@
 <a style="text-decoration : none;" href="/product?ID={{.OriginalIngredient.ID}}">
 	<!--<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.OriginalIngredient.ProductName}}</span>-->
 	{{template "productbutton" .}}
-</a>{{end}} {{range .AltIngredient}}
+</a>{{end}} {{if ne (len .AltIngredient) 0}}{{with .OriginalIngredient.ProductName}}{{.}}:&nbsp;{{end}}{{end}}{{range .AltIngredient}}
 <a style="text-decoration : none;" href="/product?ID={{.ID}}">
 	<!--<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>-->
 	{{template "productbutton" .}}
-</a>{{end}}{{end}}{{end}}
+</a>{{end}}{{if ne (len .AltIngredient) 0}}&nbsp;&nbsp;{{end}}{{end}}{{end}}
 {{end}}
 
 

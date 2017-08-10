@@ -35,6 +35,7 @@ const (
 	Slice
 	TopOffWith
 	Fresh
+	Splash
 )
 
 var DozeStrings = [...]string{
@@ -45,6 +46,7 @@ var DozeStrings = [...]string{
 	"slice",
 	"top off with",
 	"fresh",
+	"splash",
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).

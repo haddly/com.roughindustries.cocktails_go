@@ -564,14 +564,22 @@ func SelectProductByID(ID int) Product {
 func SelectProductsByCocktailAndProductType(ID int, pt int) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
+	var args []interface{}
 
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT product.idProduct, product.productName, product.productType, COALESCE(product.productDescription, ''), COALESCE(product.productImagePath, '')," +
-		" COALESCE(product.productImage, '') FROM commonwealthcocktails.product" +
+	buffer.WriteString("SELECT product.idProduct, product.productName, product.productType, product.productGroupType," +
+		" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, ''), COALESCE(product.productImageSourceName, '')," +
+		" COALESCE(product.productImage, ''), COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, '')," +
+		" COALESCE(product.productPreText, ''), COALESCE(product.productPostText, ''), COALESCE(product.productRating, 0)," +
+		" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, '')" +
+		" FROM commonwealthcocktails.product" +
 		" JOIN commonwealthcocktails.cocktailToProducts ON product.idProduct=cocktailToProducts.idProduct" +
 		" JOIN commonwealthcocktails.cocktail ON cocktailToProducts.idCocktail=cocktail.idCocktail" +
-		" WHERE cocktail.idCocktail=" + strconv.Itoa(ID) + " AND product.productType=" + strconv.Itoa(pt) + ";")
+		" WHERE cocktail.idCocktail=? AND product.productType=?;")
+	args = append(args, strconv.Itoa(ID))
+	args = append(args, strconv.Itoa(pt))
+
 	canQuery = true
 
 	if canQuery {
@@ -579,7 +587,7 @@ func SelectProductsByCocktailAndProductType(ID int, pt int) []Product {
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
 		log.Println(query)
-		rows, err := conn.Query(query)
+		rows, err := conn.Query(query, args...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -587,13 +595,13 @@ func SelectProductsByCocktailAndProductType(ID int, pt int) []Product {
 		for rows.Next() {
 			var prod Product
 			var desc string
-			var pt int
-			err := rows.Scan(&prod.ID, &prod.ProductName, &pt, &desc, &prod.ImagePath, &prod.Image)
-			prod.Description = template.HTML(desc)
-			prod.ProductType.ID = pt
+			var details string
+			err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink)
 			if err != nil {
 				log.Fatal(err)
 			}
+			prod.Description = template.HTML(html.UnescapeString(desc))
+			prod.Details = template.HTML(html.UnescapeString(details))
 			log.Println(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
 			ret = append(ret, prod)
 		}

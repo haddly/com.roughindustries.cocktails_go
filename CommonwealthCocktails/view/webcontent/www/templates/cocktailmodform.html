@@ -393,7 +393,7 @@
                     <div class="form-group">
                         <div class="col-xs-5">
                             <label for="Ingredient" class="col-xs-12">Ingredient</label>
-                            <select class="form-control" name="'recipestep[0].Ingredient">
+                            <select class="form-control" name="recipestep[0].Ingredient">
                                 {{range $.Ingredients.PBT}}
                                 <optgroup label="{{.ProductType.ProductTypeName}}">
                                     {{range .Products}}
@@ -524,6 +524,7 @@
                     });
                 </script>
                 <div class="col-xs-12">
+                    {{with .Cocktail.Recipe.ID}}<input type="hidden" name="recipeID" value="{{.}}">{{end}}
                     <label for="recipeMethod">Recipe Method</label>
                     <textarea id="recipeMethod" class="form-control" rows="3" name="recipeMethod">{{with .Cocktail.Recipe.Method}}{{.}}{{end}}</textarea>
                     <script>
