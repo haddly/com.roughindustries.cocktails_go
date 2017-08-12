@@ -12,6 +12,7 @@ import (
 	"model"
 	"net/http"
 	//"net/url"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -120,13 +121,24 @@ func main() {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./view/webcontent/www/js"))))
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./view/webcontent/www/fonts"))))
 	http.Handle("/slick/", http.StripPrefix("/slick/", http.FileServer(http.Dir("./view/webcontent/www/libs/slick"))))
-	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
-	})
 	http.HandleFunc("/memcache", func(w http.ResponseWriter, r *http.Request) {
 		model.LoadMCWithProductData()
 		model.LoadMCWithMetaData()
 	})
+
+	//Let's Encrypt HTTPS setup, Challenges are based on the number of domains
+	//Challenge 1
+	//http.HandleFunc("/.well-known/acme-challenge/{Your Let's Encrypt Page Code}", func(w http.ResponseWriter, r *http.Request) {
+	//	fmt.Fprintf(w, "{Your Let's Encrypt Conent Code}")
+	//})
+	//Challenge N...
+	//http.HandleFunc("/.well-known/acme-challenge/{Your Let's Encrypt Page Code}", func(w http.ResponseWriter, r *http.Request) {
+	//	fmt.Fprintf(w, "{Your Let's Encrypt Conent Code}")
+	//})
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
+	})
+
 	log.Println("Added Handlers ... Starting Server\n")
 	//this starts up the server
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
