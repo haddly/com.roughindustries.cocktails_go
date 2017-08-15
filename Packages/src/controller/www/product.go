@@ -42,13 +42,10 @@ func (product *Product) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
-		if len(model.Products) <= id-1 {
-			page.RenderPageTemplate(w, "404")
-		} else {
-			p = model.GetProductByIDWithBDG(id)
-			page.BaseProductWithBDG = *p
-			page.RenderPageTemplate(w, "product")
-		}
+
+		p = model.GetProductByIDWithBDG(id)
+		page.BaseProductWithBDG = *p
+		page.RenderPageTemplate(w, "product")
 	}
 }
 
@@ -207,7 +204,7 @@ func (product *Product) ProductsHandler(w http.ResponseWriter, r *http.Request) 
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
 	var p []model.Product
-	p = model.GetProducts()
+	p = model.SelectAllProducts()
 	page.Products = p
 	page.RenderPageTemplate(w, "products")
 }

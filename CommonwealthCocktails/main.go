@@ -12,7 +12,7 @@ import (
 	"model"
 	"net/http"
 	//"net/url"
-	"fmt"
+	//"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -52,6 +52,7 @@ func init() {
 
 		var mc_server string
 		//mc_server = ??
+		mc_server = "memcached-12898.c12.us-east-1-4.ec2.cloud.redislabs.com:12898"
 
 		if dbaddr == "" {
 			log.Println("No DB Address set.")

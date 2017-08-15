@@ -2,11 +2,18 @@
 package www
 
 import (
+	"bufio"
 	"bytes"
 	"connectors"
 	"html/template"
+	//"io"
+	"io/ioutil"
+	"log"
 	"model"
 	"net/http"
+	"os"
+	"regexp"
+	"strings"
 )
 
 type Database struct {
@@ -30,29 +37,25 @@ func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" {
 		var buffer bytes.Buffer
-		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.GetCurrentDB() + "<br/>")
-		buffer.WriteString("<br/><b>Tables</b>: ")
-		model.InitProductTables()
-		model.InitCocktailTables()
-		model.InitPostTables()
-		model.InitMetaTables()
-		model.InitRecipeTables()
-		model.InitAdvertisementTables()
-		model.InitCocktailReferences()
-		model.InitAdvertisementReferences()
-		model.InitMetaReferences()
-		model.InitProductReferences()
-		model.InitRecipeReferences()
-		model.InitUserTables()
+		dat, _ := ioutil.ReadFile("sql/ccschemadump.sql")
 
+		requests := strings.Split(string(dat), ";")
 		conn, _ := connectors.GetDB()
-		rows, _ := conn.Query("SHOW TABLES;")
-		for rows.Next() {
-			var temp string
-			rows.Scan(&temp)
-			buffer.WriteString("<br>" + temp)
+		conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
+		for _, request := range requests {
+			r, _ := regexp.Compile("(.*/*!.*)")
+			if !r.MatchString(string(request)) {
+				buffer.WriteString(string(request) + ";<br><br>")
+				log.Println(string(request))
+				if len(string(request)) > 0 {
+					_, err := conn.Exec(string(request))
+					if err != nil {
+						log.Println(err)
+					}
+				}
+			}
 		}
+
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
@@ -76,22 +79,30 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" {
 		var buffer bytes.Buffer
-		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.GetCurrentDB() + "<br/>")
-
-		model.ProcessPosts()
-		model.ProcessMetaTypes()
-		model.ProcessProducts()
-		model.ProcessMetas()
-		model.ProcessCocktails()
-		model.ProcessRecipes()
-		model.ProcessDerivedProducts()
-		model.ProcessGroupProducts()
-		model.ProcessUsers()
-
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")
+		dir, _ := os.Getwd()
+		dat, _ := os.Open("sql/ccdatadump.sql")
+		defer dat.Close()
+		scanner := bufio.NewScanner(dat)
+		scanner.Split(bufio.ScanLines)
+
+		buffer.WriteString(dir + "<br><br>")
+		conn, _ := connectors.GetDB()
+		conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
+		for scanner.Scan() {
+			request := scanner.Text()
+			buffer.WriteString(string(request) + ";<br><br>")
+			log.Println(string(request))
+			if len(string(request)) > 0 {
+				_, err := conn.Exec(string(request))
+				if err != nil {
+					log.Println(err)
+				}
+			}
+		}
 		//apply the template page info to the index page
 		statStr := buffer.String()
+		log.Println(statStr)
 		page.Messages["Status"] = template.HTML(statStr)
 		page.RenderPageTemplate(w, "dbindex")
 	} else {

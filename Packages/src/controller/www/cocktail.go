@@ -45,14 +45,11 @@ func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
-		if len(model.Products) <= id-1 {
-			page.RenderPageTemplate(w, "404")
-		} else {
-			cs = model.GetCocktailByID(id, true)
-			page.CocktailSet = cs
-			//apply the template page info to the index page
-			page.RenderPageTemplate(w, "cocktail")
-		}
+		cs = model.GetCocktailByID(id, true)
+		page.CocktailSet = cs
+		//apply the template page info to the index page
+		page.RenderPageTemplate(w, "cocktail")
+
 	}
 }
 
@@ -71,7 +68,7 @@ func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Reques
 	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	var c []model.Cocktail
-	c = model.GetCocktails()
+	c = model.SelectAllCocktails(false)
 	cs.ChildCocktails = c
 	page.CocktailSet = cs
 	//apply the template page info to the index page
@@ -289,20 +286,17 @@ func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *
 		page.RenderPageTemplate(w, "404")
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
-		log.Println("Product ID: " + m["ID"][0])
-		if len(model.Products) <= id-1 {
-			page.RenderPageTemplate(w, "404")
-		} else {
-			var inProduct model.Product
-			inProduct.ID = id
-			var c []model.Cocktail
-			c = model.SelectCocktailsByProduct(inProduct)
-			cs.ChildCocktails = c
-			prod := model.SelectProduct(inProduct)
-			cs.Product = prod[0]
-			page.CocktailSet = cs
-			page.RenderPageTemplate(w, "cocktails")
-		}
+
+		var inProduct model.Product
+		inProduct.ID = id
+		var c []model.Cocktail
+		c = model.SelectCocktailsByProduct(inProduct)
+		cs.ChildCocktails = c
+		prod := model.SelectProduct(inProduct)
+		cs.Product = prod[0]
+		page.CocktailSet = cs
+		page.RenderPageTemplate(w, "cocktails")
+
 	}
 }
 

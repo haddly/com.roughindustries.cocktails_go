@@ -72,7 +72,7 @@ type Product struct {
 	About            Post
 	Errors           map[string]string
 	//Advertiser Info
-	Advertisement Advertisement
+	//Advertisement Advertisement
 }
 
 type DerivedProduct struct {
@@ -99,10 +99,4 @@ type ProductsByTypes struct {
 type ProductsByType struct {
 	ProductType ProductType
 	Products    []Product
-}
-
-func GetProducts() []Product {
-	var p []Product
-	p = Products
-	return p
 }

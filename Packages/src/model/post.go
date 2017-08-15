@@ -57,7 +57,7 @@ type Post struct {
 	PostExcerptImageSourceLink string
 
 	//Advertiser Info
-	Advertisement Advertisement
+	//Advertisement Advertisement
 }
 
 func (post *Post) FormattedDate() string {

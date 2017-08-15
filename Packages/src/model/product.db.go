@@ -4,7 +4,6 @@ package model
 import (
 	"bytes"
 	"connectors"
-	"database/sql"
 	"encoding/gob"
 	"github.com/bradfitz/gomemcache/memcache"
 	"html"
@@ -13,113 +12,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-func InitProductTables() {
-	conn, _ := connectors.GetDB()
-
-	var temp string
-	if err := conn.QueryRow("SHOW TABLES LIKE 'producttype';").Scan(&temp); err == nil {
-		log.Println("producttype Table Exists")
-	} else if err == sql.ErrNoRows {
-		log.Println("Creating producttype Table")
-		conn.Query("CREATE TABLE `commonwealthcocktails`.`producttype` (`idProductType` INT NOT NULL AUTO_INCREMENT,PRIMARY KEY (`idProductType`));")
-		conn.Query("ALTER TABLE `commonwealthcocktails`.`producttype` " +
-			"ADD COLUMN `productTypeName` VARCHAR(150) NOT NULL AFTER `idProductType`," +
-			"ADD COLUMN `productTypeIsIngredient` TINYINT(1) NOT NULL AFTER `productTypeName`;")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('1', 'Spirit', '1');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('2', 'Liqueur', '1');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('3', 'Wine', '1');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('4', 'Mixer', '1');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('5', 'Beer', '1');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('6', 'Garnish, '0');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('7', 'Drinkware', '0');")
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`producttype` (`idProductType`, `productTypeName`, `productTypeIsIngredient`) VALUES ('8', 'Tool', '0');")
-	}
-
-	if err := conn.QueryRow("SHOW TABLES LIKE 'product';").Scan(&temp); err == nil {
-		log.Println("product Table Exists")
-	} else if err == sql.ErrNoRows {
-		log.Println("Creating product Table")
-		conn.Query("CREATE TABLE `commonwealthcocktails`.`product` (`idProduct` INT NOT NULL AUTO_INCREMENT,PRIMARY KEY (`idProduct`));") //ID
-		conn.Query("ALTER TABLE `commonwealthcocktails`.`product`" +
-			"ADD COLUMN `productName` VARCHAR(150) NOT NULL AFTER `idProduct`," + //ProductName
-			"ADD COLUMN `productType`  INT NOT NULL AFTER `productName`," + //ProductType
-			"ADD COLUMN `productDescription` VARCHAR(1500) AFTER `productType`," + //Description
-			"ADD COLUMN `productDetails` VARCHAR(1500) AFTER `productDescription`," + //Details
-			"ADD COLUMN `productImagePath` VARCHAR(750) AFTER `productDetails`," + //ImagePath
-			"ADD COLUMN `productImage` VARCHAR(500) AFTER `productImagePath`," + //Image
-			"ADD COLUMN `productImageSourceName` VARCHAR(500) AFTER `productImage`," + //ImageSourceName
-			"ADD COLUMN `productImageSourceLink` VARCHAR(750) AFTER `productImageSourceName`," + //ImageSourceLink
-			"ADD COLUMN `productArticle` INT AFTER `productImageSourceLink`," + //Article
-			"ADD COLUMN `productRecipe` INT AFTER `productArticle`," + //Recipe
-			"ADD COLUMN `productGroupType` INT AFTER `productRecipe`," + //ProductGroupType
-			"ADD COLUMN `productPreText` VARCHAR(250) AFTER `productGroupType`," + //PreText
-			"ADD COLUMN `productPostText` VARCHAR(250) AFTER `productPreText`," + //PostText
-			"ADD COLUMN `productRating` INT(1) AFTER `productPostText`," + //Rating
-			"ADD COLUMN `productSourceName` VARCHAR(1500) AFTER `productRating`," + //SourceName
-			"ADD COLUMN `productSourceLink` VARCHAR(1500) AFTER `productSourceName`," + //SourceLink
-			"ADD COLUMN `productAbout` INT AFTER `productSourceLink`," +
-			"ADD UNIQUE INDEX `productName_UNIQUE` (`productName` ASC);") //About
-
-	}
-}
-
-func InitProductReferences() {
-	conn, _ := connectors.GetDB()
-
-	conn.Query("ALTER TABLE `commonwealthcocktails`.`product`" +
-		"ADD CONSTRAINT product_producttype_id_fk FOREIGN KEY(productType) REFERENCES producttype(idProductType)," +
-		"ADD CONSTRAINT product_productgrouptype_id_fk FOREIGN KEY(productGroupType) REFERENCES grouptype(idGroupType)," +
-		"ADD CONSTRAINT product_productarticle_id_fk FOREIGN KEY(productArticle) REFERENCES post(idPost)," +
-		"ADD CONSTRAINT product_productrecipe_id_fk FOREIGN KEY(productRecipe) REFERENCES recipe(idRecipe)," +
-		"ADD CONSTRAINT product_productabout_id_fk FOREIGN KEY(productAbout) REFERENCES post(idPost);")
-
-	addDerivedProductTables()
-	addGroupProductTables()
-}
-
-func addDerivedProductTables() {
-	conn, _ := connectors.GetDB()
-
-	var temp string
-	if err := conn.QueryRow("SHOW TABLES LIKE 'derivedProduct';").Scan(&temp); err == nil {
-		log.Println("derivedProduct Table Exists")
-	} else if err == sql.ErrNoRows {
-		log.Println("Creating derivedProduct Table")
-		//Drink
-		conn.Exec("CREATE TABLE `commonwealthcocktails`.`derivedProduct` (`idDerivedProduct` INT NOT NULL AUTO_INCREMENT," +
-			" `idBaseProduct` INT NOT NULL," +
-			" `idProduct` INT NOT NULL," +
-			" PRIMARY KEY (`idDerivedProduct`)," +
-			" CONSTRAINT derivedProduct_idBaseProduct_id_fk FOREIGN KEY(idBaseProduct) REFERENCES product(idProduct)," +
-			" CONSTRAINT derivedProduct_idProduct_id_fk FOREIGN KEY(idProduct) REFERENCES product(idProduct));")
-	}
-}
-
-func addGroupProductTables() {
-	conn, _ := connectors.GetDB()
-
-	var temp string
-	if err := conn.QueryRow("SHOW TABLES LIKE 'groupProduct';").Scan(&temp); err == nil {
-		log.Println("groupProduct Table Exists")
-	} else if err == sql.ErrNoRows {
-		log.Println("Creating groupProduct Table")
-		//Drink
-		conn.Exec("CREATE TABLE `commonwealthcocktails`.`groupProduct` (`idGroupProduct` INT NOT NULL AUTO_INCREMENT," +
-			" `idBaseProduct` INT NOT NULL," +
-			" `idProduct` INT NOT NULL," +
-			" PRIMARY KEY (`idGroupProduct`)," +
-			" CONSTRAINT groupProduct_idGroup_id_fk FOREIGN KEY(idGroupProduct) REFERENCES product(idProduct)," +
-			" CONSTRAINT groupProduct_idProduct_id_fk FOREIGN KEY(idProduct) REFERENCES product(idProduct));")
-	}
-}
-
-func ProcessProducts() {
-	for _, product := range Products {
-		log.Println(product.ProductName)
-		ProcessProduct(product)
-	}
-}
 
 func ProcessProduct(product Product) int {
 	conn, _ := connectors.GetDB()
@@ -192,12 +84,6 @@ func UpdateProduct(product Product) int {
 	return ProcessProduct(product)
 }
 
-func ProcessGroupProducts() {
-	for _, productgroup := range ProductGroups {
-		ProcessGroupProduct(productgroup)
-	}
-}
-
 //going to have to update this a bit TCH
 func ProcessGroupProduct(productgroup GroupProduct) {
 	conn, _ := connectors.GetDB()
@@ -237,14 +123,6 @@ func ClearGroupProductByBaseProductID(productID int64) {
 	query := buffer.String()
 	log.Println(query + " " + strconv.Itoa(int(productID)))
 	conn.Exec(query, args...)
-}
-
-func ProcessDerivedProducts() {
-
-	for _, derivedproduct := range DerivedProducts {
-		ProcessDerivedProduct(derivedproduct)
-	}
-
 }
 
 func ProcessDerivedProduct(derivedproduct DerivedProduct) {
@@ -521,6 +399,46 @@ func GetBDGByProduct(product Product) *BaseProductWithBDG {
 //JOIN  commonwealthcocktails.cocktail ON cocktailToProducts.idCocktail=cocktail.idCocktail
 //WHERE cocktail.idCocktail=2;
 //}
+func SelectAllProducts() []Product {
+	var ret []Product
+	conn, _ := connectors.GetDB()
+
+	var buffer bytes.Buffer
+	var canQuery = false
+	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, '')," +
+		" COALESCE(productImage, '') FROM commonwealthcocktails.product;")
+	canQuery = true
+
+	if canQuery {
+		query := buffer.String()
+		query = strings.TrimRight(query, " AND")
+		query = query + ";"
+		log.Println(query)
+		rows, err := conn.Query(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var desc string
+			var pt int
+			var prod Product
+			err := rows.Scan(&prod.ID, &prod.ProductName, &pt, &desc, &prod.ImagePath, &prod.Image)
+			prod.Description = template.HTML(desc)
+			prod.ProductType.ID = pt
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
+			ret = append(ret, prod)
+		}
+		err = rows.Err()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return ret
+}
 
 func SelectProductByID(ID int) Product {
 	var ret Product

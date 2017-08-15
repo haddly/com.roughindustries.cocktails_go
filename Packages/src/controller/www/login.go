@@ -38,10 +38,13 @@ var (
 	//	"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/plus.me"},
 	//Endpoint: google.Endpoint,
 	//}
+	}
 	// Some random string, random for each request
 	// this way could create a memory leak sense I don't clear out the map ever, just a heads up
-	oauthStateString  = make(map[string]bool)
-	}
+	oauthStateString = make(map[string]bool)
+
+	//defaultUser = ??
+	//defaultPassword = ??
 )
 
 // loginHandler
@@ -66,6 +69,15 @@ func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	page.User = user
 	if page.User.Validate() {
+		//this is in case you need to perform DB actions before the DB is setup
+		//otherwise you wouldn't have an users
+		if page.User.Username == defaultUser {
+			if page.User.Password == defaultPassword {
+				SetSession(w, r, page.User.Username)
+				http.Redirect(w, r, "/", 302)
+				return
+			}
+		}
 		usr := model.SelectUserForLogin(user, false)
 		if len(usr.Username) > 0 {
 			SetSession(w, r, usr.Username)

@@ -16,15 +16,6 @@ type User struct {
 	Errors        map[string]string
 }
 
-func GetUser(username string) *User {
-	for _, element := range Users {
-		if element.Username == username {
-			return &element
-		}
-	}
-	return nil
-}
-
 func (user *User) Validate() bool {
 	user.Errors = make(map[string]string)
 
