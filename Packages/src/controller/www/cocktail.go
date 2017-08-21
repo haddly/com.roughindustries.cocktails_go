@@ -1,4 +1,4 @@
-// Package cocktail
+//controller/www/cocktail.go
 package www
 
 import (
@@ -89,7 +89,7 @@ func (cocktail *Cocktail) CocktailModFormHandler(w http.ResponseWriter, r *http.
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
 	log.Println("In Add Cocktail Form handler")
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -142,7 +142,7 @@ func (cocktail *Cocktail) CocktailModHandler(w http.ResponseWriter, r *http.Requ
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
 
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {

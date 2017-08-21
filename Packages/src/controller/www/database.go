@@ -1,4 +1,6 @@
-//www/Database.go
+//controller/www/database.go: Functions and handlers for interacting with the
+//database at the level above the individual tables.  This includes loading
+//the tables and data from sql mysqldump files.
 package www
 
 import (
@@ -6,7 +8,6 @@ import (
 	"bytes"
 	"connectors"
 	"html/template"
-	//"io"
 	"io/ioutil"
 	"log"
 	"model"
@@ -16,13 +17,18 @@ import (
 	"strings"
 )
 
+//Database struct for defining methods to
 type Database struct {
 }
 
-type Status struct {
-	Status template.HTML
+//Init to setup the http handlers
+func (database *Database) Init() {
+	http.HandleFunc("/db_tables", database.DBTablesHandler)
+	http.HandleFunc("/db_data", database.DBDataHandler)
+	http.HandleFunc("/db_test", database.DBTestHandler)
 }
 
+//Handler for loading the sql mysqldump file for db tables
 func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
@@ -35,13 +41,16 @@ func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	// Check for a valid user and that authentication
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		dat, _ := ioutil.ReadFile("sql/ccschemadump.sql")
-
 		requests := strings.Split(string(dat), ";")
 		conn, _ := connectors.GetDB()
+		//disable foreign key contraint sense I don't know the order we add
+		//the tables
 		conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
+		//parse the file and run only the slq commands
 		for _, request := range requests {
 			r, _ := regexp.Compile("(.*/*!.*)")
 			if !r.MatchString(string(request)) {
@@ -65,6 +74,7 @@ func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
+//Handler for loading the sql mysqldump file for db data
 func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
@@ -77,7 +87,7 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")
 		dir, _ := os.Getwd()
@@ -88,7 +98,10 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 
 		buffer.WriteString(dir + "<br><br>")
 		conn, _ := connectors.GetDB()
+		//disable foreign key contraint sense I don't know the order we add
+		//the data
 		conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
+		//parse the file and run only the slq commands
 		for scanner.Scan() {
 			request := scanner.Text()
 			buffer.WriteString(string(request) + ";<br><br>")
@@ -110,6 +123,7 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+//Handler for running db sanity checks
 func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
@@ -122,7 +136,7 @@ func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) 
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Database</b>:<br/>")
 		buffer.WriteString(model.GetCurrentDB() + "<br/>")
@@ -136,10 +150,4 @@ func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) 
 	} else {
 		page.RenderPageTemplate(w, "404")
 	}
-}
-
-func (database *Database) Init() {
-	http.HandleFunc("/db_tables", database.DBTablesHandler)
-	http.HandleFunc("/db_data", database.DBDataHandler)
-	http.HandleFunc("/db_test", database.DBTestHandler)
 }

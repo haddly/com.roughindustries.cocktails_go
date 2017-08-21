@@ -1,4 +1,5 @@
-//connectors/mc_connection.go
+//connectors/mc_connection.go: This is a singleton that provides a way of
+//connecting to the memcache
 package connectors
 
 import (
@@ -6,14 +7,17 @@ import (
 	"log"
 )
 
+//memcache variables
 var mc *memcache.Client = nil
 var mc_server string
 
+//Set the memcache variables for connecting to the memcache server
 func SetMCVars(in_mc_server string) {
 	mc_server = in_mc_server
 	log.Println(mc_server)
 }
 
+//Get a connection to the memcache
 func GetMC() (*memcache.Client, error) {
 	if mc_server != "" {
 		if mc == nil {

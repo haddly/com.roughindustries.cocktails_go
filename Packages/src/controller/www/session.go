@@ -18,8 +18,8 @@ import (
 //automatically creates 2 instances with the basic flex env which if I am trying
 //to share managed sessions over the 2 instances requires remote persistance
 //storage for the sessions.  The idea is to save the managed sessions in a
-//memcache and a database but try to use the memcache for the bulk of the gets
-//for the manages sessions.
+//memcache and/or a database but try to use the memcache for the bulk of the gets
+//for the manages sessions, because of performance.
 
 var store = sessions.NewCookieStore([]byte(randSeq(64)))
 
@@ -158,8 +158,4 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 		}
 		//MEMCACHE SESSION DELETE
 	}
-}
-
-func init() {
-
 }

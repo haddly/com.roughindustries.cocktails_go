@@ -61,7 +61,7 @@ func (product *Product) ProductModFormHandler(w http.ResponseWriter, r *http.Req
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -108,7 +108,7 @@ func (product *Product) ProductModHandler(w http.ResponseWriter, r *http.Request
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {

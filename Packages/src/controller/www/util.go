@@ -1,3 +1,4 @@
+//controller/www/util.go: Utility functions
 package www
 
 import (
@@ -7,8 +8,11 @@ import (
 	"runtime"
 )
 
+//all alpha numeric ascii characters upper and lower case
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
+//Generate a random sequence of length n characters from the alpha numeric
+//ascii characters upper and lower case
 func randSeq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
@@ -17,6 +21,8 @@ func randSeq(n int) string {
 	return string(b)
 }
 
+//Helper function for producing a standard 404 page error when we through an
+//panic
 func Error404(w http.ResponseWriter, rec interface{}) {
 	page := NewPage()
 	pc := make([]uintptr, 10) // at least 1 entry needed
@@ -26,9 +32,4 @@ func Error404(w http.ResponseWriter, rec interface{}) {
 	log.Printf("Recovered %s:%d %s\n", file, line, f.Name())
 	log.Println(rec)
 	page.RenderPageTemplate(w, "404")
-}
-
-func Loader(w http.ResponseWriter) {
-	page := NewPage()
-	page.RenderPageTemplate(w, "loader")
 }

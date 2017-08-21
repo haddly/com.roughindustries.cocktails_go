@@ -1,4 +1,5 @@
-//connectors/db_connection.go
+//connectors/db_connection.go: This is a singleton that provides a pool for
+//connecting to the database
 package connectors
 
 import (
@@ -7,6 +8,7 @@ import (
 	"log"
 )
 
+//Database variables
 var db *sql.DB = nil
 var dbaddr string
 var dbpasswd string
@@ -15,6 +17,7 @@ var proto string
 var port string
 var dbname string
 
+//Set the database variables for connecting to the database
 func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto string, in_port string, in_dbname string) {
 	dbaddr = in_dbaddr
 	dbpasswd = in_dbpasswd
@@ -25,6 +28,7 @@ func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto st
 	log.Println(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?timeout=1m")
 }
 
+//Get a connection to the database
 func GetDB() (*sql.DB, error) {
 	if db == nil {
 		log.Println("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")

@@ -14,6 +14,12 @@ import (
 type Meta struct {
 }
 
+func (meta *Meta) Init() {
+	log.Println("Init in www/meta.go")
+	http.HandleFunc("/metaModForm", meta.MetaModFormHandler)
+	http.HandleFunc("/metaMod", meta.MetaModHandler)
+}
+
 func (meta *Meta) MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
@@ -26,7 +32,7 @@ func (meta *Meta) MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -68,7 +74,7 @@ func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage()
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -150,10 +156,4 @@ func ValidateMeta(meta *model.Meta, m map[string][]string) bool {
 		meta.Blurb = template.HTML(m["metaBlurb"][0])
 	}
 	return len(meta.Errors) == 0
-}
-
-func (meta *Meta) Init() {
-	log.Println("Init in www/meta.go")
-	http.HandleFunc("/metaModForm", meta.MetaModFormHandler)
-	http.HandleFunc("/metaMod", meta.MetaModHandler)
 }

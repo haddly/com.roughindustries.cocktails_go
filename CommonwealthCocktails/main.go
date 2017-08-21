@@ -11,8 +11,6 @@ import (
 	"math/rand"
 	"model"
 	"net/http"
-	//"net/url"
-	//"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -31,6 +29,8 @@ var page = www.NewPage()
 
 var a = alexa.Hello{}
 
+//Initialize the database connection, memcache connection, and all the
+//controllers
 func init() {
 
 	var datasource = model.DSTtoi("DB")
@@ -104,18 +104,9 @@ func init() {
 	log.Println("End Init")
 }
 
-func main() {
-	//log.SetOutput(ioutil.Discard)
-	log.Println("Starting ... \n")
-	//print out the current directory
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(dir)
-
-	// Mandatory root-based resources and redirects for other resources
-	// This is handled in the app.yaml for google cloud platform deployments
+// Mandatory root-based resources and redirects for other resources
+// This used to be handled in the app.yaml for google cloud platform deployments
+func AddMainHandlers() {
 	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./view/webcontent/www/images"))))
 	http.Handle("/font-awesome/", http.StripPrefix("/font-awesome/", http.FileServer(http.Dir("./view/webcontent/www/font-awesome"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./view/webcontent/www/css"))))
@@ -126,8 +117,13 @@ func main() {
 		model.LoadMCWithProductData()
 		model.LoadMCWithMetaData()
 	})
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
+	})
+}
 
-	//Let's Encrypt HTTPS setup, Challenges are based on the number of domains
+//Let's Encrypt HTTPS setup, Challenges are based on the number of domains
+func AddLetsEncrypt() {
 	//Challenge 1
 	//http.HandleFunc("/.well-known/acme-challenge/{Your Let's Encrypt Page Code}", func(w http.ResponseWriter, r *http.Request) {
 	//	fmt.Fprintf(w, "{Your Let's Encrypt Conent Code}")
@@ -136,11 +132,19 @@ func main() {
 	//http.HandleFunc("/.well-known/acme-challenge/{Your Let's Encrypt Page Code}", func(w http.ResponseWriter, r *http.Request) {
 	//	fmt.Fprintf(w, "{Your Let's Encrypt Conent Code}")
 	//})
-	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
-	})
+}
 
-	log.Println("Added Handlers ... Starting Server\n")
+func main() {
+	log.Println("Initializing ... \n")
+	//print out the current directory
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(dir)
+	AddMainHandlers()
+	AddLetsEncrypt()
+	log.Println("Starting Server ... \n")
 	//this starts up the server
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }

@@ -1,4 +1,5 @@
-// Package login
+//controller/www/login.go: Functions and handlers for dealing with logins.  This
+//includes standard page login and OAuth
 package www
 
 import (
@@ -17,15 +18,8 @@ import (
 	"strings"
 )
 
-// cookie handling
-
+//Login struct for defining methods to
 type Login struct {
-}
-
-type FBOauth struct {
-	id    string
-	email string
-	name  string
 }
 
 var (
@@ -47,62 +41,19 @@ var (
 	//defaultPassword = ??
 )
 
-// loginHandler
-func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	name := r.FormValue("name")
-	pass := r.FormValue("password")
-	log.Println(r)
-	user := model.User{
-		Username: name,
-		Password: pass,
-	}
-	page.User = user
-	if page.User.Validate() {
-		//this is in case you need to perform DB actions before the DB is setup
-		//otherwise you wouldn't have an users
-		if page.User.Username == defaultUser {
-			if page.User.Password == defaultPassword {
-				SetSession(w, r, page.User.Username)
-				http.Redirect(w, r, "/", 302)
-				return
-			}
-		}
-		usr := model.SelectUserForLogin(user, false)
-		if len(usr.Username) > 0 {
-			SetSession(w, r, usr.Username)
-			http.Redirect(w, r, "/", 302)
-			return
-		} else {
-			log.Println("Bad username or password: " + name)
-			page.Errors["loginErrors"] = "Bad Username and/or Password!"
-			page.RenderPageTemplate(w, "/loginindex")
-			return
-		}
-	} else {
-		log.Println("Bad username or password: " + name)
-		page.Errors["loginErrors"] = "Invalid Username and/or Password"
-		page.RenderPageTemplate(w, "/loginindex")
-		return
-	}
+//Init to setup the http handlers
+func (login *Login) Init() {
+	log.Println("Init in www/login.go")
+	http.HandleFunc("/loginIndex", login.loginIndexHandler)
+	http.HandleFunc("/login", login.loginHandler)
+	http.HandleFunc("/logout", login.logoutHandler)
+	http.HandleFunc("/GoogleLogin", login.handleGoogleLogin)
+	http.HandleFunc("/GoogleCallback", login.handleGoogleCallback)
+	http.HandleFunc("/FacebookLogin", login.handleFacebookLogin)
+	http.HandleFunc("/FacebookCallback", login.handleFacebookCallback)
 }
 
-// logoutHandler
-func (login *Login) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	ClearSession(w, r)
-	http.Redirect(w, r, "/", 302)
-}
-
+//Login page handler which displays the standard login page.
 func (login *Login) loginIndexHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
@@ -118,6 +69,58 @@ func (login *Login) loginIndexHandler(w http.ResponseWriter, r *http.Request) {
 	page.RenderPageTemplate(w, "loginindex")
 }
 
+//Login page request handler which process the standard login request.  This
+//will after verifying the user and password create a user session
+func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
+	if ValidateLogin(&page.User, r) {
+		//this is in case you need to perform DB actions before the DB is setup
+		//otherwise you wouldn't have an users
+		if page.User.Username == defaultUser {
+			if page.User.Password == defaultPassword {
+				SetSession(w, r, page.User.Username)
+				http.Redirect(w, r, "/", 302)
+				return
+			}
+		}
+		//Confirm the username and password
+		usr := model.SelectUserForLogin(page.User, false)
+		if len(usr.Username) > 0 {
+			SetSession(w, r, usr.Username)
+			http.Redirect(w, r, "/", 302)
+			return
+		} else {
+			log.Println("Bad username or password: " + page.User.Username)
+			page.Errors["loginErrors"] = "Bad Username and/or Password!"
+			page.RenderPageTemplate(w, "/loginindex")
+			return
+		}
+	} else {
+		log.Println("Bad username or password: " + page.User.Username)
+		page.Errors["loginErrors"] = "Invalid Username and/or Password"
+		page.RenderPageTemplate(w, "/loginindex")
+		return
+	}
+
+}
+
+//Logout page request handler which process the standard logout request.  This
+//will close the user's session
+func (login *Login) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	ClearSession(w, r)
+	http.Redirect(w, r, "/", 302)
+}
+
 func (login *Login) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// CATCH ONLY HEADER START
 	defer func() {
@@ -127,9 +130,7 @@ func (login *Login) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	// CATCH ONLY HEADER START
-
 	str := randSeq(64)
-
 	//MEMCACHE OAUTH SET
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -369,15 +370,20 @@ func (login *Login) handleFacebookCallback(w http.ResponseWriter, r *http.Reques
 	http.Redirect(w, r, "/", 302)
 }
 
-// server main method
+//Validates the login form request and populates the user
+//struct
+func ValidateLogin(user *model.User, r *http.Request) bool {
+	user.Errors = make(map[string]string)
 
-func (login *Login) Init() {
-	log.Println("Init in www/login.go")
-	http.HandleFunc("/loginIndex", login.loginIndexHandler)
-	http.HandleFunc("/login", login.loginHandler)
-	http.HandleFunc("/logout", login.logoutHandler)
-	http.HandleFunc("/GoogleLogin", login.handleGoogleLogin)
-	http.HandleFunc("/GoogleCallback", login.handleGoogleCallback)
-	http.HandleFunc("/FacebookLogin", login.handleFacebookLogin)
-	http.HandleFunc("/FacebookCallback", login.handleFacebookCallback)
+	if len(r.FormValue("name")) > 0 {
+		user.Username = r.FormValue("name")
+	} else {
+		user.Errors["Username"] = "Please enter a valid username"
+	}
+	if len(r.FormValue("password")) > 0 {
+		user.Password = r.FormValue("password")
+	} else {
+		user.Errors["Password"] = "Please enter a valid password"
+	}
+	return len(user.Errors) == 0
 }
