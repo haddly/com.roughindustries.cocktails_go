@@ -1,4 +1,5 @@
-//model/meta.connectors.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/meta.db.go:package model
 package model
 
 import (
@@ -15,16 +16,34 @@ import (
 	"strings"
 )
 
-func ProcessMeta(meta Meta) int {
-	conn, _ := connectors.GetDB()
-	var args []interface{}
+//CREATE, UPDATE, DELETE
+//Insert a meta record into the database
+func InsertMeta(meta Meta) int {
+	//set the ID to zero to indicate an insert
+	meta.ID = 0
+	return ProcessMeta(meta)
+}
 
-	var buffer bytes.Buffer
+//Update a meta record in the database based on ID
+func UpdateMeta(meta Meta) int {
+	return ProcessMeta(meta)
+}
+
+//Process an insert or an update
+func ProcessMeta(meta Meta) int {
+	conn, _ := connectors.GetDB() //get db connection
+	var args []interface{}        //arguments for variables in the data struct
+	var buffer bytes.Buffer       //buffer for the query
+
+	//If the ID is zero then do an insert else do an update based on the ID
 	if meta.ID == 0 {
 		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`meta` SET ")
 	} else {
 		buffer.WriteString("UPDATE `commonwealthcocktails`.`meta` SET ")
 	}
+
+	//Append the correct columns to be added based on data available in the
+	//data structure
 	if meta.MetaName != "" {
 		buffer.WriteString("`metaName`=?,")
 		args = append(args, html.EscapeString(meta.MetaName))
@@ -36,6 +55,8 @@ func ProcessMeta(meta Meta) int {
 	metatype := SelectMetaType(meta.MetaType, true, true, true)
 	buffer.WriteString(" `metaType`=?,")
 	args = append(args, strconv.Itoa(metatype[0].ID))
+
+	//Cleanup the query and append where if it is an update
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	if meta.ID == 0 {
@@ -45,6 +66,7 @@ func ProcessMeta(meta Meta) int {
 		args = append(args, meta.ID)
 	}
 
+	//Lets do this thing
 	log.Println(query)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
@@ -52,15 +74,7 @@ func ProcessMeta(meta Meta) int {
 	return ret
 }
 
-func InsertMeta(meta Meta) int {
-	meta.ID = 0
-	return ProcessMeta(meta)
-}
-
-func UpdateMeta(meta Meta) int {
-	return ProcessMeta(meta)
-}
-
+//SELECTS
 func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {
 	var ret []MetaType
 
@@ -260,17 +274,6 @@ func GetMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool)
 
 }
 
-func checkCount(rows *sql.Rows) (count int, err error) {
-	for rows.Next() {
-		err = rows.Scan(&count)
-		if err != nil {
-			log.Fatal(err)
-			return 0, err
-		}
-	}
-	return count, nil
-}
-
 func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 	var ret []Meta
 	var isRoot bool
@@ -315,4 +318,16 @@ func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 		}
 	}
 	return ret, isRoot
+}
+
+//UTILS
+func checkCount(rows *sql.Rows) (count int, err error) {
+	for rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Fatal(err)
+			return 0, err
+		}
+	}
+	return count, nil
 }

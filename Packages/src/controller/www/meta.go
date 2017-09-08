@@ -1,4 +1,5 @@
-//www/meta.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/meta.go:
 package www
 
 import (
@@ -11,16 +12,9 @@ import (
 	"strings"
 )
 
-type Meta struct {
-}
-
-func (meta *Meta) Init() {
-	log.Println("Init in www/meta.go")
-	http.HandleFunc("/metaModForm", meta.MetaModFormHandler)
-	http.HandleFunc("/metaMod", meta.MetaModHandler)
-}
-
-func (meta *Meta) MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
+//Meta Modification Form page handler which displays the Meta Modification
+//Form page.
+func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -61,8 +55,10 @@ func (meta *Meta) MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//handle / requests to the server
-func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
+//Meta modification form page request handler which process the meta
+//modification request.  This will after verifying a valid user session,
+//modify the meta data based on the request.
+func MetaModHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -75,60 +71,58 @@ func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
 	page.Username, page.Authenticated = GetSession(r)
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
-		u, err := url.Parse(r.URL.String())
-		log.Println(u)
-		if err != nil {
-			page.RenderPageTemplate(w, "404")
-			return
-		}
-		m, err := url.ParseQuery(u.RawQuery)
-		if err != nil {
-			page.RenderPageTemplate(w, "404")
-			return
-		}
-		log.Println(m)
-
-		if ValidateMeta(&page.Meta, m) {
-			if m["button"][0] == "add" {
+		//Get the generic data that all meta mod pages need
+		var mbt model.MetasByTypes
+		mbt = model.GetMetaByTypes(false, true, false)
+		page.MetasByTypes = mbt
+		//Validate the form input and populate the meta data
+		if ValidateMeta(&page.Meta, r) {
+			//did we get an add, update, or something else request
+			if r.Form["button"][0] == "add" {
 				ret_id := model.InsertMeta(page.Meta)
-				var mbt model.MetasByTypes
 				model.LoadMCWithMetaData()
-				mbt = model.GetMetaByTypes(false, true, false)
-				page.MetasByTypes = mbt
 				page.Meta.ID = ret_id
 				outMeta := model.SelectMeta(page.Meta)
 				page.Meta = outMeta[0]
 				page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "metamodform")
 				return
-			} else if m["button"][0] == "update" {
+			} else if r.Form["button"][0] == "update" {
 				rows_updated := model.UpdateMeta(page.Meta)
-				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
-				var mbt model.MetasByTypes
 				model.LoadMCWithMetaData()
-				mbt = model.GetMetaByTypes(false, true, false)
-				page.MetasByTypes = mbt
+				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
 				outMeta := model.SelectMeta(page.Meta)
 				page.Meta = outMeta[0]
 				page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "metamodform")
 				return
+			} else if len(r.Form["ID"]) != 0 {
+				id, _ := strconv.Atoi(r.Form["ID"][0])
+				var in model.Meta
+				in.ID = id
+				out := model.SelectMeta(in)
+				page.Meta = out[0]
+				page.RenderPageTemplate(w, "metamodform")
 			} else {
-				var mbt model.MetasByTypes
-				mbt = model.GetMetaByTypes(false, true, false)
-				page.MetasByTypes = mbt
-				outMeta := model.SelectMeta(page.Meta)
-				page.Meta = outMeta[0]
+				//we only allow add and update right now
 				page.Messages["metaModifyFail"] = "Metadata modification failed.  You tried to perform an unknown operation!"
 				page.RenderPageTemplate(w, "metamodform")
 				return
 			}
 		} else {
-			var mbt model.MetasByTypes
-			mbt = model.GetMetaByTypes(false, true, false)
-			page.MetasByTypes = mbt
+			//Validation failed
 			log.Println("Bad meta!")
-			page.RenderPageTemplate(w, "/metamodform")
+			if len(r.Form["ID"]) == 0 {
+				//apply the template page info to the index page
+				page.RenderPageTemplate(w, "metamodform")
+			} else {
+				id, _ := strconv.Atoi(r.Form["ID"][0])
+				var in model.Meta
+				in.ID = id
+				out := model.SelectMeta(in)
+				page.Meta = out[0]
+				page.RenderPageTemplate(w, "metamodform")
+			}
 			return
 		}
 	} else {
@@ -137,23 +131,27 @@ func (meta *Meta) MetaModHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ValidateMeta(meta *model.Meta, m map[string][]string) bool {
+//Parses the form and then validates the meta form request and
+//populates the Meta struct
+func ValidateMeta(meta *model.Meta, r *http.Request) bool {
 	meta.Errors = make(map[string]string)
-	if len(m["metaID"]) > 0 {
-		meta.ID, _ = strconv.Atoi(m["metaID"][0])
+	r.ParseForm() // Required if you don't call r.FormValue()
+
+	if len(r.Form["metaID"]) > 0 {
+		meta.ID, _ = strconv.Atoi(r.Form["metaID"][0])
 	}
-	if len(m["metaName"]) > 0 && strings.TrimSpace(m["metaName"][0]) != "" {
-		meta.MetaName = m["metaName"][0]
+	if len(r.Form["metaName"]) > 0 && strings.TrimSpace(r.Form["metaName"][0]) != "" {
+		meta.MetaName = r.Form["metaName"][0]
 	} else {
 		meta.Errors["MetaName"] = "Please enter a valid meta name"
 	}
-	if len(m["metaType"]) > 0 {
-		meta.MetaType.ID, _ = strconv.Atoi(m["metaType"][0])
+	if len(r.Form["metaType"]) > 0 {
+		meta.MetaType.ID, _ = strconv.Atoi(r.Form["metaType"][0])
 	} else {
 		meta.Errors["MetaType"] = "Please select a valid meta type"
 	}
-	if len(m["metaBlurb"]) > 0 {
-		meta.Blurb = template.HTML(m["metaBlurb"][0])
+	if len(r.Form["metaBlurb"]) > 0 {
+		meta.Blurb = template.HTML(r.Form["metaBlurb"][0])
 	}
 	return len(meta.Errors) == 0
 }

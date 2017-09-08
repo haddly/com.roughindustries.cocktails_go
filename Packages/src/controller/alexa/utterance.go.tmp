@@ -1,0 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/alexa/utterance.go: Functions and handlers for dealing with 
+//utterances.  This is the container for the utterances that we serve over https.
+//The utterance struct represents all that can be sent to the templates.  

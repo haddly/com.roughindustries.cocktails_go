@@ -1,3 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 //controller/www/database.go: Functions and handlers for interacting with the
 //database at the level above the individual tables.  This includes loading
 //the tables and data from sql mysqldump files.
@@ -17,19 +18,8 @@ import (
 	"strings"
 )
 
-//Database struct for defining methods to
-type Database struct {
-}
-
-//Init to setup the http handlers
-func (database *Database) Init() {
-	http.HandleFunc("/db_tables", database.DBTablesHandler)
-	http.HandleFunc("/db_data", database.DBDataHandler)
-	http.HandleFunc("/db_test", database.DBTestHandler)
-}
-
 //Handler for loading the sql mysqldump file for db tables
-func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request) {
+func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -75,7 +65,7 @@ func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request
 }
 
 //Handler for loading the sql mysqldump file for db data
-func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) {
+func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -124,7 +114,7 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 //Handler for running db sanity checks
-func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) {
+func DBTestHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {

@@ -1,4 +1,5 @@
-//main/main
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//CommonwealthCocktails/main.go:
 package main
 
 import (
@@ -15,19 +16,6 @@ import (
 	"path/filepath"
 	"time"
 )
-
-//The controllers
-var d = www.Database{}
-var mem = www.Memcache{}
-var c = www.Cocktail{}
-var p = www.Product{}
-var m = www.Meta{}
-var s = www.Search{}
-var l = www.Login{}
-var post = www.Post{}
-var page = www.NewPage()
-
-var a = alexa.Hello{}
 
 //Initialize the database connection, memcache connection, and all the
 //controllers
@@ -91,35 +79,10 @@ func init() {
 	flag.Parse()
 	// wanted it to be more random so i seed it time now
 	rand.Seed(time.Now().UnixNano())
-	d.Init()
-	mem.Init()
-	c.Init()
-	p.Init()
-	m.Init()
-	s.Init()
-	a.Init()
-	post.Init()
-	l.Init()
-	page.Init()
+	// init the routing
+	www.WWWRouterInit()
+	alexa.AlexaRouterInit()
 	log.Println("End Init")
-}
-
-// Mandatory root-based resources and redirects for other resources
-// This used to be handled in the app.yaml for google cloud platform deployments
-func AddMainHandlers() {
-	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./view/webcontent/www/images"))))
-	http.Handle("/font-awesome/", http.StripPrefix("/font-awesome/", http.FileServer(http.Dir("./view/webcontent/www/font-awesome"))))
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./view/webcontent/www/css"))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./view/webcontent/www/js"))))
-	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./view/webcontent/www/fonts"))))
-	http.Handle("/slick/", http.StripPrefix("/slick/", http.FileServer(http.Dir("./view/webcontent/www/libs/slick"))))
-	http.HandleFunc("/memcache", func(w http.ResponseWriter, r *http.Request) {
-		model.LoadMCWithProductData()
-		model.LoadMCWithMetaData()
-	})
-	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
-	})
 }
 
 //Let's Encrypt HTTPS setup, Challenges are based on the number of domains
@@ -142,7 +105,6 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println(dir)
-	AddMainHandlers()
 	AddLetsEncrypt()
 	log.Println("Starting Server ... \n")
 	//this starts up the server

@@ -1,10 +1,12 @@
-//controller/www/cocktail.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/cocktail.go: Functions and handlers for dealing with cocktails.
+//TODO: migrate cocktail by meta or product id to a single function that
+//is passed a meta or a product id parameter
 package www
 
 import (
 	"html/template"
 	"log"
-	"math"
 	"model"
 	"net/http"
 	"net/url"
@@ -14,12 +16,8 @@ import (
 	"strings"
 )
 
-// Cocktail
-type Cocktail struct {
-}
-
-// CocktailHandler
-func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktail page handler which displays the standard cocktail page.
+func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -53,8 +51,9 @@ func (cocktail *Cocktail) CocktailHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// CocktailsHandler
-func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktails page (i.e. all the cocktails) request handler which
+//displays the all the cocktails page.
+func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -75,8 +74,9 @@ func (cocktail *Cocktail) CocktailsHandler(w http.ResponseWriter, r *http.Reques
 	page.RenderPageTemplate(w, "cocktails")
 }
 
-// CocktailAddFormHandler
-func (cocktail *Cocktail) CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktail Modification Form page handler which displays the Cocktail Modification
+//Form page.
+func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -128,8 +128,10 @@ func (cocktail *Cocktail) CocktailModFormHandler(w http.ResponseWriter, r *http.
 	}
 }
 
-// CocktailAddHandler
-func (cocktail *Cocktail) CocktailModHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktail modification form page request handler which process the cocktail
+//modification request.  This will after verifying a valid user session,
+//modify the cocktail data based on the request.
+func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -201,8 +203,9 @@ func (cocktail *Cocktail) CocktailModHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-// CocktailsIndexHandler
-func (cocktail *Cocktail) CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktails Index page i.e. page that gets you to cocktails via header links,
+//metas, etc
+func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -221,8 +224,9 @@ func (cocktail *Cocktail) CocktailsIndexHandler(w http.ResponseWriter, r *http.R
 	page.RenderPageTemplate(w, "cocktailsindex")
 }
 
-// CocktailsByMetaIDHandler
-func (cocktail *Cocktail) CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktails by meta id page handler that shows all the cocktails that are
+//related to the meta id provided
+func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -260,8 +264,9 @@ func (cocktail *Cocktail) CocktailsByMetaIDHandler(w http.ResponseWriter, r *htt
 	}
 }
 
-// CocktailsByProductIDHandler
-func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
+//Cocktails by product id page handler that shows all the cocktails that are
+//related to the product id provided
+func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -300,42 +305,8 @@ func (cocktail *Cocktail) CocktailsByProductIDHandler(w http.ResponseWriter, r *
 	}
 }
 
-// CocktailSearchHandler
-func (cocktail *Cocktail) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	//apply the template page info to the index page
-	page.RenderPageTemplate(w, "search")
-}
-
-// CocktailLandingHandler
-func (cocktail *Cocktail) CocktailLandingHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	var cs model.CocktailSet
-	page.CocktailSet = cs
-	//apply the template page info to the index page
-	page.RenderPageTemplate(w, "index")
-}
-
+//Validates the cocktail form request and populates the Cocktail
+//struct
 func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 	cocktail.Errors = make(map[string]string)
 
@@ -573,48 +544,4 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 		}
 	}
 	return len(cocktail.Errors) == 0
-}
-
-func FloatToVulgar(val float64) string {
-	realPart := val
-	integerPart := math.Floor(realPart)
-	decimalPart := realPart - integerPart
-	var intStringPart string
-	if int(integerPart) == 0 {
-		intStringPart = ""
-	} else {
-		intStringPart = strconv.Itoa(int(integerPart))
-	}
-	if decimalPart == 0.0 {
-		return intStringPart
-	} else if decimalPart <= 0.125 {
-		return intStringPart + "⅛"
-	} else if decimalPart <= 0.25 {
-		return intStringPart + "¼"
-	} else if decimalPart <= 0.375 {
-		return intStringPart + "⅜"
-	} else if decimalPart <= .5 {
-		return intStringPart + "½"
-	} else if decimalPart <= .625 {
-		return intStringPart + "⅝"
-	} else if decimalPart <= .75 {
-		return intStringPart + "¾"
-	} else if decimalPart <= .875 {
-		return intStringPart + "⅞"
-	}
-	return strconv.Itoa(int(math.Ceil(realPart)))
-}
-
-// Init
-func (cocktail *Cocktail) Init() {
-	//Web Service and Web Page Handlers
-	log.Println("Init in www/Cocktail.go")
-	http.HandleFunc("/", cocktail.CocktailLandingHandler)
-	http.HandleFunc("/cocktail", cocktail.CocktailHandler)
-	http.HandleFunc("/cocktails", cocktail.CocktailsHandler)
-	http.HandleFunc("/cocktailsindex", cocktail.CocktailsIndexHandler)
-	http.HandleFunc("/cocktailsByMetaID", cocktail.CocktailsByMetaIDHandler)
-	http.HandleFunc("/cocktailsByProductID", cocktail.CocktailsByProductIDHandler)
-	http.HandleFunc("/cocktailModForm", cocktail.CocktailModFormHandler)
-	http.HandleFunc("/cocktailMod", cocktail.CocktailModHandler)
 }

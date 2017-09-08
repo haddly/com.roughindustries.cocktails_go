@@ -1,3 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 //controller/www/login.go: Functions and handlers for dealing with logins.  This
 //includes standard page login and OAuth
 package www
@@ -18,12 +19,10 @@ import (
 	"strings"
 )
 
-//Login struct for defining methods to
-type Login struct {
-}
-
+//Variables for use within the login package
 var (
 	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
+	//Google OAuth variables
 	//googleOauthConfig = &oauth2.Config{
 	//RedirectURL:  ??,
 	//ClientID:     ??,
@@ -32,29 +31,27 @@ var (
 	//	"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/plus.me"},
 	//Endpoint: google.Endpoint,
 	//}
+	//Facebook OAuth variables
+	//facebookOauthConfig = &oauth2.Config{
+	//ClientID: ??,
+	//ClientSecret: ??,
+	//RedirectURL: ??,
+	//Scopes:   []string{"public_profile", "email"},
+	//Endpoint: facebook.Endpoint,
+	//}
 	}
 	// Some random string, random for each request
 	// this way could create a memory leak sense I don't clear out the map ever, just a heads up
 	oauthStateString = make(map[string]bool)
 
+	//Default user is the user you can get into the system with at all times
+	//allowDefault = ??
 	//defaultUser = ??
 	//defaultPassword = ??
 )
 
-//Init to setup the http handlers
-func (login *Login) Init() {
-	log.Println("Init in www/login.go")
-	http.HandleFunc("/loginIndex", login.loginIndexHandler)
-	http.HandleFunc("/login", login.loginHandler)
-	http.HandleFunc("/logout", login.logoutHandler)
-	http.HandleFunc("/GoogleLogin", login.handleGoogleLogin)
-	http.HandleFunc("/GoogleCallback", login.handleGoogleCallback)
-	http.HandleFunc("/FacebookLogin", login.handleFacebookLogin)
-	http.HandleFunc("/FacebookCallback", login.handleFacebookCallback)
-}
-
 //Login page handler which displays the standard login page.
-func (login *Login) loginIndexHandler(w http.ResponseWriter, r *http.Request) {
+func loginIndexHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -71,7 +68,7 @@ func (login *Login) loginIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 //Login page request handler which process the standard login request.  This
 //will after verifying the user and password create a user session
-func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
+func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -86,7 +83,7 @@ func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if ValidateLogin(&page.User, r) {
 		//this is in case you need to perform DB actions before the DB is setup
 		//otherwise you wouldn't have an users
-		if page.User.Username == defaultUser {
+		if allowDefault && page.User.Username == defaultUser {
 			if page.User.Password == defaultPassword {
 				SetSession(w, r, page.User.Username)
 				http.Redirect(w, r, "/", 302)
@@ -116,12 +113,13 @@ func (login *Login) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 //Logout page request handler which process the standard logout request.  This
 //will close the user's session
-func (login *Login) logoutHandler(w http.ResponseWriter, r *http.Request) {
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	ClearSession(w, r)
 	http.Redirect(w, r, "/", 302)
 }
 
-func (login *Login) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+//Initial request from the website that then submits the request to google
+func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// CATCH ONLY HEADER START
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -163,7 +161,8 @@ func (login *Login) handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func (login *Login) handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+//Handler for the response to the Google OAuth request from handleGoogleLogin
+func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// CATCH ONLY HEADER START
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -244,7 +243,8 @@ func (login *Login) handleGoogleCallback(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/", 302)
 }
 
-func (login *Login) handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
+//Initial request from the website that then submits the request to facebook
+func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 	// CATCH ONLY HEADER START
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -288,7 +288,8 @@ func (login *Login) handleFacebookLogin(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func (login *Login) handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
+//Handler for the response to the Facebook OAuth request from handleFacebookLogin
+func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	// CATCH ONLY HEADER START
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -370,18 +371,19 @@ func (login *Login) handleFacebookCallback(w http.ResponseWriter, r *http.Reques
 	http.Redirect(w, r, "/", 302)
 }
 
-//Validates the login form request and populates the user
-//struct
+//Parses the form and then validates the login form request
+//and populates the user struct
 func ValidateLogin(user *model.User, r *http.Request) bool {
 	user.Errors = make(map[string]string)
+	r.ParseForm() // Required if you don't call r.FormValue()
 
-	if len(r.FormValue("name")) > 0 {
-		user.Username = r.FormValue("name")
+	if len(r.Form["name"]) > 0 {
+		user.Username = r.Form["name"][0]
 	} else {
 		user.Errors["Username"] = "Please enter a valid username"
 	}
-	if len(r.FormValue("password")) > 0 {
-		user.Password = r.FormValue("password")
+	if len(r.Form["password"]) > 0 {
+		user.Password = r.Form["password"][0]
 	} else {
 		user.Errors["Password"] = "Please enter a valid password"
 	}

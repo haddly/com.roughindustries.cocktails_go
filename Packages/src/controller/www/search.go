@@ -1,16 +1,14 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/search.go: Functions and handlers for dealing with searching.
 package www
 
 import (
-	"log"
 	"model"
 	"net/http"
 )
 
-type Search struct {
-}
-
-//handle / requests to the server
-func (cocktail *Search) CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
+//Search page handler which displays the standard search page.
+func CocktailSearchHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -26,10 +24,4 @@ func (cocktail *Search) CocktailSearchHandler(w http.ResponseWriter, r *http.Req
 
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, "search")
-}
-
-func (cocktail *Search) Init() {
-	log.Println("Init in www/search.go")
-	http.HandleFunc("/search", cocktail.CocktailSearchHandler)
-
 }

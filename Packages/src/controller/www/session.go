@@ -1,4 +1,14 @@
-// Package session
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/session.go: Because I am using Google Cloud Platform
+//and Golang I need this to be scalable which requires persistance
+//outside of the httpd golang instance running.  If I just used
+//a single instance this wouldn't be an issue sense I could use local
+//memory.  With multiple instances this is not possible. GCP
+//automatically creates 2 instances with the basic flex env which if I am trying
+//to share managed sessions over the 2 instances requires remote persistance
+//storage for the sessions.  The idea is to save the managed sessions in a
+//memcache and/or a database but try to use the memcache for the bulk of the gets
+//for the manages sessions, because of performance.
 package www
 
 import (
@@ -11,20 +21,15 @@ import (
 	"net/http"
 )
 
-//Because I am using Google Cloud Platform and Golang I need this to be scalable
-//which requires persistance outside of the httpd golang instance running.  If
-//I just used a single instance this wouldn't be an issue sense I could use
-//local memory.  With multiple instances this is not possible. GCP
-//automatically creates 2 instances with the basic flex env which if I am trying
-//to share managed sessions over the 2 instances requires remote persistance
-//storage for the sessions.  The idea is to save the managed sessions in a
-//memcache and/or a database but try to use the memcache for the bulk of the gets
-//for the manages sessions, because of performance.
-
+//the sessions are stored here in coockies
 var store = sessions.NewCookieStore([]byte(randSeq(64)))
 
+//memcache session mapping
 var managed_sessions = make(map[string]string)
 
+//get the session from the cookies and cross reference it with the
+//memcache
+//TODO: setup database session mapping store
 func GetSession(r *http.Request) (string, bool) {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
@@ -33,7 +38,7 @@ func GetSession(r *http.Request) (string, bool) {
 	}
 	// Retrieve our struct and type-assert it
 	if session_id, ok := session.Values["session_id"].(string); !ok {
-		log.Println("Bad Session ID")
+		log.Println("No Session ID")
 		return "", false
 	} else {
 		log.Println("Good Session ID")
@@ -72,6 +77,9 @@ func GetSession(r *http.Request) (string, bool) {
 	return "", false
 }
 
+//set the session for the cookies and cross reference it to the
+//memcache
+//TODO: setup database session mapping store
 func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
@@ -118,6 +126,8 @@ func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 	return session_id
 }
 
+//clear the session for the cookies and the memcache
+//TODO: setup database session mapping store
 func ClearSession(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {

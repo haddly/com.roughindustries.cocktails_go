@@ -5,6 +5,30 @@ import (
 	"html/template"
 )
 
+//DATA STRUCTURES
+type Product struct {
+	ID               int
+	ProductName      string
+	ProductType      ProductType
+	Description      template.HTML
+	Details          template.HTML
+	ImagePath        string
+	Image            string
+	ImageSourceName  string
+	ImageSourceLink  string
+	Article          Post
+	Recipe           Recipe
+	ProductGroupType GroupType
+	PreText          string
+	PostText         string
+	Drink            []Meta
+	Rating           int
+	SourceName       string
+	SourceLink       string
+	About            Post
+	Errors           map[string]string
+}
+
 type ProductType struct {
 	ID                      int
 	IsIngredient            bool
@@ -12,6 +36,33 @@ type ProductType struct {
 	ProductTypeNameNoSpaces string
 }
 
+type DerivedProduct struct {
+	Product     Product
+	BaseProduct Product
+}
+
+type GroupProduct struct {
+	Products     []Product
+	GroupProduct Product
+}
+
+type BaseProductWithBDG struct {
+	Product         Product
+	DerivedProducts []Product
+	GroupProducts   []Product
+	BaseProduct     Product
+}
+
+type ProductsByTypes struct {
+	PBT []ProductsByType
+}
+
+type ProductsByType struct {
+	ProductType ProductType
+	Products    []Product
+}
+
+//ENUMERATIONS - These must match the database one for one in both ID and order
 type ProductTypeConst int
 
 const (
@@ -48,55 +99,4 @@ func ProductTypeStringToInt(a string) int {
 		i++
 	}
 	return 0
-}
-
-type Product struct {
-	ID               int
-	ProductName      string
-	ProductType      ProductType
-	Description      template.HTML
-	Details          template.HTML
-	ImagePath        string
-	Image            string
-	ImageSourceName  string
-	ImageSourceLink  string
-	Article          Post
-	Recipe           Recipe
-	ProductGroupType GroupType
-	PreText          string
-	PostText         string
-	Drink            []Meta
-	Rating           int
-	SourceName       string
-	SourceLink       string
-	About            Post
-	Errors           map[string]string
-	//Advertiser Info
-	//Advertisement Advertisement
-}
-
-type DerivedProduct struct {
-	Product     Product
-	BaseProduct Product
-}
-
-type GroupProduct struct {
-	Products     []Product
-	GroupProduct Product
-}
-
-type BaseProductWithBDG struct {
-	Product         Product
-	DerivedProducts []Product
-	GroupProducts   []Product
-	BaseProduct     Product
-}
-
-type ProductsByTypes struct {
-	PBT []ProductsByType
-}
-
-type ProductsByType struct {
-	ProductType ProductType
-	Products    []Product
 }

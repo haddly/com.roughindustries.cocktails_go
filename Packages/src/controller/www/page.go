@@ -1,3 +1,9 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/page.go: Functions and handlers for dealing with pages.  This
+//is the container for the pages that we serve over http.  The page struct
+//represents all that can be sent to the templates.  I put in a gereric
+//load page here that just does a processing wheel until the page is loaded.
+//
 package www
 
 import (
@@ -8,57 +14,8 @@ import (
 	"strings"
 )
 
-func (page *page) RenderPageTemplate(w http.ResponseWriter, tmpl string) {
-	// CATCH ONLY HEADER START
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	// CATCH ONLY HEADER START
-	t, err := parseTempFiles(tmpl)
-	if err != nil {
-		Error404(w, err)
-		page.RenderPageTemplate(w, "404")
-		return
-	}
-	err = t.ExecuteTemplate(w, "base", page)
-	if err != nil {
-		Error404(w, err)
-		return
-	}
-}
-
-func parseTempFiles(tmpl string) (*template.Template, error) {
-	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
-	return t, e
-}
-
-func Load(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	//page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	log.Println("Loader")
-	log.Println(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
-	log.Println(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
-	redirect := strings.Replace(r.URL.EscapedPath(), "/load/", "", 1)
-	if redirect == "" {
-		page.Redirect = "index"
-	} else {
-		page.Redirect = redirect + "?" + r.URL.RawQuery
-	}
-	page.RenderPageTemplate(w, "loader")
-}
-
+//the page struct is all the things a template could display or use when it
+//generates a page
 type page struct {
 	Username             string
 	Redirect             string
@@ -85,16 +42,86 @@ type page struct {
 	Messages             map[string]template.HTML
 }
 
+//the page template renderer.  This should be the basic method for displaying
+//all pages.
+func (page *page) RenderPageTemplate(w http.ResponseWriter, tmpl string) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	// CATCH ONLY HEADER START
+	t, err := parseTempFiles(tmpl)
+	if err != nil {
+		Error404(w, err)
+		page.RenderPageTemplate(w, "404")
+		return
+	}
+	err = t.ExecuteTemplate(w, "base", page)
+	if err != nil {
+		Error404(w, err)
+		return
+	}
+}
+
+//The parse template files includes not only the page that is being requested
+//but also the header, footer, google analytics, and navigation for
+//provide a complete page
+func parseTempFiles(tmpl string) (*template.Template, error) {
+	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
+	return t, e
+}
+
+// The main index page handler
+func LandingHandler(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
+	//apply the template page info to the index page
+	page.RenderPageTemplate(w, "index")
+}
+
+//The load page does a processing wheel until the actual page is loaded. It
+//works as a redirect basically with the wheel showing till the redirected page
+//is ready
+func Load(w http.ResponseWriter, r *http.Request) {
+	// STANDARD HANDLER HEADER START
+	// catch all errors and return 404
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	page := NewPage()
+	//page.Username, page.Authenticated = GetSession(r)
+	// STANDARD HANLDER HEADER END
+	log.Println("Loader")
+	log.Println(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
+	log.Println(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
+	redirect := strings.Replace(r.URL.EscapedPath(), "/load/", "", 1)
+	if redirect == "" {
+		page.Redirect = "index"
+	} else {
+		page.Redirect = redirect + "?" + r.URL.RawQuery
+	}
+	page.RenderPageTemplate(w, "loader")
+}
+
+//An initialization function that provides an initialized page object
 func NewPage() page {
 	var p page
 	p.Messages = make(map[string]template.HTML)
 	p.Errors = make(map[string]string)
 	return p
-}
-
-// Init
-func (page *page) Init() {
-	//Web Service and Web Page Handlers
-	log.Println("Init in www/page.go")
-	http.HandleFunc("/load/", Load)
 }

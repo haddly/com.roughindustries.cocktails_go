@@ -1,3 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 //controller/www/memcache.go: Functions and handlers for interacting with the
 //memcache at a high level.  This includes delteing and loading large sets
 //of data from the database.
@@ -10,18 +11,8 @@ import (
 	"net/http"
 )
 
-//Memcache struct for defining methods to
-type Memcache struct {
-}
-
-//Init to setup the http handlers
-func (memcache *Memcache) Init() {
-	http.HandleFunc("/mc_delete", memcache.MCDeleteHandler)
-	http.HandleFunc("/mc_load", memcache.MCAddHandler)
-}
-
 //delete all the memcache entries
-func (memcache *Memcache) MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
+func MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
@@ -46,7 +37,7 @@ func (memcache *Memcache) MCDeleteHandler(w http.ResponseWriter, r *http.Request
 }
 
 //load all the memcache entries from the database
-func (memcache *Memcache) MCAddHandler(w http.ResponseWriter, r *http.Request) {
+func MCAddHandler(w http.ResponseWriter, r *http.Request) {
 	// STANDARD HANDLER HEADER START
 	// catch all errors and return 404
 	defer func() {
