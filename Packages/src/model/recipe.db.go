@@ -336,7 +336,7 @@ func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product 
 	if includeBDG {
 		prod := SelectProduct(rs.OriginalIngredient)
 		if len(prod) > 0 {
-			bdg := GetBDGByProduct(prod[0])
+			bdg := SelectBDGByProduct(prod[0])
 			if bdg.BaseProduct.ID != 0 {
 				ret = append(ret, bdg.BaseProduct)
 			}

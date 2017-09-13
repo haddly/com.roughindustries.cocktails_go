@@ -18,17 +18,7 @@ import (
 
 //Cocktail page handler which displays the standard cocktail page.
 func CocktailHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -54,17 +44,7 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails page (i.e. all the cocktails) request handler which
 //displays the all the cocktails page.
 func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	var c []model.Cocktail
 	c = model.SelectAllCocktails(false)
@@ -77,17 +57,7 @@ func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktail Modification Form page handler which displays the Cocktail Modification
 //Form page.
 func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	log.Println("In Add Cocktail Form handler")
 	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
@@ -104,13 +74,13 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 		page.CocktailsByAlphaNums = cba
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
-		mbt = model.GetMetaByTypes(false, true, false)
+		mbt = model.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
-		ingredients = model.GetProductsByTypes(true, false, false)
+		ingredients = model.SelectProductsByTypes(true, false, false)
 		page.Ingredients = ingredients
 		var nonIngredients model.ProductsByTypes
-		nonIngredients = model.GetProductsByTypes(false, true, false)
+		nonIngredients = model.SelectProductsByTypes(false, true, false)
 		page.NonIngredients = nonIngredients
 		if len(m["ID"]) == 0 {
 			//apply the template page info to the index page
@@ -132,18 +102,7 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 //modification request.  This will after verifying a valid user session,
 //modify the cocktail data based on the request.
 func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
-
 	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
@@ -162,13 +121,13 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 		page.CocktailsByAlphaNums = cba
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
-		mbt = model.GetMetaByTypes(false, true, false)
+		mbt = model.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
-		ingredients = model.GetProductsByTypes(true, false, false)
+		ingredients = model.SelectProductsByTypes(true, false, false)
 		page.Ingredients = ingredients
 		var nonIngredients model.ProductsByTypes
-		nonIngredients = model.GetProductsByTypes(false, true, false)
+		nonIngredients = model.SelectProductsByTypes(false, true, false)
 		page.NonIngredients = nonIngredients
 		if ValidateCocktail(&page.Cocktail, m) {
 			if m["button"][0] == "add" {
@@ -206,19 +165,9 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails Index page i.e. page that gets you to cocktails via header links,
 //metas, etc
 func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	var m model.MetasByTypes
-	m = model.GetMetaByTypes(true, true, false)
+	m = model.SelectMetaByTypes(true, true, false)
 	page.MetasByTypes = m
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, "cocktailsindex")
@@ -227,17 +176,7 @@ func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails by meta id page handler that shows all the cocktails that are
 //related to the meta id provided
 func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -267,17 +206,7 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails by product id page handler that shows all the cocktails that are
 //related to the product id provided
 func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {

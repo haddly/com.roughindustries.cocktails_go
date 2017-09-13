@@ -1,4 +1,5 @@
-//model/product.connectors.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/product.db.go:package model
 package model
 
 import (
@@ -13,7 +14,20 @@ import (
 	"strings"
 )
 
-func ProcessProduct(product Product) int {
+//CREATE, UPDATE, DELETE
+//Insert a product record into the database
+func InsertProduct(product Product) int {
+	product.ID = 0
+	return processProduct(product)
+}
+
+//
+func UpdateProduct(product Product) int {
+	return processProduct(product)
+}
+
+//
+func processProduct(product Product) int {
 	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
 	if product.ID == 0 {
@@ -75,17 +89,20 @@ func ProcessProduct(product Product) int {
 	return ret
 }
 
-func InsertProduct(product Product) int {
-	product.ID = 0
-	return ProcessProduct(product)
+//
+func InsertGroupProduct(productgroup GroupProduct) {
+	processGroupProduct(productgroup)
 }
 
-func UpdateProduct(product Product) int {
-	return ProcessProduct(product)
+//
+func UpdateGroupProduct(productgroup GroupProduct) {
+	//clear out the old group for this id
+	clearGroupProductByBaseProductID(int64(productgroup.GroupProduct.ID))
+	processGroupProduct(productgroup)
 }
 
-//going to have to update this a bit TCH
-func ProcessGroupProduct(productgroup GroupProduct) {
+//
+func processGroupProduct(productgroup GroupProduct) {
 	conn, _ := connectors.GetDB()
 
 	//TODO: handle updates which requier deletion of old relationships
@@ -102,17 +119,8 @@ func ProcessGroupProduct(productgroup GroupProduct) {
 	}
 }
 
-func InsertGroupProduct(productgroup GroupProduct) {
-	ProcessGroupProduct(productgroup)
-}
-
-func UpdateGroupProduct(productgroup GroupProduct) {
-	//clear out the old group for this id
-	ClearGroupProductByBaseProductID(int64(productgroup.GroupProduct.ID))
-	ProcessGroupProduct(productgroup)
-}
-
-func ClearGroupProductByBaseProductID(productID int64) {
+//
+func clearGroupProductByBaseProductID(productID int64) {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
@@ -125,7 +133,20 @@ func ClearGroupProductByBaseProductID(productID int64) {
 	conn.Exec(query, args...)
 }
 
-func ProcessDerivedProduct(derivedproduct DerivedProduct) {
+//
+func InsertDerivedProduct(derivedproduct DerivedProduct) {
+	processDerivedProduct(derivedproduct)
+}
+
+//
+func UpdateDerivedProduct(derivedproduct DerivedProduct) {
+	//clear out the old group for this id
+	clearDerivedProductByProductID(int64(derivedproduct.Product.ID))
+	processDerivedProduct(derivedproduct)
+}
+
+//
+func processDerivedProduct(derivedproduct DerivedProduct) {
 	conn, _ := connectors.GetDB()
 
 	//TODO: handle updates which requier deletion of old relationships
@@ -138,17 +159,8 @@ func ProcessDerivedProduct(derivedproduct DerivedProduct) {
 	}
 }
 
-func InsertDerivedProduct(derivedproduct DerivedProduct) {
-	ProcessDerivedProduct(derivedproduct)
-}
-
-func UpdateDerivedProduct(derivedproduct DerivedProduct) {
-	//clear out the old group for this id
-	ClearDerivedProductByProductID(int64(derivedproduct.Product.ID))
-	ProcessDerivedProduct(derivedproduct)
-}
-
-func ClearDerivedProductByProductID(productID int64) {
+//
+func clearDerivedProductByProductID(productID int64) {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
@@ -161,6 +173,8 @@ func ClearDerivedProductByProductID(productID int64) {
 	conn.Exec(query, args...)
 }
 
+//SELECTS
+//
 func SelectProduct(product Product) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
@@ -250,7 +264,8 @@ func SelectProduct(product Product) []Product {
 	return ret
 }
 
-func GetProductsByTypes(includeIngredients bool, includeNonIngredients bool, ignoreCache bool) ProductsByTypes {
+//
+func SelectProductsByTypes(includeIngredients bool, includeNonIngredients bool, ignoreCache bool) ProductsByTypes {
 	ret := new(ProductsByTypes)
 	ret = nil
 	if !ignoreCache {
@@ -328,14 +343,16 @@ func GetProductsByTypes(includeIngredients bool, includeNonIngredients bool, ign
 	return *ret
 }
 
-func GetProductByIDWithBDG(ID int) *BaseProductWithBDG {
+//
+func SelectProductByIDWithBDG(ID int) *BaseProductWithBDG {
 	var inProduct Product
 	inProduct.ID = ID
 	p := SelectProduct(inProduct)
-	return GetBDGByProduct(p[0])
+	return SelectBDGByProduct(p[0])
 }
 
-func GetBDGByProduct(product Product) *BaseProductWithBDG {
+//
+func SelectBDGByProduct(product Product) *BaseProductWithBDG {
 	conn, _ := connectors.GetDB()
 
 	var bpwbd BaseProductWithBDG
@@ -399,6 +416,8 @@ func GetBDGByProduct(product Product) *BaseProductWithBDG {
 //JOIN  commonwealthcocktails.cocktail ON cocktailToProducts.idCocktail=cocktail.idCocktail
 //WHERE cocktail.idCocktail=2;
 //}
+
+//
 func SelectAllProducts() []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
@@ -440,6 +459,7 @@ func SelectAllProducts() []Product {
 	return ret
 }
 
+//
 func SelectProductByID(ID int) Product {
 	var ret Product
 	conn, _ := connectors.GetDB()
@@ -479,6 +499,7 @@ func SelectProductByID(ID int) Product {
 	return ret
 }
 
+//
 func SelectProductsByCocktailAndProductType(ID int, pt int) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()

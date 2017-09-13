@@ -53,34 +53,14 @@ var (
 
 //Login page handler which displays the standard login page.
 func loginIndexHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	page.RenderPageTemplate(w, "loginindex")
 }
 
 //Login page request handler which process the standard login request.  This
 //will after verifying the user and password create a user session
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	if ValidateLogin(&page.User, r) {
 		//this is in case you need to perform DB actions before the DB is setup
 		//otherwise you wouldn't have an users
@@ -133,14 +113,6 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 //Initial request from the website that then submits the request to google
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
-	// CATCH ONLY HEADER START
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	// CATCH ONLY HEADER START
 	str := randSeq(64)
 	//MEMCACHE OAUTH SET
 	mc, _ := connectors.GetMC()
@@ -176,15 +148,6 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 
 //Handler for the response to the Google OAuth request from handleGoogleLogin
 func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
-	// CATCH ONLY HEADER START
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	// CATCH ONLY HEADER START
-
 	//MEMCACHE OAUTH GET
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -260,17 +223,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 //Initial request from the website that then submits the request to facebook
 func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
-	// CATCH ONLY HEADER START
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	// CATCH ONLY HEADER START
-
 	str := randSeq(64)
-
 	//MEMCACHE OAUTH SET
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -305,15 +258,6 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 
 //Handler for the response to the Facebook OAuth request from handleFacebookLogin
 func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
-	// CATCH ONLY HEADER START
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	// CATCH ONLY HEADER START
-
 	//MEMCACHE OAUTH GET
 	mc, _ := connectors.GetMC()
 	if mc != nil {

@@ -14,16 +14,7 @@ import (
 
 //Product page handler which displays the standard product page.
 func ProductHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	// STANDARD HANLDER HEADER END
 	var p *model.BaseProductWithBDG
 	//Process Form gets an ID if it was passed
 	r.ParseForm()
@@ -33,7 +24,7 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(r.Form["ID"][0])
 
-		p = model.GetProductByIDWithBDG(id)
+		p = model.SelectProductByIDWithBDG(id)
 		page.BaseProductWithBDG = *p
 		page.RenderPageTemplate(w, "product")
 	}
@@ -42,22 +33,12 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 //Product Modification Form page handler which displays the Product Modification
 //Form page.
 func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-
-	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		//Process Form gets an ID if it was passed
 		r.ParseForm()
 		var pbt model.ProductsByTypes
-		pbt = model.GetProductsByTypes(true, true, false)
+		pbt = model.SelectProductsByTypes(true, true, false)
 		var prods []model.Product
 		var prod model.Product
 		prods = model.SelectProduct(prod)
@@ -72,7 +53,7 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 			in.ID = id
 			out := model.SelectProduct(in)
 			page.Product = out[0]
-			page.BaseProductWithBDG = *model.GetBDGByProduct(out[0])
+			page.BaseProductWithBDG = *model.SelectBDGByProduct(out[0])
 			page.RenderPageTemplate(w, "productmodform")
 		}
 	} else {
@@ -84,21 +65,11 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 //modification request.  This will after verifying a valid user session,
 //modify the product data based on the request.
 func ProductModHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-
-	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		//Get the generic data that all product mod pages need
 		var pbt model.ProductsByTypes
-		pbt = model.GetProductsByTypes(true, true, false)
+		pbt = model.SelectProductsByTypes(true, true, false)
 		var prods []model.Product
 		var prod model.Product
 		prods = model.SelectProduct(prod)
@@ -123,7 +94,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 					model.InsertGroupProduct(gp)
 				}
 				model.LoadMCWithProductData()
-				pbt = model.GetProductsByTypes(true, true, false)
+				pbt = model.SelectProductsByTypes(true, true, false)
 				page.ProductsByTypes = pbt
 				page.Product.ID = ret_id
 				outProduct := model.SelectProduct(page.Product)
@@ -147,7 +118,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
 				model.LoadMCWithProductData()
-				pbt = model.GetProductsByTypes(true, true, false)
+				pbt = model.SelectProductsByTypes(true, true, false)
 				page.ProductsByTypes = pbt
 				outProduct := model.SelectProduct(page.Product)
 				page.Product = outProduct[0]
@@ -175,17 +146,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 //Products page (i.e. all the products) request handler which
 //displays the all the products page.
 func ProductsHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-
-	// STANDARD HANLDER HEADER END
 	var p []model.Product
 	p = model.SelectAllProducts()
 	page.Products = p

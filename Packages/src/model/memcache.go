@@ -46,21 +46,21 @@ func LoadMCWithProductData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var pbt ProductsByTypes
-		pbt = GetProductsByTypes(true, true, true)
+		pbt = SelectProductsByTypes(true, true, true)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_tt", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		pbt = GetProductsByTypes(true, false, true)
+		pbt = SelectProductsByTypes(true, false, true)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_tf", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		pbt = GetProductsByTypes(false, true, true)
+		pbt = SelectProductsByTypes(false, true, true)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_ft", Value: buf.Bytes()})
@@ -84,21 +84,21 @@ func LoadMCWithMetaData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var mbt MetasByTypes
-		mbt = GetMetaByTypes(true, true, true)
+		mbt = SelectMetaByTypes(true, true, true)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_tt", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		mbt = GetMetaByTypes(true, false, true)
+		mbt = SelectMetaByTypes(true, false, true)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_tf", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		mbt = GetMetaByTypes(false, true, true)
+		mbt = SelectMetaByTypes(false, true, true)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_ft", Value: buf.Bytes()})

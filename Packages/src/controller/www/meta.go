@@ -27,7 +27,7 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "404")
 		}
 		var mbt model.MetasByTypes
-		mbt = model.GetMetaByTypes(false, true, false)
+		mbt = model.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		if len(m["ID"]) == 0 {
 			//apply the template page info to the index page
@@ -53,7 +53,7 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request) {
 	if page.Username != "" && page.Authenticated {
 		//Get the generic data that all meta mod pages need
 		var mbt model.MetasByTypes
-		mbt = model.GetMetaByTypes(false, true, false)
+		mbt = model.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		//Validate the form input and populate the meta data
 		if ValidateMeta(&page.Meta, r) {

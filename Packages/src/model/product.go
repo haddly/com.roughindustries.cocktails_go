@@ -1,4 +1,5 @@
-//model/product.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/product.go:package model
 package model
 
 import (
@@ -28,6 +29,7 @@ type Product struct {
 	Errors           map[string]string
 }
 
+//
 type ProductType struct {
 	ID                      int
 	IsIngredient            bool
@@ -35,16 +37,19 @@ type ProductType struct {
 	ProductTypeNameNoSpaces string
 }
 
+//
 type DerivedProduct struct {
 	Product     Product
 	BaseProduct Product
 }
 
+//
 type GroupProduct struct {
 	Products     []Product
 	GroupProduct Product
 }
 
+//
 type BaseProductWithBDG struct {
 	Product         Product
 	DerivedProducts []Product
@@ -52,18 +57,22 @@ type BaseProductWithBDG struct {
 	BaseProduct     Product
 }
 
+//
 type ProductsByTypes struct {
 	PBT []ProductsByType
 }
 
+//
 type ProductsByType struct {
 	ProductType ProductType
 	Products    []Product
 }
 
 //ENUMERATIONS - These must match the database one for one in both ID and order
+//
 type ProductTypeConst int
 
+//
 const (
 	Spirit = 1 + iota
 	Liqueur
@@ -75,6 +84,7 @@ const (
 	Tool
 )
 
+//
 var ProductTypeStrings = [...]string{
 	"Spirit",
 	"Liqueur",
@@ -89,6 +99,7 @@ var ProductTypeStrings = [...]string{
 // String returns the English name of the Producttype ("Spirit", "Liqueur", ...).
 func (pt ProductTypeConst) String() string { return ProductTypeStrings[pt-1] }
 
+//
 func ProductTypeStringToInt(a string) int {
 	var i = 1
 	for _, b := range ProductTypeStrings {

@@ -5,7 +5,6 @@ package model
 import (
 	"bytes"
 	"connectors"
-	"database/sql"
 	"encoding/gob"
 	"fmt"
 	"github.com/bradfitz/gomemcache/memcache"
@@ -21,16 +20,16 @@ import (
 func InsertMeta(meta Meta) int {
 	//set the ID to zero to indicate an insert
 	meta.ID = 0
-	return ProcessMeta(meta)
+	return processMeta(meta)
 }
 
 //Update a meta record in the database based on ID
 func UpdateMeta(meta Meta) int {
-	return ProcessMeta(meta)
+	return processMeta(meta)
 }
 
 //Process an insert or an update
-func ProcessMeta(meta Meta) int {
+func processMeta(meta Meta) int {
 	conn, _ := connectors.GetDB() //get db connection
 	var args []interface{}        //arguments for variables in the data struct
 	var buffer bytes.Buffer       //buffer for the query
@@ -75,6 +74,7 @@ func ProcessMeta(meta Meta) int {
 }
 
 //SELECTS
+//
 func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {
 	var ret []MetaType
 
@@ -147,6 +147,7 @@ func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHa
 	return ret
 }
 
+//
 func SelectMeta(meta Meta) []Meta {
 	var ret []Meta
 	conn, _ := connectors.GetDB()
@@ -193,7 +194,8 @@ func SelectMeta(meta Meta) []Meta {
 	return ret
 }
 
-func GetMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool) MetasByTypes {
+//
+func SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool) MetasByTypes {
 	ret := new(MetasByTypes)
 	ret = nil
 	if !ignoreCache {
@@ -274,6 +276,7 @@ func GetMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool)
 
 }
 
+//
 func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 	var ret []Meta
 	var isRoot bool
@@ -318,16 +321,4 @@ func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 		}
 	}
 	return ret, isRoot
-}
-
-//UTILS
-func checkCount(rows *sql.Rows) (count int, err error) {
-	for rows.Next() {
-		err = rows.Scan(&count)
-		if err != nil {
-			log.Fatal(err)
-			return 0, err
-		}
-	}
-	return count, nil
 }

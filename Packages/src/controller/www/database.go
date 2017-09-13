@@ -20,17 +20,7 @@ import (
 
 //Handler for loading the sql mysqldump file for db tables
 func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	// Check for a valid user and that authentication
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
@@ -54,7 +44,6 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
@@ -66,17 +55,7 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 
 //Handler for loading the sql mysqldump file for db data
 func DBDataHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")
@@ -85,7 +64,6 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 		defer dat.Close()
 		scanner := bufio.NewScanner(dat)
 		scanner.Split(bufio.ScanLines)
-
 		buffer.WriteString(dir + "<br><br>")
 		conn, _ := connectors.GetDB()
 		//disable foreign key contraint sense I don't know the order we add
@@ -115,24 +93,14 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 
 //Handler for running db sanity checks
 func DBTestHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
 	page := NewPage(r)
-	
-	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Database</b>:<br/>")
 		buffer.WriteString(model.GetCurrentDB() + "<br/>")
 
-		model.GetMetaByTypes(false, false, true)
-		model.GetProductsByTypes(true, true, true)
+		model.SelectMetaByTypes(false, false, true)
+		model.SelectProductsByTypes(true, true, true)
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
