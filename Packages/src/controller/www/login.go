@@ -76,7 +76,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		//Confirm the username is in DB and password after getting user from DB
 		usr := model.SelectUserForLogin(page.User, false)
-		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
+		//if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
+		if usr.Password == page.User.Password {
 			us := new(model.UserSession)
 			if len(usr.Username) > 0 {
 				us.Username = usr.Username

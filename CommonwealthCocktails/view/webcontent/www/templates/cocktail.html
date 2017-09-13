@@ -262,16 +262,14 @@
 				{{if .OriginalIngredient.PreText}}
 				{{.OriginalIngredient.PreText}}&nbsp; 
 				{{end}} 
-				{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}} 
+				{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}}
 			</a> 
+			<a title="Related Cocktails" href="/cocktailsByIngredientID?ID={{.OriginalIngredient.ID}}">
+				<i style="display: table-cell; font-size: 0.73em; color: black; vertical-align: middle;" class="fa fa-glass"></i>
+			</a>
 			{{end}}
 		</div>
 	</td>
-<!--<td width="10" align="right">-->
-<!--	<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByMetaID?ID={{.OriginalIngredient.ID}}">-->
-<!--		<i class="fa fa-glass"></i>-->
-<!--	</a>-->
-<!--</td>-->
 </tr>
 {{end}} {{end}}
 {{end}}

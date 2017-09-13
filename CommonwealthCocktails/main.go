@@ -10,7 +10,6 @@ import (
 	"github.com/gorilla/context"
 	"log"
 	"math/rand"
-	"model"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,61 +20,56 @@ import (
 //controllers
 func init() {
 
-	var datasource = model.DSTtoi("DB")
+	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
+	var dbaddr string
+	var dbpasswd string
+	var user string
+	var proto string
+	var port string
+	var dbname string
+	//dbaddr = ??
+	//dbpasswd = ??
+	//user = ??
+	//proto = ??
+	//port = ??
+	//dbname = ??
 
-	if datasource == model.DB {
-		//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
-		var dbaddr string
-		var dbpasswd string
-		var user string
-		var proto string
-		var port string
-		var dbname string
-		//dbaddr = ??
-		//dbpasswd = ??
-		//user = ??
-		//proto = ??
-		//port = ??
-		//dbname = ??
+	var mc_server string
+	//mc_server = ??
+	mc_server = "memcached-12898.c12.us-east-1-4.ec2.cloud.redislabs.com:12898"
 
-		var mc_server string
-		//mc_server = ??
-		mc_server = "memcached-12898.c12.us-east-1-4.ec2.cloud.redislabs.com:12898"
-
-		if dbaddr == "" {
-			log.Println("No DB Address set.")
-			os.Exit(0)
-		}
-		if dbpasswd == "" {
-			log.Println("No DB password set.")
-			os.Exit(0)
-		}
-		if user == "" {
-			log.Println("No DB user set.")
-			os.Exit(0)
-		}
-		if proto == "" {
-			log.Println("No DB protocol set.")
-			os.Exit(0)
-		}
-		if port == "" {
-			log.Println("No DB port set.")
-			os.Exit(0)
-		}
-		if dbname == "" {
-			log.Println("No DB name set.")
-			os.Exit(0)
-		}
-		connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
-		if mc_server != "" {
-			connectors.SetMCVars(mc_server)
-		} else {
-			log.Println("No Memcache server set. If you want to use memcaching you will " +
-				"have to set this value in main.go.")
-		}
+	if dbaddr == "" {
+		log.Println("No DB Address set.")
+		os.Exit(0)
+	}
+	if dbpasswd == "" {
+		log.Println("No DB password set.")
+		os.Exit(0)
+	}
+	if user == "" {
+		log.Println("No DB user set.")
+		os.Exit(0)
+	}
+	if proto == "" {
+		log.Println("No DB protocol set.")
+		os.Exit(0)
+	}
+	if port == "" {
+		log.Println("No DB port set.")
+		os.Exit(0)
+	}
+	if dbname == "" {
+		log.Println("No DB name set.")
+		os.Exit(0)
+	}
+	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
+	if mc_server != "" {
+		connectors.SetMCVars(mc_server)
+	} else {
+		log.Println("No Memcache server set. If you want to use memcaching you will " +
+			"have to set this value in main.go.")
 	}
 
-	model.SetDataSourceType(datasource)
 	flag.Parse()
 	// wanted it to be more random so i seed it time now
 	rand.Seed(time.Now().UnixNano())

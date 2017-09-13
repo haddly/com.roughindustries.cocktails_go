@@ -29,6 +29,7 @@
                     <li class="dropdown">
                         <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{.Username}} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
+                            {{if .AllowAdmin}}
                             <li class="dropdown-header">Modify</li>
                             <li><a href="/load/cocktailModForm">Modify Cocktail</a></li>
                             <li><a href="/load/productModForm">Modify Product</a></li>
@@ -43,6 +44,7 @@
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">Admin</li>
                             <li role="separator" class="divider"></li>
+                            {{end}}
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </li>
@@ -63,7 +65,10 @@
     </div>
     <!-- /.container -->
 </nav>
-{{end}} {{define "navbar404"}}
+{{end}} 
+
+<!---->
+{{define "navbar404"}}
 <nav class="navbar navbar-default navbar-inverse navbar-fixed-top">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->

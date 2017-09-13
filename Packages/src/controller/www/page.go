@@ -14,12 +14,17 @@ import (
 	"strings"
 )
 
+//Is the website public or private, i.e. do you want to offer admin
+//accessability to the website
+var AllowAdmin = true
+
 //the page struct is all the things a template could display or use when it
 //generates a page
 type page struct {
 	Username             string
 	Redirect             string
 	Authenticated        bool
+	AllowAdmin           bool
 	CocktailSearch       model.CocktailSearch
 	CocktailSet          model.CocktailSet
 	MetasByTypes         model.MetasByTypes
@@ -105,6 +110,7 @@ func NewPage(r *http.Request) page {
 	var p page
 	p.Messages = make(map[string]template.HTML)
 	p.Errors = make(map[string]string)
+	p.AllowAdmin = AllowAdmin
 	if r != nil {
 		p.Username, p.Authenticated = GetSession(r)
 	}

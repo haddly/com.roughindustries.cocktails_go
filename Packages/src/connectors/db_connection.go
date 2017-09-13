@@ -5,6 +5,7 @@ package connectors
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
 )
 
@@ -32,7 +33,10 @@ func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto st
 func GetDB() (*sql.DB, error) {
 	if db == nil {
 		log.Println("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
+		//which db do you want to use
 		d, err := sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
+		//d, err := sql.Open("sqlite3", "./sql/commonwealthcocktails.db")
+		log.Println("DB = sqlite3")
 		if err != nil {
 			log.Println("Error connecting to database")
 			log.Fatal(err)

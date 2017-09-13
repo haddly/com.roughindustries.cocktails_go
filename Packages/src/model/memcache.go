@@ -1,4 +1,5 @@
-//model/database.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/memcache.go:package model
 package model
 
 import (
@@ -64,13 +65,6 @@ func LoadMCWithProductData() {
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_ft", Value: buf.Bytes()})
-
-		// item, _ := mc.Get("pbt")
-		// var ret ProductsByTypes
-		// read := bytes.NewReader(item.Value)
-		// dec := gob.NewDecoder(read)
-		// dec.Decode(&ret)
-		// log.Println(ret)
 	}
 }
 

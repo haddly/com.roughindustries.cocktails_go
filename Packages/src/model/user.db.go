@@ -17,7 +17,7 @@ func SelectUserForLogin(user User, isOauth bool) *User {
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
-	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail` FROM `commonwealthcocktails`.`users` WHERE ")
+	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail` FROM `users` WHERE ")
 	if user.Username != "" {
 		buffer.WriteString(" `userName`=? AND")
 		args = append(args, html.EscapeString(user.Username))

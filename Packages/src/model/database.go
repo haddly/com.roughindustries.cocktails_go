@@ -1,10 +1,10 @@
-//model/database.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/database.go:package model
 package model
 
 import (
 	"connectors"
 	"log"
-	"strings"
 )
 
 func GetCurrentDB() string {
@@ -19,14 +19,4 @@ func GetCurrentDB() string {
 		log.Println(dbname)
 	}
 	return dbname
-}
-
-func MysqlRealEscapeString(value string) string {
-	replace := map[string]string{"\\": "\\\\", "'": `\'`, "\\0": "\\\\0", "\n": "\\n", "\r": "\\r", `"`: `\"`, "\x1a": "\\Z"}
-
-	for b, a := range replace {
-		value = strings.Replace(value, b, a, -1)
-	}
-
-	return value
 }
