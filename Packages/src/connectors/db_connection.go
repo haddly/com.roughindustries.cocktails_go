@@ -9,6 +9,20 @@ import (
 	"log"
 )
 
+type DBTypesConst int
+
+const (
+	MySQL = 1 + iota
+	SQLite
+)
+
+var DBTypeStrings = [...]string{
+	"MySQL",
+	"SQLite",
+}
+
+func (dt DBTypesConst) String() string { return DBTypeStrings[dt-1] }
+
 //Database variables
 var db *sql.DB = nil
 var dbaddr string
@@ -17,26 +31,36 @@ var user string
 var proto string
 var port string
 var dbname string
+var DBType DBTypesConst
 
 //Set the database variables for connecting to the database
-func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto string, in_port string, in_dbname string) {
+func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto string, in_port string, in_dbname string, in_dbtype DBTypesConst) {
 	dbaddr = in_dbaddr
 	dbpasswd = in_dbpasswd
 	user = in_user
 	proto = in_proto
 	port = in_port
 	dbname = in_dbname
-	log.Println(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?timeout=1m")
+	DBType = in_dbtype
+	log.Println(DBType)
+	if DBType == MySQL {
+		log.Println(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?timeout=1m")
+	}
 }
 
 //Get a connection to the database
 func GetDB() (*sql.DB, error) {
 	if db == nil {
-		log.Println("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
 		//which db do you want to use
-		d, err := sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
-		//d, err := sql.Open("sqlite3", "./sql/commonwealthcocktails.db")
-		log.Println("DB = sqlite3")
+		var err error
+		var d *sql.DB
+		if DBType == MySQL {
+			log.Println("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
+			d, err = sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
+		} else if DBType == SQLite {
+			log.Println("Creating a new connection: sqllite to commonwealthcocktails.db")
+			d, err = sql.Open("sqlite3", "./sql/commonwealthcocktails.db")
+		}
 		if err != nil {
 			log.Println("Error connecting to database")
 			log.Fatal(err)

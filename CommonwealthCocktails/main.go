@@ -27,12 +27,14 @@ func init() {
 	var proto string
 	var port string
 	var dbname string
+	var dbtype connectors.DBTypesConst
 	//dbaddr = ??
 	//dbpasswd = ??
 	//user = ??
 	//proto = ??
 	//port = ??
 	//dbname = ??
+	//dbtype = www.DBTypesConst.MySQL
 
 	var mc_server string
 	//mc_server = ??
@@ -62,7 +64,7 @@ func init() {
 		log.Println("No DB name set.")
 		os.Exit(0)
 	}
-	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname)
+	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname, dbtype)
 	if mc_server != "" {
 		connectors.SetMCVars(mc_server)
 	} else {

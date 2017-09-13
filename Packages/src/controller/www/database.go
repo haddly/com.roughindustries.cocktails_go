@@ -24,8 +24,12 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for a valid user and that authentication
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
-		dat, _ := ioutil.ReadFile("sql/ccschemadump.sql")
-		//dat, _ := ioutil.ReadFile("sql/ccsqlite3schema.sql")
+		var dat []byte
+		if connectors.DBType == connectors.MySQL {
+			dat, _ = ioutil.ReadFile("sql/ccschemadump.sql")
+		} else if connectors.DBType == connectors.SQLite {
+			dat, _ = ioutil.ReadFile("sql/ccsqlite3schema.sql")
+		}
 		requests := strings.Split(string(dat), ";")
 		conn, _ := connectors.GetDB()
 		//disable foreign key contraint sense I don't know the order we add
@@ -61,8 +65,12 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 		var buffer bytes.Buffer
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")
 		dir, _ := os.Getwd()
-		dat, _ := os.Open("sql/ccdatadump.sql")
-		//dat, _ := os.Open("sql/ccsqlite3data.sql")
+		var dat *os.File
+		if connectors.DBType == connectors.MySQL {
+			dat, _ = os.Open("sql/ccdatadump.sql")
+		} else if connectors.DBType == connectors.SQLite {
+			dat, _ = os.Open("sql/ccsqlite3data.sql")
+		}
 		defer dat.Close()
 		scanner := bufio.NewScanner(dat)
 		scanner.Split(bufio.ScanLines)
