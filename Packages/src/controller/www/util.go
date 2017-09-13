@@ -27,7 +27,7 @@ func randSeq(n int) string {
 //Helper function for producing a standard 404 page error when we through an
 //panic
 func Error404(w http.ResponseWriter, rec interface{}) {
-	page := NewPage()
+	page := NewPage(nil)
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])

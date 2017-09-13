@@ -22,8 +22,7 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
 	// STANDARD HANLDER HEADER END
 	var p *model.BaseProductWithBDG
 	//Process Form gets an ID if it was passed
@@ -51,8 +50,8 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		//Process Form gets an ID if it was passed
@@ -93,8 +92,8 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		//Get the generic data that all product mod pages need
@@ -184,8 +183,8 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+
 	// STANDARD HANLDER HEADER END
 	var p []model.Product
 	p = model.SelectAllProducts()

@@ -42,6 +42,8 @@ type page struct {
 	Messages             map[string]template.HTML
 }
 
+var counter = 0
+
 //the page template renderer.  This should be the basic method for displaying
 //all pages.
 func (page *page) RenderPageTemplate(w http.ResponseWriter, tmpl string) {
@@ -76,17 +78,7 @@ func parseTempFiles(tmpl string) (*template.Template, error) {
 
 // The main index page handler
 func LandingHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
+	page := NewPage(r)
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, "index")
 }
@@ -95,17 +87,7 @@ func LandingHandler(w http.ResponseWriter, r *http.Request) {
 //works as a redirect basically with the wheel showing till the redirected page
 //is ready
 func Load(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	//page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
+	page := NewPage(r)
 	log.Println("Loader")
 	log.Println(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
 	log.Println(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
@@ -119,9 +101,12 @@ func Load(w http.ResponseWriter, r *http.Request) {
 }
 
 //An initialization function that provides an initialized page object
-func NewPage() page {
+func NewPage(r *http.Request) page {
 	var p page
 	p.Messages = make(map[string]template.HTML)
 	p.Errors = make(map[string]string)
+	if r != nil {
+		p.Username, p.Authenticated = GetSession(r)
+	}
 	return p
 }

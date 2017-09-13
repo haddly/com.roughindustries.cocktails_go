@@ -50,12 +50,7 @@ type Cocktail struct {
 	Family          []Meta
 	Drink           []Meta
 	IsFamilyRoot    bool
-	About           Post
-	Articles        []Post
 	Errors          map[string]string
-
-	//Advertiser Info
-	//Advertisement Advertisement
 }
 
 type Name struct {

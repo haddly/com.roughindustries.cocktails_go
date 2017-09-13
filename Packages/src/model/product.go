@@ -6,6 +6,7 @@ import (
 )
 
 //DATA STRUCTURES
+//Product data structure
 type Product struct {
 	ID               int
 	ProductName      string
@@ -16,7 +17,6 @@ type Product struct {
 	Image            string
 	ImageSourceName  string
 	ImageSourceLink  string
-	Article          Post
 	Recipe           Recipe
 	ProductGroupType GroupType
 	PreText          string
@@ -25,7 +25,6 @@ type Product struct {
 	Rating           int
 	SourceName       string
 	SourceLink       string
-	About            Post
 	Errors           map[string]string
 }
 

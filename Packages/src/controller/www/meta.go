@@ -15,17 +15,7 @@ import (
 //Meta Modification Form page handler which displays the Meta Modification
 //Form page.
 func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
+	page := NewPage(r)
 	if page.Username != "" && page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
@@ -59,17 +49,7 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 //modification request.  This will after verifying a valid user session,
 //modify the meta data based on the request.
 func MetaModHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
+	page := NewPage(r)
 	if page.Username != "" && page.Authenticated {
 		//Get the generic data that all meta mod pages need
 		var mbt model.MetasByTypes

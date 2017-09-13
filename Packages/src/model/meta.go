@@ -23,7 +23,6 @@ type Meta struct {
 	ID       int
 	MetaName string
 	MetaType MetaType
-	Article  Post
 	Blurb    template.HTML
 	Errors   map[string]string
 }

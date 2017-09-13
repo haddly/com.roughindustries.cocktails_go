@@ -9,6 +9,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"github.com/bradfitz/gomemcache/memcache"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
@@ -60,8 +61,8 @@ func loginIndexHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	page.RenderPageTemplate(w, "loginindex")
 }
@@ -77,25 +78,37 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	if ValidateLogin(&page.User, r) {
 		//this is in case you need to perform DB actions before the DB is setup
 		//otherwise you wouldn't have an users
 		if allowDefault && page.User.Username == defaultUser {
-			if page.User.Password == defaultPassword {
-				SetSession(w, r, page.User.Username)
+			//if page.User.Password == defaultPassword {
+			if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
+				us := new(model.UserSession)
+				us.Username = defaultUser
+				SetSession(w, r, us)
 				http.Redirect(w, r, "/", 302)
 				return
 			}
 		}
-		//Confirm the username and password
+		//Confirm the username is in DB and password after getting user from DB
 		usr := model.SelectUserForLogin(page.User, false)
-		if len(usr.Username) > 0 {
-			SetSession(w, r, usr.Username)
-			http.Redirect(w, r, "/", 302)
-			return
+		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
+			us := new(model.UserSession)
+			if len(usr.Username) > 0 {
+				us.Username = usr.Username
+				SetSession(w, r, us)
+				http.Redirect(w, r, "/", 302)
+				return
+			} else {
+				log.Println("Bad username or password: " + page.User.Username)
+				page.Errors["loginErrors"] = "Bad Username and/or Password!"
+				page.RenderPageTemplate(w, "/loginindex")
+				return
+			}
 		} else {
 			log.Println("Bad username or password: " + page.User.Username)
 			page.Errors["loginErrors"] = "Bad Username and/or Password!"
@@ -239,7 +252,9 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	user.Email = email
 	usr := model.SelectUserForLogin(user, true)
-	SetSession(w, r, usr.Username)
+	us := new(model.UserSession)
+	us.Username = usr.Username
+	SetSession(w, r, us)
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -367,7 +382,9 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	user.Email = email.(string)
 	usr := model.SelectUserForLogin(user, true)
-	SetSession(w, r, usr.Username)
+	us := new(model.UserSession)
+	us.Username = usr.Username
+	SetSession(w, r, us)
 	http.Redirect(w, r, "/", 302)
 }
 

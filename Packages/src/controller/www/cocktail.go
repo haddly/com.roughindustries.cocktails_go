@@ -26,8 +26,8 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
@@ -62,8 +62,8 @@ func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	var c []model.Cocktail
@@ -85,8 +85,8 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	log.Println("In Add Cocktail Form handler")
 	if page.Username != "" && page.Authenticated {
@@ -140,8 +140,8 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 
 	if page.Username != "" && page.Authenticated {
@@ -214,8 +214,8 @@ func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	var m model.MetasByTypes
 	m = model.GetMetaByTypes(true, true, false)
@@ -235,8 +235,8 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
@@ -275,8 +275,8 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())

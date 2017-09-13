@@ -13,22 +13,12 @@ import (
 
 //delete all the memcache entries
 func MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
+	page := NewPage(r)
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Memcache Delete</b>:<br/>")
 		model.DeleteAllMemcache()
-		page.Username, page.Authenticated = GetSession(r)
+
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
@@ -38,17 +28,7 @@ func MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 //load all the memcache entries from the database
 func MCAddHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
+	page := NewPage(r)
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Memcache Add</b>:<br/>")

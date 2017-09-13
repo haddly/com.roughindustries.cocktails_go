@@ -28,8 +28,8 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	// Check for a valid user and that authentication
 	if page.Username != "" && page.Authenticated {
@@ -74,8 +74,8 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
@@ -123,8 +123,8 @@ func DBTestHandler(w http.ResponseWriter, r *http.Request) {
 			Error404(w, rec)
 		}
 	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
+	page := NewPage(r)
+	
 	// STANDARD HANLDER HEADER END
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer

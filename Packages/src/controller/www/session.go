@@ -18,6 +18,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/gorilla/sessions"
 	"log"
+	"model"
 	"net/http"
 )
 
@@ -25,7 +26,7 @@ import (
 var store = sessions.NewCookieStore([]byte(randSeq(64)))
 
 //memcache session mapping
-var managed_sessions = make(map[string]string)
+var managed_sessions = make(map[string]model.UserSession)
 
 //get the session from the cookies and cross reference it with the
 //memcache
@@ -48,7 +49,7 @@ func GetSession(r *http.Request) (string, bool) {
 		if mc != nil {
 			item := new(memcache.Item)
 			item, _ = mc.Get("managed_sessions")
-			managed_sessions = make(map[string]string)
+			managed_sessions = make(map[string]model.UserSession)
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
@@ -57,12 +58,12 @@ func GetSession(r *http.Request) (string, bool) {
 				}
 			}
 			data := managed_sessions[session_id+"_u"]
-			if data == "" {
+			if data.Username == "" {
 				log.Println("Not Authenticated")
-				return data, false
+				return data.Username, false
 			} else {
 				log.Println("Authenticated")
-				return data, true
+				return data.Username, true
 
 			}
 		} else {
@@ -80,7 +81,7 @@ func GetSession(r *http.Request) (string, bool) {
 //set the session for the cookies and cross reference it to the
 //memcache
 //TODO: setup database session mapping store
-func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
+func SetSession(w http.ResponseWriter, r *http.Request, data *model.UserSession) string {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		Error404(w, err.Error())
@@ -100,7 +101,7 @@ func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 	if mc != nil {
 		item := new(memcache.Item)
 		item, _ = mc.Get("managed_sessions")
-		managed_sessions = make(map[string]string)
+		managed_sessions = make(map[string]model.UserSession)
 		if item != nil {
 			if len(item.Value) > 0 {
 				read := bytes.NewReader(item.Value)
@@ -108,7 +109,7 @@ func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 				dec.Decode(&managed_sessions)
 			}
 		}
-		managed_sessions[session_id+"_u"] = data
+		managed_sessions[session_id+"_u"] = *data
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		enc.Encode(managed_sessions)
@@ -145,7 +146,7 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 		if mc != nil {
 			item := new(memcache.Item)
 			item, _ = mc.Get("managed_sessions")
-			managed_sessions = make(map[string]string)
+			managed_sessions = make(map[string]model.UserSession)
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
