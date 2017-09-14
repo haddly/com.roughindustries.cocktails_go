@@ -6,5 +6,6 @@ Packages/src/golang.org
 Packages/src/google.golang.org
 Packages/pkg/*
 CommonwealthCocktails/sql/*.db
+CommonwealthCocktails/sql/*sqlite*
 sensitive.config
 !pkg/.gitkeep

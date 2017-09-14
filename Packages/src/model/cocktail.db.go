@@ -28,9 +28,9 @@ func ProcessCocktail(cocktail Cocktail) int {
 
 	var buffer bytes.Buffer
 	if cocktail.ID == 0 {
-		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`cocktail` SET ")
+		buffer.WriteString("INSERT INTO `cocktail` SET ")
 	} else {
-		buffer.WriteString("UPDATE `commonwealthcocktails`.`cocktail` SET ")
+		buffer.WriteString("UPDATE `cocktail` SET ")
 	}
 	if cocktail.Title != "" {
 		buffer.WriteString("`cocktailTitle`=?,")
@@ -160,7 +160,7 @@ func ProcessCocktail(cocktail Cocktail) int {
 		args = args[0:0]
 		args = append(args, strconv.FormatInt(lastCocktailId, 10))
 		args = append(args, strconv.Itoa(recipeID))
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`cocktailToRecipe` (`idCocktail`, `idRecipe`) VALUES (?, ?);", args...)
+		conn.Exec("INSERT INTO `cocktailToRecipe` (`idCocktail`, `idRecipe`) VALUES (?, ?);", args...)
 	}
 	return int(lastCocktailId)
 }
@@ -171,7 +171,7 @@ func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	var buffer bytes.Buffer
 	var args []interface{}
 	var nameIDs []int
-	buffer.WriteString("SELECT cocktailToAltNames.idAltName FROM commonwealthcocktails.cocktailToAltNames WHERE idCocktail=?;")
+	buffer.WriteString("SELECT cocktailToAltNames.idAltName FROM cocktailToAltNames WHERE idCocktail=?;")
 	args = append(args, cocktailID)
 	query := buffer.String()
 	rows, err := conn.Query(query, args...)
@@ -192,7 +192,7 @@ func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	buffer.Reset()
 	args = args[0:0]
 
-	buffer.WriteString("SELECT cocktailToAKAs.idAKAName FROM commonwealthcocktails.cocktailToAKAs WHERE idCocktail=?;")
+	buffer.WriteString("SELECT cocktailToAKAs.idAKAName FROM cocktailToAKAs WHERE idCocktail=?;")
 	args = append(args, cocktailID)
 	query = buffer.String()
 	rows, err = conn.Query(query, args...)
@@ -214,7 +214,7 @@ func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	for _, nameID := range nameIDs {
 		buffer.Reset()
 		args = args[0:0]
-		buffer.WriteString("DELETE FROM `commonwealthcocktails`.`altnames` WHERE `idAltNames`=?;")
+		buffer.WriteString("DELETE FROM `altnames` WHERE `idAltNames`=?;")
 		args = append(args, nameID)
 		query = buffer.String()
 		conn.Exec(query, args...)
@@ -223,7 +223,7 @@ func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	buffer.Reset()
 	args = args[0:0]
 
-	buffer.WriteString("DELETE FROM `commonwealthcocktails`.`cocktailToAltNames` WHERE `idCocktail`=?;")
+	buffer.WriteString("DELETE FROM `cocktailToAltNames` WHERE `idCocktail`=?;")
 	args = append(args, cocktailID)
 	query = buffer.String()
 	conn.Exec(query, args...)
@@ -231,7 +231,7 @@ func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	buffer.Reset()
 	args = args[0:0]
 
-	buffer.WriteString("DELETE FROM `commonwealthcocktails`.`cocktailToAKAs` WHERE `idCocktail`=?;")
+	buffer.WriteString("DELETE FROM `cocktailToAKAs` WHERE `idCocktail`=?;")
 	args = append(args, cocktailID)
 	query = buffer.String()
 	conn.Exec(query, args...)
@@ -242,7 +242,7 @@ func ProcessAKAs(names []Name, cocktailID int64) {
 	var args []interface{}
 	var buffer bytes.Buffer
 	for _, name := range names {
-		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`altnames` SET ")
+		buffer.WriteString("INSERT INTO `altnames` SET ")
 
 		if name.Name != "" {
 			buffer.WriteString("`altNamesString`=\"?\",")
@@ -262,7 +262,7 @@ func ProcessAKAs(names []Name, cocktailID int64) {
 		args = args[0:0]
 		args = append(args, strconv.FormatInt(cocktailID, 10))
 		args = append(args, strconv.FormatInt(lastAltNameId, 10))
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`cocktailToAKAs` (`idCocktail`, `idAKAName`) VALUES (?, ?);")
+		conn.Exec("INSERT INTO `cocktailToAKAs` (`idCocktail`, `idAKAName`) VALUES (?, ?);")
 	}
 }
 
@@ -272,7 +272,7 @@ func ProcessAltNames(names []Name, cocktailID int64) {
 
 	var buffer bytes.Buffer
 	for _, name := range names {
-		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`altnames` SET ")
+		buffer.WriteString("INSERT INTO `altnames` SET ")
 
 		if name.Name != "" {
 			buffer.WriteString("`altNamesString`=\"?\",")
@@ -292,7 +292,7 @@ func ProcessAltNames(names []Name, cocktailID int64) {
 		args = args[0:0]
 		args = append(args, strconv.FormatInt(cocktailID, 10))
 		args = append(args, strconv.FormatInt(lastAltNameId, 10))
-		conn.Exec("INSERT INTO `commonwealthcocktails`.`cocktailToAltNames` (`idCocktail`, `idAltName`) VALUES (?, ?);", args...)
+		conn.Exec("INSERT INTO `cocktailToAltNames` (`idCocktail`, `idAltName`) VALUES (?, ?);", args...)
 	}
 }
 
@@ -302,7 +302,7 @@ func ClearCocktailToProductsByCocktailID(cocktailID int64) {
 	var args []interface{}
 
 	//delete all rows from cocktailToProducts table by cocktail id
-	buffer.WriteString("DELETE FROM `commonwealthcocktails`.`cocktailToProducts` WHERE `idCocktail`=?;")
+	buffer.WriteString("DELETE FROM `cocktailToProducts` WHERE `idCocktail`=?;")
 	args = append(args, cocktailID)
 	query := buffer.String()
 	conn.Exec(query, args...)
@@ -315,7 +315,7 @@ func ProcessCocktailToProducts(products []Product, cocktailID int64) {
 	for _, product := range products {
 		prodTo := SelectProduct(product)
 		if len(prodTo) > 0 {
-			query := "INSERT INTO `commonwealthcocktails`.`cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES (?, ?, ?);"
+			query := "INSERT INTO `cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES (?, ?, ?);"
 			args = args[0:0]
 			args = append(args, strconv.FormatInt(cocktailID, 10))
 			args = append(args, strconv.Itoa(prodTo[0].ID))
@@ -332,7 +332,7 @@ func ClearCocktailToMetasByCocktailID(cocktailID int64) {
 	var args []interface{}
 
 	//delete all rows from cocktailToMetas table by cocktail id
-	buffer.WriteString("DELETE FROM `commonwealthcocktails`.`cocktailToMetas` WHERE `idCocktail`=?;")
+	buffer.WriteString("DELETE FROM `cocktailToMetas` WHERE `idCocktail`=?;")
 	args = append(args, cocktailID)
 	query := buffer.String()
 	conn.Exec(query, args...)
@@ -345,7 +345,7 @@ func ProcessCocktailToMetas(metas []Meta, cocktailID int64, isRootCocktailForMet
 	for _, meta := range metas {
 		metaTo := SelectMeta(meta)
 		if len(metaTo) > 0 {
-			query := "INSERT INTO `commonwealthcocktails`.`cocktailToMetas` (`idCocktail`, `idMeta`, `idMetaType`, `isRootCocktailForMeta`) VALUES (?, ?, ?, ?);"
+			query := "INSERT INTO `cocktailToMetas` (`idCocktail`, `idMeta`, `idMetaType`, `isRootCocktailForMeta`) VALUES (?, ?, ?, ?);"
 			args = args[0:0]
 			args = append(args, strconv.FormatInt(cocktailID, 10))
 			args = append(args, strconv.Itoa(metaTo[0].ID))
@@ -381,7 +381,7 @@ func GetCocktailsByAlphaNums(ignoreCache bool) CocktailsByAlphaNums {
 		conn, _ := connectors.GetDB()
 		var buffer bytes.Buffer
 		buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName" +
-			" FROM commonwealthcocktails.cocktail ORDER BY cocktail.cocktailTitle;")
+			" FROM cocktail ORDER BY cocktail.cocktailTitle;")
 		query := buffer.String()
 		log.Println(query)
 		cba_rows, _ := conn.Query(query)
@@ -416,8 +416,8 @@ func SelectCocktailsByMeta(meta Meta) []Cocktail {
 	var canQuery = false
 	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
 		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')" +
-		" FROM commonwealthcocktails.cocktail" +
-		" JOIN commonwealthcocktails.cocktailToMetas ON cocktailToMetas.idCocktail=cocktail.idCocktail WHERE")
+		" FROM cocktail" +
+		" JOIN cocktailToMetas ON cocktailToMetas.idCocktail=cocktail.idCocktail WHERE")
 	//cocktailToMetas.idMeta=23;
 	//
 	if meta.ID != 0 {
@@ -469,8 +469,8 @@ func SelectCocktailsByProduct(product Product) []Cocktail {
 	var canQuery = false
 	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
 		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')" +
-		" FROM commonwealthcocktails.cocktail" +
-		" JOIN commonwealthcocktails.cocktailToProducts ON cocktailToProducts.idCocktail=cocktail.idCocktail WHERE")
+		" FROM cocktail" +
+		" JOIN cocktailToProducts ON cocktailToProducts.idCocktail=cocktail.idCocktail WHERE")
 	//cocktailToMetas.idProduct=23;
 	//
 	if product.ID != 0 {
@@ -523,7 +523,7 @@ func SelectAllCocktails(includeBDG bool) []Cocktail {
 		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')," +
 		" cocktail.cocktailSourceName, cocktail.cocktailSourceLink, cocktail.cocktailImageSourceName, cocktail.cocktailImageSourceLink," +
 		" COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')" +
-		" FROM commonwealthcocktails.cocktail;")
+		" FROM cocktail;")
 	canQuery = true
 	if canQuery {
 		query := buffer.String()
@@ -568,67 +568,63 @@ func SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
-	var canQuery = false
 	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
 		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')," +
 		" cocktail.cocktailSourceName, cocktail.cocktailSourceLink, cocktail.cocktailImageSourceName, cocktail.cocktailImageSourceLink," +
 		" COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')" +
-		" FROM commonwealthcocktails.cocktail" +
+		" FROM cocktail" +
 		" WHERE idCocktail=" + strconv.Itoa(ID) + ";")
-	canQuery = true
-	if canQuery {
-		query := buffer.String()
-		query = strings.TrimRight(query, " AND")
-		query = query + ";"
-		log.Println(query)
-		rows, err := conn.Query(query)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-		for rows.Next() {
-			var cocktail Cocktail
-			var desc string
-			var comment string
-			var origin string
-			err := rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name, &cocktail.Rating, &cocktail.ImagePath,
-				&cocktail.Image, &desc, &comment, &cocktail.SourceName, &cocktail.SourceLink, &cocktail.ImageSourceName, &cocktail.ImageSourceLink,
-				&origin, &cocktail.SpokenName, &cocktail.DisplayName)
-			cocktail.Description = template.HTML(html.UnescapeString(desc))
-			cocktail.Comment = template.HTML(html.UnescapeString(comment))
-			cocktail.Origin = template.HTML(html.UnescapeString(origin))
-			if err != nil {
-				log.Fatal(err)
-			}
-			//add recipe to cocktail
-			cocktail.Recipe = SelectRecipeByCocktail(cocktail, includeBDG)
-			cocktail.Drinkware = SelectProductsByCocktailAndProductType(cocktail.ID, int(Drinkware))
-			cocktail.Garnish = SelectProductsByCocktailAndProductType(cocktail.ID, int(Garnish))
-			cocktail.Tool = SelectProductsByCocktailAndProductType(cocktail.ID, int(Tool))
-			cocktail.Flavor, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Flavor))
-			cocktail.BaseSpirit, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(BaseSpirit))
-			cocktail.Type, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Type))
 
-			cocktail.Served, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Served))
-			cocktail.Technique, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Technique))
-			cocktail.Strength, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Strength))
-			cocktail.Difficulty, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Difficulty))
-			cocktail.TOD, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(TOD))
-			cocktail.Ratio, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Ratio))
-			cocktail.Family, cocktail.IsFamilyRoot = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Family))
-
-			//add cocktail to cocktail family
-			cs.Cocktail = cocktail
-
-			log.Println(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
-				cocktail.Image, cocktail.Description, cocktail.Comment, cocktail.SourceName, cocktail.SourceLink, cocktail.ImageSourceName, cocktail.ImageSourceLink,
-				cocktail.SpokenName, cocktail.DisplayName)
-		}
-		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
+	query := buffer.String()
+	log.Println(query)
+	rows, err := conn.Query(query)
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer rows.Close()
+	for rows.Next() {
+		var cocktail Cocktail
+		var desc string
+		var comment string
+		var origin string
+		err := rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name, &cocktail.Rating, &cocktail.ImagePath,
+			&cocktail.Image, &desc, &comment, &cocktail.SourceName, &cocktail.SourceLink, &cocktail.ImageSourceName, &cocktail.ImageSourceLink,
+			&origin, &cocktail.SpokenName, &cocktail.DisplayName)
+		cocktail.Description = template.HTML(html.UnescapeString(desc))
+		cocktail.Comment = template.HTML(html.UnescapeString(comment))
+		cocktail.Origin = template.HTML(html.UnescapeString(origin))
+		if err != nil {
+			log.Fatal(err)
+		}
+		//add recipe to cocktail
+		cocktail.Recipe = SelectRecipeByCocktail(cocktail, includeBDG)
+		cocktail.Drinkware = SelectProductsByCocktailAndProductType(cocktail.ID, int(Drinkware))
+		cocktail.Garnish = SelectProductsByCocktailAndProductType(cocktail.ID, int(Garnish))
+		cocktail.Tool = SelectProductsByCocktailAndProductType(cocktail.ID, int(Tool))
+		cocktail.Flavor, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Flavor))
+		cocktail.BaseSpirit, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(BaseSpirit))
+		cocktail.Type, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Type))
+
+		cocktail.Served, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Served))
+		cocktail.Technique, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Technique))
+		cocktail.Strength, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Strength))
+		cocktail.Difficulty, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Difficulty))
+		cocktail.TOD, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(TOD))
+		cocktail.Ratio, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Ratio))
+		cocktail.Family, cocktail.IsFamilyRoot = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Family))
+
+		//add cocktail to cocktail family
+		cs.Cocktail = cocktail
+
+		log.Println(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
+			cocktail.Image, cocktail.Description, cocktail.Comment, cocktail.SourceName, cocktail.SourceLink, cocktail.ImageSourceName, cocktail.ImageSourceLink,
+			cocktail.SpokenName, cocktail.DisplayName)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return cs
 }
 

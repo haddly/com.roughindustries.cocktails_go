@@ -40,7 +40,7 @@ func WWWRouterInit() {
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./view/webcontent/www/fonts"))))
 	http.Handle("/slick/", http.StripPrefix("/slick/", http.FileServer(http.Dir("./view/webcontent/www/libs/slick"))))
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "view/webcontent/www/favicon.ico")
+		http.ServeFile(w, r, "./view/webcontent/www/favicon.ico")
 	})
 	//Memcache Routing
 	http.Handle("/mc_delete", RecoverHandler(http.HandlerFunc(MCDeleteHandler)))

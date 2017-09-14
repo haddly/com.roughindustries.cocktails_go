@@ -36,9 +36,9 @@ func processMeta(meta Meta) int {
 
 	//If the ID is zero then do an insert else do an update based on the ID
 	if meta.ID == 0 {
-		buffer.WriteString("INSERT INTO `commonwealthcocktails`.`meta` SET ")
+		buffer.WriteString("INSERT INTO `meta` SET ")
 	} else {
-		buffer.WriteString("UPDATE `commonwealthcocktails`.`meta` SET ")
+		buffer.WriteString("UPDATE `meta` SET ")
 	}
 
 	//Append the correct columns to be added based on data available in the
@@ -83,7 +83,7 @@ func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHa
 	//log.Println(metatype.MetaTypeName)
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT `idMetaType`, `metatypeName`, `metatypeOrdinal`, `metatypeShowInCocktailsIndex`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM `commonwealthcocktails`.`metatype` WHERE ")
+	buffer.WriteString("SELECT `idMetaType`, `metatypeName`, `metatypeOrdinal`, `metatypeShowInCocktailsIndex`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM `metatype` WHERE ")
 	if metatype.ID != 0 {
 		buffer.WriteString("`idMetaType`=" + strconv.Itoa(metatype.ID) + " AND")
 		canQuery = true
@@ -154,7 +154,7 @@ func SelectMeta(meta Meta) []Meta {
 
 	log.Println(meta.MetaName)
 	var buffer bytes.Buffer
-	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType`, COALESCE(`metaBlurb`, '') FROM `commonwealthcocktails`.`meta` WHERE ")
+	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType`, COALESCE(`metaBlurb`, '') FROM `meta` WHERE ")
 	if meta.ID != 0 {
 		buffer.WriteString("`idMeta`=" + strconv.Itoa(meta.ID) + " AND")
 	}
@@ -226,7 +226,7 @@ func SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bo
 		var mtList []int
 		conn, _ := connectors.GetDB()
 
-		query := "SELECT `idMetaType` FROM  `commonwealthcocktails`.`metatype`"
+		query := "SELECT `idMetaType` FROM  `metatype`"
 
 		if byShowInCocktailsIndex {
 			query += " WHERE metatypeShowInCocktailsIndex=1"
@@ -256,7 +256,7 @@ func SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bo
 		mtListString := strings.Trim(strings.Replace(fmt.Sprint(mtList), " ", ",", -1), "[]")
 		//for _, i := range mtList {
 		var mbt MetasByType
-		mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metatypeName`, `metatypeShowInCocktailsIndex`, `metatypeOrdinal`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM  `commonwealthcocktails`.`metatype` WHERE idMetaType IN (" + mtListString + ");")
+		mbt_rows, _ := conn.Query("SELECT `idMetaType`, `metatypeName`, `metatypeShowInCocktailsIndex`, `metatypeOrdinal`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM  `metatype` WHERE idMetaType IN (" + mtListString + ");")
 		defer mbt_rows.Close()
 		for mbt_rows.Next() {
 			err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal, &mbt.MetaType.HasRoot, &mbt.MetaType.IsOneToMany)
@@ -286,9 +286,9 @@ func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 	var buffer bytes.Buffer
 	var canQuery = false
 	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType, cocktailToMetas.isRootCocktailForMeta" +
-		" FROM commonwealthcocktails.meta" +
-		" JOIN commonwealthcocktails.cocktailToMetas ON meta.idMeta=cocktailToMetas.idMeta" +
-		" JOIN commonwealthcocktails.cocktail ON cocktailToMetas.idCocktail=cocktail.idCocktail" +
+		" FROM meta" +
+		" JOIN cocktailToMetas ON meta.idMeta=cocktailToMetas.idMeta" +
+		" JOIN cocktail ON cocktailToMetas.idCocktail=cocktail.idCocktail" +
 		" WHERE cocktail.idCocktail=" + strconv.Itoa(ID) + " AND meta.metaType=" + strconv.Itoa(mt) + "")
 	canQuery = true
 
