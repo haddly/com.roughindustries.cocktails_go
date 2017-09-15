@@ -9,18 +9,22 @@ import (
 	"log"
 )
 
+//Database types constant enumeration
 type DBTypesConst int
 
+//Types of databases supported in the enum
 const (
 	MySQL = 1 + iota
 	SQLite
 )
 
+//String values for the database enumeration
 var DBTypeStrings = [...]string{
 	"MySQL",
 	"SQLite",
 }
 
+// String returns the English name of the database types ("MySSQL", "SQLite", ...).
 func (dt DBTypesConst) String() string { return DBTypeStrings[dt-1] }
 
 //Database variables

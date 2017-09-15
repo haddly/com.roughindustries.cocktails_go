@@ -18,7 +18,6 @@ import (
 func (user *User) SelectUserForLogin(isOauth bool) *User {
 	var ret User
 	conn, _ := connectors.GetDB()
-
 	log.Println(user.Username)
 	var buffer bytes.Buffer
 	var canQuery = false

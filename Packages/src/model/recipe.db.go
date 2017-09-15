@@ -13,22 +13,22 @@ import (
 )
 
 //CREATE, UPDATE, DELETE
-//
+//Insert a recipe record into the database
 func InsertRecipe(recipe Recipe) int {
 	recipe.ID = 0
 	return processRecipe(recipe)
 }
 
-//
+//Update a recipe record into the database.
 func UpdateRecipe(recipe Recipe) int {
 	return processRecipe(recipe)
 }
 
-//
+//This will process inserts and updates. Updates delete relationships and
+//underlying recipe steps, and then add them back in
 func processRecipe(recipe Recipe) int {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-
 	var buffer bytes.Buffer
 	if recipe.ID == 0 {
 		buffer.WriteString("INSERT INTO `recipe` SET ")
@@ -74,10 +74,9 @@ func processRecipe(recipe Recipe) int {
 	return int(recipeID)
 }
 
-//
+//Delete the recipe steps and relationships
 func clearRecipeStepsByRecipeID(recipeID int64) {
 	conn, _ := connectors.GetDB()
-
 	var buffer bytes.Buffer
 	var args []interface{}
 	var rsIDs []int
@@ -131,10 +130,9 @@ func clearRecipeStepsByRecipeID(recipeID int64) {
 	}
 }
 
-//
+//Delete the alternate ingredient relationships
 func clearAltIngredientsByRecipeStepID(stepID int64) {
 	conn, _ := connectors.GetDB()
-
 	var buffer bytes.Buffer
 	var args []interface{}
 	//delete all altingredients from altingredients table by stepid
@@ -147,26 +145,32 @@ func clearAltIngredientsByRecipeStepID(stepID int64) {
 }
 
 //This is a helper function, I recommend that you always clear out the
-//recipesteps before you start to process anything
+//recipesteps before you start to process anything. This function adds
+//recipe steps to the database
 func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 	conn, _ := connectors.GetDB()
-
+	var args []interface{}
 	var buffer bytes.Buffer
 	buffer.WriteString("INSERT INTO `recipestep` SET ")
 	if recipestep.OriginalIngredient.ID != 0 {
-		buffer.WriteString("`recipestepOriginalIngredient`=" + strconv.Itoa(recipestep.OriginalIngredient.ID) + ",")
+		buffer.WriteString("`recipestepOriginalIngredient`=?,")
+		args = append(args, strconv.Itoa(recipestep.OriginalIngredient.ID))
 	}
-	buffer.WriteString("`recipestepRecipeCardinalFloat`=" + strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32) + ",")
+	buffer.WriteString("`recipestepRecipeCardinalFloat`=?,")
+	args = append(args, strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32))
 	if recipestep.RecipeCardinalString != "" {
-		buffer.WriteString("`recipestepRecipeCardinalString`=\"" + recipestep.RecipeCardinalString + "\",")
+		buffer.WriteString("`recipestepRecipeCardinalString`=?,")
+		args = append(args, recipestep.RecipeCardinalString)
 	}
-	buffer.WriteString("`recipestepRecipeOrdinal`=" + strconv.Itoa(recipestep.RecipeOrdinal) + ",")
-	buffer.WriteString("`recipestepRecipeDoze`=" + strconv.Itoa(int(recipestep.RecipeDoze.ID)) + ",")
+	buffer.WriteString("`recipestepRecipeOrdinal`=?,")
+	args = append(args, strconv.Itoa(recipestep.RecipeOrdinal))
+	buffer.WriteString("`recipestepRecipeDoze`=?,")
+	args = append(args, strconv.Itoa(int(recipestep.RecipeDoze.ID)))
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	query = query + ";"
 	log.Println(query)
-	res, err := conn.Exec(query)
+	res, err := conn.Exec(query, args...)
 	stepID, err := res.LastInsertId()
 	if err != nil {
 		log.Fatal(err)
@@ -177,7 +181,7 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 	}
 	log.Printf("Step ID = %d, affected = %d\n", stepID, rowCnt)
 	if recipestep.OriginalIngredient.ID < 1 {
-		rows, _ := conn.Query("SELECT idProduct, productName FROM product where productName = '" + recipestep.OriginalIngredient.ProductName + "';")
+		rows, _ := conn.Query("SELECT idProduct, productName FROM product where productName=?;", recipestep.OriginalIngredient.ProductName)
 		defer rows.Close()
 		var (
 			id   int
@@ -190,7 +194,7 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 			}
 			log.Println(id, name)
 		}
-		conn.Exec("UPDATE `recipestep` SET `recipestepOriginalIngredient`='" + strconv.Itoa(id) + "' WHERE `idRecipeStep`='" + strconv.FormatInt(stepID, 10) + "';")
+		conn.Exec("UPDATE `recipestep` SET `recipestepOriginalIngredient`=? WHERE `idRecipeStep`=?;", strconv.Itoa(id), strconv.FormatInt(stepID, 10))
 	}
 	for _, altingredient := range recipestep.AltIngredient {
 		processAltIngredient(altingredient, stepID)
@@ -200,42 +204,46 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 }
 
 //This is a helper function, I recommend that you always clear out the
-//altingredients before you start to process anything
+//altingredients before you start to process anything.  This function
+//adds alternate ingredients to the database.
 func processAltIngredient(altingredient Product, stepID int64) {
 	conn, _ := connectors.GetDB()
-
+	var args []interface{}
 	product := SelectProduct(altingredient)
 	if len(product) > 0 {
-		conn.Exec("INSERT INTO `altIngredient` (`idProduct`, `idRecipeStep`) VALUES ('" + strconv.Itoa(product[0].ID) + "', '" + strconv.FormatInt(stepID, 10) + "');")
+		args = append(args, strconv.Itoa(product[0].ID))
+		args = append(args, strconv.FormatInt(stepID, 10))
+		conn.Exec("INSERT INTO `altIngredient` (`idProduct`, `idRecipeStep`) VALUES (?, ?);", args...)
 	}
 }
 
 //This is a helper function, I recommend that you always clear out the
-//recipesteps before you start to process anything
+//recipesteps before you start to process anything.  This function
+//adds the relationship between recipe steps and recipe records.
 func processRecipeToRecipeStep(recipeID int64, stepID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-
 	args = append(args, strconv.FormatInt(recipeID, 10))
 	args = append(args, strconv.FormatInt(stepID, 10))
 	conn.Exec("INSERT INTO `recipeToRecipeSteps` (`idRecipe`, `idRecipeStep`) VALUES (?, ?);", args...)
 }
 
 //SELECTS
-//
+//Get the recipe that is associated with a cocktail id.  The include BDG flag
+//adds the group related information
 func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
-
 	var ret Recipe
 	conn, _ := connectors.GetDB()
-
+	var args []interface{}
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT recipe.idRecipe, recipe.recipeMethod FROM recipe" +
 		" JOIN cocktailToRecipe ON cocktailToRecipe.idRecipe=recipe.idRecipe" +
 		" JOIN  cocktail ON cocktailToRecipe.idCocktail=cocktail.idCocktail" +
-		" WHERE cocktail.idCocktail=" + strconv.Itoa(cocktail.ID) + ";")
+		" WHERE cocktail.idCocktail=?;")
+	args = append(args, strconv.Itoa(cocktail.ID))
 	query := buffer.String()
 	log.Println(query)
-	rows, err := conn.Query(query)
+	rows, err := conn.Query(query, args...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -258,12 +266,12 @@ func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 	return ret
 }
 
-//
+//Get the recipe steps that make up the cocktail.  The include BDG flag
+//adds the group related information
 func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeStep {
-
 	var ret []RecipeStep
 	conn, _ := connectors.GetDB()
-
+	var args []interface{}
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT recipestep.idRecipeStep, recipestep.recipestepOriginalIngredient, recipestep.recipestepRecipeCardinalFloat," +
 		" COALESCE(recipestep.recipestepRecipeCardinalString, ''), recipestep.recipestepRecipeDoze" +
@@ -272,10 +280,11 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeSte
 		" JOIN recipe ON  recipeToRecipeSteps.idRecipe=recipe.idRecipe" +
 		" JOIN cocktailToRecipe ON cocktailToRecipe.idRecipe=recipe.idRecipe" +
 		" JOIN  cocktail ON cocktailToRecipe.idCocktail=cocktail.idCocktail" +
-		" WHERE cocktail.idCocktail=" + strconv.Itoa(cocktail.ID) + " ORDER BY recipestepRecipeOrdinal;")
+		" WHERE cocktail.idCocktail=? ORDER BY recipestepRecipeOrdinal;")
+	args = append(args, strconv.Itoa(cocktail.ID))
 	query := buffer.String()
 	log.Println(query)
-	rows, err := conn.Query(query)
+	rows, err := conn.Query(query, args...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -303,11 +312,11 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeSte
 
 }
 
-//
+//Get the alternate ingredients that are associated with a recipe step.
+//The include BDG flag adds the group related information
 func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
-
 	var buffer bytes.Buffer
 	var args []interface{}
 	buffer.WriteString("SELECT altIngredient.idProduct FROM altIngredient WHERE `idRecipeStep`=?;")
@@ -352,14 +361,12 @@ func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product 
 	return ret
 }
 
-//
+//Get all the doze records
 func SelectDoze() []Doze {
 	var ret []Doze
 	conn, _ := connectors.GetDB()
-
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT doze.idDoze, doze.dozeName FROM doze;")
-
 	query := buffer.String()
 	log.Println(query)
 	rows, err := conn.Query(query)

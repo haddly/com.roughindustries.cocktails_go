@@ -30,13 +30,13 @@ type RecipeStep struct {
 }
 
 //ENUMERATIONS - These must match the database one for one in both ID and order
-//
+//A doze represents a unit of measure.
 type Doze struct {
 	ID       int
 	DozeName string
 }
 
-//
+//Doze constants represent the unites of measure you can have in a recipe step
 const (
 	Shot = 1 + iota
 	Ounce
@@ -48,7 +48,7 @@ const (
 	Splash
 )
 
-//
+//String values for the int consts
 var DozeStrings = [...]string{
 	"shot",
 	"oz.",

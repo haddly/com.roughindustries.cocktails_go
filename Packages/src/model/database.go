@@ -8,7 +8,7 @@ import (
 )
 
 //SELECTS
-//
+//Get the current name of the database being used.
 func SelectCurrentDB() string {
 	log.Println("Getting CurrentDB")
 	conn, _ := connectors.GetDB()
