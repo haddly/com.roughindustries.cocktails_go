@@ -27,7 +27,7 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "404")
 		}
 		var mbt model.MetasByTypes
-		mbt = model.SelectMetaByTypes(false, true, false)
+		mbt = page.Meta.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		if len(m["ID"]) == 0 {
 			//apply the template page info to the index page
@@ -36,7 +36,7 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 			id, _ := strconv.Atoi(m["ID"][0])
 			var in model.Meta
 			in.ID = id
-			out := model.SelectMeta(in)
+			out := in.SelectMeta()
 			page.Meta = out[0]
 			page.RenderPageTemplate(w, "metamodform")
 		}
@@ -53,25 +53,25 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request) {
 	if page.Username != "" && page.Authenticated {
 		//Get the generic data that all meta mod pages need
 		var mbt model.MetasByTypes
-		mbt = model.SelectMetaByTypes(false, true, false)
+		mbt = page.Meta.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		//Validate the form input and populate the meta data
 		if ValidateMeta(&page.Meta, r) {
 			//did we get an add, update, or something else request
 			if r.Form["button"][0] == "add" {
-				ret_id := model.InsertMeta(page.Meta)
+				ret_id := page.Meta.InsertMeta()
 				model.LoadMCWithMetaData()
 				page.Meta.ID = ret_id
-				outMeta := model.SelectMeta(page.Meta)
+				outMeta := page.Meta.SelectMeta()
 				page.Meta = outMeta[0]
 				page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "metamodform")
 				return
 			} else if r.Form["button"][0] == "update" {
-				rows_updated := model.UpdateMeta(page.Meta)
+				rows_updated := page.Meta.UpdateMeta()
 				model.LoadMCWithMetaData()
 				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
-				outMeta := model.SelectMeta(page.Meta)
+				outMeta := page.Meta.SelectMeta()
 				page.Meta = outMeta[0]
 				page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "metamodform")
@@ -80,7 +80,7 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request) {
 				id, _ := strconv.Atoi(r.Form["ID"][0])
 				var in model.Meta
 				in.ID = id
-				out := model.SelectMeta(in)
+				out := in.SelectMeta()
 				page.Meta = out[0]
 				page.RenderPageTemplate(w, "metamodform")
 			} else {
@@ -99,7 +99,7 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request) {
 				id, _ := strconv.Atoi(r.Form["ID"][0])
 				var in model.Meta
 				in.ID = id
-				out := model.SelectMeta(in)
+				out := in.SelectMeta()
 				page.Meta = out[0]
 				page.RenderPageTemplate(w, "metamodform")
 			}

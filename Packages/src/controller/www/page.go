@@ -18,6 +18,10 @@ import (
 //accessability to the website
 var AllowAdmin = true
 
+//Use Google Analytics in the page.  This is to stop using google analytics
+//code in the test environment.
+var UseGA = false
+
 //the page struct is all the things a template could display or use when it
 //generates a page
 type page struct {
@@ -25,6 +29,7 @@ type page struct {
 	Redirect             string
 	Authenticated        bool
 	AllowAdmin           bool
+	UseGA                bool
 	CocktailSearch       model.CocktailSearch
 	CocktailSet          model.CocktailSet
 	MetasByTypes         model.MetasByTypes
@@ -106,11 +111,12 @@ func Load(w http.ResponseWriter, r *http.Request) {
 }
 
 //An initialization function that provides an initialized page object
-func NewPage(r *http.Request) page {
-	var p page
+func NewPage(r *http.Request) *page {
+	p := new(page)
 	p.Messages = make(map[string]template.HTML)
 	p.Errors = make(map[string]string)
 	p.AllowAdmin = AllowAdmin
+	p.UseGA = UseGA
 	if r != nil {
 		p.Username, p.Authenticated = GetSession(r)
 	}

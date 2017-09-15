@@ -1,4 +1,5 @@
-//model/user.connectors.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/user.db.go:package model
 package model
 
 import (
@@ -9,7 +10,12 @@ import (
 	"strings"
 )
 
-func SelectUserForLogin(user User, isOauth bool) *User {
+//CREATE, UPDATE, DELETE
+
+//SELECTS
+//Check the database for a user based on user name and password, if Ouath is
+//set then check the user based on email
+func (user *User) SelectUserForLogin(isOauth bool) *User {
 	var ret User
 	conn, _ := connectors.GetDB()
 

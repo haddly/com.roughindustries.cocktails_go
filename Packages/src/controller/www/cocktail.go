@@ -33,7 +33,7 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
-		cs = model.GetCocktailByID(id, true)
+		cs = model.SelectCocktailsByID(id, true)
 		page.CocktailSet = cs
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, "cocktail")
@@ -70,11 +70,11 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "404")
 		}
 		var cba model.CocktailsByAlphaNums
-		cba = model.GetCocktailsByAlphaNums(false)
+		cba = model.SelectCocktailsByAlphaNums(false)
 		page.CocktailsByAlphaNums = cba
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
-		mbt = model.SelectMetaByTypes(false, true, false)
+		mbt = page.Meta.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
 		ingredients = model.SelectProductsByTypes(true, false, false)
@@ -117,11 +117,11 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(m)
 		var cba model.CocktailsByAlphaNums
-		cba = model.GetCocktailsByAlphaNums(false)
+		cba = model.SelectCocktailsByAlphaNums(false)
 		page.CocktailsByAlphaNums = cba
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
-		mbt = model.SelectMetaByTypes(false, true, false)
+		mbt = page.Meta.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
 		ingredients = model.SelectProductsByTypes(true, false, false)
@@ -167,7 +167,7 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(r)
 	var m model.MetasByTypes
-	m = model.SelectMetaByTypes(true, true, false)
+	m = page.Meta.SelectMetaByTypes(true, true, false)
 	page.MetasByTypes = m
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, "cocktailsindex")
@@ -196,7 +196,7 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 		var c []model.Cocktail
 		c = model.SelectCocktailsByMeta(inMeta)
 		cs.ChildCocktails = c
-		meta := model.SelectMeta(inMeta)
+		meta := inMeta.SelectMeta()
 		cs.Metadata = meta[0]
 		page.CocktailSet = cs
 		page.RenderPageTemplate(w, "cocktails")

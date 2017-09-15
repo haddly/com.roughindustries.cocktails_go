@@ -17,19 +17,19 @@ import (
 
 //CREATE, UPDATE, DELETE
 //Insert a meta record into the database
-func InsertMeta(meta Meta) int {
+func (meta *Meta) InsertMeta() int {
 	//set the ID to zero to indicate an insert
 	meta.ID = 0
-	return processMeta(meta)
+	return meta.processMeta()
 }
 
 //Update a meta record in the database based on ID
-func UpdateMeta(meta Meta) int {
-	return processMeta(meta)
+func (meta *Meta) UpdateMeta() int {
+	return meta.processMeta()
 }
 
 //Process an insert or an update
-func processMeta(meta Meta) int {
+func (meta *Meta) processMeta() int {
 	conn, _ := connectors.GetDB() //get db connection
 	var args []interface{}        //arguments for variables in the data struct
 	var buffer bytes.Buffer       //buffer for the query
@@ -51,7 +51,7 @@ func processMeta(meta Meta) int {
 		buffer.WriteString(" `metaBlurb`=?,")
 		args = append(args, html.EscapeString(string(meta.Blurb)))
 	}
-	metatype := SelectMetaType(meta.MetaType, true, true, true)
+	metatype := meta.MetaType.SelectMetaType(true, true, true)
 	buffer.WriteString(" `metaType`=?,")
 	args = append(args, strconv.Itoa(metatype[0].ID))
 
@@ -75,7 +75,7 @@ func processMeta(meta Meta) int {
 
 //SELECTS
 //
-func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {
+func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {
 	var ret []MetaType
 
 	conn, _ := connectors.GetDB()
@@ -148,7 +148,7 @@ func SelectMetaType(metatype MetaType, ignoreShowInCocktailsIndex bool, ignoreHa
 }
 
 //
-func SelectMeta(meta Meta) []Meta {
+func (meta *Meta) SelectMeta() []Meta {
 	var ret []Meta
 	conn, _ := connectors.GetDB()
 
@@ -194,40 +194,19 @@ func SelectMeta(meta Meta) []Meta {
 	return ret
 }
 
-//
-func SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool) MetasByTypes {
+//If ignore cache is true then the database query is run otherwise the cache
+//is checked first
+func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool) MetasByTypes {
 	ret := new(MetasByTypes)
 	ret = nil
 	if !ignoreCache {
-		mc, _ := connectors.GetMC()
-		if mc != nil {
-			item := new(memcache.Item)
-			item = nil
-			if byShowInCocktailsIndex && orderBy {
-				item, _ = mc.Get("mbt_tt")
-			} else if byShowInCocktailsIndex && !orderBy {
-				item, _ = mc.Get("mbt_tf")
-			} else if !byShowInCocktailsIndex && orderBy {
-				item, _ = mc.Get("mbt_ft")
-			}
-
-			if item != nil {
-				if len(item.Value) > 0 {
-					read := bytes.NewReader(item.Value)
-					dec := gob.NewDecoder(read)
-					dec.Decode(&ret)
-				}
-			}
-		}
+		ret = meta.memcachedMetaByTypes(byShowInCocktailsIndex, orderBy)
 	}
-
 	if ret == nil {
 		ret = new(MetasByTypes)
 		var mtList []int
 		conn, _ := connectors.GetDB()
-
 		query := "SELECT `idMetaType` FROM  `metatype`"
-
 		if byShowInCocktailsIndex {
 			query += " WHERE metatypeShowInCocktailsIndex=1"
 		}
@@ -266,7 +245,7 @@ func SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bo
 			mbt.MetaType.MetaTypeNameNoSpaces = strings.Join(strings.Fields(mbt.MetaType.MetaTypeName), "")
 			var inMeta Meta
 			inMeta.MetaType = mbt.MetaType
-			outMeta := SelectMeta(inMeta)
+			outMeta := inMeta.SelectMeta()
 			mbt.Metas = outMeta
 			ret.MBT = append(ret.MBT, mbt)
 		}
@@ -276,8 +255,35 @@ func SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bo
 
 }
 
+//Memcache retrieval of metas by types
+func (meta *Meta) memcachedMetaByTypes(byShowInCocktailsIndex bool, orderBy bool) *MetasByTypes {
+	ret := new(MetasByTypes)
+	ret = nil
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		item := new(memcache.Item)
+		item = nil
+		if byShowInCocktailsIndex && orderBy {
+			item, _ = mc.Get("mbt_tt")
+		} else if byShowInCocktailsIndex && !orderBy {
+			item, _ = mc.Get("mbt_tf")
+		} else if !byShowInCocktailsIndex && orderBy {
+			item, _ = mc.Get("mbt_ft")
+		}
+
+		if item != nil {
+			if len(item.Value) > 0 {
+				read := bytes.NewReader(item.Value)
+				dec := gob.NewDecoder(read)
+				dec.Decode(&ret)
+			}
+		}
+	}
+	return ret
+}
+
 //
-func SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
+func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 	var ret []Meta
 	var isRoot bool
 	isRoot = false

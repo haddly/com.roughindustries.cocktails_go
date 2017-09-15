@@ -410,13 +410,6 @@ func SelectBDGByProduct(product Product) *BaseProductWithBDG {
 	return &bpwbd
 }
 
-//func SelectProductsByCocktail(cocktail Cocktail) []Product{
-//SELECT * FROM product
-//JOIN cocktailToProducts ON cocktailToProducts.idProduct=product.idProduct
-//JOIN  cocktail ON cocktailToProducts.idCocktail=cocktail.idCocktail
-//WHERE cocktail.idCocktail=2;
-//}
-
 //
 func SelectAllProducts() []Product {
 	var ret []Product

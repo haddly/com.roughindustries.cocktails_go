@@ -1,4 +1,5 @@
-//model/cocktail.connectors.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/cocktail.db.go:package model
 package model
 
 import (
@@ -13,16 +14,20 @@ import (
 	"strings"
 )
 
+//CREATE, UPDATE, DELETE
+//Insert a cocktail record into the database
 func InsertCocktail(cocktail Cocktail) int {
 	cocktail.ID = 0
-	return ProcessCocktail(cocktail)
+	return processCocktail(cocktail)
 }
 
+//
 func UpdateCocktail(cocktail Cocktail) int {
-	return ProcessCocktail(cocktail)
+	return processCocktail(cocktail)
 }
 
-func ProcessCocktail(cocktail Cocktail) int {
+//
+func processCocktail(cocktail Cocktail) int {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 
@@ -124,37 +129,37 @@ func ProcessCocktail(cocktail Cocktail) int {
 	} else {
 		recipeID = UpdateRecipe(cocktail.Recipe)
 	}
-	ClearAltNamesAndAKAsByCocktailID(lastCocktailId)
-	ProcessAKAs(cocktail.AKA, lastCocktailId)
-	ProcessAltNames(cocktail.AlternateName, lastCocktailId)
+	clearAltNamesAndAKAsByCocktailID(lastCocktailId)
+	processAKAs(cocktail.AKA, lastCocktailId)
+	processAltNames(cocktail.AlternateName, lastCocktailId)
 
-	ClearCocktailToProductsByCocktailID(lastCocktailId)
-	ProcessCocktailToProducts(cocktail.Garnish, lastCocktailId)
-	ProcessCocktailToProducts(cocktail.Drinkware, lastCocktailId)
-	ProcessCocktailToProducts(cocktail.Tool, lastCocktailId)
+	clearCocktailToProductsByCocktailID(lastCocktailId)
+	processCocktailToProducts(cocktail.Garnish, lastCocktailId)
+	processCocktailToProducts(cocktail.Drinkware, lastCocktailId)
+	processCocktailToProducts(cocktail.Tool, lastCocktailId)
 
-	log.Println("Processing Cocktail to Metas")
-	ClearCocktailToMetasByCocktailID(lastCocktailId)
-	log.Println("Processing Cocktail to Family")
-	ProcessCocktailToMetas(cocktail.Family, lastCocktailId, btoi(cocktail.IsFamilyRoot))
-	log.Println("Processing Cocktail to Flavor")
-	ProcessCocktailToMetas(cocktail.Flavor, lastCocktailId, 0)
-	log.Println("Processing Cocktail to Type")
-	ProcessCocktailToMetas(cocktail.Type, lastCocktailId, 0)
-	log.Println("Processing Cocktail to BaseSpirit")
-	ProcessCocktailToMetas(cocktail.BaseSpirit, lastCocktailId, 0)
-	log.Println("Processing Cocktail to Served")
-	ProcessCocktailToMetas(cocktail.Served, lastCocktailId, 0)
-	log.Println("Processing Cocktail to Technique")
-	ProcessCocktailToMetas(cocktail.Technique, lastCocktailId, 0)
-	log.Println("Processing Cocktail to Strength")
-	ProcessCocktailToMetas(cocktail.Strength, lastCocktailId, 0)
-	log.Println("Processing Cocktail to Difficulty")
-	ProcessCocktailToMetas(cocktail.Difficulty, lastCocktailId, 0)
-	log.Println("Processing Cocktail to TOD")
-	ProcessCocktailToMetas(cocktail.TOD, lastCocktailId, 0)
-	log.Println("Processing Cocktail to Ratio")
-	ProcessCocktailToMetas(cocktail.Ratio, lastCocktailId, 0)
+	log.Println("processing Cocktail to Metas")
+	clearCocktailToMetasByCocktailID(lastCocktailId)
+	log.Println("processing Cocktail to Family")
+	processCocktailToMetas(cocktail.Family, lastCocktailId, btoi(cocktail.IsFamilyRoot))
+	log.Println("processing Cocktail to Flavor")
+	processCocktailToMetas(cocktail.Flavor, lastCocktailId, 0)
+	log.Println("processing Cocktail to Type")
+	processCocktailToMetas(cocktail.Type, lastCocktailId, 0)
+	log.Println("processing Cocktail to BaseSpirit")
+	processCocktailToMetas(cocktail.BaseSpirit, lastCocktailId, 0)
+	log.Println("processing Cocktail to Served")
+	processCocktailToMetas(cocktail.Served, lastCocktailId, 0)
+	log.Println("processing Cocktail to Technique")
+	processCocktailToMetas(cocktail.Technique, lastCocktailId, 0)
+	log.Println("processing Cocktail to Strength")
+	processCocktailToMetas(cocktail.Strength, lastCocktailId, 0)
+	log.Println("processing Cocktail to Difficulty")
+	processCocktailToMetas(cocktail.Difficulty, lastCocktailId, 0)
+	log.Println("processing Cocktail to TOD")
+	processCocktailToMetas(cocktail.TOD, lastCocktailId, 0)
+	log.Println("processing Cocktail to Ratio")
+	processCocktailToMetas(cocktail.Ratio, lastCocktailId, 0)
 
 	if cocktail.ID == 0 {
 		args = args[0:0]
@@ -165,7 +170,8 @@ func ProcessCocktail(cocktail Cocktail) int {
 	return int(lastCocktailId)
 }
 
-func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
+//
+func clearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
@@ -237,7 +243,8 @@ func ClearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	conn.Exec(query, args...)
 }
 
-func ProcessAKAs(names []Name, cocktailID int64) {
+//
+func processAKAs(names []Name, cocktailID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 	var buffer bytes.Buffer
@@ -266,7 +273,8 @@ func ProcessAKAs(names []Name, cocktailID int64) {
 	}
 }
 
-func ProcessAltNames(names []Name, cocktailID int64) {
+//
+func processAltNames(names []Name, cocktailID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 
@@ -296,7 +304,8 @@ func ProcessAltNames(names []Name, cocktailID int64) {
 	}
 }
 
-func ClearCocktailToProductsByCocktailID(cocktailID int64) {
+//
+func clearCocktailToProductsByCocktailID(cocktailID int64) {
 	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
 	var args []interface{}
@@ -308,7 +317,8 @@ func ClearCocktailToProductsByCocktailID(cocktailID int64) {
 	conn.Exec(query, args...)
 }
 
-func ProcessCocktailToProducts(products []Product, cocktailID int64) {
+//
+func processCocktailToProducts(products []Product, cocktailID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 
@@ -326,7 +336,8 @@ func ProcessCocktailToProducts(products []Product, cocktailID int64) {
 	}
 }
 
-func ClearCocktailToMetasByCocktailID(cocktailID int64) {
+//
+func clearCocktailToMetasByCocktailID(cocktailID int64) {
 	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
 	var args []interface{}
@@ -338,12 +349,13 @@ func ClearCocktailToMetasByCocktailID(cocktailID int64) {
 	conn.Exec(query, args...)
 }
 
-func ProcessCocktailToMetas(metas []Meta, cocktailID int64, isRootCocktailForMeta int) {
+//
+func processCocktailToMetas(metas []Meta, cocktailID int64, isRootCocktailForMeta int) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 
 	for _, meta := range metas {
-		metaTo := SelectMeta(meta)
+		metaTo := meta.SelectMeta()
 		if len(metaTo) > 0 {
 			query := "INSERT INTO `cocktailToMetas` (`idCocktail`, `idMeta`, `idMetaType`, `isRootCocktailForMeta`) VALUES (?, ?, ?, ?);"
 			args = args[0:0]
@@ -357,7 +369,9 @@ func ProcessCocktailToMetas(metas []Meta, cocktailID int64, isRootCocktailForMet
 	}
 }
 
-func GetCocktailsByAlphaNums(ignoreCache bool) CocktailsByAlphaNums {
+//SELECTS
+//
+func SelectCocktailsByAlphaNums(ignoreCache bool) CocktailsByAlphaNums {
 	ret := new(CocktailsByAlphaNums)
 	ret = nil
 	if !ignoreCache {
@@ -407,6 +421,7 @@ func GetCocktailsByAlphaNums(ignoreCache bool) CocktailsByAlphaNums {
 
 }
 
+//
 func SelectCocktailsByMeta(meta Meta) []Cocktail {
 	var ret []Cocktail
 	conn, _ := connectors.GetDB()
@@ -460,6 +475,7 @@ func SelectCocktailsByMeta(meta Meta) []Cocktail {
 	return ret
 }
 
+//
 func SelectCocktailsByProduct(product Product) []Cocktail {
 	var ret []Cocktail
 	conn, _ := connectors.GetDB()
@@ -513,6 +529,7 @@ func SelectCocktailsByProduct(product Product) []Cocktail {
 	return ret
 }
 
+//
 func SelectAllCocktails(includeBDG bool) []Cocktail {
 	var c []Cocktail
 	conn, _ := connectors.GetDB()
@@ -563,6 +580,7 @@ func SelectAllCocktails(includeBDG bool) []Cocktail {
 	return c
 }
 
+//
 func SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
 	var cs CocktailSet
 	conn, _ := connectors.GetDB()
@@ -596,22 +614,23 @@ func SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
 		if err != nil {
 			log.Fatal(err)
 		}
+		meta := new(Meta)
 		//add recipe to cocktail
 		cocktail.Recipe = SelectRecipeByCocktail(cocktail, includeBDG)
 		cocktail.Drinkware = SelectProductsByCocktailAndProductType(cocktail.ID, int(Drinkware))
 		cocktail.Garnish = SelectProductsByCocktailAndProductType(cocktail.ID, int(Garnish))
 		cocktail.Tool = SelectProductsByCocktailAndProductType(cocktail.ID, int(Tool))
-		cocktail.Flavor, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Flavor))
-		cocktail.BaseSpirit, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(BaseSpirit))
-		cocktail.Type, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Type))
+		cocktail.Flavor, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Flavor))
+		cocktail.BaseSpirit, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(BaseSpirit))
+		cocktail.Type, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Type))
 
-		cocktail.Served, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Served))
-		cocktail.Technique, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Technique))
-		cocktail.Strength, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Strength))
-		cocktail.Difficulty, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Difficulty))
-		cocktail.TOD, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(TOD))
-		cocktail.Ratio, _ = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Ratio))
-		cocktail.Family, cocktail.IsFamilyRoot = SelectMetasByCocktailAndMetaType(cocktail.ID, int(Family))
+		cocktail.Served, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Served))
+		cocktail.Technique, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Technique))
+		cocktail.Strength, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Strength))
+		cocktail.Difficulty, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Difficulty))
+		cocktail.TOD, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(TOD))
+		cocktail.Ratio, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Ratio))
+		cocktail.Family, cocktail.IsFamilyRoot = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Family))
 
 		//add cocktail to cocktail family
 		cs.Cocktail = cocktail
@@ -626,11 +645,4 @@ func SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
 	}
 
 	return cs
-}
-
-func btoi(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }

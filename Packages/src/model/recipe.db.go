@@ -1,4 +1,5 @@
-//model/recipe.connectors.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/recipe.db.go:package model
 package model
 
 import (
@@ -11,16 +12,20 @@ import (
 	"strings"
 )
 
+//CREATE, UPDATE, DELETE
+//
 func InsertRecipe(recipe Recipe) int {
 	recipe.ID = 0
-	return ProcessRecipe(recipe)
+	return processRecipe(recipe)
 }
 
+//
 func UpdateRecipe(recipe Recipe) int {
-	return ProcessRecipe(recipe)
+	return processRecipe(recipe)
 }
 
-func ProcessRecipe(recipe Recipe) int {
+//
+func processRecipe(recipe Recipe) int {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 
@@ -62,14 +67,15 @@ func ProcessRecipe(recipe Recipe) int {
 	//We don't bother trying to figure out what we can modify or not
 	//the database is small enough where we can just blow away the rows
 	//and insert new ones
-	ClearRecipeStepsByRecipeID(recipeID)
+	clearRecipeStepsByRecipeID(recipeID)
 	for _, recipestep := range recipe.RecipeSteps {
-		ProcessRecipeStep(recipestep, recipeID)
+		processRecipeStep(recipestep, recipeID)
 	}
 	return int(recipeID)
 }
 
-func ClearRecipeStepsByRecipeID(recipeID int64) {
+//
+func clearRecipeStepsByRecipeID(recipeID int64) {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
@@ -98,7 +104,7 @@ func ClearRecipeStepsByRecipeID(recipeID int64) {
 
 	//clear all altingredients by stepid
 	for _, stepID := range rsIDs {
-		ClearAltIngredientsByRecipeStepID(int64(stepID))
+		clearAltIngredientsByRecipeStepID(int64(stepID))
 	}
 
 	buffer.Reset()
@@ -125,7 +131,8 @@ func ClearRecipeStepsByRecipeID(recipeID int64) {
 	}
 }
 
-func ClearAltIngredientsByRecipeStepID(stepID int64) {
+//
+func clearAltIngredientsByRecipeStepID(stepID int64) {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
@@ -141,7 +148,7 @@ func ClearAltIngredientsByRecipeStepID(stepID int64) {
 
 //This is a helper function, I recommend that you always clear out the
 //recipesteps before you start to process anything
-func ProcessRecipeStep(recipestep RecipeStep, recipeID int64) {
+func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 	conn, _ := connectors.GetDB()
 
 	var buffer bytes.Buffer
@@ -186,15 +193,15 @@ func ProcessRecipeStep(recipestep RecipeStep, recipeID int64) {
 		conn.Exec("UPDATE `recipestep` SET `recipestepOriginalIngredient`='" + strconv.Itoa(id) + "' WHERE `idRecipeStep`='" + strconv.FormatInt(stepID, 10) + "';")
 	}
 	for _, altingredient := range recipestep.AltIngredient {
-		ProcessAltIngredient(altingredient, stepID)
+		processAltIngredient(altingredient, stepID)
 	}
 
-	ProcessRecipeToRecipeStep(recipeID, stepID)
+	processRecipeToRecipeStep(recipeID, stepID)
 }
 
 //This is a helper function, I recommend that you always clear out the
 //altingredients before you start to process anything
-func ProcessAltIngredient(altingredient Product, stepID int64) {
+func processAltIngredient(altingredient Product, stepID int64) {
 	conn, _ := connectors.GetDB()
 
 	product := SelectProduct(altingredient)
@@ -205,7 +212,7 @@ func ProcessAltIngredient(altingredient Product, stepID int64) {
 
 //This is a helper function, I recommend that you always clear out the
 //recipesteps before you start to process anything
-func ProcessRecipeToRecipeStep(recipeID int64, stepID int64) {
+func processRecipeToRecipeStep(recipeID int64, stepID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 
@@ -214,6 +221,8 @@ func ProcessRecipeToRecipeStep(recipeID int64, stepID int64) {
 	conn.Exec("INSERT INTO `recipeToRecipeSteps` (`idRecipe`, `idRecipeStep`) VALUES (?, ?);", args...)
 }
 
+//SELECTS
+//
 func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 
 	var ret Recipe
@@ -249,6 +258,7 @@ func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 	return ret
 }
 
+//
 func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeStep {
 
 	var ret []RecipeStep
@@ -293,6 +303,7 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeSte
 
 }
 
+//
 func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
@@ -341,6 +352,7 @@ func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product 
 	return ret
 }
 
+//
 func SelectDoze() []Doze {
 	var ret []Doze
 	conn, _ := connectors.GetDB()

@@ -75,7 +75,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		//Confirm the username is in DB and password after getting user from DB
-		usr := model.SelectUserForLogin(page.User, false)
+		usr := page.User.SelectUserForLogin(false)
 		//if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
 		if usr.Password == page.User.Password {
 			us := new(model.UserSession)
@@ -215,7 +215,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	log.Println(email)
 	var user model.User
 	user.Email = email
-	usr := model.SelectUserForLogin(user, true)
+	usr := user.SelectUserForLogin(true)
 	us := new(model.UserSession)
 	us.Username = usr.Username
 	SetSession(w, r, us)
@@ -326,7 +326,7 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	email := dat["email"]
 	var user model.User
 	user.Email = email.(string)
-	usr := model.SelectUserForLogin(user, true)
+	usr := user.SelectUserForLogin(true)
 	us := new(model.UserSession)
 	us.Username = usr.Username
 	SetSession(w, r, us)

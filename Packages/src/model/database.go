@@ -7,7 +7,9 @@ import (
 	"log"
 )
 
-func GetCurrentDB() string {
+//SELECTS
+//
+func SelectCurrentDB() string {
 	log.Println("Getting CurrentDB")
 	conn, _ := connectors.GetDB()
 	log.Println("Getting Databases")

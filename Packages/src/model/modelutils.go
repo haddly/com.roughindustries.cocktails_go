@@ -18,3 +18,12 @@ func checkCount(rows *sql.Rows) (count int, err error) {
 	}
 	return count, nil
 }
+
+//Convert a boolean to the corresponding int value, i.e. true = 1 and
+//false = 0
+func btoi(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}

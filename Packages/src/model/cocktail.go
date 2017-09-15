@@ -1,19 +1,13 @@
-//model/cocktail.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/cocktail.go:package model
 package model
 
 import (
 	"html/template"
 )
 
-// recipe:
-//   - !recipeStep
-//       ingredient:
-//          ProductName: Pineapple
-//          ProductType: 3
-//       recipeCardinal: 1.0
-//       recipeDoze: whole
-//       recipeOrdinal: 1
-
+//DATA STRUCTURES
+//Cocktail data structure
 type Cocktail struct {
 	ID              int
 	Title           string
@@ -53,10 +47,12 @@ type Cocktail struct {
 	Errors          map[string]string
 }
 
+//
 type Name struct {
 	Name string
 }
 
+//
 type CocktailSet struct {
 	ChildCocktails []Cocktail
 	RootCocktail   Cocktail
@@ -65,43 +61,13 @@ type CocktailSet struct {
 	Product        Product
 }
 
+//
 type CocktailSearch struct {
 	Products []Product
 	Metadata []Meta
 }
 
+//
 type CocktailsByAlphaNums struct {
 	CBA map[string][]Cocktail
-}
-
-func GetCocktailSearch() CocktailSearch {
-	var cs CocktailSearch
-	// for _, element := range Products {
-	// 	if element.ProductGroupType == Base {
-	// 		cs.Products = append(cs.Products, element)
-	// 	}
-	// }
-	//cs.Metadata = Metadata
-	return cs
-}
-
-func GetCocktailByID(ID int, includeBDG bool) CocktailSet {
-	var c Cocktail
-	c.ID = ID
-	return processCocktailRequest(c, includeBDG)
-}
-
-func processCocktailRequest(c Cocktail, includeBDG bool) CocktailSet {
-	var cs CocktailSet
-	cs = SelectCocktailsByID(c.ID, includeBDG)
-	return cs
-}
-
-func intInSlice(a int, list []int) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
 }

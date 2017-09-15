@@ -107,9 +107,9 @@ func DBTestHandler(w http.ResponseWriter, r *http.Request) {
 	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.GetCurrentDB() + "<br/>")
+		buffer.WriteString(model.SelectCurrentDB() + "<br/>")
 
-		model.SelectMetaByTypes(false, false, true)
+		page.Meta.SelectMetaByTypes(false, false, true)
 		model.SelectProductsByTypes(true, true, true)
 		//apply the template page info to the index page
 		statStr := buffer.String()

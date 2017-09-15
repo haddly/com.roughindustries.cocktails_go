@@ -9,6 +9,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
+//Clears out the whole memcache
 func DeleteAllMemcache() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -16,12 +17,14 @@ func DeleteAllMemcache() {
 	}
 }
 
+//Calls all the loaders to reinitialize the memcache
 func LoadAllMemcache() {
 	LoadMCWithProductData()
 	LoadMCWithMetaData()
 	LoadMCWithCocktailByAlphaNumsData()
 }
 
+//Reinitialize the memcache with all the cocktails in alpha numeric order
 func LoadMCWithCocktailByAlphaNumsData() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -30,13 +33,15 @@ func LoadMCWithCocktailByAlphaNumsData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var cba CocktailsByAlphaNums
-		cba = GetCocktailsByAlphaNums(true)
+		cba = SelectCocktailsByAlphaNums(true)
 		enc.Encode(cba)
 
 		mc.Set(&memcache.Item{Key: "cba", Value: buf.Bytes()})
 	}
 }
 
+//Reinitialize the products lists in the memcache for both ingredients and
+//non-ingredients, ingredients only, and non-ingredients only lists
 func LoadMCWithProductData() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -68,9 +73,15 @@ func LoadMCWithProductData() {
 	}
 }
 
+//Reinitialize the meta lists in the memcache for both show in cocktail
+//index ordered by metatype ordinal, just the list of meta values to show
+//in the cocktail index with no order by, and all the metas and ordered by
+//ordinal
 func LoadMCWithMetaData() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
+		meta := new(Meta)
+
 		mc.Delete("mbt_tt")
 		mc.Delete("mbt_tf")
 		mc.Delete("mbt_ft")
@@ -78,21 +89,21 @@ func LoadMCWithMetaData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var mbt MetasByTypes
-		mbt = SelectMetaByTypes(true, true, true)
+		mbt = meta.SelectMetaByTypes(true, true, true)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_tt", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		mbt = SelectMetaByTypes(true, false, true)
+		mbt = meta.SelectMetaByTypes(true, false, true)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_tf", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		mbt = SelectMetaByTypes(false, true, true)
+		mbt = meta.SelectMetaByTypes(false, true, true)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_ft", Value: buf.Bytes()})
