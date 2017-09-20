@@ -323,7 +323,7 @@ func processCocktailToProducts(products []Product, cocktailID int64) {
 	var args []interface{}
 
 	for _, product := range products {
-		prodTo := SelectProduct(product)
+		prodTo := product.SelectProduct()
 		if len(prodTo) > 0 {
 			query := "INSERT INTO `cocktailToProducts` (`idCocktail`, `idProduct`, `idProductType`) VALUES (?, ?, ?);"
 			args = args[0:0]
@@ -615,11 +615,12 @@ func SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
 			log.Fatal(err)
 		}
 		meta := new(Meta)
+		product := new(Product)
 		//add recipe to cocktail
 		cocktail.Recipe = SelectRecipeByCocktail(cocktail, includeBDG)
-		cocktail.Drinkware = SelectProductsByCocktailAndProductType(cocktail.ID, int(Drinkware))
-		cocktail.Garnish = SelectProductsByCocktailAndProductType(cocktail.ID, int(Garnish))
-		cocktail.Tool = SelectProductsByCocktailAndProductType(cocktail.ID, int(Tool))
+		cocktail.Drinkware = product.SelectProductsByCocktailAndProductType(cocktail.ID, int(Drinkware))
+		cocktail.Garnish = product.SelectProductsByCocktailAndProductType(cocktail.ID, int(Garnish))
+		cocktail.Tool = product.SelectProductsByCocktailAndProductType(cocktail.ID, int(Tool))
 		cocktail.Flavor, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Flavor))
 		cocktail.BaseSpirit, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(BaseSpirit))
 		cocktail.Type, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Type))

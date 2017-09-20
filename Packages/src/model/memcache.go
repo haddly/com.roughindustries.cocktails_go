@@ -45,6 +45,8 @@ func LoadMCWithCocktailByAlphaNumsData() {
 func LoadMCWithProductData() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
+		product := new(Product)
+
 		mc.Delete("pbt_tt")
 		mc.Delete("pbt_tf")
 		mc.Delete("pbt_ft")
@@ -52,21 +54,21 @@ func LoadMCWithProductData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var pbt ProductsByTypes
-		pbt = SelectProductsByTypes(true, true, true)
+		pbt = product.SelectProductsByTypes(true, true, true)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_tt", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		pbt = SelectProductsByTypes(true, false, true)
+		pbt = product.SelectProductsByTypes(true, false, true)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_tf", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		pbt = SelectProductsByTypes(false, true, true)
+		pbt = product.SelectProductsByTypes(false, true, true)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_ft", Value: buf.Bytes()})

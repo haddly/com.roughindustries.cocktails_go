@@ -110,7 +110,7 @@ func DBTestHandler(w http.ResponseWriter, r *http.Request) {
 		buffer.WriteString(model.SelectCurrentDB() + "<br/>")
 
 		page.Meta.SelectMetaByTypes(false, false, true)
-		model.SelectProductsByTypes(true, true, true)
+		page.Product.SelectProductsByTypes(true, true, true)
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)

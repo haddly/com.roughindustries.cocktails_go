@@ -209,7 +209,7 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 func processAltIngredient(altingredient Product, stepID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-	product := SelectProduct(altingredient)
+	product := altingredient.SelectProduct()
 	if len(product) > 0 {
 		args = append(args, strconv.Itoa(product[0].ID))
 		args = append(args, strconv.FormatInt(stepID, 10))
@@ -297,7 +297,8 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeSte
 		if err != nil {
 			log.Fatal(err)
 		}
-		rs.OriginalIngredient = SelectProductByID(oiID)
+		product := new(Product)
+		rs.OriginalIngredient = product.SelectProductByID(oiID)
 		rs.RecipeDoze = Doze{ID: doze}
 		rs.AltIngredient = SelectAltIngredientsByRecipeStep(rs, includeBDG)
 		log.Println(rs.ID, rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze.ID))
@@ -334,7 +335,7 @@ func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product 
 		if err != nil {
 			log.Fatal(err)
 		}
-		prod = SelectProductByID(prod.ID)
+		prod = prod.SelectProductByID(prod.ID)
 		ret = append(ret, prod)
 	}
 	err = rows.Err()
@@ -344,9 +345,9 @@ func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product 
 
 	//TODO: Add group and derived products to the al products list
 	if includeBDG {
-		prod := SelectProduct(rs.OriginalIngredient)
+		prod := rs.OriginalIngredient.SelectProduct()
 		if len(prod) > 0 {
-			bdg := SelectBDGByProduct(prod[0])
+			bdg := prod[0].SelectBDGByProduct()
 			if bdg.BaseProduct.ID != 0 {
 				ret = append(ret, bdg.BaseProduct)
 			}

@@ -74,26 +74,29 @@ func (meta *Meta) processMeta() int {
 }
 
 //SELECTS
-//
+//Select from the metatype table based on the attributes set in the metatype
+//object.  Also ignores the showincocktailsindex column or ignoreHasRoot column
+//or the ignoreIsOneToMany column based on the flags provided
 func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {
 	var ret []MetaType
-
 	conn, _ := connectors.GetDB()
-
-	//log.Println(metatype.MetaTypeName)
+	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	var canQuery = false
 	buffer.WriteString("SELECT `idMetaType`, `metatypeName`, `metatypeOrdinal`, `metatypeShowInCocktailsIndex`, `metatypeHasRoot`, `metatypeIsOneToMany` FROM `metatype` WHERE ")
 	if metatype.ID != 0 {
-		buffer.WriteString("`idMetaType`=" + strconv.Itoa(metatype.ID) + " AND")
+		buffer.WriteString("`idMetaType`=? AND")
+		args = append(args, strconv.Itoa(metatype.ID))
 		canQuery = true
 	}
 	if metatype.MetaTypeName != "" {
-		buffer.WriteString("`metatypeName`=\"" + metatype.MetaTypeName + "\" AND")
+		buffer.WriteString("`metatypeName`=? AND")
+		args = append(args, metatype.MetaTypeName)
 		canQuery = true
 	}
 	if metatype.Ordinal != 0 {
-		buffer.WriteString(" `metatypeOrdinal`=" + strconv.Itoa(metatype.Ordinal) + " AND")
+		buffer.WriteString(" `metatypeOrdinal`=? AND")
+		args = append(args, strconv.Itoa(metatype.Ordinal))
 		canQuery = true
 	}
 	if !ignoreShowInCocktailsIndex {
@@ -125,7 +128,7 @@ func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignore
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
 		log.Println(query)
-		rows, err := conn.Query(query)
+		rows, err := conn.Query(query, args...)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -147,22 +150,24 @@ func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignore
 	return ret
 }
 
-//
+//Select from the meta table based on the attributes set in the meta object.
 func (meta *Meta) SelectMeta() []Meta {
 	var ret []Meta
 	conn, _ := connectors.GetDB()
-
-	log.Println(meta.MetaName)
+	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType`, COALESCE(`metaBlurb`, '') FROM `meta` WHERE ")
 	if meta.ID != 0 {
-		buffer.WriteString("`idMeta`=" + strconv.Itoa(meta.ID) + " AND")
+		buffer.WriteString("`idMeta`=? AND")
+		args = append(args, strconv.Itoa(meta.ID))
 	}
 	if meta.MetaName != "" {
-		buffer.WriteString("`metaName`=\"" + meta.MetaName + "\" AND")
+		buffer.WriteString("`metaName`=? AND")
+		args = append(args, meta.MetaName)
 	}
 	if meta.MetaType.ID != 0 {
-		buffer.WriteString(" `metaType` IN (" + strconv.Itoa(meta.MetaType.ID) + ") AND")
+		buffer.WriteString(" `metaType` IN (?) AND")
+		args = append(args, strconv.Itoa(meta.MetaType.ID))
 	}
 
 	query := buffer.String()
@@ -170,7 +175,7 @@ func (meta *Meta) SelectMeta() []Meta {
 	query = strings.TrimRight(query, " AND")
 	query = query + ";"
 	log.Println(query)
-	rows, err := conn.Query(query)
+	rows, err := conn.Query(query, args...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -194,8 +199,9 @@ func (meta *Meta) SelectMeta() []Meta {
 	return ret
 }
 
-//If ignore cache is true then the database query is run otherwise the cache
-//is checked first
+//Select a set of meta records based on the flags passed in via the metatypes
+//table. If ignore cache is true then the database query is run otherwise the
+//cache is checked first.
 func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool) MetasByTypes {
 	ret := new(MetasByTypes)
 	ret = nil
@@ -282,49 +288,45 @@ func (meta *Meta) memcachedMetaByTypes(byShowInCocktailsIndex bool, orderBy bool
 	return ret
 }
 
-//
+//Select a set of meta records based on a cocktail id nad metatype id
 func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
 	var ret []Meta
 	var isRoot bool
 	isRoot = false
 	conn, _ := connectors.GetDB()
-
+	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
-	var canQuery = false
 	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType, cocktailToMetas.isRootCocktailForMeta" +
 		" FROM meta" +
 		" JOIN cocktailToMetas ON meta.idMeta=cocktailToMetas.idMeta" +
 		" JOIN cocktail ON cocktailToMetas.idCocktail=cocktail.idCocktail" +
-		" WHERE cocktail.idCocktail=" + strconv.Itoa(ID) + " AND meta.metaType=" + strconv.Itoa(mt) + "")
-	canQuery = true
-
-	if canQuery {
-		query := buffer.String()
-		query = strings.TrimRight(query, " AND")
-		query = query + ";"
-		log.Println(query)
-		rows, err := conn.Query(query)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-		for rows.Next() {
-			var meta Meta
-			var root string
-			err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if !isRoot {
-				isRoot, _ = strconv.ParseBool(root)
-			}
-			ret = append(ret, meta)
-			log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
-		}
-		err = rows.Err()
-		if err != nil {
-			log.Fatal(err)
-		}
+		" WHERE cocktail.idCocktail=? AND meta.metaType=?;")
+	args = append(args, strconv.Itoa(ID))
+	args = append(args, strconv.Itoa(mt))
+	query := buffer.String()
+	log.Println(query)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer rows.Close()
+	for rows.Next() {
+		var meta Meta
+		var root string
+		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if !isRoot {
+			isRoot, _ = strconv.ParseBool(root)
+		}
+		ret = append(ret, meta)
+		log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return ret, isRoot
 }

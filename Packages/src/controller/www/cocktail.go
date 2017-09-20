@@ -77,10 +77,10 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 		mbt = page.Meta.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
-		ingredients = model.SelectProductsByTypes(true, false, false)
+		ingredients = page.Product.SelectProductsByTypes(true, false, false)
 		page.Ingredients = ingredients
 		var nonIngredients model.ProductsByTypes
-		nonIngredients = model.SelectProductsByTypes(false, true, false)
+		nonIngredients = page.Product.SelectProductsByTypes(false, true, false)
 		page.NonIngredients = nonIngredients
 		if len(m["ID"]) == 0 {
 			//apply the template page info to the index page
@@ -124,10 +124,10 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 		mbt = page.Meta.SelectMetaByTypes(false, true, false)
 		page.MetasByTypes = mbt
 		var ingredients model.ProductsByTypes
-		ingredients = model.SelectProductsByTypes(true, false, false)
+		ingredients = page.Product.SelectProductsByTypes(true, false, false)
 		page.Ingredients = ingredients
 		var nonIngredients model.ProductsByTypes
-		nonIngredients = model.SelectProductsByTypes(false, true, false)
+		nonIngredients = page.Product.SelectProductsByTypes(false, true, false)
 		page.NonIngredients = nonIngredients
 		if ValidateCocktail(&page.Cocktail, m) {
 			if m["button"][0] == "add" {
@@ -226,7 +226,7 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
 		var c []model.Cocktail
 		c = model.SelectCocktailsByProduct(inProduct)
 		cs.ChildCocktails = c
-		prod := model.SelectProduct(inProduct)
+		prod := inProduct.SelectProduct()
 		cs.Product = prod[0]
 		page.CocktailSet = cs
 		page.RenderPageTemplate(w, "cocktails")

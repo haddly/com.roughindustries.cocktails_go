@@ -64,9 +64,9 @@ func WWWRouterInit() {
 
 }
 
+//This handler is designed to return a 404 error after a panic has occured
 func RecoverHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// STANDARD HANDLER HEADER START
 		// catch all errors and return 404
 		defer func() {
 			// recover from panic if one occured. Set err to nil otherwise.
@@ -74,7 +74,6 @@ func RecoverHandler(h http.Handler) http.Handler {
 				Error404(w, rec)
 			}
 		}()
-		// STANDARD HANLDER HEADER END
 		h.ServeHTTP(w, r) // call next
 	})
 }

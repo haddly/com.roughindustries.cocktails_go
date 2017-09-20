@@ -40,17 +40,15 @@ footer {
 }
 
 .brightness {
-    background-color: black;
+    background-color: white;
     display: inline-block;
 }
-.brightness img {
+.brightness div {
     opacity: 1;
 }
-.brightness img:hover {
-    opacity: .95;
+.brightness:hover {
+    opacity: .75;
 }
-
-
 
 #accordion .panel-heading {
     padding: 0;

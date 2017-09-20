@@ -24,7 +24,7 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(r.Form["ID"][0])
 
-		p = model.SelectProductByIDWithBDG(id)
+		p = page.Product.SelectProductByIDWithBDG(id)
 		page.BaseProductWithBDG = *p
 		page.RenderPageTemplate(w, "product")
 	}
@@ -38,10 +38,10 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 		//Process Form gets an ID if it was passed
 		r.ParseForm()
 		var pbt model.ProductsByTypes
-		pbt = model.SelectProductsByTypes(true, true, false)
+		pbt = page.Product.SelectProductsByTypes(true, true, false)
 		var prods []model.Product
 		var prod model.Product
-		prods = model.SelectProduct(prod)
+		prods = prod.SelectProduct()
 		page.Products = prods
 		page.ProductsByTypes = pbt
 		if len(r.Form["ID"]) == 0 {
@@ -51,9 +51,9 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 			id, _ := strconv.Atoi(r.Form["ID"][0])
 			var in model.Product
 			in.ID = id
-			out := model.SelectProduct(in)
+			out := in.SelectProduct()
 			page.Product = out[0]
-			page.BaseProductWithBDG = *model.SelectBDGByProduct(out[0])
+			page.BaseProductWithBDG = *page.Product.SelectBDGByProduct()
 			page.RenderPageTemplate(w, "productmodform")
 		}
 	} else {
@@ -69,10 +69,10 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 	if page.Username != "" && page.Authenticated {
 		//Get the generic data that all product mod pages need
 		var pbt model.ProductsByTypes
-		pbt = model.SelectProductsByTypes(true, true, false)
+		pbt = page.Product.SelectProductsByTypes(true, true, false)
 		var prods []model.Product
 		var prod model.Product
-		prods = model.SelectProduct(prod)
+		prods = prod.SelectProduct()
 		page.Products = prods
 		page.ProductsByTypes = pbt
 		//Validate the form input and populate the product data, this also
@@ -80,47 +80,47 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 		if ValidateProduct(&page.Product, &page.BaseProductWithBDG, r) {
 			//did we get an add, update, or something else request
 			if r.Form["button"][0] == "add" {
-				ret_id := model.InsertProduct(page.Product)
+				ret_id := page.Product.InsertProduct()
 				//handle add of bdg if derived or group
 				if page.Product.ProductGroupType == model.Derived {
 					var dp model.DerivedProduct
 					dp.Product.ID = ret_id
 					dp.BaseProduct.ID = page.BaseProductWithBDG.BaseProduct.ID
-					model.InsertDerivedProduct(dp)
+					dp.InsertDerivedProduct()
 				} else if page.Product.ProductGroupType == model.Group {
 					var gp model.GroupProduct
 					gp.GroupProduct.ID = ret_id
 					gp.Products = page.BaseProductWithBDG.GroupProducts
-					model.InsertGroupProduct(gp)
+					gp.InsertGroupProduct()
 				}
 				model.LoadMCWithProductData()
-				pbt = model.SelectProductsByTypes(true, true, false)
+				pbt = page.Product.SelectProductsByTypes(true, true, false)
 				page.ProductsByTypes = pbt
 				page.Product.ID = ret_id
-				outProduct := model.SelectProduct(page.Product)
+				outProduct := page.Product.SelectProduct()
 				page.Product = outProduct[0]
 				page.Messages["productModifySuccess"] = "Product modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "productmodform")
 				return
 			} else if r.Form["button"][0] == "update" {
-				rows_updated := model.UpdateProduct(page.Product)
+				rows_updated := page.Product.UpdateProduct()
 				//handle add of bdg if derived or group, requires the
 				if page.Product.ProductGroupType == model.Derived {
 					var dp model.DerivedProduct
 					dp.Product.ID = page.Product.ID
 					dp.BaseProduct.ID = page.BaseProductWithBDG.BaseProduct.ID
-					model.UpdateDerivedProduct(dp)
+					dp.UpdateDerivedProduct()
 				} else if page.Product.ProductGroupType == model.Group {
 					var gp model.GroupProduct
 					gp.GroupProduct.ID = page.Product.ID
 					gp.Products = page.BaseProductWithBDG.GroupProducts
-					model.UpdateGroupProduct(gp)
+					gp.UpdateGroupProduct()
 				}
 				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
 				model.LoadMCWithProductData()
-				pbt = model.SelectProductsByTypes(true, true, false)
+				pbt = page.Product.SelectProductsByTypes(true, true, false)
 				page.ProductsByTypes = pbt
-				outProduct := model.SelectProduct(page.Product)
+				outProduct := page.Product.SelectProduct()
 				page.Product = outProduct[0]
 				page.Messages["productModifySuccess"] = "Product modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "productmodform")
@@ -148,7 +148,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(r)
 	var p []model.Product
-	p = model.SelectAllProducts()
+	p = page.Product.SelectAllProducts()
 	page.Products = p
 	page.RenderPageTemplate(w, "products")
 }
