@@ -40,7 +40,6 @@ var (
 	//Scopes:   []string{"public_profile", "email"},
 	//Endpoint: facebook.Endpoint,
 	//}
-	}
 	// Some random string, random for each request
 	// this way could create a memory leak sense I don't clear out the map ever, just a heads up
 	oauthStateString = make(map[string]bool)
