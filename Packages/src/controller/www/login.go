@@ -9,7 +9,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"github.com/bradfitz/gomemcache/memcache"
-	"golang.org/x/crypto/bcrypt"
+	//"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
@@ -65,8 +65,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		//this is in case you need to perform DB actions before the DB is setup
 		//otherwise you wouldn't have an users
 		if allowDefault && page.User.Username == defaultUser {
-			//if page.User.Password == defaultPassword {
-			if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
+			if page.User.Password == defaultPassword {
+				//if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
 				us := new(model.UserSession)
 				us.Username = defaultUser
 				SetSession(w, r, us)
