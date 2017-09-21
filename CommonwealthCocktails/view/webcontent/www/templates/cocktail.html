@@ -158,12 +158,7 @@
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
 				<div align="center" class="row">
-					{{with .Cocktail.Advertisement}} {{if .Advertiser.AdvertiserName}}
-					<div class="col-xs-12 text-center no-wrap">
-						<div align="center" style="position: relative; width: 100%; max-width:400px">
-						{{if .MediumVertSnippet}} {{.MediumVertSnippet}} {{end}}
-					</div>
-					{{end}}{{end}}
+
 				</div>
 				<br>
 				<div class="row">
@@ -205,14 +200,6 @@
 <!--Cocktail Image-->
 {{define "cocktailimage"}}
 <div align="center" style="position: relative; width: 100%;">
-{{with .Cocktail.Advertisement}} {{if .Advertiser.AdvertiserName}}
-	<div align="center" style="position: relative; width: 100%;">
-	{{if .MediumHorSnippet}} {{.MediumHorSnippet}} {{else}}
-	<a target="_blank" href="{{.Advertiser.AdvertiserLink}}">
-		<img class="img-responsive" src="https://placeholdit.imgix.net/~text?txtsize=14&bg=ffffff&txtclr=000000&txtsize=33&txt=Sponsored+By+{{.Advertiser.AdvertiserName}}&w=600&h=150&txttrack=0" />
-	</a>{{end}}
-	</div>
-	{{end}}{{end}} 
 	{{if .Cocktail.Image}} {{if .Cocktail.ImagePath}}
 	<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{else}}
 	<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}} {{else}}
@@ -275,16 +262,14 @@
 				{{if .OriginalIngredient.PreText}}
 				{{.OriginalIngredient.PreText}}&nbsp; 
 				{{end}} 
-				{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}} 
+				{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}}
 			</a> 
+			<a title="Related Cocktails" href="/cocktailsByIngredientID?ID={{.OriginalIngredient.ID}}">
+				<i style="display: table-cell; font-size: 0.73em; color: black; vertical-align: middle;" class="fa fa-glass"></i>
+			</a>
 			{{end}}
 		</div>
 	</td>
-<!--<td width="10" align="right">-->
-<!--	<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByMetaID?ID={{.OriginalIngredient.ID}}">-->
-<!--		<i class="fa fa-glass"></i>-->
-<!--	</a>-->
-<!--</td>-->
 </tr>
 {{end}} {{end}}
 {{end}}

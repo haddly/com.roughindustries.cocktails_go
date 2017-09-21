@@ -1,16 +1,11 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 package alexa
 
 import (
 	"bytes"
-	//"encoding/json"
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/mux"
 	alexa "github.com/mikeflynn/go-alexa/skillserver"
 	"html/template"
-	//"io/ioutil"
 	"log"
-	"net/http"
-	//"time"
 )
 
 type News struct {
@@ -41,16 +36,6 @@ var app = alexa.EchoApplication{ // Route
 
 var Applications = map[string]interface{}{
 	"/echo/helloworld": app,
-}
-
-func (hello *Hello) Init() {
-	log.Println("Init in alexa/hello.go")
-	router := mux.NewRouter()
-	alexa.Init(Applications, router)
-
-	n := negroni.Classic()
-	n.UseHandler(router)
-	http.Handle("/echo/helloworld", router)
 }
 
 func EchoIntentHandler(echoReq *alexa.EchoRequest, echoResp *alexa.EchoResponse) {

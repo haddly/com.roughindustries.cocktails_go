@@ -1,4 +1,14 @@
-// Package session
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/session.go: Because I am using Google Cloud Platform
+//and Golang I need this to be scalable which requires persistance
+//outside of the httpd golang instance running.  If I just used
+//a single instance this wouldn't be an issue sense I could use local
+//memory.  With multiple instances this is not possible. GCP
+//automatically creates 2 instances with the basic flex env which if I am trying
+//to share managed sessions over the 2 instances requires remote persistance
+//storage for the sessions.  The idea is to save the managed sessions in a
+//memcache and/or a database but try to use the memcache for the bulk of the gets
+//for the manages sessions, because of performance.
 package www
 
 import (
@@ -8,23 +18,19 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/gorilla/sessions"
 	"log"
+	"model"
 	"net/http"
 )
 
-//Because I am using Google Cloud Platform and Golang I need this to be scalable
-//which requires persistance outside of the httpd golang instance running.  If
-//I just used a single instance this wouldn't be an issue sense I could use
-//local memory.  With multiple instances this is not possible. GCP
-//automatically creates 2 instances with the basic flex env which if I am trying
-//to share managed sessions over the 2 instances requires remote persistance
-//storage for the sessions.  The idea is to save the managed sessions in a
-//memcache and a database but try to use the memcache for the bulk of the gets
-//for the manages sessions.
-
+//the sessions are stored here in coockies
 var store = sessions.NewCookieStore([]byte(randSeq(64)))
 
-var managed_sessions = make(map[string]string)
+//memcache session mapping
+var managed_sessions = make(map[string]model.UserSession)
 
+//get the session from the cookies and cross reference it with the
+//memcache
+//TODO: setup database session mapping store
 func GetSession(r *http.Request) (string, bool) {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
@@ -33,7 +39,7 @@ func GetSession(r *http.Request) (string, bool) {
 	}
 	// Retrieve our struct and type-assert it
 	if session_id, ok := session.Values["session_id"].(string); !ok {
-		log.Println("Bad Session ID")
+		log.Println("No Session ID")
 		return "", false
 	} else {
 		log.Println("Good Session ID")
@@ -43,7 +49,7 @@ func GetSession(r *http.Request) (string, bool) {
 		if mc != nil {
 			item := new(memcache.Item)
 			item, _ = mc.Get("managed_sessions")
-			managed_sessions = make(map[string]string)
+			managed_sessions = make(map[string]model.UserSession)
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
@@ -52,12 +58,12 @@ func GetSession(r *http.Request) (string, bool) {
 				}
 			}
 			data := managed_sessions[session_id+"_u"]
-			if data == "" {
+			if data.Username == "" {
 				log.Println("Not Authenticated")
-				return data, false
+				return data.Username, false
 			} else {
 				log.Println("Authenticated")
-				return data, true
+				return data.Username, true
 
 			}
 		} else {
@@ -72,7 +78,10 @@ func GetSession(r *http.Request) (string, bool) {
 	return "", false
 }
 
-func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
+//set the session for the cookies and cross reference it to the
+//memcache
+//TODO: setup database session mapping store
+func SetSession(w http.ResponseWriter, r *http.Request, data *model.UserSession) string {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		Error404(w, err.Error())
@@ -92,7 +101,7 @@ func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 	if mc != nil {
 		item := new(memcache.Item)
 		item, _ = mc.Get("managed_sessions")
-		managed_sessions = make(map[string]string)
+		managed_sessions = make(map[string]model.UserSession)
 		if item != nil {
 			if len(item.Value) > 0 {
 				read := bytes.NewReader(item.Value)
@@ -100,7 +109,7 @@ func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 				dec.Decode(&managed_sessions)
 			}
 		}
-		managed_sessions[session_id+"_u"] = data
+		managed_sessions[session_id+"_u"] = *data
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		enc.Encode(managed_sessions)
@@ -118,6 +127,8 @@ func SetSession(w http.ResponseWriter, r *http.Request, data string) string {
 	return session_id
 }
 
+//clear the session for the cookies and the memcache
+//TODO: setup database session mapping store
 func ClearSession(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
@@ -135,7 +146,7 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 		if mc != nil {
 			item := new(memcache.Item)
 			item, _ = mc.Get("managed_sessions")
-			managed_sessions = make(map[string]string)
+			managed_sessions = make(map[string]model.UserSession)
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
@@ -158,8 +169,4 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 		}
 		//MEMCACHE SESSION DELETE
 	}
-}
-
-func init() {
-
 }

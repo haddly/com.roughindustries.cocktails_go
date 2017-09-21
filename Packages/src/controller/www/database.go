@@ -1,57 +1,53 @@
-//www/Database.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/database.go: Functions and handlers for interacting with the
+//database at the level above the individual tables.  This includes loading
+//the tables and data from sql mysqldump files.
 package www
 
 import (
+	"bufio"
 	"bytes"
 	"connectors"
 	"html/template"
+	"io/ioutil"
+	"log"
 	"model"
 	"net/http"
+	"os"
+	"regexp"
+	"strings"
 )
 
-type Database struct {
-}
-
-type Status struct {
-	Status template.HTML
-}
-
-func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+//Handler for loading the sql mysqldump file for db tables
+func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
+	page := NewPage(r)
+	// Check for a valid user and that authentication
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
-		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.GetCurrentDB() + "<br/>")
-		buffer.WriteString("<br/><b>Tables</b>: ")
-		model.InitProductTables()
-		model.InitCocktailTables()
-		model.InitPostTables()
-		model.InitMetaTables()
-		model.InitRecipeTables()
-		model.InitAdvertisementTables()
-		model.InitCocktailReferences()
-		model.InitAdvertisementReferences()
-		model.InitMetaReferences()
-		model.InitProductReferences()
-		model.InitRecipeReferences()
-		model.InitUserTables()
-
+		var dat []byte
+		if connectors.DBType == connectors.MySQL {
+			dat, _ = ioutil.ReadFile("sql/ccschemadump.sql")
+		} else if connectors.DBType == connectors.SQLite {
+			dat, _ = ioutil.ReadFile("sql/ccsqlite3schema.sql")
+		}
+		requests := strings.Split(string(dat), ";")
 		conn, _ := connectors.GetDB()
-		rows, _ := conn.Query("SHOW TABLES;")
-		for rows.Next() {
-			var temp string
-			rows.Scan(&temp)
-			buffer.WriteString("<br>" + temp)
+		//disable foreign key contraint sense I don't know the order we add
+		//the tables
+		conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
+		//parse the file and run only the slq commands
+		for _, request := range requests {
+			r, _ := regexp.Compile("(.*/*!.*)")
+			if !r.MatchString(string(request)) {
+				buffer.WriteString(string(request) + ";<br><br>")
+				log.Println(string(request))
+				if len(string(request)) > 0 {
+					_, err := conn.Exec(string(request))
+					if err != nil {
+						log.Println(err)
+					}
+				}
+			}
 		}
 		//apply the template page info to the index page
 		statStr := buffer.String()
@@ -62,36 +58,42 @@ func (database *Database) DBTablesHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+//Handler for loading the sql mysqldump file for db data
+func DBDataHandler(w http.ResponseWriter, r *http.Request) {
+	page := NewPage(r)
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
-		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.GetCurrentDB() + "<br/>")
-
-		model.ProcessPosts()
-		model.ProcessMetaTypes()
-		model.ProcessProducts()
-		model.ProcessMetas()
-		model.ProcessCocktails()
-		model.ProcessRecipes()
-		model.ProcessDerivedProducts()
-		model.ProcessGroupProducts()
-		model.ProcessUsers()
-
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")
+		dir, _ := os.Getwd()
+		var dat *os.File
+		if connectors.DBType == connectors.MySQL {
+			dat, _ = os.Open("sql/ccdatadump.sql")
+		} else if connectors.DBType == connectors.SQLite {
+			dat, _ = os.Open("sql/ccsqlite3data.sql")
+		}
+		defer dat.Close()
+		scanner := bufio.NewScanner(dat)
+		scanner.Split(bufio.ScanLines)
+		buffer.WriteString(dir + "<br><br>")
+		conn, _ := connectors.GetDB()
+		//disable foreign key contraint sense I don't know the order we add
+		//the data
+		conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
+		//parse the file and run only the slq commands
+		for scanner.Scan() {
+			request := scanner.Text()
+			buffer.WriteString(string(request) + ";<br><br>")
+			log.Println(string(request))
+			if len(string(request)) > 0 {
+				_, err := conn.Exec(string(request))
+				if err != nil {
+					log.Println(err)
+				}
+			}
+		}
 		//apply the template page info to the index page
 		statStr := buffer.String()
+		log.Println(statStr)
 		page.Messages["Status"] = template.HTML(statStr)
 		page.RenderPageTemplate(w, "dbindex")
 	} else {
@@ -99,25 +101,16 @@ func (database *Database) DBDataHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+//Handler for running db sanity checks
+func DBTestHandler(w http.ResponseWriter, r *http.Request) {
+	page := NewPage(r)
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.GetCurrentDB() + "<br/>")
+		buffer.WriteString(model.SelectCurrentDB() + "<br/>")
 
-		model.GetMetaByTypes(false, false, true)
-		model.GetProductsByTypes(true, true, true)
+		page.Meta.SelectMetaByTypes(false, false, true)
+		page.Product.SelectProductsByTypes(true, true, true)
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
@@ -125,10 +118,4 @@ func (database *Database) DBTestHandler(w http.ResponseWriter, r *http.Request) 
 	} else {
 		page.RenderPageTemplate(w, "404")
 	}
-}
-
-func (database *Database) Init() {
-	http.HandleFunc("/db_tables", database.DBTablesHandler)
-	http.HandleFunc("/db_data", database.DBDataHandler)
-	http.HandleFunc("/db_test", database.DBTestHandler)
 }

@@ -1,10 +1,13 @@
-//model/meta.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/meta.go:package model
 package model
 
 import (
 	"html/template"
 )
 
+//DATA STRUCTURES
+//Metatype data structure
 type MetaType struct {
 	ID                   int
 	ShowInCocktailsIndex bool
@@ -15,6 +18,28 @@ type MetaType struct {
 	IsOneToMany          bool
 }
 
+//Meta data structure
+type Meta struct {
+	ID       int
+	MetaName string
+	MetaType MetaType
+	Blurb    template.HTML
+	Errors   map[string]string
+}
+
+//A list of a set of metas grouped by metatype
+type MetasByTypes struct {
+	MBT []MetasByType
+}
+
+//A set of metas for a metatype
+type MetasByType struct {
+	MetaType MetaType
+	Metas    []Meta
+}
+
+//ENUMERATIONS - These must match the database one for one in both ID and order
+//The integer values for the metatype enumeration
 type MetaTypesConst int
 
 const (
@@ -33,9 +58,8 @@ const (
 	Drink
 )
 
-var MetaTypeCount = 13
-
-//family can be used to duplicate liquor.coms pages likr
+//The string values for the metatype enumeration
+//family can be used to duplicate liquor.coms pages like
 //http://www.liquor.com/mosaic/margarita-recipes/#gs.0BEty3o
 //it can include a post with a excerpt and multiple base
 //cocktails that are shown first, i.e. frozen margarita and
@@ -61,6 +85,7 @@ var MetaTypeStrings = [...]string{
 // String returns the English name of the metatype ("Flavor", "Base Spirit", ...).
 func (mt MetaTypesConst) String() string { return MetaTypeStrings[mt-1] }
 
+//The integer values for the grouptype enumeration
 type GroupType int
 
 const (
@@ -70,6 +95,7 @@ const (
 	Substitute
 )
 
+//The string values for the grouptype enumeration
 var GroupTypeStrings = [...]string{
 	"Base",
 	"Derived",
@@ -80,6 +106,8 @@ var GroupTypeStrings = [...]string{
 // String returns the English name of the Grouptype ("Base", "Derived", ...).
 func (ct GroupType) String() string { return GroupTypeStrings[ct-1] }
 
+//Helper function for templates so that they can take a grouptype string
+//and convert it to the int const
 func GroupTypeStringToInt(a string) int {
 	var i = 1
 	for _, b := range GroupTypeStrings {
@@ -89,22 +117,4 @@ func GroupTypeStringToInt(a string) int {
 		i++
 	}
 	return 0
-}
-
-type Meta struct {
-	ID       int               //valid string in validator map key is metaID
-	MetaName string            //valid string in validator map key is metaName
-	MetaType MetaType          //valid string in validator map key is metaType
-	Article  Post              //TBD
-	Blurb    template.HTML     //valid string in validator map key is metaBlurb
-	Errors   map[string]string //N/A for validator
-}
-
-type MetasByTypes struct {
-	MBT []MetasByType
-}
-
-type MetasByType struct {
-	MetaType MetaType
-	Metas    []Meta
 }
