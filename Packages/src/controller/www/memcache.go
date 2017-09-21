@@ -1,4 +1,7 @@
-//www/memcache.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//controller/www/memcache.go: Functions and handlers for interacting with the
+//memcache at a high level.  This includes delteing and loading large sets
+//of data from the database.
 package www
 
 import (
@@ -8,26 +11,14 @@ import (
 	"net/http"
 )
 
-type Memcache struct {
-}
-
-func (memcache *Memcache) MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+//delete all the memcache entries
+func MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	page := NewPage(r)
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Memcache Delete</b>:<br/>")
 		model.DeleteAllMemcache()
-		page.Username, page.Authenticated = GetSession(r)
+
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
@@ -35,19 +26,10 @@ func (memcache *Memcache) MCDeleteHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (memcache *Memcache) MCAddHandler(w http.ResponseWriter, r *http.Request) {
-	// STANDARD HANDLER HEADER START
-	// catch all errors and return 404
-	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if rec := recover(); rec != nil {
-			Error404(w, rec)
-		}
-	}()
-	page := NewPage()
-	page.Username, page.Authenticated = GetSession(r)
-	// STANDARD HANLDER HEADER END
-	if page.Username != "" {
+//load all the memcache entries from the database
+func MCAddHandler(w http.ResponseWriter, r *http.Request) {
+	page := NewPage(r)
+	if page.Username != "" && page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Memcache Add</b>:<br/>")
 		model.LoadAllMemcache()
@@ -56,9 +38,4 @@ func (memcache *Memcache) MCAddHandler(w http.ResponseWriter, r *http.Request) {
 		page.Messages["Status"] = template.HTML(statStr)
 		page.RenderPageTemplate(w, "mcindex")
 	}
-}
-
-func (memcache *Memcache) Init() {
-	http.HandleFunc("/mc_delete", memcache.MCDeleteHandler)
-	http.HandleFunc("/mc_load", memcache.MCAddHandler)
 }

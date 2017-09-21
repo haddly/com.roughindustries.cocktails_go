@@ -1,40 +1,32 @@
-//model/user.go
+// Copyright 2017 Rough Industries LLC. All rights reserved.
+//model/user.go:package model
 package model
 
 import (
-	"strings"
 	"time"
 )
 
+//DATA STRUCTURES
+//User data structure.
 type User struct {
-	ID            int
-	Username      string
-	Password      string
+	ID         int
+	Username   string
+	FullName   string
+	Password   string
+	IsDisabled bool
+
 	Email         string
 	Authenticated bool
 	LastLogin     time.Time
 	Errors        map[string]string
 }
 
-func GetUser(username string) *User {
-	for _, element := range Users {
-		if element.Username == username {
-			return &element
-		}
-	}
-	return nil
-}
-
-func (user *User) Validate() bool {
-	user.Errors = make(map[string]string)
-
-	if strings.TrimSpace(user.Username) == "" {
-		user.Errors["Username"] = "Please enter a valid username"
-	}
-
-	if len(user.Password) == 0 {
-		user.Errors["Password"] = "Please enter a valid password"
-	}
-
-	return len(user.Errors) == 0
+//User session data structure.  Keeps track of users logged in or accessing the
+//site.
+type UserSession struct {
+	SessionKey   string
+	Username     string
+	UserID       int
+	LoginTime    time.Time
+	LastSeenTime time.Time
 }
