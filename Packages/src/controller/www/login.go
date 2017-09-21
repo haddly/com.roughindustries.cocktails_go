@@ -114,24 +114,13 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 //Initial request from the website that then submits the request to google
 func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	str := randSeq(64)
-	//MEMCACHE OAUTH SET
 	mc, _ := connectors.GetMC()
 	if mc != nil {
-		item := new(memcache.Item)
-		item, _ = mc.Get("oauthStateString")
-		if item != nil {
-			if len(item.Value) > 0 {
-				read := bytes.NewReader(item.Value)
-				dec := gob.NewDecoder(read)
-				dec.Decode(&oauthStateString)
-			}
-		}
-		oauthStateString[str] = true
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
-		enc.Encode(oauthStateString)
-
-		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
+		//change to a date time to see if the seq is out of date so we don't accept it
+		enc.Encode(true)
+		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
 		log.Println("Bad memcache handleGoogleLogin")
 		//Try the database here
@@ -140,25 +129,40 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		// 	panic
 		// }
 	}
-	//MEMCACHE OAUTH SET
-
 	url := googleOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 //Handler for the response to the Google OAuth request from handleGoogleLogin
 func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
-	//MEMCACHE OAUTH GET
+	state := r.FormValue("state")
+	//change to a date time to see if the seq is out of date so we don't accept it
+	var isValid bool
+	isValid = false
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		item := new(memcache.Item)
-		item, _ = mc.Get("oauthStateString")
+		item, _ = mc.Get(state)
 		if item != nil {
 			if len(item.Value) > 0 {
 				read := bytes.NewReader(item.Value)
 				dec := gob.NewDecoder(read)
-				dec.Decode(&oauthStateString)
+				dec.Decode(&isValid)
+				//MEMCACHE OAUTH GET
+				if !isValid {
+					log.Printf("invalid oauth state")
+					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+					return
+				} else {
+					mc.Delete(state)
+				}
+			} else {
+				log.Printf("invalid oauth state")
+				return
 			}
+		} else {
+			log.Printf("invalid oauth state")
+			return
 		}
 	} else {
 		log.Println("Bad memcache handleGoogleCallback")
@@ -168,32 +172,6 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 		// 	panic
 		// }
 	}
-	//MEMCACHE OAUTH GET
-
-	state := r.FormValue("state")
-	if !oauthStateString[state] {
-		log.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
-	} else {
-		delete(oauthStateString, state)
-	}
-
-	//MEMCACHE OAUTH SET
-	if mc != nil {
-		buf := new(bytes.Buffer)
-		enc := gob.NewEncoder(buf)
-		enc.Encode(oauthStateString)
-
-		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
-	} else {
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
-	}
-	//MEMCACHE OAUTH SET
 
 	code := r.FormValue("code")
 	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
@@ -224,24 +202,13 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 //Initial request from the website that then submits the request to facebook
 func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 	str := randSeq(64)
-	//MEMCACHE OAUTH SET
 	mc, _ := connectors.GetMC()
 	if mc != nil {
-		item := new(memcache.Item)
-		item, _ = mc.Get("oauthStateString")
-		if item != nil {
-			if len(item.Value) > 0 {
-				read := bytes.NewReader(item.Value)
-				dec := gob.NewDecoder(read)
-				dec.Decode(&oauthStateString)
-			}
-		}
-		oauthStateString[str] = true
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
-		enc.Encode(oauthStateString)
-
-		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
+		//change to a date time to see if the seq is out of date so we don't accept it
+		enc.Encode(true)
+		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
 		log.Println("Bad memcache handleGoogleLogin")
 		//Try the database here
@@ -250,7 +217,6 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 		// 	panic
 		// }
 	}
-	//MEMCACHE OAUTH SET
 	oauthStateString[str] = true
 	url := facebookOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
@@ -258,17 +224,34 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 
 //Handler for the response to the Facebook OAuth request from handleFacebookLogin
 func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
-	//MEMCACHE OAUTH GET
+	state := r.FormValue("state")
+	//change to a date time to see if the seq is out of date so we don't accept it
+	var isValid bool
+	isValid = false
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		item := new(memcache.Item)
-		item, _ = mc.Get("oauthStateString")
+		item, _ = mc.Get(state)
 		if item != nil {
 			if len(item.Value) > 0 {
 				read := bytes.NewReader(item.Value)
 				dec := gob.NewDecoder(read)
-				dec.Decode(&oauthStateString)
+				dec.Decode(&isValid)
+				//MEMCACHE OAUTH GET
+				if !isValid {
+					log.Printf("invalid oauth state")
+					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+					return
+				} else {
+					mc.Delete(state)
+				}
+			} else {
+				log.Printf("invalid oauth state")
+				return
 			}
+		} else {
+			log.Printf("invalid oauth state")
+			return
 		}
 	} else {
 		log.Println("Bad memcache handleGoogleCallback")
@@ -278,32 +261,6 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 		// 	panic
 		// }
 	}
-	//MEMCACHE OAUTH GET
-
-	state := r.FormValue("state")
-	if !oauthStateString[state] {
-		log.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
-	} else {
-		delete(oauthStateString, state)
-	}
-
-	//MEMCACHE OAUTH SET
-	if mc != nil {
-		buf := new(bytes.Buffer)
-		enc := gob.NewEncoder(buf)
-		enc.Encode(oauthStateString)
-
-		mc.Set(&memcache.Item{Key: "oauthStateString", Value: buf.Bytes()})
-	} else {
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
-	}
-	//MEMCACHE OAUTH SET
 
 	code := r.FormValue("code")
 	//_, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
