@@ -30,7 +30,6 @@ type page struct {
 	Authenticated        bool
 	AllowAdmin           bool
 	UseGA                bool
-	CocktailSearch       model.CocktailSearch
 	CocktailSet          model.CocktailSet
 	MetasByTypes         model.MetasByTypes
 	Ingredients          model.ProductsByTypes

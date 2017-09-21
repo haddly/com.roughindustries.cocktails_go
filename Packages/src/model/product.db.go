@@ -356,7 +356,7 @@ func (product *Product) SelectProductsByTypes(includeIngredients bool, includeNo
 	return *ret
 }
 
-//
+//Memcache retrieval of products by types
 func (product *Product) memcachedProductsByTypes(includeIngredients bool, includeNonIngredients bool) *ProductsByTypes {
 	ret := new(ProductsByTypes)
 	ret = nil
@@ -383,7 +383,8 @@ func (product *Product) memcachedProductsByTypes(includeIngredients bool, includ
 	return ret
 }
 
-//
+//Select a product by an id number and include the base, derived, or group
+//information
 func (product *Product) SelectProductByIDWithBDG(ID int) *BaseProductWithBDG {
 	var inProduct Product
 	inProduct.ID = ID
@@ -391,10 +392,9 @@ func (product *Product) SelectProductByIDWithBDG(ID int) *BaseProductWithBDG {
 	return p[0].SelectBDGByProduct()
 }
 
-//
+//Select the base, derived, or group information for a product
 func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 	conn, _ := connectors.GetDB()
-
 	var bpwbd BaseProductWithBDG
 	var inProduct Product
 	bpwbd.Product = *product
@@ -402,7 +402,7 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 	var bp Product
 	log.Println("Product With ID for BD return " + strconv.Itoa(product.ID) + "and GroupType " + strconv.Itoa(int(product.ProductGroupType)))
 	if product.ProductGroupType == Base {
-		bd_rows, _ := conn.Query("SELECT `idProduct` FROM  `derivedProduct` WHERE idBaseProduct='" + strconv.Itoa(product.ID) + "';")
+		bd_rows, _ := conn.Query("SELECT `idProduct` FROM  `derivedProduct` WHERE idBaseProduct=?;", strconv.Itoa(product.ID))
 		defer bd_rows.Close()
 		for bd_rows.Next() {
 			var derivedProductID int
@@ -417,7 +417,7 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 		}
 		bpwbd.DerivedProducts = dgp
 	} else if product.ProductGroupType == Derived {
-		bd_rows, _ := conn.Query("SELECT `idBaseProduct` FROM  `derivedProduct` WHERE idProduct='" + strconv.Itoa(product.ID) + "';")
+		bd_rows, _ := conn.Query("SELECT `idBaseProduct` FROM  `derivedProduct` WHERE idProduct=?;", strconv.Itoa(product.ID))
 		defer bd_rows.Close()
 		for bd_rows.Next() {
 			var baseProductID int
@@ -432,7 +432,7 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 		}
 		bpwbd.BaseProduct = bp
 	} else if product.ProductGroupType == Group {
-		bd_rows, _ := conn.Query("SELECT `idProduct` FROM  `groupProduct` WHERE idBaseProduct='" + strconv.Itoa(product.ID) + "';")
+		bd_rows, _ := conn.Query("SELECT `idProduct` FROM  `groupProduct` WHERE idBaseProduct=?;", strconv.Itoa(product.ID))
 		defer bd_rows.Close()
 		for bd_rows.Next() {
 			var groupProductID int
@@ -450,15 +450,13 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 	return &bpwbd
 }
 
-//
+//Select all products in the database
 func (product *Product) SelectAllProducts() []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
-
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, '')," +
 		" COALESCE(productImage, '') FROM product;")
-
 	query := buffer.String()
 	log.Println(query)
 	rows, err := conn.Query(query)
@@ -487,46 +485,20 @@ func (product *Product) SelectAllProducts() []Product {
 	return ret
 }
 
-//
+//Select a product by an id number
 func (product *Product) SelectProductByID(ID int) Product {
-	var ret Product
-	conn, _ := connectors.GetDB()
-
-	var buffer bytes.Buffer
-	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, '')," +
-		" COALESCE(productImage, '') FROM product WHERE idProduct=" + strconv.Itoa(ID) + ";")
-	query := buffer.String()
-	log.Println(query)
-	rows, err := conn.Query(query)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var desc string
-		var pt int
-		err := rows.Scan(&ret.ID, &ret.ProductName, &pt, &desc, &ret.ImagePath, &ret.Image)
-		ret.Description = template.HTML(desc)
-		ret.ProductType.ID = pt
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(ret.ID, ret.ProductName, int(ret.ProductType.ID), ret.Description, ret.ImagePath, ret.Image)
-	}
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return ret
+	var inProduct Product
+	inProduct.ID = ID
+	p := inProduct.SelectProduct()
+	return p[0]
 }
 
-//
+//Select a set of products by an associated cocktail id number and product type
+//id number
 func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT product.idProduct, product.productName, product.productType, product.productGroupType," +
 		" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, ''), COALESCE(product.productImageSourceName, '')," +

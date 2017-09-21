@@ -47,12 +47,15 @@ type Cocktail struct {
 	Errors          map[string]string
 }
 
-//
+//The name struct allows for easier access to an array of strings in
+//the templating system
 type Name struct {
 	Name string
 }
 
-//
+//This data struct represents a combination of cocktails with the cocktail
+//of interest being the Cocktail object with either a root cocktail or a
+//set of children cocktails along with the related products and metadata
 type CocktailSet struct {
 	ChildCocktails []Cocktail
 	RootCocktail   Cocktail
@@ -61,13 +64,7 @@ type CocktailSet struct {
 	Product        Product
 }
 
-//
-type CocktailSearch struct {
-	Products []Product
-	Metadata []Meta
-}
-
-//
+//All the cocktails requested in a alpha numeric map
 type CocktailsByAlphaNums struct {
 	CBA map[string][]Cocktail
 }
