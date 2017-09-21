@@ -1,3 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 package alexa
 
 import (

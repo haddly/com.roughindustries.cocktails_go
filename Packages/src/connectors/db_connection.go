@@ -1,3 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 //connectors/db_connection.go: This is a singleton that provides a pool for
 //connecting to the database
 package connectors

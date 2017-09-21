@@ -1,3 +1,4 @@
+// Copyright 2017 Rough Industries LLC. All rights reserved.
 //connectors/mc_connection.go: This is a singleton that provides a way of
 //connecting to the memcache
 package connectors
