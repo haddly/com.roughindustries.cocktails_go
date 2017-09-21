@@ -33,7 +33,7 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
-		cs = model.SelectCocktailsByID(id, true)
+		cs = page.Cocktail.SelectCocktailsByID(id, true)
 		page.CocktailSet = cs
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, "cocktail")
@@ -47,7 +47,7 @@ func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(r)
 	var cs model.CocktailSet
 	var c []model.Cocktail
-	c = model.SelectAllCocktails(false)
+	c = page.Cocktail.SelectAllCocktails(false)
 	cs.ChildCocktails = c
 	page.CocktailSet = cs
 	//apply the template page info to the index page
@@ -70,7 +70,7 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "404")
 		}
 		var cba model.CocktailsByAlphaNums
-		cba = model.SelectCocktailsByAlphaNums(false)
+		cba = page.Cocktail.SelectCocktailsByAlphaNums(false)
 		page.CocktailsByAlphaNums = cba
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
@@ -89,7 +89,7 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 			id, _ := strconv.Atoi(m["ID"][0])
 			var in model.Cocktail
 			in.ID = id
-			out := model.SelectCocktailsByID(id, false)
+			out := page.Cocktail.SelectCocktailsByID(id, false)
 			page.Cocktail = out.Cocktail
 			page.RenderPageTemplate(w, "cocktailmodform")
 		}
@@ -117,7 +117,7 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(m)
 		var cba model.CocktailsByAlphaNums
-		cba = model.SelectCocktailsByAlphaNums(false)
+		cba = page.Cocktail.SelectCocktailsByAlphaNums(false)
 		page.CocktailsByAlphaNums = cba
 		page.Doze = model.SelectDoze()
 		var mbt model.MetasByTypes
@@ -131,17 +131,17 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 		page.NonIngredients = nonIngredients
 		if ValidateCocktail(&page.Cocktail, m) {
 			if m["button"][0] == "add" {
-				ret_id := model.InsertCocktail(page.Cocktail)
+				ret_id := page.Cocktail.InsertCocktail()
 				model.LoadMCWithCocktailByAlphaNumsData()
-				outCocktail := model.SelectCocktailsByID(ret_id, false)
+				outCocktail := page.Cocktail.SelectCocktailsByID(ret_id, false)
 				page.Cocktail = outCocktail.Cocktail
 				page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "cocktailmodform")
 				return
 			} else if m["button"][0] == "update" {
-				ret_id := model.UpdateCocktail(page.Cocktail)
+				ret_id := page.Cocktail.UpdateCocktail()
 				model.LoadMCWithCocktailByAlphaNumsData()
-				outCocktail := model.SelectCocktailsByID(ret_id, false)
+				outCocktail := page.Cocktail.SelectCocktailsByID(ret_id, false)
 				page.Cocktail = outCocktail.Cocktail
 				page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
 				page.RenderPageTemplate(w, "cocktailmodform")
@@ -194,7 +194,7 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 		var inMeta model.Meta
 		inMeta.ID = id
 		var c []model.Cocktail
-		c = model.SelectCocktailsByMeta(inMeta)
+		c = page.Cocktail.SelectCocktailsByMeta(inMeta)
 		cs.ChildCocktails = c
 		meta := inMeta.SelectMeta()
 		cs.Metadata = meta[0]
@@ -224,7 +224,7 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
 		var inProduct model.Product
 		inProduct.ID = id
 		var c []model.Cocktail
-		c = model.SelectCocktailsByProduct(inProduct)
+		c = page.Cocktail.SelectCocktailsByProduct(inProduct)
 		cs.ChildCocktails = c
 		prod := inProduct.SelectProduct()
 		cs.Product = prod[0]

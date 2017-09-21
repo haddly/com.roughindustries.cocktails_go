@@ -28,12 +28,13 @@ func LoadAllMemcache() {
 func LoadMCWithCocktailByAlphaNumsData() {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
+		cocktail := new(Cocktail)
 		mc.Delete("cba")
 
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var cba CocktailsByAlphaNums
-		cba = SelectCocktailsByAlphaNums(true)
+		cba = cocktail.SelectCocktailsByAlphaNums(true)
 		enc.Encode(cba)
 
 		mc.Set(&memcache.Item{Key: "cba", Value: buf.Bytes()})
