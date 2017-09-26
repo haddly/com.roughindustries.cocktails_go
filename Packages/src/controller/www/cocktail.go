@@ -18,7 +18,7 @@ import (
 
 //Cocktail page handler which displays the standard cocktail page.
 func CocktailHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -44,7 +44,7 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails page (i.e. all the cocktails) request handler which
 //displays the all the cocktails page.
 func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var cs model.CocktailSet
 	var c []model.Cocktail
 	c = page.Cocktail.SelectAllCocktails(false)
@@ -57,9 +57,9 @@ func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktail Modification Form page handler which displays the Cocktail Modification
 //Form page.
 func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	log.Println("In Add Cocktail Form handler")
-	if page.Username != "" && page.Authenticated {
+	if page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -94,7 +94,7 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "cocktailmodform")
 		}
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
@@ -102,8 +102,8 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 //modification request.  This will after verifying a valid user session,
 //modify the cocktail data based on the request.
 func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -157,7 +157,7 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 		return
 	}
 }
@@ -165,7 +165,7 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails Index page i.e. page that gets you to cocktails via header links,
 //metas, etc
 func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var m model.MetasByTypes
 	m = page.Meta.SelectMetaByTypes(true, true, false)
 	page.MetasByTypes = m
@@ -176,7 +176,7 @@ func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails by meta id page handler that shows all the cocktails that are
 //related to the meta id provided
 func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -206,7 +206,7 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 //Cocktails by product id page handler that shows all the cocktails that are
 //related to the product id provided
 func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {

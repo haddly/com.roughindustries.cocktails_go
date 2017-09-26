@@ -50,6 +50,8 @@ func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto st
 	log.Println(DBType)
 	if DBType == MySQL {
 		log.Println(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?timeout=1m")
+	} else if DBType == SQLite {
+		log.Println("SQLite connecting to ./sql/commonwealthcocktails.db")
 	}
 }
 

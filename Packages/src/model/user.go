@@ -25,8 +25,7 @@ type User struct {
 //site.
 type UserSession struct {
 	SessionKey   string
-	Username     string
-	UserID       int
+	User         User
 	LoginTime    time.Time
 	LastSeenTime time.Time
 }

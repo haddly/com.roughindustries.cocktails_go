@@ -9,7 +9,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"github.com/bradfitz/gomemcache/memcache"
-	//"golang.org/x/crypto/bcrypt"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
@@ -18,6 +18,7 @@ import (
 	"model"
 	"net/http"
 	"strings"
+	"time"
 )
 
 //Variables for use within the login package
@@ -52,22 +53,24 @@ var (
 
 //Login page handler which displays the standard login page.
 func loginIndexHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	page.RenderPageTemplate(w, "loginindex")
 }
 
 //Login page request handler which process the standard login request.  This
 //will after verifying the user and password create a user session
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	if ValidateLogin(&page.User, r) {
 		//this is in case you need to perform DB actions before the DB is setup
 		//otherwise you wouldn't have an users
 		if allowDefault && page.User.Username == defaultUser {
-			if page.User.Password == defaultPassword {
-				//if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
+			//if page.User.Password == defaultPassword {
+			if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
 				us := new(model.UserSession)
-				us.Username = defaultUser
+				us.User.Username = defaultUser
+				us.LoginTime = time.Now()
+				us.LastSeenTime = time.Now()
 				SetSession(w, r, us)
 				http.Redirect(w, r, "/", 302)
 				return
@@ -75,11 +78,16 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		//Confirm the username is in DB and password after getting user from DB
 		usr := page.User.SelectUserForLogin(false)
-		//if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
-		if usr.Password == page.User.Password {
+		log.Println(usr.Password)
+		log.Println(page.User.Password)
+		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
+			log.Println("Passed password")
+			//if usr.Password == page.User.Password {
 			us := new(model.UserSession)
 			if len(usr.Username) > 0 {
-				us.Username = usr.Username
+				us.User = *usr
+				us.LoginTime = time.Now()
+				us.LastSeenTime = time.Now()
 				SetSession(w, r, us)
 				http.Redirect(w, r, "/", 302)
 				return
@@ -119,7 +127,7 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		//change to a date time to see if the seq is out of date so we don't accept it
-		enc.Encode(true)
+		enc.Encode(time.Now())
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
 		log.Println("Bad memcache handleGoogleLogin")
@@ -137,24 +145,21 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
 	//change to a date time to see if the seq is out of date so we don't accept it
-	var isValid bool
-	isValid = false
+	var timeForState time.Time
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		item := new(memcache.Item)
 		item, _ = mc.Get(state)
 		if item != nil {
+			mc.Delete(state)
 			if len(item.Value) > 0 {
 				read := bytes.NewReader(item.Value)
 				dec := gob.NewDecoder(read)
-				dec.Decode(&isValid)
-				//MEMCACHE OAUTH GET
-				if !isValid {
+				dec.Decode(&timeForState)
+				if time.Since(timeForState).Seconds() > 30 {
 					log.Printf("invalid oauth state")
 					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 					return
-				} else {
-					mc.Delete(state)
 				}
 			} else {
 				log.Printf("invalid oauth state")
@@ -194,7 +199,9 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	user.Email = email
 	usr := user.SelectUserForLogin(true)
 	us := new(model.UserSession)
-	us.Username = usr.Username
+	us.LoginTime = time.Now()
+	us.LastSeenTime = time.Now()
+	us.User = *usr
 	SetSession(w, r, us)
 	http.Redirect(w, r, "/", 302)
 }
@@ -207,7 +214,7 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		//change to a date time to see if the seq is out of date so we don't accept it
-		enc.Encode(true)
+		enc.Encode(time.Now())
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
 		log.Println("Bad memcache handleGoogleLogin")
@@ -226,24 +233,21 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	state := r.FormValue("state")
 	//change to a date time to see if the seq is out of date so we don't accept it
-	var isValid bool
-	isValid = false
+	var timeForState time.Time
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		item := new(memcache.Item)
 		item, _ = mc.Get(state)
 		if item != nil {
+			mc.Delete(state)
 			if len(item.Value) > 0 {
 				read := bytes.NewReader(item.Value)
 				dec := gob.NewDecoder(read)
-				dec.Decode(&isValid)
-				//MEMCACHE OAUTH GET
-				if !isValid {
+				dec.Decode(&timeForState)
+				if time.Since(timeForState).Seconds() > 30 {
 					log.Printf("invalid oauth state")
 					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 					return
-				} else {
-					mc.Delete(state)
 				}
 			} else {
 				log.Printf("invalid oauth state")
@@ -284,7 +288,9 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	user.Email = email.(string)
 	usr := user.SelectUserForLogin(true)
 	us := new(model.UserSession)
-	us.Username = usr.Username
+	us.LoginTime = time.Now()
+	us.LastSeenTime = time.Now()
+	us.User = *usr
 	SetSession(w, r, us)
 	http.Redirect(w, r, "/", 302)
 }

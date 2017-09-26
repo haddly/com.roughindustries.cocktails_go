@@ -20,52 +20,67 @@ import (
 	"log"
 	"model"
 	"net/http"
+	"time"
 )
 
 //the sessions are stored here in coockies
 var store = sessions.NewCookieStore([]byte(randSeq(64)))
 
-//memcache session mapping
-var managed_sessions = make(map[string]model.UserSession)
-
 //get the session from the cookies and cross reference it with the
 //memcache
 //TODO: setup database session mapping store
-func GetSession(r *http.Request) (string, bool) {
+func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool) {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		panic("Bad GetSession Request!!!")
-		return "", false
+		return *new(model.UserSession), false
 	}
 	// Retrieve our struct and type-assert it
 	if session_id, ok := session.Values["session_id"].(string); !ok {
 		log.Println("No Session ID")
-		return "", false
+		return *new(model.UserSession), false
 	} else {
-		log.Println("Good Session ID")
-
-		//MEMCACHE SESSION GET
 		mc, _ := connectors.GetMC()
 		if mc != nil {
 			item := new(memcache.Item)
-			item, _ = mc.Get("managed_sessions")
-			managed_sessions = make(map[string]model.UserSession)
+			item, _ = mc.Get(session_id)
+			var userSession model.UserSession
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
 					dec := gob.NewDecoder(read)
-					dec.Decode(&managed_sessions)
+					dec.Decode(&userSession)
 				}
 			}
-			data := managed_sessions[session_id+"_u"]
-			if data.Username == "" {
-				log.Println("Not Authenticated")
-				return data.Username, false
+			//Authenticate
+			//Has it been to long sense the user logged in so they have to
+			//login again, i.e. even if they have been using the site for
+			//24hours we cap the total time they can be logged into one
+			//session
+			if time.Since(userSession.LoginTime).Hours() >= 24 {
+				log.Println("User has been logged in for over 24 hours")
+				log.Println("Looks like this is an old session.")
+				ClearSession(w, r)
+				return userSession, false
 			} else {
-				log.Println("Authenticated")
-				return data.Username, true
-
+				//Has it been to log sense they last touched the website.  This
+				//prevents idle web clients from keeping a session open.  So
+				//if they went to get a cup of coffee and got distracted it will
+				//close the session so no one hopes on if it has been more then
+				//x seconds
+				if time.Since(userSession.LastSeenTime).Minutes() >= 10 {
+					log.Println("User has been inactive in for over 10 minutes")
+					log.Println("Looks like this is an old session.")
+					ClearSession(w, r)
+					return userSession, false
+				} else {
+					log.Println("Authenticated")
+					//reset the last seen time
+					userSession.LastSeenTime = time.Now()
+					return userSession, true
+				}
 			}
+
 		} else {
 			//Try the database here
 			// if db connection is good {
@@ -73,15 +88,14 @@ func GetSession(r *http.Request) (string, bool) {
 			// 	panic
 			// }
 		}
-		//MEMCACHE SESSION SET
 	}
-	return "", false
+	return *new(model.UserSession), false
 }
 
 //set the session for the cookies and cross reference it to the
 //memcache
 //TODO: setup database session mapping store
-func SetSession(w http.ResponseWriter, r *http.Request, data *model.UserSession) string {
+func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession) string {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		Error404(w, err.Error())
@@ -95,26 +109,14 @@ func SetSession(w http.ResponseWriter, r *http.Request, data *model.UserSession)
 	session_id := randSeq(64)
 	session.Values["session_id"] = session_id
 	session.Save(r, w)
-
-	//MEMCACHE SESSION SET
 	mc, _ := connectors.GetMC()
 	if mc != nil {
-		item := new(memcache.Item)
-		item, _ = mc.Get("managed_sessions")
-		managed_sessions = make(map[string]model.UserSession)
-		if item != nil {
-			if len(item.Value) > 0 {
-				read := bytes.NewReader(item.Value)
-				dec := gob.NewDecoder(read)
-				dec.Decode(&managed_sessions)
-			}
-		}
-		managed_sessions[session_id+"_u"] = *data
+		us.SessionKey = session_id
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
-		enc.Encode(managed_sessions)
-
-		mc.Set(&memcache.Item{Key: "managed_sessions", Value: buf.Bytes()})
+		enc.Encode(*us)
+		log.Println("Adding session")
+		mc.Set(&memcache.Item{Key: session_id, Value: buf.Bytes()})
 	} else {
 		//Try the database here
 		// if db connection is good {
@@ -122,8 +124,6 @@ func SetSession(w http.ResponseWriter, r *http.Request, data *model.UserSession)
 		// 	panic
 		// }
 	}
-	//MEMCACHE SESSION SET
-
 	return session_id
 }
 
@@ -144,22 +144,8 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 		//MEMCACHE SESSION DELETE
 		mc, _ := connectors.GetMC()
 		if mc != nil {
-			item := new(memcache.Item)
-			item, _ = mc.Get("managed_sessions")
-			managed_sessions = make(map[string]model.UserSession)
-			if item != nil {
-				if len(item.Value) > 0 {
-					read := bytes.NewReader(item.Value)
-					dec := gob.NewDecoder(read)
-					dec.Decode(&managed_sessions)
-				}
-				delete(managed_sessions, session_id+"_u")
-				buf := new(bytes.Buffer)
-				enc := gob.NewEncoder(buf)
-				enc.Encode(managed_sessions)
-
-				mc.Set(&memcache.Item{Key: "managed_sessions", Value: buf.Bytes()})
-			}
+			log.Println("Deleteing session")
+			mc.Delete(session_id)
 		} else {
 			//Try the database here
 			// if db connection is good {

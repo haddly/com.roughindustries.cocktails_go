@@ -20,9 +20,9 @@ import (
 
 //Handler for loading the sql mysqldump file for db tables
 func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	// Check for a valid user and that authentication
-	if page.Username != "" && page.Authenticated {
+	if page.Authenticated {
 		var buffer bytes.Buffer
 		var dat []byte
 		if connectors.DBType == connectors.MySQL {
@@ -54,14 +54,14 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 		page.Messages["Status"] = template.HTML(statStr)
 		page.RenderPageTemplate(w, "dbindex")
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
 //Handler for loading the sql mysqldump file for db data
 func DBDataHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<br/><b>Data Loaded!</b> ")
 		dir, _ := os.Getwd()
@@ -97,14 +97,14 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 		page.Messages["Status"] = template.HTML(statStr)
 		page.RenderPageTemplate(w, "dbindex")
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
 //Handler for running db sanity checks
 func DBTestHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Database</b>:<br/>")
 		buffer.WriteString(model.SelectCurrentDB() + "<br/>")
@@ -116,6 +116,6 @@ func DBTestHandler(w http.ResponseWriter, r *http.Request) {
 		page.Messages["Status"] = template.HTML(statStr)
 		page.RenderPageTemplate(w, "dbindex")
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 	}
 }

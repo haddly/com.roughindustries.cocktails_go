@@ -47,6 +47,7 @@ type page struct {
 	DerivedProduct       model.DerivedProduct
 	GroupProduct         model.GroupProduct
 	User                 model.User
+	UserSession          model.UserSession
 	Errors               map[string]string
 	Messages             map[string]template.HTML
 }
@@ -87,7 +88,7 @@ func parseTempFiles(tmpl string) (*template.Template, error) {
 
 // The main index page handler
 func LandingHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, "index")
 }
@@ -96,7 +97,7 @@ func LandingHandler(w http.ResponseWriter, r *http.Request) {
 //works as a redirect basically with the wheel showing till the redirected page
 //is ready
 func Load(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	log.Println("Loader")
 	log.Println(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
 	log.Println(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
@@ -110,14 +111,14 @@ func Load(w http.ResponseWriter, r *http.Request) {
 }
 
 //An initialization function that provides an initialized page object
-func NewPage(r *http.Request) *page {
+func NewPage(w http.ResponseWriter, r *http.Request) *page {
 	p := new(page)
 	p.Messages = make(map[string]template.HTML)
 	p.Errors = make(map[string]string)
 	p.AllowAdmin = AllowAdmin
 	p.UseGA = UseGA
 	if r != nil {
-		p.Username, p.Authenticated = GetSession(r)
+		p.UserSession, p.Authenticated = GetSession(w, r)
 	}
 	return p
 }

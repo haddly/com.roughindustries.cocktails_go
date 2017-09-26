@@ -3,6 +3,7 @@
 package www
 
 import (
+	"github.com/microcosm-cc/bluemonday"
 	"html/template"
 	"log"
 	"model"
@@ -15,8 +16,8 @@ import (
 //Meta Modification Form page handler which displays the Meta Modification
 //Form page.
 func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		u, err := url.Parse(r.URL.String())
 		log.Println(u)
 		if err != nil {
@@ -41,7 +42,7 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "metamodform")
 		}
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
@@ -49,8 +50,8 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request) {
 //modification request.  This will after verifying a valid user session,
 //modify the meta data based on the request.
 func MetaModHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		//Get the generic data that all meta mod pages need
 		var mbt model.MetasByTypes
 		mbt = page.Meta.SelectMetaByTypes(false, true, false)
@@ -106,7 +107,7 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 		return
 	}
 }
@@ -131,7 +132,12 @@ func ValidateMeta(meta *model.Meta, r *http.Request) bool {
 		meta.Errors["MetaType"] = "Please select a valid meta type"
 	}
 	if len(r.Form["metaBlurb"]) > 0 {
-		meta.Blurb = template.HTML(r.Form["metaBlurb"][0])
+		p := bluemonday.UGCPolicy()
+		p.AllowElements("img")
+		log.Println(r.Form["metaBlurb"][0])
+		html := p.Sanitize(r.Form["metaBlurb"][0])
+		log.Println(html)
+		meta.Blurb = template.HTML(html)
 	}
 	return len(meta.Errors) == 0
 }

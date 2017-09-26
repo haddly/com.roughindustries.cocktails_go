@@ -8,6 +8,7 @@ import (
 	"controller/www"
 	"flag"
 	"github.com/gorilla/context"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -19,7 +20,22 @@ import (
 //Initialize the database connection, memcache connection, and all the
 //controllers
 func init() {
-
+	//Utility for getting a hashed password.  I use this to setup the initial
+	//admin account password sense I use bcrypt to check password hashes.
+	//Set it up and then start the server if you want ot use a default admin
+	//account.
+	passwdPtr := flag.String("password", "", "Gives a password hash, but doesn't start the server. Don't forget special characters need to be escaped on the command-line, i.e. ! ? $ % $ # & * ( ) blank tab | ' ; \" < > \\ ~ ` [ ] { }")
+	flag.Parse()
+	if *passwdPtr != "" {
+		// Hashing the password with the default cost of 10
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*passwdPtr), bcrypt.DefaultCost)
+		if err != nil {
+			panic(err)
+		}
+		log.Println(string(hashedPassword))
+		os.Exit(0)
+	}
+	log.Println("Start Init")
 	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 	var dbaddr string
 	var dbpasswd string
@@ -39,29 +55,8 @@ func init() {
 	var mc_server string
 	//mc_server = ??
 
-	if dbaddr == "" {
-		log.Println("No DB Address set.")
-		os.Exit(0)
-	}
-	if dbpasswd == "" {
-		log.Println("No DB password set.")
-		os.Exit(0)
-	}
-	if user == "" {
-		log.Println("No DB user set.")
-		os.Exit(0)
-	}
-	if proto == "" {
-		log.Println("No DB protocol set.")
-		os.Exit(0)
-	}
-	if port == "" {
-		log.Println("No DB port set.")
-		os.Exit(0)
-	}
-	if dbname == "" {
-		log.Println("No DB name set.")
-		os.Exit(0)
+	if dbaddr == "" || dbpasswd == "" || user == "" || proto == "" || port == "" || dbname == "" {
+		log.Println("Not all DB parameters are set.  If your DB isn't connecting check these values.")
 	}
 	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname, dbtype)
 	if mc_server != "" {
@@ -70,8 +65,6 @@ func init() {
 		log.Println("No Memcache server set. If you want to use memcaching you will " +
 			"have to set this value in main.go.")
 	}
-
-	flag.Parse()
 	// wanted it to be more random so i seed it time now
 	rand.Seed(time.Now().UnixNano())
 	// init the routing
@@ -93,7 +86,6 @@ func AddLetsEncrypt() {
 }
 
 func main() {
-	log.Println("Initializing ... \n")
 	//print out the current directory
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {

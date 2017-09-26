@@ -193,19 +193,6 @@
         <!--<textarea id="metaBlurb" class="form-control hide" rows="3" name="metaBlurb">-->
         <!--</textarea>-->
         <textarea id="metaBlurb" name="metaBlurb">{{if .Meta.Blurb}}{{.Meta.Blurb}}{{end}}</textarea>
-        <script>
-            $(document).ready(function() {
-                $('#metaBlurb').summernote({
-                  toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontsize', ['fontsize']],
-                    ['para', ['paragraph']],
-                    ['view', ['fullscreen', 'codeview']],
-                  ]
-                });
-            });
-        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>

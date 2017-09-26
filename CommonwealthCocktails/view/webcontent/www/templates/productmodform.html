@@ -268,18 +268,6 @@
         <label for="productDescription">Product Description</label>
         <div class=" col-xs-12"></div>
         <textarea id="productDescription" class="form-control" rows="3" name="productDescription">{{with .Product.Description}}{{.}}{{end}}</textarea>
-        <script>
-            $(document).ready(function() {
-                $('#productDescription').summernote({
-                  toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontsize', ['fontsize']],
-                    ['view', ['fullscreen', 'codeview']],
-                  ]
-                });
-            });
-        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>
@@ -292,18 +280,6 @@
         <label for="productDetails">Product Details</label>
         <div class=" col-xs-12"></div>
         <textarea id="productDetails" class="form-control" rows="3" name="productDetails">{{with .Product.Details}}{{.}}{{end}}</textarea>
-        <script>
-            $(document).ready(function() {
-                $('#productDetails').summernote({
-                  toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontsize', ['fontsize']],
-                    ['view', ['fullscreen', 'codeview']],
-                  ]
-                });
-            });
-        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>

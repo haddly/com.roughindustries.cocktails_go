@@ -26,11 +26,7 @@ func (user *User) SelectUserForLogin(isOauth bool) *User {
 	if user.Username != "" {
 		buffer.WriteString(" `userName`=? AND")
 		args = append(args, html.EscapeString(user.Username))
-		if user.Password != "" {
-			buffer.WriteString(" `userPassword`=? AND")
-			args = append(args, user.Password)
-			canQuery = true
-		}
+		canQuery = true
 	}
 	if isOauth {
 		if user.Email != "" {

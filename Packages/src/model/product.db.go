@@ -314,7 +314,9 @@ func (product *Product) SelectProductsByTypes(includeIngredients bool, includeNo
 		for i := 0; i < count; i++ {
 			var pbt ProductsByType
 			var buffer bytes.Buffer
+			args = args[0:0]
 			buffer.WriteString("SELECT `idProductType`, `productTypeName`, `productTypeIsIngredient` FROM  `producttype` WHERE idProductType=? AND")
+			log.Println("Getting Products by Type ID " + strconv.Itoa(i+1))
 			args = append(args, strconv.Itoa(i+1))
 			buffer.WriteString(" (")
 			if includeIngredients {
@@ -337,6 +339,7 @@ func (product *Product) SelectProductsByTypes(includeIngredients bool, includeNo
 				if err != nil {
 					log.Fatal(err)
 				}
+				log.Println(pbt.ProductType.ID, pbt.ProductType.ProductTypeName, pbt.ProductType.IsIngredient)
 				if pbt.ProductType.ID != 0 {
 					var inProduct Product
 					inProduct.ProductType = pbt.ProductType

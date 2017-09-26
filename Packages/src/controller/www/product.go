@@ -14,7 +14,7 @@ import (
 
 //Product page handler which displays the standard product page.
 func ProductHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var p *model.BaseProductWithBDG
 	//Process Form gets an ID if it was passed
 	r.ParseForm()
@@ -33,8 +33,8 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 //Product Modification Form page handler which displays the Product Modification
 //Form page.
 func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		//Process Form gets an ID if it was passed
 		r.ParseForm()
 		var pbt model.ProductsByTypes
@@ -57,7 +57,7 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 			page.RenderPageTemplate(w, "productmodform")
 		}
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
@@ -65,8 +65,8 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 //modification request.  This will after verifying a valid user session,
 //modify the product data based on the request.
 func ProductModHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
-	if page.Username != "" && page.Authenticated {
+	page := NewPage(w, r)
+	if page.Authenticated {
 		//Get the generic data that all product mod pages need
 		var pbt model.ProductsByTypes
 		pbt = page.Product.SelectProductsByTypes(true, true, false)
@@ -138,7 +138,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		page.RenderPageTemplate(w, "404")
+		http.Redirect(w, r, "/", 302)
 		return
 	}
 }
@@ -146,7 +146,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 //Products page (i.e. all the products) request handler which
 //displays the all the products page.
 func ProductsHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(r)
+	page := NewPage(w, r)
 	var p []model.Product
 	p = page.Product.SelectAllProducts()
 	page.Products = p

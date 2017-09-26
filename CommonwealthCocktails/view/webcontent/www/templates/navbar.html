@@ -27,7 +27,7 @@
                 <li>
                     {{if .Authenticated}}
                     <li class="dropdown">
-                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{.Username}} <span class="caret"></span></a>
+                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{.UserSession.User.Username}} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             {{if .AllowAdmin}}
                             <li class="dropdown-header">Modify</li>

@@ -36,7 +36,7 @@ func (meta *Meta) processMeta() int {
 
 	//If the ID is zero then do an insert else do an update based on the ID
 	if meta.ID == 0 {
-		buffer.WriteString("INSERT INTO `meta` SET ")
+		buffer.WriteString("INSERT INTO `meta` ( ")
 	} else {
 		buffer.WriteString("UPDATE `meta` SET ")
 	}
@@ -44,22 +44,36 @@ func (meta *Meta) processMeta() int {
 	//Append the correct columns to be added based on data available in the
 	//data structure
 	if meta.MetaName != "" {
-		buffer.WriteString("`metaName`=?,")
+		if meta.ID == 0 {
+			buffer.WriteString("`metaName`,")
+		} else {
+			buffer.WriteString("`metaName`=?,")
+		}
 		args = append(args, html.EscapeString(meta.MetaName))
 	}
 	if meta.Blurb != "" {
-		buffer.WriteString(" `metaBlurb`=?,")
+		if meta.ID == 0 {
+			buffer.WriteString("`metaBlurb`,")
+		} else {
+			buffer.WriteString(" `metaBlurb`=?,")
+		}
 		args = append(args, html.EscapeString(string(meta.Blurb)))
 	}
 	metatype := meta.MetaType.SelectMetaType(true, true, true)
-	buffer.WriteString(" `metaType`=?,")
+	if meta.ID == 0 {
+		buffer.WriteString("`metaType`,")
+	} else {
+		buffer.WriteString(" `metaType`=?,")
+	}
 	args = append(args, strconv.Itoa(metatype[0].ID))
 
 	//Cleanup the query and append where if it is an update
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	if meta.ID == 0 {
-		query = query + ";"
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
 	} else {
 		query = query + " WHERE `idMeta`=?;"
 		args = append(args, meta.ID)
