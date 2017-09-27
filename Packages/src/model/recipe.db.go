@@ -7,7 +7,7 @@ import (
 	"connectors"
 	"html"
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -47,23 +47,23 @@ func processRecipe(recipe Recipe) int {
 		query = query + " WHERE `idRecipe`=?;"
 		args = append(args, strconv.Itoa(recipe.ID))
 	}
-	log.Println(query)
-	log.Println(args...)
+	glog.Infoln(query)
+	glog.Infoln(args...)
 	res, err := conn.Exec(query, args...)
 	var recipeID int64
 	if recipe.ID == 0 {
 		recipeID, err = res.LastInsertId()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 	} else {
 		recipeID = int64(recipe.ID)
 	}
 	rowCnt, err := res.RowsAffected()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
-	log.Printf("Recipe ID = %d, affected = %d\n", recipeID, rowCnt)
+	glog.Infoln("Recipe ID = %d, affected = %d\n", recipeID, rowCnt)
 	//We don't bother trying to figure out what we can modify or not
 	//the database is small enough where we can just blow away the rows
 	//and insert new ones
@@ -84,20 +84,20 @@ func clearRecipeStepsByRecipeID(recipeID int64) {
 	buffer.WriteString("SELECT recipeToRecipeSteps.idRecipeStep FROM recipeToRecipeSteps WHERE idRecipe=?;")
 	args = append(args, recipeID)
 	query := buffer.String()
-	log.Println(query)
-	log.Println(args...)
+	glog.Infoln(query)
+	glog.Infoln(args...)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var rsID int
 		err := rows.Scan(&rsID)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
-		log.Println(rsID)
+		glog.Infoln(rsID)
 		rsIDs = append(rsIDs, rsID)
 	}
 
@@ -113,8 +113,8 @@ func clearRecipeStepsByRecipeID(recipeID int64) {
 	buffer.WriteString("DELETE FROM `recipeToRecipeSteps` WHERE `idRecipe`=?;")
 	args = append(args, recipeID)
 	query = buffer.String()
-	log.Println(query)
-	log.Println(args...)
+	glog.Infoln(query)
+	glog.Infoln(args...)
 	conn.Exec(query, args...)
 
 	//delete all steps from recipesteps table by stepid
@@ -124,8 +124,8 @@ func clearRecipeStepsByRecipeID(recipeID int64) {
 		buffer.WriteString("DELETE FROM `recipestep` WHERE `idRecipeStep`=?;")
 		args = append(args, stepID)
 		query = buffer.String()
-		log.Println(query)
-		log.Println(args...)
+		glog.Infoln(query)
+		glog.Infoln(args...)
 		conn.Exec(query, args...)
 	}
 }
@@ -139,8 +139,8 @@ func clearAltIngredientsByRecipeStepID(stepID int64) {
 	buffer.WriteString("DELETE FROM `altIngredient` WHERE `idRecipeStep`=?;")
 	args = append(args, stepID)
 	query := buffer.String()
-	log.Println(query)
-	log.Println(args...)
+	glog.Infoln(query)
+	glog.Infoln(args...)
 	conn.Exec(query, args...)
 }
 
@@ -169,17 +169,17 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	query = query + ";"
-	log.Println(query)
+	glog.Infoln(query)
 	res, err := conn.Exec(query, args...)
 	stepID, err := res.LastInsertId()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	rowCnt, err := res.RowsAffected()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
-	log.Printf("Step ID = %d, affected = %d\n", stepID, rowCnt)
+	glog.Infoln("Step ID = %d, affected = %d\n", stepID, rowCnt)
 	if recipestep.OriginalIngredient.ID < 1 {
 		rows, _ := conn.Query("SELECT idProduct, productName FROM product where productName=?;", recipestep.OriginalIngredient.ProductName)
 		defer rows.Close()
@@ -190,9 +190,9 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 		for rows.Next() {
 			err := rows.Scan(&id, &name)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
-			log.Println(id, name)
+			glog.Infoln(id, name)
 		}
 		conn.Exec("UPDATE `recipestep` SET `recipestepOriginalIngredient`=? WHERE `idRecipeStep`=?;", strconv.Itoa(id), strconv.FormatInt(stepID, 10))
 	}
@@ -242,10 +242,10 @@ func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 		" WHERE cocktail.idCocktail=?;")
 	args = append(args, strconv.Itoa(cocktail.ID))
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -254,13 +254,13 @@ func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 		ret.Method = template.HTML(html.UnescapeString(method))
 		ret.RecipeSteps = SelectRecipeStepsByCocktail(cocktail, includeBDG)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
-		log.Println(ret.ID, ret.Method)
+		glog.Infoln(ret.ID, ret.Method)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret
@@ -283,10 +283,10 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeSte
 		" WHERE cocktail.idCocktail=? ORDER BY recipestepRecipeOrdinal;")
 	args = append(args, strconv.Itoa(cocktail.ID))
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -295,18 +295,18 @@ func SelectRecipeStepsByCocktail(cocktail Cocktail, includeBDG bool) []RecipeSte
 		var doze int
 		err := rows.Scan(&rs.ID, &oiID, &rs.RecipeCardinalFloat, &rs.RecipeCardinalString, &doze)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		product := new(Product)
 		rs.OriginalIngredient = product.SelectProductByID(oiID)
 		rs.RecipeDoze = Doze{ID: doze}
 		rs.AltIngredient = SelectAltIngredientsByRecipeStep(rs, includeBDG)
-		log.Println(rs.ID, rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze.ID))
+		glog.Infoln(rs.ID, rs.OriginalIngredient, rs.RecipeCardinalFloat, rs.RecipeCardinalString, int(rs.RecipeDoze.ID))
 		ret = append(ret, rs)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret
@@ -323,24 +323,24 @@ func SelectAltIngredientsByRecipeStep(rs RecipeStep, includeBDG bool) []Product 
 	buffer.WriteString("SELECT altIngredient.idProduct FROM altIngredient WHERE `idRecipeStep`=?;")
 	args = append(args, rs.ID)
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var prod Product
 		err := rows.Scan(&prod.ID)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		prod = prod.SelectProductByID(prod.ID)
 		ret = append(ret, prod)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	//TODO: Add group and derived products to the al products list
@@ -369,24 +369,24 @@ func SelectDoze() []Doze {
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT doze.idDoze, doze.dozeName FROM doze;")
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var doze Doze
 		err := rows.Scan(&doze.ID, &doze.DozeName)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
-		log.Println(doze.ID, doze.DozeName)
+		glog.Infoln(doze.ID, doze.DozeName)
 		ret = append(ret, doze)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret

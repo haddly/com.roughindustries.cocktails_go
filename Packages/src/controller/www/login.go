@@ -14,7 +14,7 @@ import (
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"strings"
@@ -54,7 +54,7 @@ var (
 //Login page handler which displays the standard login page.
 func loginIndexHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(w, r)
-	page.RenderPageTemplate(w, "loginindex")
+	page.RenderPageTemplate(w, r, "loginindex")
 }
 
 //Login page request handler which process the standard login request.  This
@@ -67,46 +67,43 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		if allowDefault && page.User.Username == defaultUser {
 			//if page.User.Password == defaultPassword {
 			if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
-				us := new(model.UserSession)
-				us.User.Username = defaultUser
-				us.LoginTime = time.Now()
-				us.LastSeenTime = time.Now()
-				SetSession(w, r, us)
+				page.UserSession.User.Username = defaultUser
+				page.UserSession.LoginTime = time.Now()
+				page.UserSession.LastSeenTime = time.Now()
+				SetSession(w, r, &page.UserSession, true)
 				http.Redirect(w, r, "/", 302)
 				return
 			}
 		}
 		//Confirm the username is in DB and password after getting user from DB
 		usr := page.User.SelectUserForLogin(false)
-		log.Println(usr.Password)
-		log.Println(page.User.Password)
+		glog.Infoln(usr.Password)
+		glog.Infoln(page.User.Password)
 		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
-			log.Println("Passed password")
-			//if usr.Password == page.User.Password {
-			us := new(model.UserSession)
+			glog.Infoln("Passed password")
 			if len(usr.Username) > 0 {
-				us.User = *usr
-				us.LoginTime = time.Now()
-				us.LastSeenTime = time.Now()
-				SetSession(w, r, us)
+				page.UserSession.User = *usr
+				page.UserSession.LoginTime = time.Now()
+				page.UserSession.LastSeenTime = time.Now()
+				SetSession(w, r, &page.UserSession, true)
 				http.Redirect(w, r, "/", 302)
 				return
 			} else {
-				log.Println("Bad username or password: " + page.User.Username)
+				glog.Infoln("Bad username or password: " + page.User.Username)
 				page.Errors["loginErrors"] = "Bad Username and/or Password!"
-				page.RenderPageTemplate(w, "/loginindex")
+				page.RenderPageTemplate(w, r, "/loginindex")
 				return
 			}
 		} else {
-			log.Println("Bad username or password: " + page.User.Username)
+			glog.Infoln("Bad username or password: " + page.User.Username)
 			page.Errors["loginErrors"] = "Bad Username and/or Password!"
-			page.RenderPageTemplate(w, "/loginindex")
+			page.RenderPageTemplate(w, r, "/loginindex")
 			return
 		}
 	} else {
-		log.Println("Bad username or password: " + page.User.Username)
+		glog.Infoln("Bad username or password: " + page.User.Username)
 		page.Errors["loginErrors"] = "Invalid Username and/or Password"
-		page.RenderPageTemplate(w, "/loginindex")
+		page.RenderPageTemplate(w, r, "/loginindex")
 		return
 	}
 
@@ -130,7 +127,7 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 		enc.Encode(time.Now())
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
-		log.Println("Bad memcache handleGoogleLogin")
+		glog.Infoln("Bad memcache handleGoogleLogin")
 		//Try the database here
 		// if db connection is good {
 		// } else {
@@ -157,20 +154,20 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 				dec := gob.NewDecoder(read)
 				dec.Decode(&timeForState)
 				if time.Since(timeForState).Seconds() > 30 {
-					log.Printf("invalid oauth state")
+					glog.Infoln("invalid oauth state")
 					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 					return
 				}
 			} else {
-				log.Printf("invalid oauth state")
+				glog.Infoln("invalid oauth state")
 				return
 			}
 		} else {
-			log.Printf("invalid oauth state")
+			glog.Infoln("invalid oauth state")
 			return
 		}
 	} else {
-		log.Println("Bad memcache handleGoogleCallback")
+		glog.Infoln("Bad memcache handleGoogleCallback")
 		//Try the database here
 		// if db connection is good {
 		// } else {
@@ -181,7 +178,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
 	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		log.Println("Code exchange failed with '%s'\n", err)
+		glog.Infoln("Code exchange failed with '%s'\n", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -190,11 +187,11 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
-	//log.Printf("Content: %s\n", contents)
+	//glog.Infoln("Content: %s\n", contents)
 	s := string(contents[:])
 	//Get the email address
 	email := strings.Replace(strings.Replace(strings.Split(strings.Split(s, ",")[1], ":")[1], "\"", "", -1), " ", "", -1)
-	log.Println(email)
+	glog.Infoln(email)
 	var user model.User
 	user.Email = email
 	usr := user.SelectUserForLogin(true)
@@ -202,7 +199,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	us.LoginTime = time.Now()
 	us.LastSeenTime = time.Now()
 	us.User = *usr
-	SetSession(w, r, us)
+	SetSession(w, r, us, true)
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -217,7 +214,7 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 		enc.Encode(time.Now())
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
-		log.Println("Bad memcache handleGoogleLogin")
+		glog.Infoln("Bad memcache handleGoogleLogin")
 		//Try the database here
 		// if db connection is good {
 		// } else {
@@ -245,20 +242,20 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 				dec := gob.NewDecoder(read)
 				dec.Decode(&timeForState)
 				if time.Since(timeForState).Seconds() > 30 {
-					log.Printf("invalid oauth state")
+					glog.Infoln("invalid oauth state")
 					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 					return
 				}
 			} else {
-				log.Printf("invalid oauth state")
+				glog.Infoln("invalid oauth state")
 				return
 			}
 		} else {
-			log.Printf("invalid oauth state")
+			glog.Infoln("invalid oauth state")
 			return
 		}
 	} else {
-		log.Println("Bad memcache handleGoogleCallback")
+		glog.Infoln("Bad memcache handleGoogleCallback")
 		//Try the database here
 		// if db connection is good {
 		// } else {
@@ -270,7 +267,7 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	//_, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
 	token, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		log.Println("Code exchange failed with '%s'\n", err)
+		glog.Infoln("Code exchange failed with '%s'\n", err)
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -281,7 +278,7 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	contents, err := ioutil.ReadAll(response.Body)
 	var dat map[string]interface{}
 	json.Unmarshal([]byte(contents), &dat)
-	log.Println(dat)
+	glog.Infoln(dat)
 	// //Get the email address
 	email := dat["email"]
 	var user model.User
@@ -291,7 +288,7 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 	us.LoginTime = time.Now()
 	us.LastSeenTime = time.Now()
 	us.User = *usr
-	SetSession(w, r, us)
+	SetSession(w, r, us, true)
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -302,7 +299,11 @@ func ValidateLogin(user *model.User, r *http.Request) bool {
 	r.ParseForm() // Required if you don't call r.FormValue()
 
 	if len(r.Form["name"]) > 0 {
-		user.Username = r.Form["name"][0]
+		if len(r.Form["name"][0]) > 0 {
+			user.Username = r.Form["name"][0]
+		} else {
+			user.Errors["Username"] = "Please enter a valid username"
+		}
 	} else {
 		user.Errors["Username"] = "Please enter a valid username"
 	}

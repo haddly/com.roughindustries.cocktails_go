@@ -5,7 +5,7 @@ package connectors
 
 import (
 	"github.com/bradfitz/gomemcache/memcache"
-	"log"
+	"github.com/golang/glog"
 )
 
 //memcache variables
@@ -15,7 +15,7 @@ var mc_server string
 //Set the memcache variables for connecting to the memcache server
 func SetMCVars(in_mc_server string) {
 	mc_server = in_mc_server
-	log.Println(mc_server)
+	glog.Infoln(mc_server)
 }
 
 //Get a connection to the memcache

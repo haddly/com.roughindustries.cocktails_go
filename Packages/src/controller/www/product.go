@@ -4,7 +4,7 @@ package www
 
 import (
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"path/filepath"
@@ -19,14 +19,14 @@ func ProductHandler(w http.ResponseWriter, r *http.Request) {
 	//Process Form gets an ID if it was passed
 	r.ParseForm()
 	if len(r.Form["ID"]) == 0 {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(r.Form["ID"][0])
 
 		p = page.Product.SelectProductByIDWithBDG(id)
 		page.BaseProductWithBDG = *p
-		page.RenderPageTemplate(w, "product")
+		page.RenderPageTemplate(w, r, "product")
 	}
 }
 
@@ -46,7 +46,7 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 		page.ProductsByTypes = pbt
 		if len(r.Form["ID"]) == 0 {
 			//apply the template page info to the index page
-			page.RenderPageTemplate(w, "productmodform")
+			page.RenderPageTemplate(w, r, "productmodform")
 		} else {
 			id, _ := strconv.Atoi(r.Form["ID"][0])
 			var in model.Product
@@ -54,7 +54,7 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request) {
 			out := in.SelectProduct()
 			page.Product = out[0]
 			page.BaseProductWithBDG = *page.Product.SelectBDGByProduct()
-			page.RenderPageTemplate(w, "productmodform")
+			page.RenderPageTemplate(w, r, "productmodform")
 		}
 	} else {
 		http.Redirect(w, r, "/", 302)
@@ -100,7 +100,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 				outProduct := page.Product.SelectProduct()
 				page.Product = outProduct[0]
 				page.Messages["productModifySuccess"] = "Product modified successfully and memcache updated!"
-				page.RenderPageTemplate(w, "productmodform")
+				page.RenderPageTemplate(w, r, "productmodform")
 				return
 			} else if r.Form["button"][0] == "update" {
 				rows_updated := page.Product.UpdateProduct()
@@ -116,25 +116,25 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request) {
 					gp.Products = page.BaseProductWithBDG.GroupProducts
 					gp.UpdateGroupProduct()
 				}
-				log.Println("Updated " + strconv.Itoa(rows_updated) + " rows")
+				glog.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
 				model.LoadMCWithProductData()
 				pbt = page.Product.SelectProductsByTypes(true, true, false)
 				page.ProductsByTypes = pbt
 				outProduct := page.Product.SelectProduct()
 				page.Product = outProduct[0]
 				page.Messages["productModifySuccess"] = "Product modified successfully and memcache updated!"
-				page.RenderPageTemplate(w, "productmodform")
+				page.RenderPageTemplate(w, r, "productmodform")
 				return
 			} else {
 				//we only allow add and update right now
 				page.Messages["productModifyFail"] = "Product modification failed.  You tried to perform an unknown operation!"
-				page.RenderPageTemplate(w, "productmodform")
+				page.RenderPageTemplate(w, r, "productmodform")
 				return
 			}
 		} else {
 			//Validation failed
-			log.Println("Bad product!")
-			page.RenderPageTemplate(w, "/productmodform")
+			glog.Infoln("Bad product!")
+			page.RenderPageTemplate(w, r, "/productmodform")
 			return
 		}
 	} else {
@@ -150,7 +150,7 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request) {
 	var p []model.Product
 	p = page.Product.SelectAllProducts()
 	page.Products = p
-	page.RenderPageTemplate(w, "products")
+	page.RenderPageTemplate(w, r, "products")
 }
 
 //Parses the form and then validates the product form request
@@ -169,7 +169,7 @@ func ValidateProduct(product *model.Product, bpwbd *model.BaseProductWithBDG, r 
 	}
 	if len(r.Form["productType"]) > 0 {
 		product.ProductType.ID, _ = strconv.Atoi(r.Form["productType"][0])
-		log.Println(product.ProductType.ID)
+		glog.Infoln(product.ProductType.ID)
 		if len(r.Form["productGroupType"+r.Form["productType"][0]]) > 0 {
 			pgt, _ := r.Form["productGroupType"+r.Form["productType"][0]]
 			if pgt[0] == "Base" {

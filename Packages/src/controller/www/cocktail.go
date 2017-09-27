@@ -6,7 +6,7 @@ package www
 
 import (
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"net/url"
@@ -22,21 +22,21 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request) {
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	}
 	if len(m["ID"]) == 0 {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(m["ID"][0])
 		cs = page.Cocktail.SelectCocktailsByID(id, true)
 		page.CocktailSet = cs
 		//apply the template page info to the index page
-		page.RenderPageTemplate(w, "cocktail")
+		page.RenderPageTemplate(w, r, "cocktail")
 
 	}
 }
@@ -51,23 +51,23 @@ func CocktailsHandler(w http.ResponseWriter, r *http.Request) {
 	cs.ChildCocktails = c
 	page.CocktailSet = cs
 	//apply the template page info to the index page
-	page.RenderPageTemplate(w, "cocktails")
+	page.RenderPageTemplate(w, r, "cocktails")
 }
 
 //Cocktail Modification Form page handler which displays the Cocktail Modification
 //Form page.
 func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(w, r)
-	log.Println("In Add Cocktail Form handler")
+	glog.Infoln("In Add Cocktail Form handler")
 	if page.Authenticated {
 		u, err := url.Parse(r.URL.String())
-		log.Println(u)
+		glog.Infoln(u)
 		if err != nil {
-			page.RenderPageTemplate(w, "404")
+			page.RenderPageTemplate(w, r, "404")
 		}
 		m, err := url.ParseQuery(u.RawQuery)
 		if err != nil {
-			page.RenderPageTemplate(w, "404")
+			page.RenderPageTemplate(w, r, "404")
 		}
 		var cba model.CocktailsByAlphaNums
 		cba = page.Cocktail.SelectCocktailsByAlphaNums(false)
@@ -84,14 +84,14 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request) {
 		page.NonIngredients = nonIngredients
 		if len(m["ID"]) == 0 {
 			//apply the template page info to the index page
-			page.RenderPageTemplate(w, "cocktailmodform")
+			page.RenderPageTemplate(w, r, "cocktailmodform")
 		} else {
 			id, _ := strconv.Atoi(m["ID"][0])
 			var in model.Cocktail
 			in.ID = id
 			out := page.Cocktail.SelectCocktailsByID(id, false)
 			page.Cocktail = out.Cocktail
-			page.RenderPageTemplate(w, "cocktailmodform")
+			page.RenderPageTemplate(w, r, "cocktailmodform")
 		}
 	} else {
 		http.Redirect(w, r, "/", 302)
@@ -105,17 +105,17 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(w, r)
 	if page.Authenticated {
 		u, err := url.Parse(r.URL.String())
-		log.Println(u)
+		glog.Infoln(u)
 		if err != nil {
-			page.RenderPageTemplate(w, "404")
+			page.RenderPageTemplate(w, r, "404")
 			return
 		}
 		m, err := url.ParseQuery(u.RawQuery)
 		if err != nil {
-			page.RenderPageTemplate(w, "404")
+			page.RenderPageTemplate(w, r, "404")
 			return
 		}
-		log.Println(m)
+		glog.Infoln(m)
 		var cba model.CocktailsByAlphaNums
 		cba = page.Cocktail.SelectCocktailsByAlphaNums(false)
 		page.CocktailsByAlphaNums = cba
@@ -136,7 +136,7 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 				outCocktail := page.Cocktail.SelectCocktailsByID(ret_id, false)
 				page.Cocktail = outCocktail.Cocktail
 				page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
-				page.RenderPageTemplate(w, "cocktailmodform")
+				page.RenderPageTemplate(w, r, "cocktailmodform")
 				return
 			} else if m["button"][0] == "update" {
 				ret_id := page.Cocktail.UpdateCocktail()
@@ -144,16 +144,16 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request) {
 				outCocktail := page.Cocktail.SelectCocktailsByID(ret_id, false)
 				page.Cocktail = outCocktail.Cocktail
 				page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
-				page.RenderPageTemplate(w, "cocktailmodform")
+				page.RenderPageTemplate(w, r, "cocktailmodform")
 				return
 			} else {
 				page.Messages["cocktailModifyFail"] = "Cocktail modification failed.  You tried to perform an unknown operation!"
-				page.RenderPageTemplate(w, "cocktailmodform")
+				page.RenderPageTemplate(w, r, "cocktailmodform")
 				return
 			}
 		} else {
-			log.Println("Bad cocktail!")
-			page.RenderPageTemplate(w, "/cocktailmodform")
+			glog.Infoln("Bad cocktail!")
+			page.RenderPageTemplate(w, r, "/cocktailmodform")
 			return
 		}
 	} else {
@@ -170,7 +170,7 @@ func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request) {
 	m = page.Meta.SelectMetaByTypes(true, true, false)
 	page.MetasByTypes = m
 	//apply the template page info to the index page
-	page.RenderPageTemplate(w, "cocktailsindex")
+	page.RenderPageTemplate(w, r, "cocktailsindex")
 }
 
 //Cocktails by meta id page handler that shows all the cocktails that are
@@ -180,17 +180,17 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	}
 	if len(m["ID"]) == 0 {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
-		log.Println("Meta ID: " + m["ID"][0])
+		glog.Infoln("Meta ID: " + m["ID"][0])
 		var inMeta model.Meta
 		inMeta.ID = id
 		var c []model.Cocktail
@@ -199,7 +199,7 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request) {
 		meta := inMeta.SelectMeta()
 		cs.Metadata = meta[0]
 		page.CocktailSet = cs
-		page.RenderPageTemplate(w, "cocktails")
+		page.RenderPageTemplate(w, r, "cocktails")
 	}
 }
 
@@ -210,14 +210,14 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
 	var cs model.CocktailSet
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	}
 	m, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	}
 	if len(m["ID"]) == 0 {
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 	} else {
 		id, _ := strconv.Atoi(m["ID"][0])
 
@@ -229,7 +229,7 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request) {
 		prod := inProduct.SelectProduct()
 		cs.Product = prod[0]
 		page.CocktailSet = cs
-		page.RenderPageTemplate(w, "cocktails")
+		page.RenderPageTemplate(w, r, "cocktails")
 
 	}
 }
@@ -401,7 +401,7 @@ func ValidateCocktail(cocktail *model.Cocktail, m map[string][]string) bool {
 			if id != "" {
 				var m model.Meta
 				m.ID, _ = strconv.Atoi(id)
-				log.Println("Family id = " + id)
+				glog.Infoln("Family id = " + id)
 				cocktail.Family = append(cocktail.Family, m)
 			}
 		}

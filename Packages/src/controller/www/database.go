@@ -10,7 +10,7 @@ import (
 	"connectors"
 	"html/template"
 	"io/ioutil"
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"os"
@@ -40,11 +40,11 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 			r, _ := regexp.Compile("(.*/*!.*)")
 			if !r.MatchString(string(request)) {
 				buffer.WriteString(string(request) + ";<br><br>")
-				log.Println(string(request))
+				glog.Infoln(string(request))
 				if len(string(request)) > 0 {
 					_, err := conn.Exec(string(request))
 					if err != nil {
-						log.Println(err)
+						glog.Infoln(err)
 					}
 				}
 			}
@@ -52,7 +52,7 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request) {
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, "dbindex")
+		page.RenderPageTemplate(w, r, "dbindex")
 	} else {
 		http.Redirect(w, r, "/", 302)
 	}
@@ -83,19 +83,19 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request) {
 		for scanner.Scan() {
 			request := scanner.Text()
 			buffer.WriteString(string(request) + ";<br><br>")
-			log.Println(string(request))
+			glog.Infoln(string(request))
 			if len(string(request)) > 0 {
 				_, err := conn.Exec(string(request))
 				if err != nil {
-					log.Println(err)
+					glog.Infoln(err)
 				}
 			}
 		}
 		//apply the template page info to the index page
 		statStr := buffer.String()
-		log.Println(statStr)
+		glog.Infoln(statStr)
 		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, "dbindex")
+		page.RenderPageTemplate(w, r, "dbindex")
 	} else {
 		http.Redirect(w, r, "/", 302)
 	}
@@ -114,7 +114,7 @@ func DBTestHandler(w http.ResponseWriter, r *http.Request) {
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, "dbindex")
+		page.RenderPageTemplate(w, r, "dbindex")
 	} else {
 		http.Redirect(w, r, "/", 302)
 	}

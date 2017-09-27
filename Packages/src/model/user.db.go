@@ -5,8 +5,8 @@ package model
 import (
 	"bytes"
 	"connectors"
+	"github.com/golang/glog"
 	"html"
-	"log"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ import (
 func (user *User) SelectUserForLogin(isOauth bool) *User {
 	var ret User
 	conn, _ := connectors.GetDB()
-	log.Println(user.Username)
+	glog.Infoln(user.Username)
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
@@ -40,22 +40,22 @@ func (user *User) SelectUserForLogin(isOauth bool) *User {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		log.Println(query)
+		glog.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
-			log.Println(ret.ID, ret.Username, ret.Password, ret.Email)
+			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email)
 		}
 		err = rows.Err()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 	}
 	return &ret

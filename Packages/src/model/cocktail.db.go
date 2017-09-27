@@ -7,9 +7,9 @@ import (
 	"connectors"
 	"encoding/gob"
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/golang/glog"
 	"html"
 	"html/template"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -100,16 +100,16 @@ func (cocktail *Cocktail) processCocktail() int {
 		query = query + " WHERE `idCocktail`=?;"
 		args = append(args, strconv.Itoa(cocktail.ID))
 	}
-	log.Println(query)
+	glog.Infoln(query)
 	res, err := conn.Exec(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	var lastCocktailId int64
 	if cocktail.ID == 0 {
 		lastCocktailId, err = res.LastInsertId()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 	} else {
 		lastCocktailId = int64(cocktail.ID)
@@ -117,9 +117,9 @@ func (cocktail *Cocktail) processCocktail() int {
 
 	rowCnt, err := res.RowsAffected()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
-	log.Printf("Cocktail ID = %d, affected = %d\n", lastCocktailId, rowCnt)
+	glog.Infoln("Cocktail ID = %d, affected = %d\n", lastCocktailId, rowCnt)
 
 	var recipeID int
 	if cocktail.ID == 0 {
@@ -136,27 +136,27 @@ func (cocktail *Cocktail) processCocktail() int {
 	cocktail.processCocktailToProducts(cocktail.Drinkware, lastCocktailId)
 	cocktail.processCocktailToProducts(cocktail.Tool, lastCocktailId)
 
-	log.Println("processing Cocktail to Metas")
+	glog.Infoln("processing Cocktail to Metas")
 	cocktail.clearCocktailToMetasByCocktailID(lastCocktailId)
-	log.Println("processing Cocktail to Family")
+	glog.Infoln("processing Cocktail to Family")
 	cocktail.processCocktailToMetas(cocktail.Family, lastCocktailId, btoi(cocktail.IsFamilyRoot))
-	log.Println("processing Cocktail to Flavor")
+	glog.Infoln("processing Cocktail to Flavor")
 	cocktail.processCocktailToMetas(cocktail.Flavor, lastCocktailId, 0)
-	log.Println("processing Cocktail to Type")
+	glog.Infoln("processing Cocktail to Type")
 	cocktail.processCocktailToMetas(cocktail.Type, lastCocktailId, 0)
-	log.Println("processing Cocktail to BaseSpirit")
+	glog.Infoln("processing Cocktail to BaseSpirit")
 	cocktail.processCocktailToMetas(cocktail.BaseSpirit, lastCocktailId, 0)
-	log.Println("processing Cocktail to Served")
+	glog.Infoln("processing Cocktail to Served")
 	cocktail.processCocktailToMetas(cocktail.Served, lastCocktailId, 0)
-	log.Println("processing Cocktail to Technique")
+	glog.Infoln("processing Cocktail to Technique")
 	cocktail.processCocktailToMetas(cocktail.Technique, lastCocktailId, 0)
-	log.Println("processing Cocktail to Strength")
+	glog.Infoln("processing Cocktail to Strength")
 	cocktail.processCocktailToMetas(cocktail.Strength, lastCocktailId, 0)
-	log.Println("processing Cocktail to Difficulty")
+	glog.Infoln("processing Cocktail to Difficulty")
 	cocktail.processCocktailToMetas(cocktail.Difficulty, lastCocktailId, 0)
-	log.Println("processing Cocktail to TOD")
+	glog.Infoln("processing Cocktail to TOD")
 	cocktail.processCocktailToMetas(cocktail.TOD, lastCocktailId, 0)
-	log.Println("processing Cocktail to Ratio")
+	glog.Infoln("processing Cocktail to Ratio")
 	cocktail.processCocktailToMetas(cocktail.Ratio, lastCocktailId, 0)
 
 	if cocktail.ID == 0 {
@@ -179,16 +179,16 @@ func (cocktail *Cocktail) clearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	query := buffer.String()
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var nameID int
 		err := rows.Scan(&nameID)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
-		log.Println(nameID)
+		glog.Infoln(nameID)
 		nameIDs = append(nameIDs, nameID)
 	}
 	buffer.Reset()
@@ -198,16 +198,16 @@ func (cocktail *Cocktail) clearAltNamesAndAKAsByCocktailID(cocktailID int64) {
 	query = buffer.String()
 	rows, err = conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var nameID int
 		err := rows.Scan(&nameID)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
-		log.Println(nameID)
+		glog.Infoln(nameID)
 		nameIDs = append(nameIDs, nameID)
 	}
 	//clear all altingredients by stepid
@@ -247,11 +247,11 @@ func (cocktail *Cocktail) processAKAs(names []Name, cocktailID int64) {
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
 		query = query + ";"
-		log.Println(query)
+		glog.Infoln(query)
 		res, err := conn.Exec(query, args...)
 		lastAltNameId, err := res.LastInsertId()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		args = args[0:0]
 		args = append(args, strconv.FormatInt(cocktailID, 10))
@@ -275,11 +275,11 @@ func (cocktail *Cocktail) processAltNames(names []Name, cocktailID int64) {
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
 		query = query + ";"
-		log.Println(query)
+		glog.Infoln(query)
 		res, err := conn.Exec(query, args...)
 		lastAltNameId, err := res.LastInsertId()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		args = args[0:0]
 		args = append(args, strconv.FormatInt(cocktailID, 10))
@@ -312,7 +312,7 @@ func (cocktail *Cocktail) processCocktailToProducts(products []Product, cocktail
 			args = append(args, strconv.FormatInt(cocktailID, 10))
 			args = append(args, strconv.Itoa(prodTo[0].ID))
 			args = append(args, strconv.Itoa(int(prodTo[0].ProductType.ID)))
-			log.Println(query)
+			glog.Infoln(query)
 			conn.Exec(query, args...)
 		}
 	}
@@ -344,7 +344,7 @@ func (cocktail *Cocktail) processCocktailToMetas(metas []Meta, cocktailID int64,
 			args = append(args, strconv.Itoa(metaTo[0].ID))
 			args = append(args, strconv.Itoa(int(metaTo[0].MetaType.ID)))
 			args = append(args, strconv.Itoa(int(isRootCocktailForMeta)))
-			log.Println(query)
+			glog.Infoln(query)
 			conn.Exec(query, args...)
 		}
 	}
@@ -366,22 +366,22 @@ func (cocktail *Cocktail) SelectCocktailsByAlphaNums(ignoreCache bool) Cocktails
 		buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName" +
 			" FROM cocktail ORDER BY cocktail.cocktailTitle;")
 		query := buffer.String()
-		log.Println(query)
+		glog.Infoln(query)
 		cba_rows, _ := conn.Query(query)
 		defer cba_rows.Close()
 		for cba_rows.Next() {
 			var cocktail Cocktail
 			err := cba_rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
 			if _, ok := ret.CBA[string(cocktail.Title[0])]; ok {
 				//append
-				log.Println("Appending to " + string(cocktail.Title[0]) + " with " + cocktail.Title)
+				glog.Infoln("Appending to " + string(cocktail.Title[0]) + " with " + cocktail.Title)
 				ret.CBA[string(cocktail.Title[0])] = append(ret.CBA[string(cocktail.Title[0])], cocktail)
 			} else {
 				//add
-				log.Println("Creating " + string(cocktail.Title[0]) + " with " + cocktail.Title)
+				glog.Infoln("Creating " + string(cocktail.Title[0]) + " with " + cocktail.Title)
 				ret.CBA[string(cocktail.Title[0])] = []Cocktail{cocktail}
 			}
 		}
@@ -414,7 +414,7 @@ func (cocktail *Cocktail) SelectCocktailsByMeta(meta Meta) []Cocktail {
 	var ret []Cocktail
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-	log.Println(meta.MetaName)
+	glog.Infoln(meta.MetaName)
 	var buffer bytes.Buffer
 	var canQuery = false
 	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
@@ -430,10 +430,10 @@ func (cocktail *Cocktail) SelectCocktailsByMeta(meta Meta) []Cocktail {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		log.Println(query)
+		glog.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -444,14 +444,14 @@ func (cocktail *Cocktail) SelectCocktailsByMeta(meta Meta) []Cocktail {
 			cocktail.Description = template.HTML(html.UnescapeString(desc))
 			cocktail.Comment = template.HTML(html.UnescapeString(comment))
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
 			ret = append(ret, cocktail)
-			log.Println(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath, cocktail.Image, cocktail.Description, cocktail.Comment)
+			glog.Infoln(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath, cocktail.Image, cocktail.Description, cocktail.Comment)
 		}
 		err = rows.Err()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 	}
 	return ret
@@ -462,7 +462,7 @@ func (cocktail *Cocktail) SelectCocktailsByProduct(product Product) []Cocktail {
 	var ret []Cocktail
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-	log.Println(product.ProductName)
+	glog.Infoln(product.ProductName)
 	var buffer bytes.Buffer
 	var canQuery = false
 	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
@@ -483,10 +483,10 @@ func (cocktail *Cocktail) SelectCocktailsByProduct(product Product) []Cocktail {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		log.Println(query)
+		glog.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
@@ -497,14 +497,14 @@ func (cocktail *Cocktail) SelectCocktailsByProduct(product Product) []Cocktail {
 			cocktail.Description = template.HTML(html.UnescapeString(desc))
 			cocktail.Comment = template.HTML(html.UnescapeString(comment))
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
 			ret = append(ret, cocktail)
-			log.Println(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath, cocktail.Image, cocktail.Description, cocktail.Comment)
+			glog.Infoln(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath, cocktail.Image, cocktail.Description, cocktail.Comment)
 		}
 		err = rows.Err()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 	}
 	return ret
@@ -521,10 +521,10 @@ func (cocktail *Cocktail) SelectAllCocktails(includeBDG bool) []Cocktail {
 		" COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')" +
 		" FROM cocktail;")
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -539,17 +539,17 @@ func (cocktail *Cocktail) SelectAllCocktails(includeBDG bool) []Cocktail {
 		cocktail.Comment = template.HTML(html.UnescapeString(comment))
 		cocktail.Origin = template.HTML(html.UnescapeString(origin))
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		//add cocktail to cocktail family
 		c = append(c, cocktail)
-		log.Println(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
+		glog.Infoln(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
 			cocktail.Image, cocktail.Description, cocktail.Comment, cocktail.SourceName, cocktail.SourceLink, cocktail.ImageSourceName, cocktail.ImageSourceLink,
 			cocktail.SpokenName, cocktail.DisplayName)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	return c
 }
@@ -569,10 +569,10 @@ func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailS
 		" WHERE idCocktail=?;")
 	args = append(args, strconv.Itoa(ID))
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -587,7 +587,7 @@ func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailS
 		cocktail.Comment = template.HTML(html.UnescapeString(comment))
 		cocktail.Origin = template.HTML(html.UnescapeString(origin))
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		meta := new(Meta)
 		product := new(Product)
@@ -611,13 +611,13 @@ func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailS
 		//add cocktail to cocktail family
 		cs.Cocktail = cocktail
 
-		log.Println(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
+		glog.Infoln(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
 			cocktail.Image, cocktail.Description, cocktail.Comment, cocktail.SourceName, cocktail.SourceLink, cocktail.ImageSourceName, cocktail.ImageSourceLink,
 			cocktail.SpokenName, cocktail.DisplayName)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return cs

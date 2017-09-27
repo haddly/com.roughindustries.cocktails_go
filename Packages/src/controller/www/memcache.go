@@ -22,7 +22,7 @@ func MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, "mcindex")
+		page.RenderPageTemplate(w, r, "mcindex")
 	} else {
 		http.Redirect(w, r, "/", 302)
 	}
@@ -38,7 +38,7 @@ func MCAddHandler(w http.ResponseWriter, r *http.Request) {
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, "mcindex")
+		page.RenderPageTemplate(w, r, "mcindex")
 	} else {
 		http.Redirect(w, r, "/", 302)
 	}

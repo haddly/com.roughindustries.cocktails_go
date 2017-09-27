@@ -8,10 +8,11 @@ package www
 
 import (
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"strings"
+	"time"
 )
 
 //Is the website public or private, i.e. do you want to offer admin
@@ -56,7 +57,7 @@ var counter = 0
 
 //the page template renderer.  This should be the basic method for displaying
 //all pages.
-func (page *page) RenderPageTemplate(w http.ResponseWriter, tmpl string) {
+func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmpl string) {
 	// CATCH ONLY HEADER START
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -65,10 +66,20 @@ func (page *page) RenderPageTemplate(w http.ResponseWriter, tmpl string) {
 		}
 	}()
 	// CATCH ONLY HEADER START
+	// setup the CSRF id for this page
+	if r != nil {
+		//set the ip for this session
+		page.UserSession.LastRemoteAddr = r.RemoteAddr
+		page.UserSession.LastXForwardedFor = r.Header.Get("X-Forwarded-For")
+		page.UserSession.LastSeenTime = time.Now()
+		page.UserSession.CSRF = randSeq(64)
+		page.UserSession.CSRFGenTime = time.Now()
+		SetSession(w, r, &page.UserSession, false)
+	}
 	t, err := parseTempFiles(tmpl)
 	if err != nil {
 		Error404(w, err)
-		page.RenderPageTemplate(w, "404")
+		page.RenderPageTemplate(w, r, "404")
 		return
 	}
 	err = t.ExecuteTemplate(w, "base", page)
@@ -90,7 +101,7 @@ func parseTempFiles(tmpl string) (*template.Template, error) {
 func LandingHandler(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(w, r)
 	//apply the template page info to the index page
-	page.RenderPageTemplate(w, "index")
+	page.RenderPageTemplate(w, r, "index")
 }
 
 //The load page does a processing wheel until the actual page is loaded. It
@@ -98,16 +109,16 @@ func LandingHandler(w http.ResponseWriter, r *http.Request) {
 //is ready
 func Load(w http.ResponseWriter, r *http.Request) {
 	page := NewPage(w, r)
-	log.Println("Loader")
-	log.Println(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
-	log.Println(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
+	glog.Infoln("Loader")
+	glog.Infoln(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
+	glog.Infoln(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
 	redirect := strings.Replace(r.URL.EscapedPath(), "/load/", "", 1)
 	if redirect == "" {
 		page.Redirect = "index"
 	} else {
 		page.Redirect = redirect + "?" + r.URL.RawQuery
 	}
-	page.RenderPageTemplate(w, "loader")
+	page.RenderPageTemplate(w, nil, "loader")
 }
 
 //An initialization function that provides an initialized page object

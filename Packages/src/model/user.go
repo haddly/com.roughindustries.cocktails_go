@@ -24,8 +24,12 @@ type User struct {
 //User session data structure.  Keeps track of users logged in or accessing the
 //site.
 type UserSession struct {
-	SessionKey   string
-	User         User
-	LoginTime    time.Time
-	LastSeenTime time.Time
+	SessionKey        string
+	User              User
+	CSRF              string
+	CSRFGenTime       time.Time
+	LoginTime         time.Time
+	LastSeenTime      time.Time
+	LastRemoteAddr    string
+	LastXForwardedFor string
 }

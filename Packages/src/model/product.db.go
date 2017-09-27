@@ -9,7 +9,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"html"
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -96,7 +96,7 @@ func (product *Product) processProduct() int {
 		query = query + " WHERE `idProduct`=?;"
 		args = append(args, strconv.Itoa(int(product.ID)))
 	}
-	log.Println(query)
+	glog.Infoln(query)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
 	ret := int(id)
@@ -128,7 +128,7 @@ func (productgroup *GroupProduct) processGroupProduct() {
 				query := "INSERT INTO `groupProduct` (`idBaseProduct`, `idProduct`) VALUES (?, ?);"
 				args = append(args, strconv.Itoa(groupproduct[0].ID))
 				args = append(args, strconv.Itoa(product[0].ID))
-				log.Println(query)
+				glog.Infoln(query)
 				conn.Exec(query, args...)
 			}
 		}
@@ -144,7 +144,7 @@ func (productgroup *GroupProduct) clearGroupProductByBaseProductID() {
 	buffer.WriteString("DELETE FROM `groupProduct` WHERE `idBaseProduct`=?;")
 	args = append(args, int64(productgroup.GroupProduct.ID))
 	query := buffer.String()
-	log.Println(query + " " + strconv.Itoa(int(int64(productgroup.GroupProduct.ID))))
+	glog.Infoln(query + " " + strconv.Itoa(int(int64(productgroup.GroupProduct.ID))))
 	conn.Exec(query, args...)
 }
 
@@ -171,7 +171,7 @@ func (derivedproduct *DerivedProduct) processDerivedProduct() {
 		query := "INSERT INTO `derivedProduct` (`idBaseProduct`, `idProduct`) VALUES (?, ?);"
 		args = append(args, strconv.Itoa(baseproduct[0].ID))
 		args = append(args, strconv.Itoa(product[0].ID))
-		log.Println(query)
+		glog.Infoln(query)
 		conn.Exec(query, args...)
 	}
 }
@@ -185,7 +185,7 @@ func (derivedproduct *DerivedProduct) clearDerivedProductByProductID() {
 	buffer.WriteString("DELETE FROM `derivedProduct` WHERE `idProduct`=?;")
 	args = append(args, int64(derivedproduct.Product.ID))
 	query := buffer.String()
-	log.Println(query + " " + strconv.Itoa(int(int64(derivedproduct.Product.ID))))
+	glog.Infoln(query + " " + strconv.Itoa(int(int64(derivedproduct.Product.ID))))
 	conn.Exec(query, args...)
 }
 
@@ -195,7 +195,7 @@ func (product *Product) SelectProduct() []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
 	var args []interface{}
-	log.Println(product.ProductName)
+	glog.Infoln(product.ProductName)
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT `idProduct`, `productName`, `productType`, `productGroupType`, COALESCE(`productDescription`, ''), COALESCE(`productDetails`, ''), " +
 		"COALESCE(`productImageSourceName`, ''), COALESCE(`productImage`, ''), COALESCE(`productImagePath`, ''), COALESCE(`productImageSourceLink`, ''), " +
@@ -266,10 +266,10 @@ func (product *Product) SelectProduct() []Product {
 	query = strings.TrimRight(query, " WHERE")
 	query = strings.TrimRight(query, " AND")
 	query = query + " ORDER BY `productType`, `productGroupType`, `productName`;"
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -278,16 +278,16 @@ func (product *Product) SelectProduct() []Product {
 		var details string
 		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.Details = template.HTML(html.UnescapeString(details))
 		ret = append(ret, prod)
-		log.Println(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.Description, prod.Details, prod.ImageSourceName, prod.Image, prod.ImagePath, prod.ImageSourceLink, prod.PreText, prod.PostText, prod.Rating, prod.SourceName, prod.SourceLink)
+		glog.Infoln(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.Description, prod.Details, prod.ImageSourceName, prod.Image, prod.ImagePath, prod.ImageSourceLink, prod.PreText, prod.PostText, prod.Rating, prod.SourceName, prod.SourceLink)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret
@@ -309,14 +309,14 @@ func (product *Product) SelectProductsByTypes(includeIngredients bool, includeNo
 		var args []interface{}
 		rows, _ := conn.Query("SELECT COUNT(*) as count FROM  `producttype`;")
 		count, err := checkCount(rows)
-		log.Println("Product Types Found " + strconv.Itoa(count))
+		glog.Infoln("Product Types Found " + strconv.Itoa(count))
 		rows.Close()
 		for i := 0; i < count; i++ {
 			var pbt ProductsByType
 			var buffer bytes.Buffer
 			args = args[0:0]
 			buffer.WriteString("SELECT `idProductType`, `productTypeName`, `productTypeIsIngredient` FROM  `producttype` WHERE idProductType=? AND")
-			log.Println("Getting Products by Type ID " + strconv.Itoa(i+1))
+			glog.Infoln("Getting Products by Type ID " + strconv.Itoa(i+1))
 			args = append(args, strconv.Itoa(i+1))
 			buffer.WriteString(" (")
 			if includeIngredients {
@@ -330,16 +330,16 @@ func (product *Product) SelectProductsByTypes(includeIngredients bool, includeNo
 			query = query + ")"
 			query = strings.TrimSuffix(query, " AND")
 			query = query + ";"
-			log.Println(query)
+			glog.Infoln(query)
 			pbt_rows, _ := conn.Query(query, args...)
 
 			defer pbt_rows.Close()
 			for pbt_rows.Next() {
 				err = pbt_rows.Scan(&pbt.ProductType.ID, &pbt.ProductType.ProductTypeName, &pbt.ProductType.IsIngredient)
 				if err != nil {
-					log.Fatal(err)
+					glog.Error(err)
 				}
-				log.Println(pbt.ProductType.ID, pbt.ProductType.ProductTypeName, pbt.ProductType.IsIngredient)
+				glog.Infoln(pbt.ProductType.ID, pbt.ProductType.ProductTypeName, pbt.ProductType.IsIngredient)
 				if pbt.ProductType.ID != 0 {
 					var inProduct Product
 					inProduct.ProductType = pbt.ProductType
@@ -403,7 +403,7 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 	bpwbd.Product = *product
 	var dgp []Product
 	var bp Product
-	log.Println("Product With ID for BD return " + strconv.Itoa(product.ID) + "and GroupType " + strconv.Itoa(int(product.ProductGroupType)))
+	glog.Infoln("Product With ID for BD return " + strconv.Itoa(product.ID) + "and GroupType " + strconv.Itoa(int(product.ProductGroupType)))
 	if product.ProductGroupType == Base {
 		bd_rows, _ := conn.Query("SELECT `idProduct` FROM  `derivedProduct` WHERE idBaseProduct=?;", strconv.Itoa(product.ID))
 		defer bd_rows.Close()
@@ -411,9 +411,9 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 			var derivedProductID int
 			err := bd_rows.Scan(&derivedProductID)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
-			log.Println("Found Derived of " + strconv.Itoa(derivedProductID))
+			glog.Infoln("Found Derived of " + strconv.Itoa(derivedProductID))
 			inProduct.ID = derivedProductID
 			derivedProduct := inProduct.SelectProduct()
 			dgp = append(dgp, derivedProduct[0])
@@ -426,9 +426,9 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 			var baseProductID int
 			err := bd_rows.Scan(&baseProductID)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
-			log.Println("Found Base of " + strconv.Itoa(baseProductID))
+			glog.Infoln("Found Base of " + strconv.Itoa(baseProductID))
 			inProduct.ID = baseProductID
 			baseProduct := inProduct.SelectProduct()
 			bp = baseProduct[0]
@@ -441,9 +441,9 @@ func (product *Product) SelectBDGByProduct() *BaseProductWithBDG {
 			var groupProductID int
 			err := bd_rows.Scan(&groupProductID)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
-			log.Println("Found Group of " + strconv.Itoa(groupProductID))
+			glog.Infoln("Found Group of " + strconv.Itoa(groupProductID))
 			inProduct.ID = groupProductID
 			groupProduct := inProduct.SelectProduct()
 			dgp = append(dgp, groupProduct[0])
@@ -461,10 +461,10 @@ func (product *Product) SelectAllProducts() []Product {
 	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, '')," +
 		" COALESCE(productImage, '') FROM product;")
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -475,14 +475,14 @@ func (product *Product) SelectAllProducts() []Product {
 		prod.Description = template.HTML(desc)
 		prod.ProductType.ID = pt
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
-		log.Println(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
+		glog.Infoln(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
 		ret = append(ret, prod)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret
@@ -515,10 +515,10 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 	args = append(args, strconv.Itoa(ID))
 	args = append(args, strconv.Itoa(pt))
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -527,16 +527,16 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 		var details string
 		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.Details = template.HTML(html.UnescapeString(details))
-		log.Println(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
+		glog.Infoln(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
 		ret = append(ret, prod)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret

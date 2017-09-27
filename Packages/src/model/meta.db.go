@@ -10,7 +10,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"html"
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -51,14 +51,12 @@ func (meta *Meta) processMeta() int {
 		}
 		args = append(args, html.EscapeString(meta.MetaName))
 	}
-	if meta.Blurb != "" {
-		if meta.ID == 0 {
-			buffer.WriteString("`metaBlurb`,")
-		} else {
-			buffer.WriteString(" `metaBlurb`=?,")
-		}
-		args = append(args, html.EscapeString(string(meta.Blurb)))
+	if meta.ID == 0 {
+		buffer.WriteString("`metaBlurb`,")
+	} else {
+		buffer.WriteString(" `metaBlurb`=?,")
 	}
+	args = append(args, html.EscapeString(string(meta.Blurb)))
 	metatype := meta.MetaType.SelectMetaType(true, true, true)
 	if meta.ID == 0 {
 		buffer.WriteString("`metaType`,")
@@ -80,7 +78,7 @@ func (meta *Meta) processMeta() int {
 	}
 
 	//Lets do this thing
-	log.Println(query)
+	glog.Infoln(query)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
 	ret := int(id)
@@ -141,24 +139,24 @@ func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignore
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		log.Println(query)
+		glog.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			var metatype MetaType
 			err := rows.Scan(&metatype.ID, &metatype.MetaTypeName, &metatype.Ordinal, &metatype.ShowInCocktailsIndex, &metatype.HasRoot, &metatype.IsOneToMany)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
 			ret = append(ret, metatype)
-			log.Println(metatype.ID, metatype.MetaTypeName, metatype.Ordinal, metatype.ShowInCocktailsIndex, metatype.HasRoot, metatype.IsOneToMany)
+			glog.Infoln(metatype.ID, metatype.MetaTypeName, metatype.Ordinal, metatype.ShowInCocktailsIndex, metatype.HasRoot, metatype.IsOneToMany)
 		}
 		err = rows.Err()
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 	}
 	return ret
@@ -188,10 +186,10 @@ func (meta *Meta) SelectMeta() []Meta {
 	query = strings.TrimRight(query, " WHERE")
 	query = strings.TrimRight(query, " AND")
 	query = query + ";"
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -199,15 +197,15 @@ func (meta *Meta) SelectMeta() []Meta {
 		var blurb string
 		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &blurb)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		meta.Blurb = template.HTML(html.UnescapeString(blurb))
 		ret = append(ret, meta)
-		log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, meta.Blurb)
+		glog.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, meta.Blurb)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret
@@ -244,11 +242,11 @@ func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, i
 			for rows.Next() {
 				var item int
 				rows.Scan(&item)
-				log.Println(item)
+				glog.Infoln(item)
 				mtList = append(mtList, item)
 			}
 		}
-		//log.Println("Meta Types Found " + strconv.Itoa(count))
+		//glog.Infoln("Meta Types Found " + strconv.Itoa(count))
 		if rows != nil {
 			rows.Close()
 		}
@@ -260,7 +258,7 @@ func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, i
 		for mbt_rows.Next() {
 			err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal, &mbt.MetaType.HasRoot, &mbt.MetaType.IsOneToMany)
 			if err != nil {
-				log.Fatal(err)
+				glog.Error(err)
 			}
 			mbt.MetaType.MetaTypeNameNoSpaces = strings.Join(strings.Fields(mbt.MetaType.MetaTypeName), "")
 			var inMeta Meta
@@ -318,10 +316,10 @@ func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool
 	args = append(args, strconv.Itoa(ID))
 	args = append(args, strconv.Itoa(mt))
 	query := buffer.String()
-	log.Println(query)
+	glog.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -329,17 +327,17 @@ func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool
 		var root string
 		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
 		if err != nil {
-			log.Fatal(err)
+			glog.Error(err)
 		}
 		if !isRoot {
 			isRoot, _ = strconv.ParseBool(root)
 		}
 		ret = append(ret, meta)
-		log.Println(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
+		glog.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
 
 	return ret, isRoot

@@ -4,21 +4,21 @@ package model
 
 import (
 	"connectors"
-	"log"
+	"github.com/golang/glog"
 )
 
 //SELECTS
 //Get the current name of the database being used.
 func SelectCurrentDB() string {
-	log.Println("Getting CurrentDB")
+	glog.Infoln("Getting CurrentDB")
 	conn, _ := connectors.GetDB()
-	log.Println("Getting Databases")
+	glog.Infoln("Getting Databases")
 	rows, _ := conn.Query("SELECT DATABASE();")
-	log.Println("Got Databases")
+	glog.Infoln("Got Databases")
 	var dbname string
 	if rows.Next() {
 		rows.Scan(&dbname)
-		log.Println(dbname)
+		glog.Infoln(dbname)
 	}
 	return dbname
 }

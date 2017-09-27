@@ -22,3 +22,4 @@ go get golang.org/x/crypto/bcrypt
 go get golang.org/x/oauth2
 go get google.golang.org/appengine
 go get github.com/microcosm-cc/bluemonday
+go get github.com/golang/glog

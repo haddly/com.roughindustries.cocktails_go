@@ -5,7 +5,7 @@ import (
 	"bytes"
 	alexa "github.com/mikeflynn/go-alexa/skillserver"
 	"html/template"
-	"log"
+	"github.com/golang/glog"
 )
 
 type News struct {
@@ -41,7 +41,7 @@ var Applications = map[string]interface{}{
 func EchoIntentHandler(echoReq *alexa.EchoRequest, echoResp *alexa.EchoResponse) {
 	t := template.New("response")
 
-	log.Println(echoReq)
+	glog.Infoln(echoReq)
 	var err error
 	t, err = t.ParseFiles("./view/webcontent/alexa/templates/hello.ssml")
 	//t, err = t.ParseFiles("./view/webcontent/alexa/templates/news.ssml")
@@ -59,12 +59,12 @@ func EchoIntentHandler(echoReq *alexa.EchoRequest, echoResp *alexa.EchoResponse)
 	//defer r.Body.Close()
 
 	//bodyBytes, _ := ioutil.ReadAll(r.Body)
-	//log.Println(string(bodyBytes))
+	//glog.Infoln(string(bodyBytes))
 
 	//jsonResult := new(News)
 
 	//json.NewDecoder(r.Body).Decode(&jsonResult)
-	//log.Println(jsonResult.Articles[0].Description)
+	//glog.Infoln(jsonResult.Articles[0].Description)
 
 	reqSlotValue := echoReq.Request.Intent.Slots["UpdateText"].Value
 	reqName := echoReq.Request.Intent.Name
@@ -76,7 +76,7 @@ func EchoIntentHandler(echoReq *alexa.EchoRequest, echoResp *alexa.EchoResponse)
 			Description: "Hi! " + reqSlotValue,
 		}
 	} else {
-		log.Println(reqSlotValue)
+		glog.Infoln(reqSlotValue)
 		if reqSlotValue == "a million dollars" {
 			data = Data{
 				Description: "If I Had a million dollars. I'd buy you a fur coat, but not a real fur coat that's cruel.",
@@ -90,12 +90,12 @@ func EchoIntentHandler(echoReq *alexa.EchoRequest, echoResp *alexa.EchoResponse)
 
 	var tpl bytes.Buffer
 	if err := t.ExecuteTemplate(&tpl, "base", data); err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 		return
 	}
 
 	result := tpl.String()
-	log.Println(result)
+	glog.Infoln(result)
 
 	sessionAtt := map[string]interface{}{
 		"session": HelloSession{ // Route

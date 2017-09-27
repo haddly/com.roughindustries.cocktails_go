@@ -3,14 +3,14 @@
 package www
 
 import (
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 )
 
 //Init to setup the http handlers
 func WWWRouterInit() {
-	log.Println("Init in www/router.go")
+	glog.Infoln("Init in www/router.go")
 	//Page Routing
 	http.Handle("/", RecoverHandler(http.HandlerFunc(LandingHandler)))
 	http.Handle("/load/", RecoverHandler(http.HandlerFunc(Load)))

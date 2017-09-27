@@ -7,9 +7,9 @@ import (
 	"controller/alexa"
 	"controller/www"
 	"flag"
+	"github.com/golang/glog"
 	"github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -32,10 +32,10 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		log.Println(string(hashedPassword))
+		glog.Infoln(string(hashedPassword))
 		os.Exit(0)
 	}
-	log.Println("Start Init")
+	glog.Infoln("Start Init")
 	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 	var dbaddr string
 	var dbpasswd string
@@ -56,13 +56,13 @@ func init() {
 	//mc_server = ??
 
 	if dbaddr == "" || dbpasswd == "" || user == "" || proto == "" || port == "" || dbname == "" {
-		log.Println("Not all DB parameters are set.  If your DB isn't connecting check these values.")
+		glog.Infoln("Not all DB parameters are set.  If your DB isn't connecting check these values.")
 	}
 	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname, dbtype)
 	if mc_server != "" {
 		connectors.SetMCVars(mc_server)
 	} else {
-		log.Println("No Memcache server set. If you want to use memcaching you will " +
+		glog.Infoln("No Memcache server set. If you want to use memcaching you will " +
 			"have to set this value in main.go.")
 	}
 	// wanted it to be more random so i seed it time now
@@ -70,7 +70,7 @@ func init() {
 	// init the routing
 	www.WWWRouterInit()
 	alexa.AlexaRouterInit()
-	log.Println("End Init")
+	glog.Infoln("End Init")
 }
 
 //Let's Encrypt HTTPS setup, Challenges are based on the number of domains
@@ -89,11 +89,11 @@ func main() {
 	//print out the current directory
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		log.Fatal(err)
+		glog.Error(err)
 	}
-	log.Println(dir)
+	glog.Infoln(dir)
 	AddLetsEncrypt()
-	log.Println("Starting Server ... \n")
+	glog.Infoln("Starting Server ... \n")
 	//this starts up the server
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }

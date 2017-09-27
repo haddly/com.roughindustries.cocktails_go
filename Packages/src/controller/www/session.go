@@ -17,7 +17,7 @@ import (
 	"encoding/gob"
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/gorilla/sessions"
-	"log"
+	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"time"
@@ -37,8 +37,12 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 	}
 	// Retrieve our struct and type-assert it
 	if session_id, ok := session.Values["session_id"].(string); !ok {
-		log.Println("No Session ID")
-		return *new(model.UserSession), false
+		glog.Infoln("No Session ID")
+		us := new(model.UserSession)
+		us.LoginTime = time.Now()
+		us.LastSeenTime = time.Now()
+		SetSession(w, r, us, true)
+		return *us, false
 	} else {
 		mc, _ := connectors.GetMC()
 		if mc != nil {
@@ -52,14 +56,20 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 					dec.Decode(&userSession)
 				}
 			}
+			//log.Print("LastSeenTime")
+			//log.Print(userSession.LastSeenTime)
 			//Authenticate
-			//Has it been to long sense the user logged in so they have to
-			//login again, i.e. even if they have been using the site for
-			//24hours we cap the total time they can be logged into one
-			//session
-			if time.Since(userSession.LoginTime).Hours() >= 24 {
-				log.Println("User has been logged in for over 24 hours")
-				log.Println("Looks like this is an old session.")
+			if userSession.User.Username == "" {
+				//The user hasn't logged in so this is to track the session
+				//with no user attached.
+				return userSession, false
+			} else if time.Since(userSession.LoginTime).Hours() >= 24 {
+				//Has it been to long sense the user logged in so they have to
+				//login again, i.e. even if they have been using the site for
+				//24hours we cap the total time they can be logged into one
+				//session
+				glog.Infoln("User has been logged in for over 24 hours")
+				glog.Infoln("Looks like this is an old session.")
 				ClearSession(w, r)
 				return userSession, false
 			} else {
@@ -69,14 +79,12 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 				//close the session so no one hopes on if it has been more then
 				//x seconds
 				if time.Since(userSession.LastSeenTime).Minutes() >= 10 {
-					log.Println("User has been inactive in for over 10 minutes")
-					log.Println("Looks like this is an old session.")
+					glog.Infoln("User has been inactive in for over 10 minutes")
+					glog.Infoln("Looks like this is an old session.")
 					ClearSession(w, r)
 					return userSession, false
 				} else {
-					log.Println("Authenticated")
-					//reset the last seen time
-					userSession.LastSeenTime = time.Now()
+					glog.Infoln("Authenticated")
 					return userSession, true
 				}
 			}
@@ -89,33 +97,48 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 			// }
 		}
 	}
-	return *new(model.UserSession), false
+	us := new(model.UserSession)
+	us.LoginTime = time.Now()
+	us.LastSeenTime = time.Now()
+	SetSession(w, r, us, true)
+	return *us, false
 }
 
 //set the session for the cookies and cross reference it to the
 //memcache
 //TODO: setup database session mapping store
-func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession) string {
+func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession, regenSessionID bool) string {
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		Error404(w, err.Error())
 		return ""
 	}
+	// Set some session values.
+	//check for session_id, if none then create it
+	var session_id string
+	var ok bool
 	session.Options.MaxAge = 0
 	session.Options.HttpOnly = true
 	session.Options.Secure = true
-	log.Println(session.Options)
-	// Set some session values.
-	session_id := randSeq(64)
-	session.Values["session_id"] = session_id
+	session_id, ok = session.Values["session_id"].(string)
+	if !ok || regenSessionID {
+		session_id = randSeq(64)
+		session.Values["session_id"] = session_id
+	} else {
+		session_id = session.Values["session_id"].(string)
+	}
+	us.SessionKey = session_id
+	//glog.Infoln(session_id)
+	//glog.Infoln(session.Options)
+	//glog.Infoln(us.LastRemoteAddr)
+	//glog.Infoln(us.LastXForwardedFor)
 	session.Save(r, w)
 	mc, _ := connectors.GetMC()
 	if mc != nil {
-		us.SessionKey = session_id
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		enc.Encode(*us)
-		log.Println("Adding session")
+		//glog.Infoln("Updating session")
 		mc.Set(&memcache.Item{Key: session_id, Value: buf.Bytes()})
 	} else {
 		//Try the database here
@@ -135,17 +158,25 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 		Error404(w, err.Error())
 		return
 	}
-	session.Options.MaxAge = -1
-	session.Save(r, w)
-
 	if session_id, ok := session.Values["session_id"].(string); !ok {
-		log.Println("Bad Session ID")
+		glog.Infoln("Bad Session ID")
 	} else {
-		//MEMCACHE SESSION DELETE
 		mc, _ := connectors.GetMC()
 		if mc != nil {
-			log.Println("Deleteing session")
-			mc.Delete(session_id)
+			glog.Infoln("Clearing session")
+			item := new(memcache.Item)
+			item, _ = mc.Get(session_id)
+			var userSession model.UserSession
+			if item != nil {
+				if len(item.Value) > 0 {
+					read := bytes.NewReader(item.Value)
+					dec := gob.NewDecoder(read)
+					dec.Decode(&userSession)
+				}
+			}
+			userSession.User = model.User{}
+			userSession.LoginTime = time.Time{}
+			SetSession(w, r, &userSession, true)
 		} else {
 			//Try the database here
 			// if db connection is good {
@@ -153,6 +184,5 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 			// 	panic
 			// }
 		}
-		//MEMCACHE SESSION DELETE
 	}
 }
