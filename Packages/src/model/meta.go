@@ -60,7 +60,7 @@ const (
 
 //The string values for the metatype enumeration
 //family can be used to duplicate liquor.coms pages like
-//http://www.liquor.com/mosaic/margarita-recipes/#gs.0BEty3o
+//https://www.liquor.com/mosaic/margarita-recipes/#gs.0BEty3o
 //it can include a post with a excerpt and multiple base
 //cocktails that are shown first, i.e. frozen margarita and
 //margarita on the rocks.  Then derived margaritas.  Mules,

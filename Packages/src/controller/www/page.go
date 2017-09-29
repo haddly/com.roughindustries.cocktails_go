@@ -7,8 +7,8 @@
 package www
 
 import (
-	"html/template"
 	"github.com/golang/glog"
+	"html/template"
 	"model"
 	"net/http"
 	"strings"
@@ -72,8 +72,7 @@ func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmp
 		page.UserSession.LastRemoteAddr = r.RemoteAddr
 		page.UserSession.LastXForwardedFor = r.Header.Get("X-Forwarded-For")
 		page.UserSession.LastSeenTime = time.Now()
-		page.UserSession.CSRF = randSeq(64)
-		page.UserSession.CSRFGenTime = time.Now()
+		page.UserSession.CSRF = encrypt([]byte(page.UserSession.CSRFKey), page.UserSession.CSRFBase)
 		SetSession(w, r, &page.UserSession, false)
 	}
 	t, err := parseTempFiles(tmpl)
@@ -98,8 +97,7 @@ func parseTempFiles(tmpl string) (*template.Template, error) {
 }
 
 // The main index page handler
-func LandingHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(w, r)
+func LandingHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, r, "index")
 }

@@ -26,6 +26,8 @@ type User struct {
 type UserSession struct {
 	SessionKey        string
 	User              User
+	CSRFBase          string
+	CSRFKey           []byte
 	CSRF              string
 	CSRFGenTime       time.Time
 	LoginTime         time.Time

@@ -16,28 +16,37 @@ import (
 	"connectors"
 	"encoding/gob"
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/gorilla/sessions"
 	"github.com/golang/glog"
+	"github.com/gorilla/sessions"
 	"model"
 	"net/http"
 	"time"
 )
 
-//the sessions are stored here in coockies
-var store = sessions.NewCookieStore([]byte(randSeq(64)))
+//the sessions are stored here in cookies
+//var store_key string = ??
 
 //get the session from the cookies and cross reference it with the
 //memcache
 //TODO: setup database session mapping store
 func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool) {
+	store := sessions.NewCookieStore([]byte(store_key))
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
-		panic("Bad GetSession Request!!!")
+		glog.Errorln("ERROR: Bad GetSession Request!!!")
+		glog.Errorln(err)
 		return *new(model.UserSession), false
 	}
 	// Retrieve our struct and type-assert it
 	if session_id, ok := session.Values["session_id"].(string); !ok {
 		glog.Infoln("No Session ID")
+		us := new(model.UserSession)
+		us.LoginTime = time.Now()
+		us.LastSeenTime = time.Now()
+		SetSession(w, r, us, true)
+		return *us, false
+	} else if csrf, ok := session.Values["csrf"].(string); !ok {
+		glog.Errorln("ERROR: No CSRF, possible attack!")
 		us := new(model.UserSession)
 		us.LoginTime = time.Now()
 		us.LastSeenTime = time.Now()
@@ -56,6 +65,10 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 					dec.Decode(&userSession)
 				}
 			}
+			//load the cookies csrf into the csrf for the session so if we
+			//need to check it later we can.  Whatever csrf value was the last
+			//one issued not the one from this page
+			userSession.CSRF = csrf
 			//log.Print("LastSeenTime")
 			//log.Print(userSession.LastSeenTime)
 			//Authenticate
@@ -108,6 +121,7 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 //memcache
 //TODO: setup database session mapping store
 func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession, regenSessionID bool) string {
+	store := sessions.NewCookieStore([]byte(store_key))
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		Error404(w, err.Error())
@@ -122,13 +136,18 @@ func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession, r
 	session.Options.Secure = true
 	session_id, ok = session.Values["session_id"].(string)
 	if !ok || regenSessionID {
-		session_id = randSeq(64)
+		session_id, _ = GenerateRandomString(32)
 		session.Values["session_id"] = session_id
-	} else {
-		session_id = session.Values["session_id"].(string)
+		us.CSRFBase, _ = GenerateRandomString(32)
+		us.CSRFKey, _ = GenerateRandomBytes(32)
+		us.CSRFGenTime = time.Now()
 	}
 	us.SessionKey = session_id
+	//set the csrf value
+	session.Values["csrf"] = us.CSRF
 	//glog.Infoln(session_id)
+	//glog.Infoln(us.CSRFKey)
+	//glog.Infoln(us.CSRF)
 	//glog.Infoln(session.Options)
 	//glog.Infoln(us.LastRemoteAddr)
 	//glog.Infoln(us.LastXForwardedFor)
@@ -153,6 +172,7 @@ func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession, r
 //clear the session for the cookies and the memcache
 //TODO: setup database session mapping store
 func ClearSession(w http.ResponseWriter, r *http.Request) {
+	store := sessions.NewCookieStore([]byte(store_key))
 	session, err := store.Get(r, "cocktails")
 	if err != nil {
 		Error404(w, err.Error())

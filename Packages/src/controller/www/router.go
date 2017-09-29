@@ -12,7 +12,7 @@ import (
 func WWWRouterInit() {
 	glog.Infoln("Init in www/router.go")
 	//Page Routing
-	http.Handle("/", RecoverHandler(http.HandlerFunc(LandingHandler)))
+	http.Handle("/", RecoverHandler(PageHandler(LandingHandler)))
 	http.Handle("/load/", RecoverHandler(http.HandlerFunc(Load)))
 	//Cocktail Routing
 	http.Handle("/cocktail", RecoverHandler(http.HandlerFunc(CocktailHandler)))
@@ -24,8 +24,8 @@ func WWWRouterInit() {
 	http.Handle("/cocktailModForm", RecoverHandler(http.HandlerFunc(CocktailModFormHandler)))
 	http.Handle("/cocktailMod", RecoverHandler(http.HandlerFunc(CocktailModHandler)))
 	//Meta Routing
-	http.Handle("/metaModForm", RecoverHandler(http.HandlerFunc(MetaModFormHandler)))
-	http.Handle("/metaMod", RecoverHandler(http.HandlerFunc(MetaModHandler)))
+	http.Handle("/metaModForm", RecoverHandler(AuthenticatedPageHandler(MetaModFormHandler, LandingHandler)))
+	http.Handle("/metaMod", RecoverHandler(ValidatedPageHandler(ValidateMeta, MetaModHandler, MetaModFormHandler)))
 	//Products Routing
 	http.Handle("/product", RecoverHandler(http.HandlerFunc(ProductHandler)))
 	http.Handle("/product/", RecoverHandler(http.HandlerFunc(ProductHandler)))
@@ -64,6 +64,56 @@ func WWWRouterInit() {
 
 }
 
+func PageHandler(next func(http.ResponseWriter, *http.Request, *page)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		page := NewPage(w, r)
+		next(w, r, page)
+		return
+	})
+}
+
+func AuthenticatedPageHandler(pass func(http.ResponseWriter, *http.Request, *page), fail func(http.ResponseWriter, *http.Request, *page)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		page := NewPage(w, r)
+		if page.Authenticated {
+			pass(w, r, page)
+			return
+		} else {
+			glog.Errorln("ERROR: User not authenticated and requesting update on meta data, possible attack!")
+			http.Redirect(w, r, "/", 302)
+			return
+		}
+	})
+}
+
+func ValidatedPageHandler(validator func(http.ResponseWriter, *http.Request, *page) bool, pass func(http.ResponseWriter, *http.Request, *page), fail func(http.ResponseWriter, *http.Request, *page)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		page := NewPage(w, r)
+		if page.Authenticated {
+			//Validate the form input and populate the meta data
+			if validator(w, r, page) {
+				//validate the CSRF ID to make sure we don't double submit or
+				//have an attack
+				if !ValidateCSRF(r, page) {
+					fail(w, r, page)
+					return
+				}
+			} else {
+				//Validation failed
+				glog.Infoln("Bad validation!")
+				fail(w, r, page)
+				return
+			}
+		} else {
+			glog.Errorln("ERROR: User not authenticated and requesting update on meta data, possible attack!")
+			http.Redirect(w, r, "/", 302)
+			return
+		}
+		pass(w, r, page)
+		return
+	})
+}
+
 //This handler is designed to return a 404 error after a panic has occured
 func RecoverHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -72,8 +122,10 @@ func RecoverHandler(h http.Handler) http.Handler {
 			// recover from panic if one occured. Set err to nil otherwise.
 			if rec := recover(); rec != nil {
 				Error404(w, rec)
+				return
 			}
 		}()
 		h.ServeHTTP(w, r) // call next
+		return
 	})
 }

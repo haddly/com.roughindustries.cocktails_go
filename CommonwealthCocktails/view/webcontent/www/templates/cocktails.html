@@ -54,7 +54,7 @@
 {{define "cocktailBlocks"}}
 {{range .ChildCocktails}}
 <div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 350px; margin-bottom: 50px;">
-	<a href="/cocktail?ID={{.ID}}" style="text-decoration : none; color : #555;">
+	<a href="/cocktail?cocktailID={{.ID}}" style="text-decoration : none; color : #555;">
 		<span style="display: block;">
 			<div align="center">
 				{{if .ImagePath}}

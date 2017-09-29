@@ -25,6 +25,8 @@ func init() {
 	//Set it up and then start the server if you want ot use a default admin
 	//account.
 	passwdPtr := flag.String("password", "", "Gives a password hash, but doesn't start the server. Don't forget special characters need to be escaped on the command-line, i.e. ! ? $ % $ # & * ( ) blank tab | ' ; \" < > \\ ~ ` [ ] { }")
+	//Add the glog command line config option to print everything to stderr
+	os.Args = append(os.Args, "-logtostderr=true")
 	flag.Parse()
 	if *passwdPtr != "" {
 		// Hashing the password with the default cost of 10
@@ -36,6 +38,7 @@ func init() {
 		os.Exit(0)
 	}
 	glog.Infoln("Start Init")
+	glog.Infoln(os.TempDir())
 	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 	var dbaddr string
 	var dbpasswd string
