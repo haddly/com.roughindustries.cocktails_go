@@ -63,7 +63,8 @@
 {{end}}
 <!---->
 {{define "loginForm"}}
-<form method="post" action="/login">
+<form method="post" action="/login" autocomplete="off">
+    <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
     {{ with .User.Errors.Username }}
         <div class="alert alert-danger" role="alert">
           <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -81,6 +82,8 @@
     {{ end }}
     <label for="password">Password</label>
     <input type="password" id="password" name="password"><br><br>
+    <!--<div class="g-recaptcha" data-sitekey=""></div>-->
+    <hr style="border-color: #FFF;">
     <button type="submit">Login</button>
 </form>
 {{end}}

@@ -12,34 +12,26 @@ import (
 )
 
 //delete all the memcache entries
-func MCDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(w, r)
-	if page.Authenticated {
-		var buffer bytes.Buffer
-		buffer.WriteString("<b>Memcache Delete</b>:<br/>")
-		model.DeleteAllMemcache()
+func MCDeleteHandler(w http.ResponseWriter, r *http.Request, page *page) {
+	var buffer bytes.Buffer
+	buffer.WriteString("<b>Memcache Delete</b>:<br/>")
+	model.DeleteAllMemcache()
 
-		//apply the template page info to the index page
-		statStr := buffer.String()
-		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, r, "mcindex")
-	} else {
-		http.Redirect(w, r, "/", 302)
-	}
+	//apply the template page info to the index page
+	statStr := buffer.String()
+	page.Messages["Status"] = template.HTML(statStr)
+	page.RenderPageTemplate(w, r, "mcindex")
+
 }
 
 //load all the memcache entries from the database
-func MCAddHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(w, r)
-	if page.Authenticated {
-		var buffer bytes.Buffer
-		buffer.WriteString("<b>Memcache Add</b>:<br/>")
-		model.LoadAllMemcache()
-		//apply the template page info to the index page
-		statStr := buffer.String()
-		page.Messages["Status"] = template.HTML(statStr)
-		page.RenderPageTemplate(w, r, "mcindex")
-	} else {
-		http.Redirect(w, r, "/", 302)
-	}
+func MCAddHandler(w http.ResponseWriter, r *http.Request, page *page) {
+	var buffer bytes.Buffer
+	buffer.WriteString("<b>Memcache Add</b>:<br/>")
+	model.LoadAllMemcache()
+	//apply the template page info to the index page
+	statStr := buffer.String()
+	page.Messages["Status"] = template.HTML(statStr)
+	page.RenderPageTemplate(w, r, "mcindex")
+
 }

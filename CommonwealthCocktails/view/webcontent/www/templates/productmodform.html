@@ -41,7 +41,7 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="row">
-                    <form action="/load/productMod" id="productModForm" autocomplete="nope">
+                    <form method="post" action="/productMod" id="productModForm" autocomplete="nope">
                         {{template "productID" .}}
                         <!---->
                         {{template "productName" .}}
@@ -96,7 +96,13 @@
                         <script>
                             $(function() {
                                 $('#addButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
                                     $('#productID').val("");
+                                });
+                                $('#updateButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
                                 });
                             });
                         </script>
@@ -154,9 +160,13 @@
             $('#productSelect').on('change', function() {
                 var id = $(this).val(); // get selected value
                 if (id) { // require a URL
-                    window.location = "/load/productModForm?ID="+id; // redirect
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/productModForm?ID="+id; // redirect
                 } else {
-                    window.location = "/load/productModForm"; // redirect
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/productModForm"; // redirect
                 }
                 return false;
             });

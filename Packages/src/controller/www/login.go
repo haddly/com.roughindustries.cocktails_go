@@ -8,13 +8,16 @@ import (
 	"connectors"
 	"encoding/gob"
 	"encoding/json"
+	"github.com/asaskevich/govalidator"
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/golang/glog"
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/google"
+	"html"
 	"io/ioutil"
-	"github.com/golang/glog"
 	"model"
 	"net/http"
 	"strings"
@@ -49,51 +52,58 @@ var (
 	//allowDefault = ??
 	//defaultUser = ??
 	//defaultPassword = ??
+
+	//sitekey = "{Your site key here}"
+	//re      = recaptcha.R{
+	//	Secret: "{Your secret here}",
+	//}
+
 )
 
 //Login page handler which displays the standard login page.
-func loginIndexHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(w, r)
+func loginIndexHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	page.RenderPageTemplate(w, r, "loginindex")
 }
 
 //Login page request handler which process the standard login request.  This
 //will after verifying the user and password create a user session
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(w, r)
-	if ValidateLogin(&page.User, r) {
-		//this is in case you need to perform DB actions before the DB is setup
-		//otherwise you wouldn't have an users
-		if allowDefault && page.User.Username == defaultUser {
-			//if page.User.Password == defaultPassword {
-			if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
-				page.UserSession.User.Username = defaultUser
-				page.UserSession.LoginTime = time.Now()
-				page.UserSession.LastSeenTime = time.Now()
-				SetSession(w, r, &page.UserSession, true)
-				http.Redirect(w, r, "/", 302)
-				return
-			}
+func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
+
+	//check the recaptcha to make sure we don't have bot or something
+	isValid := re.Verify(*r)
+	if !isValid {
+		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
+		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
+		page.RenderPageTemplate(w, r, "/loginindex")
+		return
+	}
+
+	//this is in case you need to perform DB actions before the DB is setup
+	//otherwise you wouldn't have an users
+	if allowDefault && page.User.Username == defaultUser {
+		//if page.User.Password == defaultPassword {
+		if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
+			page.UserSession.User.Username = defaultUser
+			page.UserSession.LoginTime = time.Now()
+			page.UserSession.LastSeenTime = time.Now()
+			SetSession(w, r, &page.UserSession, true)
+			http.Redirect(w, r, "/", 302)
+			return
 		}
-		//Confirm the username is in DB and password after getting user from DB
-		usr := page.User.SelectUserForLogin(false)
-		glog.Infoln(usr.Password)
-		glog.Infoln(page.User.Password)
-		if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
-			glog.Infoln("Passed password")
-			if len(usr.Username) > 0 {
-				page.UserSession.User = *usr
-				page.UserSession.LoginTime = time.Now()
-				page.UserSession.LastSeenTime = time.Now()
-				SetSession(w, r, &page.UserSession, true)
-				http.Redirect(w, r, "/", 302)
-				return
-			} else {
-				glog.Infoln("Bad username or password: " + page.User.Username)
-				page.Errors["loginErrors"] = "Bad Username and/or Password!"
-				page.RenderPageTemplate(w, r, "/loginindex")
-				return
-			}
+	}
+	//Confirm the username is in DB and password after getting user from DB
+	usr := page.User.SelectUserForLogin(false)
+	glog.Infoln(usr.Password)
+	glog.Infoln(page.User.Password)
+	if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
+		glog.Infoln("Passed password")
+		if len(usr.Username) > 0 {
+			page.UserSession.User = *usr
+			page.UserSession.LoginTime = time.Now()
+			page.UserSession.LastSeenTime = time.Now()
+			SetSession(w, r, &page.UserSession, true)
+			http.Redirect(w, r, "/", 302)
+			return
 		} else {
 			glog.Infoln("Bad username or password: " + page.User.Username)
 			page.Errors["loginErrors"] = "Bad Username and/or Password!"
@@ -102,7 +112,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		glog.Infoln("Bad username or password: " + page.User.Username)
-		page.Errors["loginErrors"] = "Invalid Username and/or Password"
+		page.Errors["loginErrors"] = "Bad Username and/or Password!"
 		page.RenderPageTemplate(w, r, "/loginindex")
 		return
 	}
@@ -111,13 +121,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 //Logout page request handler which process the standard logout request.  This
 //will close the user's session
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
+func logoutHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	ClearSession(w, r)
 	http.Redirect(w, r, "/", 302)
 }
 
 //Initial request from the website that then submits the request to google
-func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+func handleGoogleLogin(w http.ResponseWriter, r *http.Request, page *page) {
 	str := randSeq(64)
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -139,7 +149,7 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 //Handler for the response to the Google OAuth request from handleGoogleLogin
-func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 	state := r.FormValue("state")
 	//change to a date time to see if the seq is out of date so we don't accept it
 	var timeForState time.Time
@@ -204,7 +214,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 //Initial request from the website that then submits the request to facebook
-func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
+func handleFacebookLogin(w http.ResponseWriter, r *http.Request, page *page) {
 	str := randSeq(64)
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -227,7 +237,7 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 //Handler for the response to the Facebook OAuth request from handleFacebookLogin
-func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
+func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) {
 	state := r.FormValue("state")
 	//change to a date time to see if the seq is out of date so we don't accept it
 	var timeForState time.Time
@@ -294,23 +304,22 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request) {
 
 //Parses the form and then validates the login form request
 //and populates the user struct
-func ValidateLogin(user *model.User, r *http.Request) bool {
-	user.Errors = make(map[string]string)
+func ValidateLogin(w http.ResponseWriter, r *http.Request, page *page) bool {
+	page.User.Errors = make(map[string]string)
 	r.ParseForm() // Required if you don't call r.FormValue()
-
-	if len(r.Form["name"]) > 0 {
-		if len(r.Form["name"][0]) > 0 {
-			user.Username = r.Form["name"][0]
-		} else {
-			user.Errors["Username"] = "Please enter a valid username"
-		}
+	pSP := bluemonday.StrictPolicy()
+	if len(r.Form["name"]) > 0 && strings.TrimSpace(r.Form["name"][0]) != "" && govalidator.IsPrintableASCII(r.Form["name"][0]) {
+		page.User.Username = html.EscapeString(pSP.Sanitize(r.Form["name"][0]))
 	} else {
-		user.Errors["Username"] = "Please enter a valid username"
+		page.User.Errors["Username"] = "Please enter a valid username"
 	}
-	if len(r.Form["password"]) > 0 {
-		user.Password = r.Form["password"][0]
+	if len(r.Form["password"]) > 0 && strings.TrimSpace(r.Form["password"][0]) != "" && govalidator.IsPrintableASCII(r.Form["password"][0]) {
+		page.User.Password = html.EscapeString(pSP.Sanitize(r.Form["password"][0]))
 	} else {
-		user.Errors["Password"] = "Please enter a valid password"
+		page.User.Errors["Password"] = "Please enter a valid password"
 	}
-	return len(user.Errors) == 0
+	if len(page.User.Errors) > 0 {
+		page.Errors["loginErrors"] = "Invalid Username and/or Password"
+	}
+	return len(page.User.Errors) == 0
 }

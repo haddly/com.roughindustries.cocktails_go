@@ -1,10 +1,4 @@
-{{define "base"}}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    {{template "head" .}}
+{{define "loader"}}
 <style>
 .loader {
   border: 16px solid #f3f3f3;
@@ -26,30 +20,17 @@
   100% { transform: rotate(360deg); }
 }
 </style>
-</head>
 
-<body>
-
-    {{template "navbar" .}}
-    <div class="container">
-        <div class="page-header">
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="row">
-                  <center><div class="loader"></div></center>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <hr height="30px" style="border-color: #FFF;">
+<div id="loader" name="loader" class="container hide">
+    <div class="page-header">
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="row">
+              <center><div class="loader"></div></center>
             </div>
         </div>
     </div>
-    <!-- Footer -->
-    {{template "footer" .}}
-</body>
+</div>
 
-</html>
 {{end}}

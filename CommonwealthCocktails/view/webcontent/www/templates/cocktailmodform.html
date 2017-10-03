@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="row">
-                    <form action="/load/cocktailMod" id="cocktailModForm">
+                    <form method="post" action="/cocktailMod" id="cocktailModForm">
                         {{template "cocktailSelect" .}}
                         <!---->
                         {{template "cocktailID" .}}
@@ -84,7 +84,13 @@
                         <script>
                             $(function() {
                                 $('#addButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
                                     $('#cocktailID').val("");
+                                });
+                                $('#updateButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
                                 });
                             });
                         </script>
@@ -141,9 +147,13 @@
             $('#cocktailSelect').on('change', function() {
                 var id = $(this).val(); // get selected value
                 if (id) { // require a URL
-                    window.location = "/load/cocktailModForm?ID="+id; // redirect
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/cocktailModForm?ID="+id; // redirect
                 } else {
-                    window.location = "/load/cocktailModForm"; // redirect
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/cocktailModForm"; // redirect
                 }
                 return false;
             });

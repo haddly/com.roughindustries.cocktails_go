@@ -557,6 +557,7 @@ func (cocktail *Cocktail) SelectAllCocktails(includeBDG bool) []Cocktail {
 //Select a cocktail based on an id and all associated infomration. If BDG
 //flag is set set related information
 func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
+	glog.Infoln(ID)
 	var cs CocktailSet
 	var args []interface{}
 	conn, _ := connectors.GetDB()

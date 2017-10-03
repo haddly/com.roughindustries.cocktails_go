@@ -7,11 +7,11 @@
 package www
 
 import (
-	"github.com/golang/glog"
+	//"github.com/golang/glog"
 	"html/template"
 	"model"
 	"net/http"
-	"strings"
+	//"strings"
 	"time"
 )
 
@@ -49,6 +49,7 @@ type page struct {
 	GroupProduct         model.GroupProduct
 	User                 model.User
 	UserSession          model.UserSession
+	SubmitButtonString   string
 	Errors               map[string]string
 	Messages             map[string]template.HTML
 }
@@ -92,7 +93,7 @@ func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmp
 //but also the header, footer, google analytics, and navigation for
 //provide a complete page
 func parseTempFiles(tmpl string) (*template.Template, error) {
-	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
+	t, e := template.ParseFiles("./view/webcontent/www/templates/"+tmpl+".html", "./view/webcontent/www/templates/head.html", "./view/webcontent/www/templates/loader.html", "./view/webcontent/www/templates/ga.html", "./view/webcontent/www/templates/navbar.html", "./view/webcontent/www/templates/footer.html")
 	return t, e
 }
 
@@ -100,23 +101,6 @@ func parseTempFiles(tmpl string) (*template.Template, error) {
 func LandingHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, r, "index")
-}
-
-//The load page does a processing wheel until the actual page is loaded. It
-//works as a redirect basically with the wheel showing till the redirected page
-//is ready
-func Load(w http.ResponseWriter, r *http.Request) {
-	page := NewPage(w, r)
-	glog.Infoln("Loader")
-	glog.Infoln(r.URL.EscapedPath() + "?" + r.URL.RawQuery)
-	glog.Infoln(strings.Replace(r.URL.EscapedPath(), "/load/", "", 1))
-	redirect := strings.Replace(r.URL.EscapedPath(), "/load/", "", 1)
-	if redirect == "" {
-		page.Redirect = "index"
-	} else {
-		page.Redirect = redirect + "?" + r.URL.RawQuery
-	}
-	page.RenderPageTemplate(w, nil, "loader")
 }
 
 //An initialization function that provides an initialized page object

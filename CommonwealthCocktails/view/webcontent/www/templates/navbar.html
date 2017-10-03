@@ -31,16 +31,16 @@
                         <ul class="dropdown-menu">
                             {{if .AllowAdmin}}
                             <li class="dropdown-header">Modify</li>
-                            <li><a href="/load/cocktailModForm">Modify Cocktail</a></li>
-                            <li><a href="/load/productModForm">Modify Product</a></li>
-                            <li><a href="/load/metaModForm">Modify Meta</a></li>
+                            <li><a href="/cocktailModForm" onClick="toggleLoader()">Modify Cocktail</a></li>
+                            <li><a href="/productModForm" onClick="toggleLoader()">Modify Product</a></li>
+                            <li><a href="/metaModForm" onClick="toggleLoader()">Modify Meta</a></li>
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">Data Stores</li>
-                            <li><a href="/load/db_tables">Load DB Tables</a></li>
-                            <li><a href="/load/db_data">Load DB Data</a></li>
-                            <li><a href="/load/db_test">Verify DB</a></li>
-                            <li><a href="/load/mc_delete">Delete Memcache</a></li>
-                            <li><a href="/load/mc_load">Add Memcache</a></li>
+                            <li><a href="/db_tables" onClick="toggleLoader()">Load DB Tables</a></li>
+                            <li><a href="/db_data" onClick="toggleLoader()">Load DB Data</a></li>
+                            <li><a href="/db_test" onClick="toggleLoader()">Verify DB</a></li>
+                            <li><a href="/mc_delete" onClick="toggleLoader()">Delete Memcache</a></li>
+                            <li><a href="/mc_load" onClick="toggleLoader()">Add Memcache</a></li>
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">Admin</li>
                             <li role="separator" class="divider"></li>
@@ -48,6 +48,12 @@
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </li>
+                    <script>
+                        function toggleLoader() {
+                            $('#maindiv').addClass('hide');
+                            $('#loader').removeClass('hide');
+                        };
+                    </script>
                     {{else}}
                     <li class="dropdown">
                         <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Login <span class="caret"></span></a>
@@ -65,6 +71,9 @@
     </div>
     <!-- /.container -->
 </nav>
+{{template "loader" .}}
+<!--used to taggles on the loader.  This is closed in the footer-->
+<div id="maindiv" name="maindiv">
 {{end}} 
 
 <!---->
