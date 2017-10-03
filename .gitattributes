@@ -1,4 +1,4 @@
 *.yaml filter=gitignore
 *.sh filter=gitignore
 *.go filter=gitignore
-*.html filter=gitignore
+*.html filter=gitignorehtml

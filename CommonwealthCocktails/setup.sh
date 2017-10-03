@@ -2,13 +2,13 @@
 #setup you GOPATH here
 #SET THIS LINE AND ADD #gitignore to the end of the line as a comment to ignore your info
 #export GOPATH=
-export GOPATH=~/workspace/com.roughindustries.cocktails_go/Packages #gitignore
 
 #setup the #gitignore filter for lines ending in #gitignore in *.sh, *.go, and *.yaml
 git config --global filter.gitignore.clean "sed '/#gitignore$/'d"
-#setup the #gitignore filter for lines ending in #gitignore--> in *.html
-git config --global filter.gitignore.clean "sed '/#gitignore-->$/'d"
 git config --global filter.gitignore.smudge cat
+#setup the #gitignore filter for lines ending in #gitignore--> in *.html
+git config --global filter.gitignorehtml.clean "sed '/#gitignore-->$/'d"
+git config --global filter.gitignorehtml.smudge cat
 
 #get all the libraries we are using
 go get cloud.google.com/go/compute/metadata
