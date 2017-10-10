@@ -3,7 +3,7 @@
 package model
 
 import (
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"github.com/golang/glog"
 )
 

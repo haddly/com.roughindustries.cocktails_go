@@ -7,7 +7,7 @@ package www
 import (
 	"bytes"
 	"html/template"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 )
 

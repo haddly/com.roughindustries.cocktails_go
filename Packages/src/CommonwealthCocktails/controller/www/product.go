@@ -5,7 +5,7 @@ package www
 import (
 	"github.com/golang/glog"
 	"html/template"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 	"path/filepath"
 	"strconv"

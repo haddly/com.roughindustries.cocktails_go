@@ -7,7 +7,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/microcosm-cc/bluemonday"
 	"html/template"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 	"strconv"
 	"strings"

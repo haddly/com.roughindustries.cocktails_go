@@ -3,9 +3,9 @@
 package main
 
 import (
-	"connectors"
-	"controller/alexa"
-	"controller/www"
+	"CommonwealthCocktails/connectors"
+	"CommonwealthCocktails/controller/alexa"
+	"CommonwealthCocktails/controller/www"
 	"flag"
 	"github.com/golang/glog"
 	"github.com/gorilla/context"

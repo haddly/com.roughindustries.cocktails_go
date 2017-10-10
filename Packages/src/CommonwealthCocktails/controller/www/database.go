@@ -7,11 +7,11 @@ package www
 import (
 	"bufio"
 	"bytes"
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"github.com/golang/glog"
 	"html/template"
 	"io/ioutil"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 	"os"
 	"regexp"

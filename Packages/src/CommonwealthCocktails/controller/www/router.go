@@ -3,9 +3,9 @@
 package www
 
 import (
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"github.com/golang/glog"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 	"os"
 	"strings"

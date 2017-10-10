@@ -4,7 +4,7 @@ package model
 
 import (
 	"bytes"
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"encoding/gob"
 	"github.com/bradfitz/gomemcache/memcache"
 	"html"

@@ -4,7 +4,7 @@ package model
 
 import (
 	"bytes"
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"html"
 	"html/template"
 	"github.com/golang/glog"

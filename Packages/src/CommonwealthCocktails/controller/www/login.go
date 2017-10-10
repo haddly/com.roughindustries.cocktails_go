@@ -5,7 +5,7 @@ package www
 
 import (
 	"bytes"
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"encoding/gob"
 	"encoding/json"
 	"github.com/asaskevich/govalidator"
@@ -18,7 +18,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"html"
 	"io/ioutil"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 	"strings"
 	"time"

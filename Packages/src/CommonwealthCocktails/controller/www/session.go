@@ -13,12 +13,12 @@ package www
 
 import (
 	"bytes"
-	"connectors"
+	"CommonwealthCocktails/connectors"
 	"encoding/gob"
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/glog"
 	"github.com/gorilla/sessions"
-	"model"
+	"CommonwealthCocktails/model"
 	"net/http"
 	"time"
 )
