@@ -277,9 +277,27 @@ CREATE TABLE `recipestep` (
 CREATE TABLE `users` (
   `idUser` int(11) NOT NULL AUTO_INCREMENT,
   `userName` varchar(150) NOT NULL,
+  `userFullName` varchar(350) NOT NULL,
   `userPassword` varchar(250) NOT NULL,
   `userEmail` varchar(250) DEFAULT NULL,
   `userLastLogin` datetime NOT NULL,
   PRIMARY KEY (`idUser`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usersessions` (
+  `idSession` int(11) NOT NULL AUTO_INCREMENT,
+  `idUser` int(11) NOT NULL,
+  `usersessionSessionKey` varchar(150) NOT NULL,
+  `usersessionCSRFGenTime` datetime NOT NULL,
+  `usersessionCSRFBase` varchar(150) NOT NULL,
+  `usersessionLastSeenTime` datetime NOT NULL,
+  `usersessionCSRFKey` BLOB NOT NULL,
+  `usersessionLoginTime` datetime NOT NULL,
+  `usersessionIsDefaultUser` tinyint(1) NOT NULL,
+  PRIMARY KEY (`idSession`),
+  KEY `usersessions_idUser_id_fk` (`idUser`),
+  CONSTRAINT `usersessions_idUser_id_fk` FOREIGN KEY (`idUser`) REFERENCES `users` (`idUser`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;

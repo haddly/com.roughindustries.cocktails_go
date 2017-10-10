@@ -38,6 +38,7 @@ func init() {
 		os.Exit(0)
 	}
 	glog.Infoln("Start Init")
+	glog.Infoln(www.State)
 	glog.Infoln(os.TempDir())
 	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
 	var dbaddr string
@@ -73,6 +74,7 @@ func init() {
 	// init the routing
 	www.WWWRouterInit()
 	alexa.AlexaRouterInit()
+	www.State = www.Setup
 	glog.Infoln("End Init")
 }
 
@@ -89,6 +91,7 @@ func AddLetsEncrypt() {
 }
 
 func main() {
+	glog.Infoln(www.State)
 	//print out the current directory
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {

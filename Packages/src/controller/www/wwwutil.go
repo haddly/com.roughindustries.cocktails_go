@@ -39,6 +39,26 @@ func Error404(w http.ResponseWriter, rec interface{}) {
 	page.RenderPageTemplate(w, nil, "404")
 }
 
+//Setup Page Only
+func RenderSetupTemplate(w http.ResponseWriter, rec interface{}) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	// CATCH ONLY HEADER START
+	page := NewSetupPage(nil, nil)
+	pc := make([]uintptr, 10) // at least 1 entry needed
+	runtime.Callers(2, pc)
+	f := runtime.FuncForPC(pc[0])
+	file, line := f.FileLine(pc[0])
+	glog.Infoln("Setup Failed %s:%d %s\n", file, line, f.Name())
+	glog.Infoln(rec)
+	page.RenderSetupTemplate(w, nil, "setup")
+}
+
 //Validates the CSRF ID from the last page request.  True means the CSRf is good,
 //and false means that the CSRF is not the one past to the previous page.
 //This could indicate a CSRF attack.
@@ -52,7 +72,7 @@ func ValidateCSRF(r *http.Request, page *page) bool {
 			return false
 		}
 	} else {
-		panic("ERROR: No CSRF ID provided, possible CSRF attack!")
+		glog.Errorln("ERROR: No CSRF ID provided, possible CSRF attack!")
 	}
 	return true
 }

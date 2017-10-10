@@ -27,3 +27,29 @@ func SelectCurrentDB() string {
 
 	return dbname
 }
+
+func SelectTables() []string {
+	conn, _ := connectors.GetDB()
+	glog.Infoln("Getting Tables")
+	var tables []string
+	if connectors.DBType == connectors.MySQL {
+		rows, _ := conn.Query("SELECT table_name FROM information_schema.tables where table_schema='commonwealthcocktails';")
+		glog.Infoln("Got Tables")
+		var table string
+		for rows.Next() {
+			rows.Scan(&table)
+			tables = append(tables, table)
+		}
+	} else if connectors.DBType == connectors.SQLite {
+		rows, _ := conn.Query("SELECT name FROM SQLITE_MASTER WHERE type='table' ORDER BY name;")
+		glog.Infoln("Got Tables")
+		var table string
+		for rows.Next() {
+			rows.Scan(&table)
+			tables = append(tables, table)
+		}
+	}
+	glog.Infoln(tables)
+	return tables
+
+}

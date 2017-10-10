@@ -49,7 +49,7 @@ func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto st
 	DBType = in_dbtype
 	glog.Infoln(DBType)
 	if DBType == MySQL {
-		glog.Infoln(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?timeout=1m")
+		glog.Infoln(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?parseTime=true&timeout=1m")
 	} else if DBType == SQLite {
 		glog.Infoln("SQLite connecting to ./sql/commonwealthcocktails.db")
 	}
@@ -62,8 +62,8 @@ func GetDB() (*sql.DB, error) {
 		var err error
 		var d *sql.DB
 		if DBType == MySQL {
-			glog.Infoln("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
-			d, err = sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?timeout=1m")
+			glog.Infoln("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
+			d, err = sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
 		} else if DBType == SQLite {
 			glog.Infoln("Creating a new connection: sqllite to commonwealthcocktails.db")
 			d, err = sql.Open("sqlite3", "./sql/commonwealthcocktails.db")

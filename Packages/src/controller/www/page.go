@@ -26,6 +26,7 @@ var UseGA = false
 //the page struct is all the things a template could display or use when it
 //generates a page
 type page struct {
+	State                int
 	Username             string
 	Redirect             string
 	Authenticated        bool
@@ -58,6 +59,31 @@ var counter = 0
 
 //the page template renderer.  This should be the basic method for displaying
 //all pages.
+func (page *page) RenderSetupTemplate(w http.ResponseWriter, r *http.Request, tmpl string) {
+	// CATCH ONLY HEADER START
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if rec := recover(); rec != nil {
+			Error404(w, rec)
+		}
+	}()
+	// CATCH ONLY HEADER START
+	// No CSRF check because we are in Setup state
+	t, err := parseTempFiles(tmpl)
+	if err != nil {
+		Error404(w, err)
+		page.RenderPageTemplate(w, r, "404")
+		return
+	}
+	err = t.ExecuteTemplate(w, "base", page)
+	if err != nil {
+		Error404(w, err)
+		return
+	}
+}
+
+//the page template renderer.  This should be the basic method for displaying
+//all pages.
 func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmpl string) {
 	// CATCH ONLY HEADER START
 	defer func() {
@@ -69,11 +95,12 @@ func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmp
 	// CATCH ONLY HEADER START
 	// setup the CSRF id for this page
 	if r != nil {
-		//set the ip for this session
-		page.UserSession.LastRemoteAddr = r.RemoteAddr
-		page.UserSession.LastXForwardedFor = r.Header.Get("X-Forwarded-For")
 		page.UserSession.LastSeenTime = time.Now()
-		page.UserSession.CSRF = encrypt([]byte(page.UserSession.CSRFKey), page.UserSession.CSRFBase)
+		if len(page.UserSession.CSRFKey) == 0 || page.UserSession.CSRFBase == "" {
+			page.UserSession.CSRF = ""
+		} else {
+			page.UserSession.CSRF = encrypt([]byte(page.UserSession.CSRFKey), page.UserSession.CSRFBase)
+		}
 		SetSession(w, r, &page.UserSession, false)
 	}
 	t, err := parseTempFiles(tmpl)
@@ -113,5 +140,17 @@ func NewPage(w http.ResponseWriter, r *http.Request) *page {
 	if r != nil {
 		p.UserSession, p.Authenticated = GetSession(w, r)
 	}
+	return p
+}
+
+//Specific initialization for setup pages, i.e. no session data
+func NewSetupPage(w http.ResponseWriter, r *http.Request) *page {
+	p := new(page)
+	p.Messages = make(map[string]template.HTML)
+	p.Errors = make(map[string]string)
+	p.AllowAdmin = AllowAdmin
+	p.UseGA = UseGA
+	p.UserSession = *new(model.UserSession)
+	p.Authenticated = false
 	return p
 }

@@ -12,7 +12,7 @@
 	{{template "navbar" .}}
 	{{with .CocktailSet}}
 	<!-- Page Content -->
-	<div class="container">
+	<div itemscope itemtype="http://schema.org/Recipe" class="container">
 		 Portfolio Item Heading 
 		<div class="page-header">
 			{{template "cocktailpageheader" .}}
@@ -37,7 +37,8 @@
 				<div class="row">
 					<div class="col-md-12">
 						<h3>Cocktail Description</h3>
-						{{.Cocktail.Description}}
+						<p itemprop="description">{{.Cocktail.Description}}</p>
+						
 					</div>
 				</div>
 				<div class="row">
@@ -67,7 +68,7 @@
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						<h3>Method</h3>
-						{{with .Cocktail.Recipe}}{{.Method}}{{end}}
+						{{with .Cocktail.Recipe}}<p itemprop="recipeInstructions">{{.Method}}</p>{{end}}
 					</div>
 				</div>
 				{{if .ChildCocktails}}
@@ -184,13 +185,17 @@
 
 <!--Cocktail Page Header-->
 {{define "cocktailpageheader"}}
-<h1 align="center">{{.Cocktail.Name}}</h1>
+<h1 itemprop="name" align="center">{{.Cocktail.Name}}</h1>
+<meta itemprop="headline" content="{{.Cocktail.Name}}" />
 {{if .Cocktail.AKA}}
 <h6 align="center">{{range .Cocktail.AKA}}({{.Name}}){{end}}</h6>{{end}}
-<h5 align="center">
+<h5 align="center" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
 	<div id="stars-existing" class="starrr" data-rating='{{.Cocktail.Rating}}'></div>
+	<meta itemprop="ratingValue" content="{{.Cocktail.Rating}}" />
+	<meta itemprop="ratingCount" content="1" />
 </h5>
 <h6 align="center">Original Source: <a title="Go to {{.Cocktail.SourceName}}" target="_blank" href="{{.Cocktail.SourceLink}}" style="text-decoration : none; color : #555;">{{.Cocktail.SourceName}}  <i class="fa fa-external-link"></i></a></h6>
+<meta itemprop="author" content="{{.Cocktail.SourceName}}" />
 {{if .RootCocktail.Name}}
 <a href="/cocktail?ID={{.RootCocktail.ID}}" style="text-decoration : none; color : #555;">
 	<h6 align="center">Root Cocktail:&nbsp;{{.RootCocktail.Name}}</h6>
@@ -201,9 +206,9 @@
 {{define "cocktailimage"}}
 <div align="center" style="position: relative; width: 100%;">
 	{{if .Cocktail.Image}} {{if .Cocktail.ImagePath}}
-	<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{else}}
-	<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" /> {{end}} {{else}}
-	<img class="img-responsive" style="max-height:150px" src="https://placehold.it/600x600" /> {{end}}
+	<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" itemprop="image"/> {{else}}
+	<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" itemprop="image"/> {{end}} {{else}}
+	<img class="img-responsive" style="max-height:150px" src="https://placehold.it/600x600" itemprop="image"/> {{end}}
 	<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: 
 		<a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}  
 			<i class="fa fa-external-link"></i>
@@ -237,12 +242,12 @@
 
 <!--Coctail Recipe Block-->
 {{define "cocktailrecipeblock"}}
+<meta itemprop="prepTime" content="PT02M0S" />
+<meta itemprop="totalTime" content="PT02M0S" />
 {{with .Cocktail.Recipe}} {{range .RecipeSteps}}
 <tr>
 	{{if .RecipeCardinalString}}
 	<td style="white-space: nowrap;">{{.RecipeCardinalString}}</td>
-	{{else if .RecipeCardinalString}}
-	<td style="white-space: nowrap;">{{printf "%.1f" .RecipeCardinalFloat}}</td>
 	{{else}}
 	<td style="white-space: nowrap;">&nbsp;</td>
 	{{end}}
@@ -270,6 +275,7 @@
 			{{end}}
 		</div>
 	</td>
+	<meta itemprop="recipeIngredient" content="{{if .RecipeCardinalString}}{{.RecipeCardinalString}} {{end}}{{.RecipeDoze}} {{if .OriginalIngredient.PreText}}{{.OriginalIngredient.PreText}} {{end}}{{.OriginalIngredient.ProductName}} {{.OriginalIngredient.PostText}}" />
 </tr>
 {{end}} {{end}}
 {{end}}
@@ -295,7 +301,8 @@
 		{{else}}
 		<img border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
 		{{end}}	{{else}}
-		<img border="0" class="img-responsive" src="https://placehold.it/900x1200"> 
+		<img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&txt={{.OriginalIngredient.ProductName}}&w=1200&h=900&txttrack=0">
+		<!--<img border="0" class="img-responsive" src="https://placehold.it/900x1200"> -->
 		{{end}}
 	</a>
 </div>
@@ -350,6 +357,26 @@
 	<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByProductID?ID={{.ID}}">
 		<i class="fa fa-glass"></i>
 	</a>
+	{{if eq .ProductName "Shaker"}}
+	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B0001YH13E/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B0001YH13E&linkCode=as2&tag=commonweal0ad-20&linkId=4f07b239ed1864a406f42cffc20143de">
+		<i class="fa fa-amazon"></i>
+	</a>
+	{{end}}
+	{{if eq .ProductName "Old Fashioned"}}
+	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B00TFX2QFA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B00TFX2QFA&linkCode=as2&tag=commonweal0ad-20&linkId=39497b10e3224c04d8cc935dcd796fc4">
+		<i class="fa fa-amazon"></i>
+	</a>
+	{{end}}
+	{{if eq .ProductName "Highball"}}
+	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B000QU69I6/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B000QU69I6&linkCode=as2&tag=commonweal0ad-20&linkId=fd83d2347771a8b305ddc29189394282">
+		<i class="fa fa-amazon"></i>
+	</a>
+	{{end}}
+	{{if eq .ProductName "Collins"}}
+	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B001K45UN2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B001K45UN2&linkCode=as2&tag=commonweal0ad-20&linkId=b4b8b1647a03ddde156ad4efd1abaab8">
+		<i class="fa fa-amazon"></i>
+	</a>
+	{{end}}
 </div>
 {{end}}
 

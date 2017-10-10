@@ -83,13 +83,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	if allowDefault && page.User.Username == defaultUser {
 		//if page.User.Password == defaultPassword {
 		if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
+			page.UserSession.IsDefaultUser = true
 			page.UserSession.User.Username = defaultUser
 			page.UserSession.LoginTime = time.Now()
 			page.UserSession.LastSeenTime = time.Now()
+			ClearSession(w, r)
 			SetSession(w, r, &page.UserSession, true)
 			http.Redirect(w, r, "/", 302)
 			return
+		} else {
+			page.UserSession.IsDefaultUser = false
 		}
+	} else {
+		page.UserSession.IsDefaultUser = false
 	}
 	//Confirm the username is in DB and password after getting user from DB
 	usr := page.User.SelectUserForLogin(false)
@@ -265,7 +271,7 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 			return
 		}
 	} else {
-		glog.Infoln("Bad memcache handleGoogleCallback")
+		glog.Infoln("Bad memcache handleFacebookCallback")
 		//Try the database here
 		// if db connection is good {
 		// } else {

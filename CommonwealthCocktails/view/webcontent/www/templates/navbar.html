@@ -8,10 +8,11 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
-      </button>
+        </button>
             <a style="color:#FFF; font-family: 'Poiret One';    font-weight: 700;" class="navbar-brand" href="/">Commonwealth Cocktails</a>
         </div>
 
+        {{if eq .State 3}}
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
@@ -25,9 +26,10 @@
                 <!--    </a>-->
                 <!--</li>-->
                 <li>
+                
                     {{if .Authenticated}}
                     <li class="dropdown">
-                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{.UserSession.User.Username}} <span class="caret"></span></a>
+                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{if not .UserSession.User.Username}}{{if .UserSession.IsDefaultUser}}default{{end}}{{end}}{{if .UserSession.User.Username}}{{.UserSession.User.Username}}{{end}} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             {{if .AllowAdmin}}
                             <li class="dropdown-header">Modify</li>
@@ -66,7 +68,7 @@
                 </li>
             </ul>
         </div>
-
+        {{end}}
         <!-- /.navbar-collapse -->
     </div>
     <!-- /.container -->

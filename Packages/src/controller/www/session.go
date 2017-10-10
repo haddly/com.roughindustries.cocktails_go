@@ -41,6 +41,7 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 	if session_id, ok := session.Values["session_id"].(string); !ok {
 		glog.Infoln("No Session ID")
 		us := new(model.UserSession)
+		us.IsDefaultUser = false
 		us.LoginTime = time.Now()
 		us.LastSeenTime = time.Now()
 		SetSession(w, r, us, true)
@@ -48,16 +49,17 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 	} else if csrf, ok := session.Values["csrf"].(string); !ok {
 		glog.Errorln("ERROR: No CSRF, possible attack!")
 		us := new(model.UserSession)
+		us.IsDefaultUser = false
 		us.LoginTime = time.Now()
 		us.LastSeenTime = time.Now()
 		SetSession(w, r, us, true)
 		return *us, false
 	} else {
 		mc, _ := connectors.GetMC()
+		var userSession model.UserSession
 		if mc != nil {
 			item := new(memcache.Item)
 			item, _ = mc.Get(session_id)
-			var userSession model.UserSession
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
@@ -65,49 +67,48 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 					dec.Decode(&userSession)
 				}
 			}
-			//load the cookies csrf into the csrf for the session so if we
-			//need to check it later we can.  Whatever csrf value was the last
-			//one issued not the one from this page
-			userSession.CSRF = csrf
-			//log.Print("LastSeenTime")
-			//log.Print(userSession.LastSeenTime)
-			//Authenticate
-			if userSession.User.Username == "" {
-				//The user hasn't logged in so this is to track the session
-				//with no user attached.
-				return userSession, false
-			} else if time.Since(userSession.LoginTime).Hours() >= 24 {
-				//Has it been to long sense the user logged in so they have to
-				//login again, i.e. even if they have been using the site for
-				//24hours we cap the total time they can be logged into one
-				//session
-				glog.Infoln("User has been logged in for over 24 hours")
+		} else {
+			userSession.SessionKey = session_id
+			sessions := userSession.SelectUserSession()
+			if len(sessions) > 0 {
+				userSession = sessions[0]
+			}
+		}
+		//load the cookies csrf into the csrf for the session so if we
+		//need to check it later we can.  Whatever csrf value was the last
+		//one issued not the one from this page
+		userSession.CSRF = csrf
+		//log.Print("LastSeenTime")
+		//log.Print(userSession.LastSeenTime)
+		//Authenticate
+		if !userSession.IsDefaultUser && userSession.User.Username == "" {
+			//The user hasn't logged in so this is to track the session
+			//with no user attached.
+			return userSession, false
+		} else if time.Since(userSession.LoginTime).Hours() >= 24 {
+			//Has it been to long sense the user logged in so they have to
+			//login again, i.e. even if they have been using the site for
+			//24hours we cap the total time they can be logged into one
+			//session
+			glog.Infoln("User has been logged in for over 24 hours")
+			glog.Infoln("Looks like this is an old session.")
+			ClearSession(w, r)
+			return userSession, false
+		} else {
+			//Has it been to log sense they last touched the website.  This
+			//prevents idle web clients from keeping a session open.  So
+			//if they went to get a cup of coffee and got distracted it will
+			//close the session so no one hopes on if it has been more then
+			//x seconds
+			if time.Since(userSession.LastSeenTime).Minutes() >= 10 {
+				glog.Infoln("User has been inactive in for over 10 minutes")
 				glog.Infoln("Looks like this is an old session.")
 				ClearSession(w, r)
 				return userSession, false
 			} else {
-				//Has it been to log sense they last touched the website.  This
-				//prevents idle web clients from keeping a session open.  So
-				//if they went to get a cup of coffee and got distracted it will
-				//close the session so no one hopes on if it has been more then
-				//x seconds
-				if time.Since(userSession.LastSeenTime).Minutes() >= 10 {
-					glog.Infoln("User has been inactive in for over 10 minutes")
-					glog.Infoln("Looks like this is an old session.")
-					ClearSession(w, r)
-					return userSession, false
-				} else {
-					glog.Infoln("Authenticated")
-					return userSession, true
-				}
+				glog.Infoln("Authenticated")
+				return userSession, true
 			}
-
-		} else {
-			//Try the database here
-			// if db connection is good {
-			// } else {
-			// 	panic
-			// }
 		}
 	}
 	us := new(model.UserSession)
@@ -134,23 +135,29 @@ func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession, r
 	session.Options.MaxAge = 0
 	session.Options.HttpOnly = true
 	session.Options.Secure = true
+	prev_session_id := ""
 	session_id, ok = session.Values["session_id"].(string)
 	if !ok || regenSessionID {
+		if ok {
+			prev_session_id = session_id
+		}
 		session_id, _ = GenerateRandomString(32)
 		session.Values["session_id"] = session_id
 		us.CSRFBase, _ = GenerateRandomString(32)
 		us.CSRFKey, _ = GenerateRandomBytes(32)
 		us.CSRFGenTime = time.Now()
+	} else {
+		if us.CSRFBase == "" || len(us.CSRFKey) == 0 {
+			glog.Infoln("Bad CSRF Base or Key")
+			us.CSRFBase, _ = GenerateRandomString(32)
+			us.CSRFKey, _ = GenerateRandomBytes(32)
+			us.CSRFGenTime = time.Now()
+		}
+		prev_session_id = session_id
 	}
 	us.SessionKey = session_id
 	//set the csrf value
 	session.Values["csrf"] = us.CSRF
-	//glog.Infoln(session_id)
-	//glog.Infoln(us.CSRFKey)
-	//glog.Infoln(us.CSRF)
-	//glog.Infoln(session.Options)
-	//glog.Infoln(us.LastRemoteAddr)
-	//glog.Infoln(us.LastXForwardedFor)
 	session.Save(r, w)
 	mc, _ := connectors.GetMC()
 	if mc != nil {
@@ -158,13 +165,23 @@ func SetSession(w http.ResponseWriter, r *http.Request, us *model.UserSession, r
 		enc := gob.NewEncoder(buf)
 		enc.Encode(*us)
 		//glog.Infoln("Updating session")
+		if prev_session_id != "" {
+			mc.Delete(prev_session_id)
+		}
 		mc.Set(&memcache.Item{Key: session_id, Value: buf.Bytes()})
 	} else {
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
+		if prev_session_id != "" {
+			var prevus model.UserSession
+			prevus.SessionKey = prev_session_id
+			sessions := us.SelectUserSession()
+			if len(sessions) > 0 {
+				us.UpdateUserSession(prev_session_id)
+			} else {
+				us.InsertUserSession()
+			}
+		} else {
+			us.InsertUserSession()
+		}
 	}
 	return session_id
 }
@@ -181,12 +198,12 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 	if session_id, ok := session.Values["session_id"].(string); !ok {
 		glog.Infoln("Bad Session ID")
 	} else {
+		glog.Infoln("Clearing session")
 		mc, _ := connectors.GetMC()
+		var userSession model.UserSession
 		if mc != nil {
-			glog.Infoln("Clearing session")
 			item := new(memcache.Item)
 			item, _ = mc.Get(session_id)
-			var userSession model.UserSession
 			if item != nil {
 				if len(item.Value) > 0 {
 					read := bytes.NewReader(item.Value)
@@ -194,15 +211,16 @@ func ClearSession(w http.ResponseWriter, r *http.Request) {
 					dec.Decode(&userSession)
 				}
 			}
-			userSession.User = model.User{}
-			userSession.LoginTime = time.Time{}
-			SetSession(w, r, &userSession, true)
 		} else {
-			//Try the database here
-			// if db connection is good {
-			// } else {
-			// 	panic
-			// }
+			userSession.SessionKey = session_id
+			sessions := userSession.SelectUserSession()
+			if len(sessions) > 0 {
+				userSession = sessions[0]
+			}
 		}
+		userSession.User = model.User{}
+		userSession.IsDefaultUser = false
+		userSession.LoginTime = time.Time{}
+		SetSession(w, r, &userSession, true)
 	}
 }

@@ -3,9 +3,39 @@
 package www
 
 import (
+	"connectors"
 	"github.com/golang/glog"
+	"model"
 	"net/http"
+	"os"
 	"strings"
+)
+
+//The integer values for the producttype enumeration
+type SystemStateConst int
+
+const (
+	Initialize = 1 + iota
+	Setup
+	Ready
+	Down
+)
+
+//The string values for the producttype enumeration
+var SystemStateStrings = [...]string{
+	"Initialize",
+	"Setup",
+	"Ready",
+	"Down",
+}
+
+// String returns the English name of the SystemStateConst ("Initialize", "Setup", ...).
+func (ss SystemStateConst) String() string { return SystemStateStrings[ss-1] }
+
+var (
+	State                = Initialize
+	Valid_Tables         = []string{"altIngredient", "altnames", "cocktail", "cocktailToAKAs", "cocktailToAltNames", "cocktailToMetas", "cocktailToPosts", "cocktailToProducts", "cocktailToRecipe", "derivedProduct", "doze", "groupProduct", "grouptype", "meta", "metatype", "product", "producttype", "recipe", "recipeToRecipeSteps", "recipestep", "users", "usersessions"}
+	Sqlite_Ignore_Tables = []string{"sqlite_sequence"}
 )
 
 //Init to setup the http handlers
@@ -38,7 +68,6 @@ func WWWRouterInit() {
 	http.Handle("/js/", MethodsHandler(http.StripPrefix("/js/", http.FileServer(http.Dir("./view/webcontent/www/js"))), "GET"))
 	http.Handle("/fonts/", MethodsHandler(http.StripPrefix("/fonts/", http.FileServer(http.Dir("./view/webcontent/www/fonts"))), "GET"))
 	http.Handle("/slick/", MethodsHandler(http.StripPrefix("/slick/", http.FileServer(http.Dir("./view/webcontent/www/libs/slick"))), "GET"))
-	http.Handle("/favicon.ico", MethodsHandler(http.StripPrefix("/", http.FileServer(http.Dir("./view/webcontent/www/favicon.ico"))), "GET"))
 	//Memcache Routing
 	http.Handle("/mc_delete", RecoverHandler(MethodsHandler(AuthenticatedPageHandler(MCDeleteHandler, false), "GET")))
 	http.Handle("/mc_load", RecoverHandler(MethodsHandler(AuthenticatedPageHandler(MCAddHandler, false), "GET")))
@@ -54,16 +83,18 @@ func WWWRouterInit() {
 	http.Handle("/GoogleCallback", RecoverHandler(MethodsHandler(PageHandler(handleGoogleCallback), "GET")))
 	http.Handle("/FacebookLogin", RecoverHandler(MethodsHandler(PageHandler(handleFacebookLogin), "GET")))
 	http.Handle("/FacebookCallback", RecoverHandler(MethodsHandler(PageHandler(handleFacebookCallback), "GET")))
-
 }
 
 //This only loads the page into the page datastruct, there is no authentication
 //validation
 func PageHandler(next func(http.ResponseWriter, *http.Request, *page)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		page := NewPage(w, r)
-		next(w, r, page)
-		return
+		if isReadyState(w, r) {
+			page := NewPage(w, r)
+			page.State = State
+			next(w, r, page)
+			return
+		}
 	})
 }
 
@@ -73,6 +104,7 @@ func PageHandler(next func(http.ResponseWriter, *http.Request, *page)) http.Hand
 func AuthenticatedPageHandler(pass func(http.ResponseWriter, *http.Request, *page), ignoreLogout bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		page := NewPage(w, r)
+		page.State = State
 		if page.Authenticated {
 			pass(w, r, page)
 			return
@@ -93,6 +125,7 @@ func AuthenticatedPageHandler(pass func(http.ResponseWriter, *http.Request, *pag
 func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, validator func(http.ResponseWriter, *http.Request, *page) bool, require func(*page) bool, pass func(http.ResponseWriter, *http.Request, *page), fail func(http.ResponseWriter, *http.Request, *page)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		page := NewPage(w, r)
+		page.State = State
 		if page.Authenticated || ignoreAuth {
 			//Validate the form input and populate the meta data
 			if validator(w, r, page) {
@@ -140,7 +173,6 @@ func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, valid
 func MethodsHandler(h http.Handler, methods ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		isValidMethod := false
-		glog.Infoln(r.Method)
 		for _, v := range methods {
 			if strings.ToUpper(v) == r.Method {
 				isValidMethod = true
@@ -163,11 +195,91 @@ func RecoverHandler(h http.Handler) http.Handler {
 		defer func() {
 			// recover from panic if one occured. Set err to nil otherwise.
 			if rec := recover(); rec != nil {
-				Error404(w, rec)
+				switch State {
+				case Initialize:
+					glog.Errorln("We didn't get past the initialization")
+					os.Exit(3)
+				case Setup:
+					RenderSetupTemplate(w, rec)
+					return
+				case Ready:
+					Error404(w, rec)
+					return
+				case Down:
+					glog.Errorln("This instance seems to have gone down.  Shutting it off.")
+					os.Exit(3)
+				default:
+					return
+				}
 				return
 			}
 		}()
 		h.ServeHTTP(w, r) // call next
 		return
 	})
+}
+
+//This handler is designed to return a 404 error after a panic has occured
+func isReadyState(w http.ResponseWriter, r *http.Request) bool {
+	switch State {
+	case Initialize:
+		glog.Errorln("We didn't get past the initialization")
+		os.Exit(3)
+	case Setup:
+		glog.Infoln("In setup mode.  Waiting for all setup requirements to be completed before moving to new state.")
+		page := NewSetupPage(w, r)
+		page.State = State
+		//Check DB
+		conn, _ := connectors.GetDB()
+		err := conn.Ping()
+		if err != nil {
+			glog.Errorln("No database connection.  Fix the connection issue and then retry setup.")
+			page.RenderSetupTemplate(w, r, "/setup")
+			return false
+		}
+		tables := model.SelectTables()
+		found_all_tables := true
+		if len(tables) == 0 {
+			found_all_tables = false
+		}
+		for _, table := range tables {
+			found := false
+			for _, val_table := range Valid_Tables {
+				if val_table == table {
+					glog.Infoln("Validated table " + table)
+					found = true
+					break
+				}
+			}
+			if !found {
+				ignore_table := false
+				for _, sqlite_ign_table := range Sqlite_Ignore_Tables {
+					if sqlite_ign_table == table {
+						glog.Infoln("Ignoring table " + table)
+						ignore_table = true
+						break
+					}
+				}
+				if !ignore_table {
+					glog.Errorln("Missing a table! " + table)
+					found_all_tables = false
+				}
+			}
+		}
+		if !found_all_tables {
+			//try loading the tables
+			glog.Infoln("Trying to load the tables")
+			DBTablesHandler(w, r, page)
+		}
+		State = Ready
+		return true
+	case Ready:
+		return true
+	case Down:
+		glog.Errorln("This instance seems to have gone down.  Shutting it off.")
+		os.Exit(3)
+	default:
+		return false
+	}
+	return false
 }

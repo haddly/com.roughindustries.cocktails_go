@@ -1,26 +1,3 @@
 runtime: go
-#api_version: go1
+api_version: go1.8
 env: flex
-
-handlers:
-- url: /favicon.ico
-  static_files: view/webcontent/www/favicon.ico
-  upload: view/webcontent/www/favicon.ico
-#- url: /slick.html
-#  mime_type: text/html
-#  static_files: view/webcontent/www/static/slick.html
-#  upload: view/webcontent/www/static/slick.html
-- url: /images
-  static_dir: view/webcontent/www/images
-- url: /css
-  static_dir: view/webcontent/www/css
-- url: /js
-  static_dir: view/webcontent/www/js
-- url: /fonts
-  static_dir: view/webcontent/www/fonts
-- url: /font-awesome
-  static_dir: view/webcontent/www/font-awesome
-- url: /slick
-  static_dir: view/webcontent/www/libs/slick
-- url: /.*
-  script: _go_app
