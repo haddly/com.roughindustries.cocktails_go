@@ -4,12 +4,12 @@ package model
 
 import (
 	"bytes"
-	"github.com/CommonwealthCocktails/connectors"
 	"encoding/gob"
+	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/golang/glog"
 	"html"
 	"html/template"
-	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -199,7 +199,8 @@ func (product *Product) SelectProduct() []Product {
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT `idProduct`, `productName`, `productType`, `productGroupType`, COALESCE(`productDescription`, ''), COALESCE(`productDetails`, ''), " +
 		"COALESCE(`productImageSourceName`, ''), COALESCE(`productImage`, ''), COALESCE(`productImagePath`, ''), COALESCE(`productImageSourceLink`, ''), " +
-		"COALESCE(`productPreText`, ''), COALESCE(`productPostText`, ''), COALESCE(`productRating`, 0), COALESCE(`productSourceName`, ''), COALESCE(`productSourceLink`, '') " +
+		"COALESCE(`productPreText`, ''), COALESCE(`productPostText`, ''), COALESCE(`productRating`, 0), COALESCE(`productSourceName`, ''), COALESCE(`productSourceLink`, ''), " +
+		"COALESCE(`productAmazonLink`, '') " +
 		"FROM `product` WHERE ")
 	if product.ID != 0 {
 		buffer.WriteString(" `idProduct`=? AND")
@@ -276,14 +277,14 @@ func (product *Product) SelectProduct() []Product {
 		var prod Product
 		var desc string
 		var details string
-		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink)
+		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
 		if err != nil {
 			glog.Error(err)
 		}
 		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.Details = template.HTML(html.UnescapeString(details))
 		ret = append(ret, prod)
-		glog.Infoln(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.Description, prod.Details, prod.ImageSourceName, prod.Image, prod.ImagePath, prod.ImageSourceLink, prod.PreText, prod.PostText, prod.Rating, prod.SourceName, prod.SourceLink)
+		glog.Infoln(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.Description, prod.Details, prod.ImageSourceName, prod.Image, prod.ImagePath, prod.ImageSourceLink, prod.PreText, prod.PostText, prod.Rating, prod.SourceName, prod.SourceLink, prod.AmazonLink)
 	}
 	err = rows.Err()
 	if err != nil {
@@ -507,7 +508,7 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 		" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, ''), COALESCE(product.productImageSourceName, '')," +
 		" COALESCE(product.productImage, ''), COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, '')," +
 		" COALESCE(product.productPreText, ''), COALESCE(product.productPostText, ''), COALESCE(product.productRating, 0)," +
-		" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, '')" +
+		" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, ''), COALESCE(`productAmazonLink`, '')" +
 		" FROM product" +
 		" JOIN cocktailToProducts ON product.idProduct=cocktailToProducts.idProduct" +
 		" JOIN cocktail ON cocktailToProducts.idCocktail=cocktail.idCocktail" +
@@ -525,7 +526,7 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 		var prod Product
 		var desc string
 		var details string
-		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink)
+		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
 		if err != nil {
 			glog.Error(err)
 		}

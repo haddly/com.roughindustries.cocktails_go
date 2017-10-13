@@ -32,7 +32,9 @@
 								{{if .Image}} {{if .ImagePath}}
 								<img class="img-responsive" style="max-height:150px" src="{{.ImagePath}}/{{.Image}}" /> {{else}}
 								<img class="img-responsive" style="max-height:150px" src="images/{{.Image}}" /> {{end}} {{else}}
-								<img class="img-responsive" style="max-height:150px" src="https://placehold.it/900x1200"> {{end}}
+								<img border="0" style="max-height:150px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&w=1200&h=900&txttrack=0">
+								<!--<img class="img-responsive" style="max-height:150px" src="https://placehold.it/900x1200"> -->
+								{{end}}
 							</div>
 							<h3>
 								{{.ProductName}}

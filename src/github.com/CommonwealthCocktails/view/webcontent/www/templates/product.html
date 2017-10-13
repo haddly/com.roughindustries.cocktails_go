@@ -34,15 +34,15 @@
 					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 						<div align="center" style="position: relative; width: 100%;">
 
-							{{if and .Product.Image}} {{if .Product.ImagePath}}
+							{{if .Product.Image}} {{if .Product.ImagePath}}
 							<img class="img-responsive" src="{{.Product.ImagePath}}/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{else}}
-							<img class="img-responsive" src="images/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{end}}
+							<img class="img-responsive" src="images/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{end}} {{else}}
+							<img border="0" itemprop="image" style="max-height:150px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=FFFFFF&w=600&h=600"> {{end}}
 							<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source:
 								<a target="_blank" style="text-decoration : none; color : #555;" href="{{.Product.ImageSourceLink}}">
 								{{.Product.ImageSourceName}}
 								</a>
 							</h6>
-							{{else}}&nbsp;{{end}}
 						</div>
 					</div>
 					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">

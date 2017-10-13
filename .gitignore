@@ -1,14 +1,14 @@
 bin/
-Packages/pkg
-Packages/src/github.com/*
-!Packages/src/github.com/CommonwealthCocktails/
+pkg
+src/github.com/*
+!src/github.com/CommonwealthCocktails/
 
-Packages/src/github.com/CommonwealthCocktails/sql/*.db
-Packages/src/github.com/CommonwealthCocktails/sql/*sqlite*
+src/github.com/CommonwealthCocktails/sql/*.db
+src/github.com/CommonwealthCocktails/sql/*sqlite*
 
-Packages/src/cloud.google.com
-Packages/src/golang.org
-Packages/src/google.golang.org
-Packages/pkg/*
+src/cloud.google.com
+src/golang.org
+src/google.golang.org
+pkg/*
 sensitive.config
 !pkg/.gitkeep

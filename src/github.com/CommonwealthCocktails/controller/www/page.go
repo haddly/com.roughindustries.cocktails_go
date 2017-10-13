@@ -8,8 +8,8 @@ package www
 
 import (
 	//"github.com/golang/glog"
-	"html/template"
 	"github.com/CommonwealthCocktails/model"
+	"html/template"
 	"net/http"
 	//"strings"
 	"time"

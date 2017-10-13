@@ -27,6 +27,8 @@ type Product struct {
 	SourceName       string
 	SourceLink       string
 	Errors           map[string]string
+	//Affiliates
+	AmazonLink string
 }
 
 //Data struct to represent a product type.  IsIngredient determines if the

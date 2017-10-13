@@ -3,10 +3,11 @@
 package main
 
 import (
+	"flag"
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/CommonwealthCocktails/controller/alexa"
+	"github.com/CommonwealthCocktails/controller/book"
 	"github.com/CommonwealthCocktails/controller/www"
-	"flag"
 	"github.com/golang/glog"
 	"github.com/gorilla/context"
 	"golang.org/x/crypto/bcrypt"
@@ -74,6 +75,7 @@ func init() {
 	// init the routing
 	www.WWWRouterInit()
 	alexa.AlexaRouterInit()
+	book.BookRouterInit()
 	www.State = www.Setup
 	glog.Infoln("End Init")
 }
@@ -90,6 +92,16 @@ func AddLetsEncrypt() {
 	//})
 }
 
+func redirect(w http.ResponseWriter, req *http.Request) {
+	// remove/add not default ports from req.Host
+	target := "https://" + req.Host + req.URL.Path
+	if len(req.URL.RawQuery) > 0 {
+		target += "?" + req.URL.RawQuery
+	}
+	glog.Infoln("redirect to: %s", target)
+	http.Redirect(w, req, target, http.StatusTemporaryRedirect)
+}
+
 func main() {
 	glog.Infoln(www.State)
 	//print out the current directory
@@ -101,5 +113,7 @@ func main() {
 	AddLetsEncrypt()
 	glog.Infoln("Starting Server ... \n")
 	//this starts up the server
+	// redirect every http request to https
+	go http.ListenAndServe(":80", http.HandlerFunc(redirect))
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }

@@ -113,7 +113,6 @@
 						<h3>Cocktail Metadata</h3>
 					</div>
 					<div class="row">
-						<
 						<div class="row">
 							<div class="col-sm-6 col-xs-12 clearfix x-recipe-terms recipe-link">
 								<div class="row">
@@ -357,23 +356,8 @@
 	<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByProductID?ID={{.ID}}">
 		<i class="fa fa-glass"></i>
 	</a>
-	{{if eq .ProductName "Shaker"}}
-	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B0001YH13E/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B0001YH13E&linkCode=as2&tag=commonweal0ad-20&linkId=4f07b239ed1864a406f42cffc20143de">
-		<i class="fa fa-amazon"></i>
-	</a>
-	{{end}}
-	{{if eq .ProductName "Old Fashioned"}}
-	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B00TFX2QFA/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B00TFX2QFA&linkCode=as2&tag=commonweal0ad-20&linkId=39497b10e3224c04d8cc935dcd796fc4">
-		<i class="fa fa-amazon"></i>
-	</a>
-	{{end}}
-	{{if eq .ProductName "Highball"}}
-	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B000QU69I6/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B000QU69I6&linkCode=as2&tag=commonweal0ad-20&linkId=fd83d2347771a8b305ddc29189394282">
-		<i class="fa fa-amazon"></i>
-	</a>
-	{{end}}
-	{{if eq .ProductName "Collins"}}
-	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="https://www.amazon.com/gp/product/B001K45UN2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B001K45UN2&linkCode=as2&tag=commonweal0ad-20&linkId=b4b8b1647a03ddde156ad4efd1abaab8">
+	{{if .AmazonLink}}
+	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="{{.AmazonLink}}">
 		<i class="fa fa-amazon"></i>
 	</a>
 	{{end}}
