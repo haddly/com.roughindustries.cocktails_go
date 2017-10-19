@@ -5,7 +5,19 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
+<meta name="twitter:card" content="summary" />
+{{if .CocktailSet.Cocktail.Name}}
+<title>{{.CocktailSet.Cocktail.Name}}</title>
+<meta property="og:title" content="{{.CocktailSet.Cocktail.Name}}" />
+<meta property="og:name" content="{{.CocktailSet.Cocktail.Name}}" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="{{if .CocktailSet.Cocktail.Description}}{{.CocktailSet.Cocktail.Description}}{{end}}" />
+<meta property="og:image" content="{{if .CocktailSet.Cocktail.Image}}{{if .CocktailSet.Cocktail.ImagePath}}{{.CocktailSet.Cocktail.ImagePath}}/{{.CocktailSet.Cocktail.Image}}{{end}}{{end}}" />
+{{else}}
 <title>Commonwealth Cocktails</title>
+<meta property="og:title" content="Commonwealth Cocktails" />
+{{end}}
+<meta property="fb:app_id" content="440301159683076" />
 
 <!-- Bootstrap Core CSS -->
 <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">

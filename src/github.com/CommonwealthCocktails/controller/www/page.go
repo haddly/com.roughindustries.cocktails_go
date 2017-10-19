@@ -27,6 +27,7 @@ var UseGA = false
 //generates a page
 type page struct {
 	State                int
+	BaseURL              string
 	Username             string
 	Redirect             string
 	Authenticated        bool

@@ -9,16 +9,18 @@ import (
 //DATA STRUCTURES
 //User data structure.
 type User struct {
-	ID            int
-	Username      string
-	FullName      string
-	Password      string
-	IsDisabled    bool
-	Roles         string
-	Email         string
-	Authenticated bool
-	LastLogin     time.Time
-	Errors        map[string]string
+	ID                int
+	Username          string
+	FullName          string
+	Password          string
+	IsDisabled        bool
+	Roles             string
+	Email             string
+	Authenticated     bool
+	LastLogin         time.Time
+	GoogleAccessToken string
+	FBAccessToken     string
+	Errors            map[string]string
 }
 
 //User session data structure.  Keeps track of users logged in or accessing the

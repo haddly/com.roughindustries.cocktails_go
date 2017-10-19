@@ -215,6 +215,7 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 	us := new(model.UserSession)
 	us.LoginTime = time.Now()
 	us.LastSeenTime = time.Now()
+	usr.GoogleAccessToken = token.AccessToken
 	us.User = *usr
 	SetSession(w, r, us, true)
 	http.Redirect(w, r, "/", 302)
@@ -304,8 +305,10 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 	us := new(model.UserSession)
 	us.LoginTime = time.Now()
 	us.LastSeenTime = time.Now()
+	usr.FBAccessToken = token.AccessToken
 	us.User = *usr
 	SetSession(w, r, us, true)
+
 	http.Redirect(w, r, "/", 302)
 }
 

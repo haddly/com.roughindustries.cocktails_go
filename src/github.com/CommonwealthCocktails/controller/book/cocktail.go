@@ -2,14 +2,13 @@
 //controller/www/cocktail.go: Functions and handlers for dealing with cocktails.
 //TODO: migrate cocktail by meta or product id to a single function that
 //is passed a meta or a product id parameter
-package www
+package book
 
 import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/golang/glog"
 	"html/template"
 	"net/http"
-	"net/url"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -20,153 +19,12 @@ import (
 func CocktailHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var cs model.CocktailSet
 	if !ValidateCocktail(w, r, page) {
-		page.RenderPageTemplate(w, r, "404")
+		page.RenderBookTemplate(w, r, "404")
 	} else {
 		cs = page.Cocktail.SelectCocktailsByID(page.Cocktail.ID, true)
 		page.CocktailSet = cs
 		//apply the template page info to the index page
-		page.RenderPageTemplate(w, r, "cocktail")
-	}
-}
-
-//Cocktails page (i.e. all the cocktails) request handler which
-//displays the all the cocktails page.
-func CocktailsHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	var cs model.CocktailSet
-	var c []model.Cocktail
-	c = page.Cocktail.SelectAllCocktails(false)
-	cs.ChildCocktails = c
-	page.CocktailSet = cs
-	//apply the template page info to the index page
-	page.RenderPageTemplate(w, r, "cocktails")
-}
-
-//Cocktail Modification Form page handler which displays the Cocktail Modification
-//Form page.
-func CocktailModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	u, _ := url.Parse(r.URL.String())
-	glog.Infoln(u)
-	r.ParseForm()
-	var cba model.CocktailsByAlphaNums
-	cba = page.Cocktail.SelectCocktailsByAlphaNums(false)
-	page.CocktailsByAlphaNums = cba
-	page.Doze = model.SelectDoze()
-	var mbt model.MetasByTypes
-	mbt = page.Meta.SelectMetaByTypes(false, true, false)
-	page.MetasByTypes = mbt
-	var ingredients model.ProductsByTypes
-	ingredients = page.Product.SelectProductsByTypes(true, false, false)
-	page.Ingredients = ingredients
-	var nonIngredients model.ProductsByTypes
-	nonIngredients = page.Product.SelectProductsByTypes(false, true, false)
-	page.NonIngredients = nonIngredients
-	glog.Infoln(r.Form["ID"])
-	if len(r.Form["ID"]) == 0 {
-		//apply the template page info to the index page
-		page.RenderPageTemplate(w, r, "cocktailmodform")
-	} else {
-		id, _ := strconv.Atoi(r.Form["ID"][0])
-		var in model.Cocktail
-		in.ID = id
-		out := page.Cocktail.SelectCocktailsByID(id, false)
-		page.Cocktail = out.Cocktail
-		page.RenderPageTemplate(w, r, "cocktailmodform")
-	}
-}
-
-//Cocktail modification form page request handler which process the cocktail
-//modification request.  This will after verifying a valid user session,
-//modify the cocktail data based on the request.
-func CocktailModHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	r.ParseForm()
-	glog.Infoln(r.Form)
-	var cba model.CocktailsByAlphaNums
-	cba = page.Cocktail.SelectCocktailsByAlphaNums(false)
-	page.CocktailsByAlphaNums = cba
-	page.Doze = model.SelectDoze()
-	var mbt model.MetasByTypes
-	mbt = page.Meta.SelectMetaByTypes(false, true, false)
-	page.MetasByTypes = mbt
-	var ingredients model.ProductsByTypes
-	ingredients = page.Product.SelectProductsByTypes(true, false, false)
-	page.Ingredients = ingredients
-	var nonIngredients model.ProductsByTypes
-	nonIngredients = page.Product.SelectProductsByTypes(false, true, false)
-	page.NonIngredients = nonIngredients
-	if r.Form["button"][0] == "add" {
-		ret_id := page.Cocktail.InsertCocktail()
-		model.LoadMCWithCocktailByAlphaNumsData()
-		outCocktail := page.Cocktail.SelectCocktailsByID(ret_id, false)
-		page.Cocktail = outCocktail.Cocktail
-		page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
-		page.RenderPageTemplate(w, r, "cocktailmodform")
-		return
-	} else if r.Form["button"][0] == "update" {
-		ret_id := page.Cocktail.UpdateCocktail()
-		model.LoadMCWithCocktailByAlphaNumsData()
-		outCocktail := page.Cocktail.SelectCocktailsByID(ret_id, false)
-		page.Cocktail = outCocktail.Cocktail
-		page.Messages["cocktailModifySuccess"] = "Cocktail modified successfully and memcache updated!"
-		page.RenderPageTemplate(w, r, "cocktailmodform")
-		return
-	} else {
-		page.Messages["cocktailModifyFail"] = "Cocktail modification failed.  You tried to perform an unknown operation!"
-		page.RenderPageTemplate(w, r, "cocktailmodform")
-		return
-	}
-}
-
-//Cocktails Index page i.e. page that gets you to cocktails via header links,
-//metas, etc
-func CocktailsIndexHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	var m model.MetasByTypes
-	m = page.Meta.SelectMetaByTypes(true, true, false)
-	page.MetasByTypes = m
-	//apply the template page info to the index page
-	page.RenderPageTemplate(w, r, "cocktailsindex")
-}
-
-//Cocktails by meta id page handler that shows all the cocktails that are
-//related to the meta id provided
-func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	r.ParseForm() // Required if you don't call r.FormValue()
-	var cs model.CocktailSet
-	if len(r.Form["ID"]) == 0 {
-		page.RenderPageTemplate(w, r, "404")
-	} else {
-		id, _ := strconv.Atoi(r.Form["ID"][0])
-		glog.Infoln("Meta ID: " + r.Form["ID"][0])
-		var inMeta model.Meta
-		inMeta.ID = id
-		var c []model.Cocktail
-		c = page.Cocktail.SelectCocktailsByMeta(inMeta)
-		cs.ChildCocktails = c
-		meta := inMeta.SelectMeta()
-		cs.Metadata = meta[0]
-		page.CocktailSet = cs
-		page.RenderPageTemplate(w, r, "cocktails")
-	}
-}
-
-//Cocktails by product id page handler that shows all the cocktails that are
-//related to the product id provided
-func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	var cs model.CocktailSet
-	if len(r.Form["ID"]) == 0 {
-		page.RenderPageTemplate(w, r, "404")
-	} else {
-		id, _ := strconv.Atoi(r.Form["ID"][0])
-
-		var inProduct model.Product
-		inProduct.ID = id
-		var c []model.Cocktail
-		c = page.Cocktail.SelectCocktailsByProduct(inProduct)
-		cs.ChildCocktails = c
-		prod := inProduct.SelectProduct()
-		cs.Product = prod[0]
-		page.CocktailSet = cs
-		page.RenderPageTemplate(w, r, "cocktails")
-
+		page.RenderBookTemplate(w, r, "cocktail")
 	}
 }
 
@@ -264,8 +122,8 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 				}
 				if len(r.Form["recipestep["+result[i]+"].Quantity"]) > 0 {
 					rs.RecipeCardinalFloat, _ = strconv.ParseFloat(r.Form["recipestep["+result[i]+"].Quantity"][0], 64)
-					quant, _ := strconv.ParseFloat(r.Form["recipestep["+result[i]+"].Quantity"][0], 64)
-					rs.RecipeCardinalString = FloatToVulgar(quant)
+					//quant, _ := strconv.ParseFloat(r.Form["recipestep["+result[i]+"].Quantity"][0], 64)
+					//rs.RecipeCardinalString = FloatToVulgar(quant)
 				}
 				rs.RecipeOrdinal = ord
 				if len(r.Form["recipestep["+result[i]+"].AltIngredients"]) > 0 {
@@ -411,9 +269,6 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 				page.Cocktail.Drink = append(page.Cocktail.Drink, m)
 			}
 		}
-	}
-	if len(page.Cocktail.Errors) > 0 {
-		page.Errors["cocktailErrors"] = "You have errors in your input"
 	}
 	return len(page.Cocktail.Errors) == 0
 }

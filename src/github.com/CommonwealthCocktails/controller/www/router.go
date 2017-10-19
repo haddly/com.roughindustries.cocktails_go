@@ -33,7 +33,8 @@ var SystemStateStrings = [...]string{
 func (ss SystemStateConst) String() string { return SystemStateStrings[ss-1] }
 
 var (
-	State         = Initialize
+	State = Initialize
+	//BaseURL       = "??"
 	Valid_Tables  = []string{"altIngredient", "altnames", "cocktail", "cocktailToAKAs", "cocktailToAltNames", "cocktailToMetas", "cocktailToPosts", "cocktailToProducts", "cocktailToRecipe", "derivedProduct", "doze", "groupProduct", "grouptype", "meta", "metatype", "product", "producttype", "recipe", "recipeToRecipeSteps", "recipestep", "users", "usersessions"}
 	Ignore_Tables = []string{"sqlite_sequence"}
 )
@@ -83,6 +84,8 @@ func WWWRouterInit() {
 	http.Handle("/GoogleCallback", RecoverHandler(MethodsHandler(PageHandler(handleGoogleCallback), "GET")))
 	http.Handle("/FacebookLogin", RecoverHandler(MethodsHandler(PageHandler(handleFacebookLogin), "GET")))
 	http.Handle("/FacebookCallback", RecoverHandler(MethodsHandler(PageHandler(handleFacebookCallback), "GET")))
+	//Social Routing
+	http.Handle("/cocktailsocialpost", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktailSocialPost, nil, CocktailSocialPostHandler, nil), "GET")))
 }
 
 //This only loads the page into the page datastruct, there is no authentication
@@ -92,6 +95,7 @@ func PageHandler(next func(http.ResponseWriter, *http.Request, *page)) http.Hand
 		if isReadyState(w, r) {
 			page := NewPage(w, r)
 			page.State = State
+			page.BaseURL = BaseURL
 			next(w, r, page)
 			return
 		}
