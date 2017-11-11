@@ -13,6 +13,7 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/glog"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
@@ -28,45 +29,57 @@ import (
 
 //Variables for use within the login package
 var (
-	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
-	//Google OAuth variables
-	//googleOauthConfig = &oauth2.Config{
-	//RedirectURL:  ??,
-	//ClientID:     ??,
-	//ClientSecret: ??,
-	//Scopes: []string{"https://www.googleapis.com/auth/userinfo.profile",
-	//	"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/plus.me"},
-	//Endpoint: google.Endpoint,
-	//}
-	//Facebook OAuth variables
-	//facebookOauthConfig = &oauth2.Config{
-	//ClientID: ??,
-	//ClientSecret: ??,
-	//RedirectURL: ??,
-	//Scopes:   []string{"public_profile", "email"},
-	//Endpoint: facebook.Endpoint,
-	//}
+	//OAuth
+	googleOauthConfig   *oauth2.Config
+	facebookOauthConfig *oauth2.Config
 
 	// Some random string, random for each request
 	// this way could create a memory leak sense I don't clear out the map ever, just a heads up
 	oauthStateString = make(map[string]bool)
 
 	//Default user is the user you can get into the system with at all times
-	//allowDefault = ??
-	//defaultUser = ??
-	//defaultPassword = ??
+	allowDefault    bool
+	defaultUser     string
+	defaultPassword string
 
-	//sitekey = "{Your site key here}"
-	//re      = reCAPTCHA{
-	//	Secret: "{Your secret here}",
-	//}
-	//sitekeyInv = "{Your site key here}"
-	//reInv      = reCAPTCHA{
-	//	Secret: "{Your secret here}",
-	//}
-
-
+	//reCAPTCHA
+	sitekey    string
+	re         reCAPTCHA
+	sitekeyInv string
+	reInv      reCAPTCHA
 )
+
+func LoginInit() {
+	glog.Infoln("Login Init")
+	//default user
+	allowDefault = viper.GetBool("allowDefault")
+	defaultUser = viper.GetString("defaultUser")
+	//hash is = password
+	defaultPassword = viper.GetString("defaultPassword")
+
+	//reCAPTCHA
+	sitekey = viper.GetString("reCAPTCHASiteKey")
+	re = reCAPTCHA{
+		Secret: viper.GetString("reCAPTCHASecret"),
+	}
+	sitekeyInv = viper.GetString("reCAPTCHASiteKeyInv")
+	reInv = reCAPTCHA{
+		Secret: viper.GetString("reCAPTCHASecretInv"),
+	}
+
+	googleOauthConfig = &oauth2.Config{
+		ClientID:     viper.GetString("googleOauthConfigClientID"),
+		ClientSecret: viper.GetString("googleOauthConfigClientSecret"),
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
+		Endpoint:     google.Endpoint,
+	}
+	facebookOauthConfig = &oauth2.Config{
+		ClientID:     viper.GetString("facebookOauthConfigClientID"),
+		ClientSecret: viper.GetString("facebookOauthConfigClientSecret"),
+		Scopes:       []string{"public_profile", "email", "pages_show_list", "manage_pages", "publish_pages"},
+		Endpoint:     facebook.Endpoint,
+	}
+}
 
 //Login page handler which displays the standard login page.
 func loginIndexHandler(w http.ResponseWriter, r *http.Request, page *page) {
@@ -103,6 +116,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 
 	//this is in case you need to perform DB actions before the DB is setup
 	//otherwise you wouldn't have an users
+	glog.Infoln(allowDefault)
 	if allowDefault && page.User.Username == defaultUser {
 		//if page.User.Password == defaultPassword {
 		if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {

@@ -45,6 +45,8 @@ func WWWRouterInit() {
 	glog.Infoln("Init in www/router.go")
 	glog.Infoln(viper.GetString("BaseURL"))
 	BaseURL = viper.GetString("BaseURL")
+	//Inits
+	LoginInit()
 	//Page Routing
 	http.Handle("/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
 	//Cocktail Routing

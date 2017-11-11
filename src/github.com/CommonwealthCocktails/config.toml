@@ -8,4 +8,16 @@
 #MySQL, SQLite
 #dbtype = ""
 #mc_server = ""
+#allowDefault = false
+#defaultUser  = ""
+#defaultPassword = ""
+#reCAPTCHASiteKey = ""
+#reCAPTCHASecret = ""
+#reCAPTCHASiteKeyInv = ""
+#reCAPTCHASecretInv = ""
+#googleOauthConfigClientID = ""
+#googleOauthConfigClientSecret = ""
+#facebookOauthConfigClientID = ""
+#facebookOauthConfigClientSecret = ""
+
 
