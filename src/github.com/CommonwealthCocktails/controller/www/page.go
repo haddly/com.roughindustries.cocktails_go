@@ -7,8 +7,8 @@
 package www
 
 import (
-	//"github.com/golang/glog"
 	"github.com/CommonwealthCocktails/model"
+	"github.com/golang/glog"
 	"html/template"
 	"net/http"
 	//"strings"
@@ -29,7 +29,6 @@ type page struct {
 	State                int
 	BaseURL              string
 	Username             string
-	Redirect             string
 	Authenticated        bool
 	AllowAdmin           bool
 	UseGA                bool
@@ -85,7 +84,7 @@ func (page *page) RenderSetupTemplate(w http.ResponseWriter, r *http.Request, tm
 
 //the page template renderer.  This should be the basic method for displaying
 //all pages.
-func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmpl string) {
+func (this *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmpl string) {
 	// CATCH ONLY HEADER START
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
@@ -96,21 +95,23 @@ func (page *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmp
 	// CATCH ONLY HEADER START
 	// setup the CSRF id for this page
 	if r != nil {
-		page.UserSession.LastSeenTime = time.Now()
-		if len(page.UserSession.CSRFKey) == 0 || page.UserSession.CSRFBase == "" {
-			page.UserSession.CSRF = ""
+		this.UserSession.LastSeenTime = time.Now()
+		if len(this.UserSession.CSRFKey) == 0 || this.UserSession.CSRFBase == "" {
+			this.UserSession.CSRF = ""
 		} else {
-			page.UserSession.CSRF = encrypt([]byte(page.UserSession.CSRFKey), page.UserSession.CSRFBase)
+			this.UserSession.CSRF = encrypt([]byte(this.UserSession.CSRFKey), this.UserSession.CSRFBase)
+			glog.Infoln(this.UserSession.CSRF)
+			glog.Infoln(this.UserSession.CSRFBase)
 		}
-		SetSession(w, r, &page.UserSession, false)
+		SetSession(w, r, &this.UserSession, false)
 	}
 	t, err := parseTempFiles(tmpl)
 	if err != nil {
 		Error404(w, err)
-		page.RenderPageTemplate(w, r, "404")
+		this.RenderPageTemplate(w, r, "404")
 		return
 	}
-	err = t.ExecuteTemplate(w, "base", page)
+	err = t.ExecuteTemplate(w, "base", this)
 	if err != nil {
 		Error404(w, err)
 		return

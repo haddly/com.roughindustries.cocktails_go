@@ -21,6 +21,23 @@ CREATE TABLE `altnames` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cc_usermeta` (
+  `idUserMeta` int(11) NOT NULL,
+  `usermetaName` varchar(150) NOT NULL,
+  `usermetaType` int(11) NOT NULL,
+  PRIMARY KEY (`idUserMeta`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cc_usermetatype` (
+  `idUserMetaType` int(11) NOT NULL,
+  `usermetatypeName` varchar(150) NOT NULL,
+  PRIMARY KEY (`idUserMetaType`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cocktail` (
   `idCocktail` int(11) NOT NULL AUTO_INCREMENT,
   `cocktailTitle` varchar(150) NOT NULL,
@@ -38,7 +55,7 @@ CREATE TABLE `cocktail` (
   `cocktailSourceName` varchar(150) DEFAULT NULL,
   `cocktailSourceLink` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`idCocktail`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -81,7 +98,7 @@ CREATE TABLE `cocktailToMetas` (
   CONSTRAINT `cocktailToMetas_idCocktail_id_fk` FOREIGN KEY (`idCocktail`) REFERENCES `cocktail` (`idCocktail`),
   CONSTRAINT `cocktailToMetas_idMetaType_id_fk` FOREIGN KEY (`idMetaType`) REFERENCES `metatype` (`idMetaType`),
   CONSTRAINT `cocktailToMetas_idMeta_id_fk` FOREIGN KEY (`idMeta`) REFERENCES `meta` (`idMeta`)
-) ENGINE=InnoDB AUTO_INCREMENT=313 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=594 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -110,7 +127,7 @@ CREATE TABLE `cocktailToProducts` (
   CONSTRAINT `cocktailToProducts_idCocktail_id_fk` FOREIGN KEY (`idCocktail`) REFERENCES `cocktail` (`idCocktail`),
   CONSTRAINT `cocktailToProducts_idProductType_id_fk` FOREIGN KEY (`idProductType`) REFERENCES `producttype` (`idProductType`),
   CONSTRAINT `cocktailToProducts_idProduct_id_fk` FOREIGN KEY (`idProduct`) REFERENCES `product` (`idProduct`)
-) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=270 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -123,7 +140,7 @@ CREATE TABLE `cocktailToRecipe` (
   KEY `cocktailToRecipe_idRecipe_id_fk` (`idRecipe`),
   CONSTRAINT `cocktailToRecipe_idCocktail_id_fk` FOREIGN KEY (`idCocktail`) REFERENCES `cocktail` (`idCocktail`),
   CONSTRAINT `cocktailToRecipe_idRecipe_id_fk` FOREIGN KEY (`idRecipe`) REFERENCES `recipe` (`idRecipe`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -136,7 +153,7 @@ CREATE TABLE `derivedProduct` (
   KEY `derivedProduct_idProduct_id_fk` (`idProduct`),
   CONSTRAINT `derivedProduct_idBaseProduct_id_fk` FOREIGN KEY (`idBaseProduct`) REFERENCES `product` (`idProduct`),
   CONSTRAINT `derivedProduct_idProduct_id_fk` FOREIGN KEY (`idProduct`) REFERENCES `product` (`idProduct`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -144,7 +161,7 @@ CREATE TABLE `doze` (
   `idDoze` int(11) NOT NULL AUTO_INCREMENT,
   `dozeName` varchar(150) NOT NULL,
   PRIMARY KEY (`idDoze`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -222,7 +239,7 @@ CREATE TABLE `product` (
   CONSTRAINT `product_productgrouptype_id_fk` FOREIGN KEY (`productGroupType`) REFERENCES `grouptype` (`idGroupType`),
   CONSTRAINT `product_productrecipe_id_fk` FOREIGN KEY (`productRecipe`) REFERENCES `recipe` (`idRecipe`),
   CONSTRAINT `product_producttype_id_fk` FOREIGN KEY (`productType`) REFERENCES `producttype` (`idProductType`)
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=143 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -239,7 +256,7 @@ CREATE TABLE `recipe` (
   `idRecipe` int(11) NOT NULL AUTO_INCREMENT,
   `recipeMethod` varchar(2500) DEFAULT NULL,
   PRIMARY KEY (`idRecipe`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -252,7 +269,7 @@ CREATE TABLE `recipeToRecipeSteps` (
   KEY `recipeToRecipeSteps_idRecipeStep_id_fk` (`idRecipeStep`),
   CONSTRAINT `recipeToRecipeSteps_idRecipeStep_id_fk` FOREIGN KEY (`idRecipeStep`) REFERENCES `recipestep` (`idRecipeStep`),
   CONSTRAINT `recipeToRecipeSteps_idRecipe_id_fk` FOREIGN KEY (`idRecipe`) REFERENCES `recipe` (`idRecipe`)
-) ENGINE=InnoDB AUTO_INCREMENT=189 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=327 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -260,7 +277,7 @@ CREATE TABLE `recipestep` (
   `idRecipeStep` int(11) NOT NULL AUTO_INCREMENT,
   `recipestepOriginalIngredient` int(11) NOT NULL,
   `recipestepRecipeCardinalFloat` float NOT NULL,
-  `recipestepRecipeCardinalString` varchar(15) NOT NULL,
+  `recipestepRecipeCardinalString` varchar(15) CHARACTER SET latin1 NOT NULL,
   `recipestepRecipeOrdinal` int(11) NOT NULL,
   `recipestepRecipeDoze` int(11) NOT NULL,
   `recipestepAdIngredient` int(11) DEFAULT NULL,
@@ -271,7 +288,7 @@ CREATE TABLE `recipestep` (
   CONSTRAINT `recipestep_recipestepadingredient_id_fk` FOREIGN KEY (`recipestepAdIngredient`) REFERENCES `product` (`idProduct`),
   CONSTRAINT `recipestep_recipesteporiginalingredient_id_fk` FOREIGN KEY (`recipestepOriginalIngredient`) REFERENCES `product` (`idProduct`),
   CONSTRAINT `recipestep_recipesteprecipedoze_id_fk` FOREIGN KEY (`recipestepRecipeDoze`) REFERENCES `doze` (`idDoze`)
-) ENGINE=InnoDB AUTO_INCREMENT=191 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=329 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -281,8 +298,13 @@ CREATE TABLE `users` (
   `userPassword` varchar(250) NOT NULL,
   `userEmail` varchar(250) DEFAULT NULL,
   `userLastLogin` datetime NOT NULL,
+  `userFirstName` varchar(250) DEFAULT NULL,
+  `userLastName` varchar(250) DEFAULT NULL,
+  `userVerificationInitTime` datetime DEFAULT NULL,
+  `userVerificationCode` varchar(128) DEFAULT NULL,
+  `userVerificationComplete` int(1) DEFAULT NULL,
   PRIMARY KEY (`idUser`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;

@@ -106,8 +106,14 @@ func GetSession(w http.ResponseWriter, r *http.Request) (model.UserSession, bool
 				ClearSession(w, r)
 				return userSession, false
 			} else {
-				glog.Infoln("Authenticated")
-				return userSession, true
+				if !userSession.User.VerificationComplete {
+					glog.Infoln("User has not completed verification process")
+					ClearSession(w, r)
+					return userSession, false
+				} else {
+					glog.Infoln("Authenticated")
+					return userSession, true
+				}
 			}
 		}
 	}

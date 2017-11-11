@@ -13,8 +13,11 @@
     {{template "navbar" .}}
 
     <div class="container">
-        <div class="page-header">
-        </div>
+        <div class="row">
+    		<div class="col-xs-12">
+    			<hr height="30px" style="border-color: #FFF;">
+    		</div>
+	    </div>
         <div class="row">
             <div class="col-xs-12">
                 <div class="row">
@@ -80,8 +83,27 @@
         <span class="sr-only">Error:</span> {{.}}
     </div>
     {{ end }}
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password"><br><br>
+   
+    <table>
+        <tr>
+            <td>
+                <label for="password">Password&nbsp;</label>
+            </td>
+            <td>
+                <input type="password" id="password" name="password">
+    
+            </td>
+        </tr>
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+            <td>
+                <a style="text-decoration: none;" href="/forgotPasswdForm">Forgot Password?</a>
+            </td>
+        </tr>
+    </table>
+    <br><br>
     <!--<div class="g-recaptcha" data-sitekey=""></div>-->
     <hr style="border-color: #FFF;">
     <button type="submit">Login</button>

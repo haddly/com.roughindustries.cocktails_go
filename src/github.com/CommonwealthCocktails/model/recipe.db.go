@@ -5,9 +5,9 @@ package model
 import (
 	"bytes"
 	"github.com/CommonwealthCocktails/connectors"
+	"github.com/golang/glog"
 	"html"
 	"html/template"
-	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -31,18 +31,24 @@ func processRecipe(recipe Recipe) int {
 	var args []interface{}
 	var buffer bytes.Buffer
 	if recipe.ID == 0 {
-		buffer.WriteString("INSERT INTO `recipe` SET ")
+		buffer.WriteString("INSERT INTO `recipe` ( ")
 	} else {
 		buffer.WriteString("UPDATE `recipe` SET ")
 	}
 	if recipe.Method != "" {
-		buffer.WriteString("`recipeMethod`=?,")
+		if recipe.ID == 0 {
+			buffer.WriteString("`recipeMethod`,")
+		} else {
+			buffer.WriteString("`recipeMethod`=?,")
+		}
 		args = append(args, html.EscapeString(string(recipe.Method)))
 	}
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	if recipe.ID == 0 {
-		query = query + ";"
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
 	} else {
 		query = query + " WHERE `idRecipe`=?;"
 		args = append(args, strconv.Itoa(recipe.ID))
@@ -151,24 +157,26 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 	var buffer bytes.Buffer
-	buffer.WriteString("INSERT INTO `recipestep` SET ")
+	buffer.WriteString("INSERT INTO `recipestep` ( ")
 	if recipestep.OriginalIngredient.ID != 0 {
-		buffer.WriteString("`recipestepOriginalIngredient`=?,")
+		buffer.WriteString("`recipestepOriginalIngredient`,")
 		args = append(args, strconv.Itoa(recipestep.OriginalIngredient.ID))
 	}
-	buffer.WriteString("`recipestepRecipeCardinalFloat`=?,")
+	buffer.WriteString("`recipestepRecipeCardinalFloat`,")
 	args = append(args, strconv.FormatFloat(recipestep.RecipeCardinalFloat, 'f', -1, 32))
 	if recipestep.RecipeCardinalString != "" {
-		buffer.WriteString("`recipestepRecipeCardinalString`=?,")
+		buffer.WriteString("`recipestepRecipeCardinalString`,")
 		args = append(args, recipestep.RecipeCardinalString)
 	}
-	buffer.WriteString("`recipestepRecipeOrdinal`=?,")
+	buffer.WriteString("`recipestepRecipeOrdinal`,")
 	args = append(args, strconv.Itoa(recipestep.RecipeOrdinal))
-	buffer.WriteString("`recipestepRecipeDoze`=?,")
+	buffer.WriteString("`recipestepRecipeDoze`,")
 	args = append(args, strconv.Itoa(int(recipestep.RecipeDoze.ID)))
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
-	query = query + ";"
+	vals := strings.Repeat("?,", len(args))
+	vals = strings.TrimRight(vals, ",")
+	query = query + ") VALUES (" + vals + ");"
 	glog.Infoln(query)
 	res, err := conn.Exec(query, args...)
 	stepID, err := res.LastInsertId()
@@ -181,7 +189,7 @@ func processRecipeStep(recipestep RecipeStep, recipeID int64) {
 	}
 	glog.Infoln("Step ID = %d, affected = %d\n", stepID, rowCnt)
 	if recipestep.OriginalIngredient.ID < 1 {
-		rows, _ := conn.Query("SELECT idProduct, productName FROM product where productName=?;", recipestep.OriginalIngredient.ProductName)
+		rows, _ := conn.Query("SELECT idProduct, COALESCE(productName, '') FROM product where productName=?;", recipestep.OriginalIngredient.ProductName)
 		defer rows.Close()
 		var (
 			id   int
@@ -236,7 +244,7 @@ func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 	conn, _ := connectors.GetDB()
 	var args []interface{}
 	var buffer bytes.Buffer
-	buffer.WriteString("SELECT recipe.idRecipe, recipe.recipeMethod FROM recipe" +
+	buffer.WriteString("SELECT recipe.idRecipe, COALESCE(recipe.recipeMethod, '') FROM recipe" +
 		" JOIN cocktailToRecipe ON cocktailToRecipe.idRecipe=recipe.idRecipe" +
 		" JOIN  cocktail ON cocktailToRecipe.idCocktail=cocktail.idCocktail" +
 		" WHERE cocktail.idCocktail=?;")

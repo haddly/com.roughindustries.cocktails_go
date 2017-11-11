@@ -6,6 +6,7 @@ import (
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/CommonwealthCocktails/model"
 	"github.com/golang/glog"
+	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"strings"
@@ -33,15 +34,17 @@ var SystemStateStrings = [...]string{
 func (ss SystemStateConst) String() string { return SystemStateStrings[ss-1] }
 
 var (
-	State = Initialize
-	//BaseURL       = "??"
-	Valid_Tables  = []string{"altIngredient", "altnames", "cocktail", "cocktailToAKAs", "cocktailToAltNames", "cocktailToMetas", "cocktailToPosts", "cocktailToProducts", "cocktailToRecipe", "derivedProduct", "doze", "groupProduct", "grouptype", "meta", "metatype", "product", "producttype", "recipe", "recipeToRecipeSteps", "recipestep", "users", "usersessions"}
+	State         = Initialize
+	BaseURL       = ""
+	Valid_Tables  = []string{"cc_usermeta", "cc_usermetatype", "altIngredient", "altnames", "cocktail", "cocktailToAKAs", "cocktailToAltNames", "cocktailToMetas", "cocktailToPosts", "cocktailToProducts", "cocktailToRecipe", "derivedProduct", "doze", "groupProduct", "grouptype", "meta", "metatype", "product", "producttype", "recipe", "recipeToRecipeSteps", "recipestep", "userroles", "users", "usersessions"}
 	Ignore_Tables = []string{"sqlite_sequence"}
 )
 
 //Init to setup the http handlers
 func WWWRouterInit() {
 	glog.Infoln("Init in www/router.go")
+	glog.Infoln(viper.GetString("BaseURL"))
+	BaseURL = viper.GetString("BaseURL")
 	//Page Routing
 	http.Handle("/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
 	//Cocktail Routing
@@ -51,8 +54,8 @@ func WWWRouterInit() {
 	http.Handle("/cocktailsindex/", RecoverHandler(MethodsHandler(PageHandler(CocktailsIndexHandler), "GET")))
 	http.Handle("/cocktailsByMetaID", RecoverHandler(MethodsHandler(PageHandler(CocktailsByMetaIDHandler), "GET")))
 	http.Handle("/cocktailsByProductID", RecoverHandler(MethodsHandler(PageHandler(CocktailsByProductIDHandler), "GET")))
-	http.Handle("/cocktailModForm", RecoverHandler(MethodsHandler(AuthenticatedPageHandler(CocktailModFormHandler, false), "GET")))
-	http.Handle("/cocktailMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateCocktail, nil, CocktailModHandler, CocktailModFormHandler), "POST")))
+	http.Handle("/cocktailModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktail, nil, CocktailModFormHandler, LandingHandler), "GET")))
+	http.Handle("/cocktailMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateCocktail, RequiredCocktailMod, CocktailModHandler, CocktailModFormHandler), "POST")))
 	//Meta Routing
 	http.Handle("/metaModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateMeta, nil, MetaModFormHandler, LandingHandler), "GET")))
 	http.Handle("/metaMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateMeta, RequiredMetaMod, MetaModHandler, MetaModFormHandler), "POST")))
@@ -60,8 +63,8 @@ func WWWRouterInit() {
 	http.Handle("/product", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
 	http.Handle("/product/", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
 	http.Handle("/products", RecoverHandler(MethodsHandler(PageHandler(ProductsHandler), "GET")))
-	http.Handle("/productModForm", RecoverHandler(MethodsHandler(AuthenticatedPageHandler(ProductModFormHandler, false), "GET")))
-	http.Handle("/productMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateMeta, nil, ProductModHandler, ProductModFormHandler), "POST")))
+	http.Handle("/productModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateProduct, nil, ProductModFormHandler, LandingHandler), "GET")))
+	http.Handle("/productMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateProduct, RequiredProductMod, ProductModHandler, ProductModFormHandler), "POST")))
 	//Static routing
 	http.Handle("/images/", MethodsHandler(http.StripPrefix("/images/", http.FileServer(http.Dir("./view/webcontent/www/images"))), "GET"))
 	http.Handle("/font-awesome/", MethodsHandler(http.StripPrefix("/font-awesome/", http.FileServer(http.Dir("./view/webcontent/www/font-awesome"))), "GET"))
@@ -84,6 +87,15 @@ func WWWRouterInit() {
 	http.Handle("/GoogleCallback", RecoverHandler(MethodsHandler(PageHandler(handleGoogleCallback), "GET")))
 	http.Handle("/FacebookLogin", RecoverHandler(MethodsHandler(PageHandler(handleFacebookLogin), "GET")))
 	http.Handle("/FacebookCallback", RecoverHandler(MethodsHandler(PageHandler(handleFacebookCallback), "GET")))
+	//Register Routing
+	http.Handle("/registerForm", RecoverHandler(MethodsHandler(PageHandler(registerHandler), "GET")))
+	http.Handle("/register", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateRegister, RequiredRegister, registerFormHandler, registerHandler), "POST")))
+	http.Handle("/verifyregistration", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateEmailCode, RequiredEmailCode, verifyRegisterHandler, verifyRegisterHandler), "GET")))
+	//Forgot Password
+	http.Handle("/forgotPasswdForm", RecoverHandler(MethodsHandler(PageHandler(forgotPasswdHandler), "GET")))
+	http.Handle("/forgotPasswd", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateForgotPasswd, RequiredForgotPasswd, forgotPasswdFormHandler, forgotPasswdHandler), "POST")))
+	http.Handle("/passwdResetForm", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateEmailCode, RequiredEmailCode, resetPasswdHandler, resetPasswdHandler), "GET")))
+	http.Handle("/passwdReset", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateResetPasswd, RequiredResetPasswd, resetPasswdFormHandler, resetPasswdHandler), "POST")))
 	//Social Routing
 	http.Handle("/cocktailsocialpost", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktailSocialPost, nil, CocktailSocialPostHandler, nil), "GET")))
 }
@@ -109,6 +121,7 @@ func AuthenticatedPageHandler(pass func(http.ResponseWriter, *http.Request, *pag
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		page := NewPage(w, r)
 		page.State = State
+		page.BaseURL = BaseURL
 		if page.Authenticated {
 			pass(w, r, page)
 			return
@@ -126,40 +139,57 @@ func AuthenticatedPageHandler(pass func(http.ResponseWriter, *http.Request, *pag
 
 //This loads the page into the page datastruct, authenticates, and validates.
 //You can ignore authentication by setting the ignoreAuth flag.
-func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, validator func(http.ResponseWriter, *http.Request, *page) bool, require func(*page) bool, pass func(http.ResponseWriter, *http.Request, *page), fail func(http.ResponseWriter, *http.Request, *page)) http.Handler {
+func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, validator func(http.ResponseWriter, *http.Request, *page) bool, require func(http.ResponseWriter, *http.Request, *page) bool, pass func(http.ResponseWriter, *http.Request, *page), fail func(http.ResponseWriter, *http.Request, *page)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		page := NewPage(w, r)
 		page.State = State
+		page.BaseURL = BaseURL
 		if page.Authenticated || ignoreAuth {
-			//Validate the form input and populate the meta data
-			if validator(w, r, page) {
-				//validate the CSRF ID to make sure we don't double submit or
-				//have an attack
-				if !ignoreCSRF && !ValidateCSRF(r, page) {
-					http.Redirect(w, r, "/logout", 302)
-					return
-				} else {
-					//was a require fields method passed
-					if require != nil {
-						//check for required fields
-						if !require(page) {
-							pass(w, r, page)
+			//was a require fields method passed
+			if require != nil {
+				//check for required fields
+				if !require(w, r, page) {
+					//Validate the form input and populate the meta data
+					if validator(w, r, page) {
+						//validate the CSRF ID to make sure we don't double submit or
+						//have an attack
+						if !ignoreCSRF && !ValidateCSRF(r, page) {
+							http.Redirect(w, r, "/logout", 302)
+							return
 						} else {
-							//check for required failed
-							glog.Infoln("Missing required fields!")
-							fail(w, r, page)
+							pass(w, r, page)
 							return
 						}
 					} else {
-						pass(w, r, page)
+						//Validation failed
+						glog.Infoln("Bad validation!")
+						fail(w, r, page)
+						return
 					}
+				} else {
+					//check for required failed
+					glog.Infoln("Missing required fields!")
+					fail(w, r, page)
 					return
 				}
 			} else {
-				//Validation failed
-				glog.Infoln("Bad validation!")
-				fail(w, r, page)
-				return
+				//Validate the form input and populate the meta data
+				if validator(w, r, page) {
+					//validate the CSRF ID to make sure we don't double submit or
+					//have an attack
+					if !ignoreCSRF && !ValidateCSRF(r, page) {
+						http.Redirect(w, r, "/logout", 302)
+						return
+					} else {
+						pass(w, r, page)
+						return
+					}
+				} else {
+					//Validation failed
+					glog.Infoln("Bad validation!")
+					fail(w, r, page)
+					return
+				}
 			}
 		} else if ignoreLogout {
 			glog.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")

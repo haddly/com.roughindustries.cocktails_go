@@ -32,6 +32,7 @@
                         <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{if not .UserSession.User.Username}}{{if .UserSession.IsDefaultUser}}default{{end}}{{end}}{{if .UserSession.User.Username}}{{.UserSession.User.Username}}{{end}} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             {{if .AllowAdmin}}
+                            {{if eq .UserSession.User.Role 1 2}}
                             <li class="dropdown-header">Modify</li>
                             <li><a href="/cocktailModForm" onClick="toggleLoader()">Modify Cocktail</a></li>
                             <li><a href="/productModForm" onClick="toggleLoader()">Modify Product</a></li>
@@ -46,6 +47,7 @@
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">Admin</li>
                             <li role="separator" class="divider"></li>
+                            {{end}}
                             {{end}}
                             <li><a href="/logout">Logout</a></li>
                         </ul>
@@ -63,6 +65,7 @@
                             <li><a href="/loginIndex">Login</a></li>
                             <li><a href="/GoogleLogin">Login with Google</a></li>
                             <li><a href="/FacebookLogin">Login with Facebook</a></li>
+                            <li><a href="/registerForm">Signup</a></li>
                         </ul>
                     </li> {{end}}
                 </li>

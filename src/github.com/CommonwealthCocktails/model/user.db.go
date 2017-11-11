@@ -13,6 +13,119 @@ import (
 )
 
 //CREATE, UPDATE, DELETE
+//Insert a user record into the database
+func (user *User) InsertUser() int {
+	//set the ID to zero to indicate an insert
+	user.ID = 0
+	return user.processUser()
+}
+
+//Update a user record in the database based on ID
+func (user *User) UpdateUser() int {
+	return user.processUser()
+}
+
+//process a user record into the database for update and insert
+func (user *User) processUser() int {
+	conn, _ := connectors.GetDB() //get db connection
+	var args []interface{}        //arguments for variables in the data struct
+	var buffer bytes.Buffer       //buffer for the query
+
+	//If the ID is zero then do an insert else do an update based on the ID
+	if user.ID == 0 {
+		buffer.WriteString("INSERT INTO `users` ( ")
+	} else {
+		buffer.WriteString("UPDATE `users` SET ")
+	}
+
+	//Append the correct columns to be added based on data available in the
+	//data structure
+	if user.Username != "" {
+		if user.ID == 0 {
+			buffer.WriteString("`userName`,")
+		} else {
+			buffer.WriteString("`userName`=?,")
+		}
+		args = append(args, html.EscapeString(user.Username))
+	}
+	if user.Password != "" {
+		if user.ID == 0 {
+			buffer.WriteString("`userPassword`,")
+		} else {
+			buffer.WriteString("`userPassword`=?,")
+		}
+		args = append(args, user.Password)
+	}
+	if user.Email != "" {
+		if user.ID == 0 {
+			buffer.WriteString("`userEmail`,")
+		} else {
+			buffer.WriteString("`userEmail`=?,")
+		}
+		args = append(args, user.Email)
+	}
+	if user.VerificationCode != "" {
+		if user.ID == 0 {
+			buffer.WriteString("`userVerificationCode`,")
+		} else {
+			buffer.WriteString("`userVerificationCode`=?,")
+		}
+		args = append(args, user.VerificationCode)
+	}
+	if user.FirstName != "" {
+		if user.ID == 0 {
+			buffer.WriteString("`userFirstName`,")
+		} else {
+			buffer.WriteString("`userFirstName`=?,")
+		}
+		args = append(args, user.FirstName)
+	}
+	if user.LastName != "" {
+		if user.ID == 0 {
+			buffer.WriteString("`userLastName`,")
+		} else {
+			buffer.WriteString("`userLastName`=?,")
+		}
+		args = append(args, user.LastName)
+	}
+	if user.ID == 0 {
+		buffer.WriteString("`userVerificationInitTime`,")
+	} else {
+		buffer.WriteString("`userVerificationInitTime`=?,")
+	}
+	args = append(args, user.VerificationInitTime)
+	if user.ID == 0 {
+		buffer.WriteString("`userVerificationComplete`,")
+	} else {
+		buffer.WriteString("`userVerificationComplete`=?,")
+	}
+	args = append(args, user.VerificationComplete)
+
+	//Cleanup the query and append where if it is an update
+	query := buffer.String()
+	query = strings.TrimRight(query, ",")
+	if user.ID == 0 {
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
+	} else {
+		query = query + " WHERE `idUser`=?;"
+		args = append(args, user.ID)
+	}
+
+	//Lets do this thing
+	glog.Infoln(query)
+	ret := -1
+	r, err := conn.Exec(query, args...)
+	if err != nil {
+		glog.Error(err)
+		return ret
+	}
+	id, _ := r.LastInsertId()
+	ret = int(id)
+	return ret
+}
+
 //Insert a user session record into the database
 func (userSession *UserSession) InsertUserSession() int {
 	conn, _ := connectors.GetDB() //get db connection
@@ -121,7 +234,7 @@ func (userSession *UserSession) UpdateUserSession(prevSessionKey string) int {
 }
 
 //SELECTS
-//Get a user from the user id and/or the user name both of which should be
+//Get a user from the user id and the user name both of which should be
 //unique.
 func (user *User) SelectUser() *User {
 	var ret User
@@ -130,14 +243,14 @@ func (user *User) SelectUser() *User {
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
-	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail` FROM `users` WHERE ")
+	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail`, `userFirstName`, `userLastName`, `userVerificationInitTime`, `userVerificationCode`, `userVerificationComplete`, `userRole` FROM `users` WHERE ")
 	if user.ID != 0 {
-		buffer.WriteString(" `idUser`=? AND ")
+		buffer.WriteString("`idUser`=? AND ")
 		args = append(args, strconv.Itoa(user.ID))
 		canQuery = true
 	}
 	if user.Username != "" {
-		buffer.WriteString(" `userName`=?")
+		buffer.WriteString("`userName`=? AND ")
 		args = append(args, html.EscapeString(user.Username))
 		canQuery = true
 	}
@@ -153,11 +266,108 @@ func (user *User) SelectUser() *User {
 		}
 		defer rows.Close()
 		for rows.Next() {
-			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email)
+			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email, &ret.FirstName, &ret.LastName, &ret.VerificationInitTime, &ret.VerificationCode, &ret.VerificationComplete, &ret.Role)
 			if err != nil {
 				glog.Error(err)
 			}
-			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email)
+			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
+		}
+		err = rows.Err()
+		if err != nil {
+			glog.Error(err)
+		}
+	}
+	return &ret
+}
+
+//Get a user from the the user name or the email
+func (user *User) SelectUsersByIdORUsernameOREmail() []User {
+	var ret []User
+	conn, _ := connectors.GetDB()
+	glog.Infoln(user.Username)
+	var buffer bytes.Buffer
+	var canQuery = false
+	var args []interface{}
+	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail`, `userFirstName`, `userLastName`, `userVerificationInitTime`, `userVerificationCode`, `userVerificationComplete`, `userRole` FROM `users` WHERE ")
+	if user.ID != 0 {
+		buffer.WriteString("`idUser`=? OR ")
+		args = append(args, strconv.Itoa(user.ID))
+		canQuery = true
+	}
+	if user.Username != "" {
+		buffer.WriteString("`userName`=? OR ")
+		args = append(args, html.EscapeString(user.Username))
+		canQuery = true
+	}
+	if user.Email != "" {
+		buffer.WriteString("`userEmail`=? OR ")
+		args = append(args, html.EscapeString(user.Email))
+		canQuery = true
+	}
+
+	if canQuery {
+		query := buffer.String()
+		query = strings.TrimRight(query, " OR")
+		query = query + ";"
+		glog.Infoln(query)
+		rows, err := conn.Query(query, args...)
+		if err != nil {
+			glog.Error(err)
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var user User
+			err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.FirstName, &user.LastName, &user.VerificationInitTime, &user.VerificationCode, &user.VerificationComplete, &user.Role)
+			if err != nil {
+				glog.Error(err)
+			}
+			glog.Infoln(user.ID, user.Username, user.Password, user.Email, user.FirstName, user.LastName, user.VerificationInitTime, user.VerificationCode, user.VerificationComplete, user.Role)
+			ret = append(ret, user)
+		}
+		err = rows.Err()
+		if err != nil {
+			glog.Error(err)
+		}
+	}
+	return ret
+}
+
+//Check the database for a user based on verification code and email address
+func (user *User) SelectUserForVerification() *User {
+	var ret User
+	conn, _ := connectors.GetDB()
+	glog.Infoln(user.Username)
+	var buffer bytes.Buffer
+	var canQuery = false
+	var args []interface{}
+	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail`, `userFirstName`, `userLastName`, `userVerificationInitTime`, `userVerificationCode`, `userVerificationComplete`, `userRole` FROM `users` WHERE ")
+	if user.VerificationCode != "" {
+		buffer.WriteString(" `userVerificationCode`=? AND")
+		args = append(args, html.EscapeString(user.VerificationCode))
+		canQuery = true
+	}
+	if user.Email != "" {
+		buffer.WriteString("`userEmail`=? AND")
+		args = append(args, user.Email)
+		canQuery = true
+	}
+	if canQuery {
+		query := buffer.String()
+		query = strings.TrimRight(query, " AND")
+		query = query + ";"
+		glog.Infoln(query)
+		rows, err := conn.Query(query, args...)
+		if err != nil {
+			glog.Error(err)
+			return nil
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email, &ret.FirstName, &ret.LastName, &ret.VerificationInitTime, &ret.VerificationCode, &ret.VerificationComplete, &ret.Role)
+			if err != nil {
+				glog.Error(err)
+			}
+			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
 		}
 		err = rows.Err()
 		if err != nil {
@@ -176,7 +386,7 @@ func (user *User) SelectUserForLogin(isOauth bool) *User {
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
-	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail` FROM `users` WHERE ")
+	buffer.WriteString("SELECT `idUser`, `userName`, `userPassword`, `userEmail`, `userFirstName`, `userLastName`, `userVerificationInitTime`, `userVerificationCode`, `userVerificationComplete`, `userRole` FROM `users` WHERE ")
 	if user.Username != "" {
 		buffer.WriteString(" `userName`=? AND")
 		args = append(args, html.EscapeString(user.Username))
@@ -202,11 +412,11 @@ func (user *User) SelectUserForLogin(isOauth bool) *User {
 		}
 		defer rows.Close()
 		for rows.Next() {
-			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email)
+			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email, &ret.FirstName, &ret.LastName, &ret.VerificationInitTime, &ret.VerificationCode, &ret.VerificationComplete, &ret.Role)
 			if err != nil {
 				glog.Error(err)
 			}
-			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email)
+			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
 		}
 		err = rows.Err()
 		if err != nil {

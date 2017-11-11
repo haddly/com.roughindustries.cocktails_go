@@ -13,6 +13,7 @@ func BookRouterInit() {
 	glog.Infoln("Init in book/router.go")
 	http.Handle("/book", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
 	http.Handle("/book/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
+	http.Handle("/book/cocktail", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
 }
 
 //This only loads the page into the page datastruct, there is no authentication

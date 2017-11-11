@@ -649,6 +649,7 @@
 <!--TOD             []Meta-->
 <!--Ratio           []Meta-->
 <!--Family          []Meta-->
+<!--Style           []Meta-->
 <!--etc-->
 {{define "cocktailMetas"}}
 <!---->
@@ -684,6 +685,9 @@
                         {{end}} {{end}}
                         {{if eq .MetaType.ID 11}} {{range $mi, $me := .Metas}}
                         <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.TOD}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 14}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Style}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
                         {{end}} {{end}}
                     {{else}}
                     <select class="form-control" name="{{.MetaType.MetaTypeNameNoSpaces}}">

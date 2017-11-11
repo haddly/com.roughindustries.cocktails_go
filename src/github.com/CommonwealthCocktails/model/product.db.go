@@ -32,70 +32,130 @@ func (product *Product) processProduct() int {
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	if product.ID == 0 {
-		buffer.WriteString("INSERT INTO `product` SET ")
+		buffer.WriteString("INSERT INTO `product` ( ")
 	} else {
 		buffer.WriteString("UPDATE `product` SET ")
 	}
 	if product.ProductName != "" {
-		buffer.WriteString("`productName`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productName`,")
+		} else {
+			buffer.WriteString("`productName`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.ProductName)))
 	}
-	buffer.WriteString(" `productType`=?,")
+	if product.ID == 0 {
+		buffer.WriteString("`productType`,")
+	} else {
+		buffer.WriteString(" `productType`=?,")
+	}
 	args = append(args, strconv.Itoa(int(product.ProductType.ID)))
-	buffer.WriteString(" `productGroupType`=?,")
+	if product.ID == 0 {
+		buffer.WriteString("`productGroupType`,")
+	} else {
+		buffer.WriteString(" `productGroupType`=?,")
+	}
 	args = append(args, strconv.Itoa(int(product.ProductGroupType)))
 	if product.Description != "" {
-		buffer.WriteString("`productDescription`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productDescription`,")
+		} else {
+			buffer.WriteString(" `productDescription`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.Description)))
 	}
 	if product.Details != "" {
-		buffer.WriteString("`productDetails`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productDetails`,")
+		} else {
+			buffer.WriteString(" `productDetails`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.Details)))
 	}
 	if product.PreText != "" {
-		buffer.WriteString("`productPreText`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productPreText`,")
+		} else {
+			buffer.WriteString(" `productPreText`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.PreText)))
 	}
 	if product.PostText != "" {
-		buffer.WriteString("`productPostText`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productPostText`,")
+		} else {
+			buffer.WriteString(" `productPostText`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.PostText)))
 	}
 	if product.Rating != 0 {
-		buffer.WriteString(" `productRating`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productRating`,")
+		} else {
+			buffer.WriteString(" `productRating`=?,")
+		}
 		args = append(args, strconv.Itoa(product.Rating))
 	}
 	if product.ImagePath != "" {
-		buffer.WriteString("`productImagePath`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productImagePath`,")
+		} else {
+			buffer.WriteString(" `productImagePath`=?,")
+		}
 		args = append(args, product.ImagePath)
 	}
 	if product.Image != "" {
-		buffer.WriteString("`productImage`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productImage`,")
+		} else {
+			buffer.WriteString(" `productImage`=?,")
+		}
 		args = append(args, product.Image)
 	}
 	if product.ImageSourceName != "" {
-		buffer.WriteString("`productImageSourceName`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productImageSourceName`,")
+		} else {
+			buffer.WriteString(" `productImageSourceName`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.ImageSourceName)))
 	}
 	if product.ImageSourceLink != "" {
-		buffer.WriteString("`productImageSourceLink`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productImageSourceLink`,")
+		} else {
+			buffer.WriteString(" `productImageSourceLink`=?,")
+		}
 		args = append(args, product.ImageSourceLink)
 	}
 	if product.SourceName != "" {
-		buffer.WriteString("`productSourceName`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productSourceName`,")
+		} else {
+			buffer.WriteString(" `productSourceName`=?,")
+		}
 		args = append(args, html.EscapeString(string(product.SourceName)))
 	}
 	if product.SourceLink != "" {
-		buffer.WriteString("`productSourceLink`=?,")
+		if product.ID == 0 {
+			buffer.WriteString("`productSourceLink`,")
+		} else {
+			buffer.WriteString(" `productSourceLink`=?,")
+		}
 		args = append(args, product.SourceLink)
 	}
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	if product.ID == 0 {
-		query = query + ";"
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
 	} else {
 		query = query + " WHERE `idProduct`=?;"
 		args = append(args, strconv.Itoa(int(product.ID)))
 	}
+	glog.Infoln(product)
+	glog.Infoln(args)
 	glog.Infoln(query)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
@@ -124,12 +184,16 @@ func (productgroup *GroupProduct) processGroupProduct() {
 	if len(groupproduct) > 0 {
 		for _, productItem := range productgroup.Products {
 			product := productItem.SelectProduct()
+			args = args[:0]
 			if len(product) > 0 {
 				query := "INSERT INTO `groupProduct` (`idBaseProduct`, `idProduct`) VALUES (?, ?);"
 				args = append(args, strconv.Itoa(groupproduct[0].ID))
 				args = append(args, strconv.Itoa(product[0].ID))
 				glog.Infoln(query)
-				conn.Exec(query, args...)
+				_, err := conn.Exec(query, args...)
+				if err != nil {
+					glog.Errorln(err)
+				}
 			}
 		}
 	}
@@ -275,12 +339,14 @@ func (product *Product) SelectProduct() []Product {
 	defer rows.Close()
 	for rows.Next() {
 		var prod Product
+		var name string
 		var desc string
 		var details string
-		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
 		if err != nil {
 			glog.Error(err)
 		}
+		prod.ProductName = template.HTML(html.UnescapeString(name))
 		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.Details = template.HTML(html.UnescapeString(details))
 		ret = append(ret, prod)
@@ -459,8 +525,8 @@ func (product *Product) SelectAllProducts() []Product {
 	var ret []Product
 	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
-	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, '')," +
-		" COALESCE(productImage, '') FROM product;")
+	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, ''), " +
+		"COALESCE(productImage, ''), COALESCE(`productPreText`, ''), COALESCE(`productPostText`, '') FROM product ORDER BY productName;")
 	query := buffer.String()
 	glog.Infoln(query)
 	rows, err := conn.Query(query)
@@ -469,16 +535,18 @@ func (product *Product) SelectAllProducts() []Product {
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var name string
 		var desc string
 		var pt int
 		var prod Product
-		err := rows.Scan(&prod.ID, &prod.ProductName, &pt, &desc, &prod.ImagePath, &prod.Image)
-		prod.Description = template.HTML(desc)
+		err := rows.Scan(&prod.ID, &name, &pt, &desc, &prod.ImagePath, &prod.Image, &prod.PreText, &prod.PostText)
+		prod.ProductName = template.HTML(html.UnescapeString(name))
+		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.ProductType.ID = pt
 		if err != nil {
 			glog.Error(err)
 		}
-		glog.Infoln(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
+		glog.Infoln(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image, prod.PreText, prod.PostText)
 		ret = append(ret, prod)
 	}
 	err = rows.Err()
@@ -523,13 +591,15 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var name string
 		var prod Product
 		var desc string
 		var details string
-		err := rows.Scan(&prod.ID, &prod.ProductName, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
 		if err != nil {
 			glog.Error(err)
 		}
+		prod.ProductName = template.HTML(html.UnescapeString(name))
 		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.Details = template.HTML(html.UnescapeString(details))
 		glog.Infoln(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)

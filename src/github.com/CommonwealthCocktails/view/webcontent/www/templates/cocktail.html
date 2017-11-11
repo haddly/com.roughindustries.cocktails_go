@@ -38,6 +38,7 @@
 					</div>
 					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 						{{template "cocktailimage" .}}
+					</div>
 					<div class="col-xs-0 col-sm-3 col-md-3 col-lg-3">
 						&nbsp;
 					</div>
@@ -142,7 +143,9 @@
 								<div class="row">
 									{{template "techniquebuttons" .}}
 								</div>
-								
+								<div class="row">
+									{{template "stylebuttons" .}}
+								</div>
 							</div>
 							<div class="col-sm-6 col-xs-12 clearfix">
 								<div class="row">
@@ -160,23 +163,26 @@
 								<div class="row">
 									{{template "familybuttons" .}}
 								</div>
+								<div class="row">
+									{{template "occasionbuttons" .}}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-1">
-			</div>
+			<!--<div class="col-md-1">-->
+			<!--</div>-->
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
 				<div align="center" class="row">
-
+					&nbsp;
 				</div>
 				<br>
 				<div class="row">
 					<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
 						<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
-							<span style="font-size: 16px; background-color: white; padding: 0 10px;">Related Cocktails <!--Padding is optional--></span>
+							<span style="font-size: 16px; background-color: white; padding: 0 10px;">Coming Soon<!--Related Cocktails Padding is optional--></span>
 						</div>
 					</div>
 				</div>
@@ -231,15 +237,14 @@
 			<i class="fa fa-external-link"></i>
 		</a>
 	</h6>
-	</div>
 </div>
 {{end}}
 
 <!--Cocktail Link Bar-->
 {{define "cocktaillinkbar"}}
 {{with .CocktailSet}}
-<div class="fb-share-button" style="display: inline-block;" data-href="https://{{$.BaseURL}}/cocktail?cocktailID={{.Cocktail.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true">
-	<a class="btn btn-default btn-sm" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2F{{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&amp;src=sdkpreparse">
+<div class="fb-share-button" style="display: inline-block;" data-href="{{$.BaseURL}}/cocktail?cocktailID={{.Cocktail.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true">
+	<a class="btn btn-default btn-sm" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&amp;src=sdkpreparse">
 		<i class="fa fa-facebook"></i>
 	</a>
 </div>
@@ -256,17 +261,17 @@
 
 <div class="btn btn-default btn-sm" style="display: inline-block;" >
 	<a target="_blank" class="twitter-share-button" data-dnt="true"
-  href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Name}}&url=https%3A%2F%2F{{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
+  href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
 		<i style="color: black;" class="fa fa-twitter"></i>
 	</a>
 </div>
 
-<!--<a href="mailto:someone@example.com?subject=Great Cocktail from Commonwealth Cocktails&body=Hi,I found this website and thought you might like it https://{{$.BaseURL}}/" class="btn btn-default btn-sm" title="Email">-->
+<!--<a href="mailto:someone@example.com?subject=Great Cocktail from Commonwealth Cocktails&body=Hi,I found this website and thought you might like it {{$.BaseURL}}/" class="btn btn-default btn-sm" title="Email">-->
 <!--	<i class="fa fa-envelope"></i>-->
 <!--</a>-->
 
 <div class="btn btn-default btn-sm" style="display: inline-block;" >
-<a data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url=https%3A%2F%2F{{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&media=&description=">
+<a data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&media=&description=">
 	<i style="color: black;" class="fa fa-pinterest"></i>
 </a>
 </div>
@@ -305,6 +310,12 @@
 			<a title="Related Cocktails" href="/cocktailsByIngredientID?ID={{.OriginalIngredient.ID}}">
 				<i style="display: table-cell; font-size: 0.73em; color: black; vertical-align: middle;" class="fa fa-glass"></i>
 			</a>
+			&nbsp;
+			{{if .OriginalIngredient.AmazonLink}}
+				<a title="Recommend Product" target="_blank" href="{{.OriginalIngredient.AmazonLink}}">
+					<i style="display: table-cell; font-size: 0.73em; color: black; vertical-align: middle;" class="fa fa-amazon"></i>
+				</a>
+			{{end}}
 			{{end}}
 		</div>
 	</td>
@@ -532,6 +543,30 @@
 </div>
 <div class="col-xs-7 x-recipe-preparation">
 	{{range .Cocktail.TOD}}
+		{{template "metadatabutton" .}}
+	{{end}}
+</div>
+{{end}}
+
+<!--Occasion-->
+{{define "occasionbuttons"}}
+<div class="col-xs-5 text-right no-wrap">
+	<p>Occasion:</p>
+</div>
+<div class="col-xs-7 x-recipe-preparation">
+	{{range .Cocktail.Occasion}}
+		{{template "metadatabutton" .}}
+	{{end}}
+</div>
+{{end}}
+
+<!--Style-->
+{{define "stylebuttons"}}
+<div class="col-xs-5 text-right no-wrap">
+	<p>Style:</p>
+</div>
+<div class="col-xs-7 x-recipe-preparation">
+	{{range .Cocktail.Style}}
 		{{template "metadatabutton" .}}
 	{{end}}
 </div>

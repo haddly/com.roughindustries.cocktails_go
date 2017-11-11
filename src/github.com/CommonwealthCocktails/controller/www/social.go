@@ -20,7 +20,7 @@ func CocktailSocialPostHandler(w http.ResponseWriter, r *http.Request, page *pag
 	if err == nil {
 		glog.Infoln(page_res)
 		res, _ := fb.Post("/774837096005400/feed?", fb.Params{
-			"link":         "https://cocktails-go-roughindustries.c9users.io/cocktail?cocktailID=" + strconv.Itoa(page.Cocktail.ID),
+			"link":         page.BaseURL + "/cocktail?cocktailID=" + strconv.Itoa(page.Cocktail.ID),
 			"access_token": page_res["access_token"],
 		})
 		glog.Infoln("here is the facebook results:", res)

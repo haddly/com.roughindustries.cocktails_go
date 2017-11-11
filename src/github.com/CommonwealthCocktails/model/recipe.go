@@ -46,18 +46,32 @@ const (
 	TopOffWith
 	Fresh
 	Splash
+	Leaf
+	Drop
+	Segment
+	Grind
+	Pinch
+	Wedge
+	Teaspoon
 )
 
 //String values for the int consts
 var DozeStrings = [...]string{
-	"shot",
-	"oz.",
+	"shot(s)",
+	"ounce(s)",
 	"whole",
-	"dash",
-	"slice",
+	"dash(es)",
+	"slice(s)",
 	"top off with",
 	"fresh",
-	"splash",
+	"splash(es)",
+	"leaf(ves)",
+	"drop(s)",
+	"segment(s)",
+	"grind(s)",
+	"pinch(es)",
+	"wedge(s)",
+	"teaspoon(s)",
 }
 
 // String returns the English name of the doze ("Shot", "Ounce", ...).

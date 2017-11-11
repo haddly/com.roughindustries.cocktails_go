@@ -42,6 +42,7 @@
             <div class="col-xs-12">
                 <div class="row">
                     <form method="post" action="/productMod" id="productModForm" autocomplete="nope">
+                        <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
                         {{template "productID" .}}
                         <!---->
                         {{template "productName" .}}

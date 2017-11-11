@@ -1,0 +1,108 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{with .CocktailSet}}
+	<!-- Page Content -->
+	<table border="0" style="max-width:500px">
+		<tbody >
+			<tr align="center" width="100%">
+				<td align="center" colspan="2">{{template "cocktailpageheader" .}}</td>
+			</tr>
+			<!--<tr width="100%">-->
+			<!--	<td align="left" colspan="2">-->
+			<!--		<h3>Cocktail Description</h3>-->
+			<!--		<p itemprop="description">{{.Cocktail.Description}}</p>-->
+			<!--	</td>-->
+			<!--</tr>-->
+			<tr>
+				<td valign="top">{{template "cocktailimage" .}}</td>
+				<td>
+					<h3>Cocktail Details</h3>
+					<table align="left" border="0" cellpadding="1" cellspacing="1">
+						<tbody>
+							{{template "cocktailrecipeblock" .}}
+							<tr width="100%">
+								<td align="left" colspan="6">
+									<h3>Method</h3>
+									{{with .Cocktail.Recipe}}
+									<p itemprop="recipeInstructions">{{.Method}}</p>{{end}}</td>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			
+		</tbody>
+	</table>
+	{{end}}
+</body>
+
+</html>
+{{end}}
+
+<!--Cocktail Page Header-->
+{{define "cocktailpageheader"}}
+<h3 itemprop="name" align="center">{{.Cocktail.Name}}</h3>
+{{end}}
+
+<!--Cocktail Image-->
+{{define "cocktailimage"}}
+<div align="left" style="position: relative;">
+	{{if .Cocktail.Image}} {{if .Cocktail.ImagePath}}
+	<img style="max-height: 150px;" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}"/> {{else}}
+	<img tyle="max-height: 150px;" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}"/> {{end}} {{else}}
+	<img tyle="max-height: 150px;" src="https://placehold.it/600x600"/> {{end}}
+</div>
+{{end}}
+
+<!--Coctail Recipe Block-->
+{{define "cocktailrecipeblock"}}
+<meta itemprop="prepTime" content="PT02M0S" />
+<meta itemprop="totalTime" content="PT02M0S" /> {{with .Cocktail.Recipe}} {{range .RecipeSteps}}
+<tr>
+	{{if .RecipeCardinalString}}
+	<td valign="top" style="white-space: nowrap;">{{.RecipeCardinalString}}</td>
+	{{else}}
+	<td valign="top" style="white-space: nowrap;">&nbsp;</td>
+	{{end}}
+	<td valign="top" width="10">&nbsp;</td>
+	<td valign="top" style="white-space: nowrap;">{{.RecipeDoze}}</td>
+	<td valign="top" width="10">&nbsp;</td>
+	<td valign="top">
+		<div class="iconlink">
+			{{if .AdIngredient.ProductName}}
+			<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
+				{{if .AdIngredient.PreText}}
+				{{.AdIngredient.PreText}}&nbsp; 
+				{{end}} 
+				{{.AdIngredient.ProductName}}&nbsp;{{.AdIngredient.PostText}} </a>
+			</a> {{else}}
+			<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
+				{{if .OriginalIngredient.PreText}}
+				{{.OriginalIngredient.PreText}}&nbsp; 
+				{{end}} 
+				{{.OriginalIngredient.ProductName}}&nbsp;{{.OriginalIngredient.PostText}}
+			</a> {{end}}
+		</div>
+	</td>
+	<meta itemprop="recipeIngredient" content="{{if .RecipeCardinalString}}{{.RecipeCardinalString}} {{end}}{{.RecipeDoze}} {{if .OriginalIngredient.PreText}}{{.OriginalIngredient.PreText}} {{end}}{{.OriginalIngredient.ProductName}} {{.OriginalIngredient.PostText}}"
+	/>
+</tr>
+{{end}} {{end}} {{end}}
+
+<!--Derived Cocktails-->
+{{define "derivedcocktails"}}
+<h3>Derived Cocktails</h3>
+{{range .ChildCocktails}}
+<a style="text-decoration : none;" href="/cocktail?ID={{.ID}}">
+	<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.Name}}</span>
+</a> {{end}} {{end}}

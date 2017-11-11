@@ -9,18 +9,23 @@ import (
 //DATA STRUCTURES
 //User data structure.
 type User struct {
-	ID                int
-	Username          string
-	FullName          string
-	Password          string
-	IsDisabled        bool
-	Roles             string
-	Email             string
-	Authenticated     bool
-	LastLogin         time.Time
-	GoogleAccessToken string
-	FBAccessToken     string
-	Errors            map[string]string
+	ID                   int
+	Username             string
+	FirstName            string
+	LastName             string
+	Password             string
+	NewPassword          string
+	IsDisabled           bool
+	Role                 UserRole
+	Email                string
+	VerificationCode     string
+	VerificationInitTime time.Time
+	VerificationComplete bool
+	Authenticated        bool
+	LastLogin            time.Time
+	GoogleAccessToken    string
+	FBAccessToken        string
+	Errors               map[string]string
 }
 
 //User session data structure.  Keeps track of users logged in or accessing the
@@ -40,19 +45,23 @@ type UserSession struct {
 }
 
 //ENUMERATIONS - These must match the database one for one in both ID and order
-//The integer values for the producttype enumeration
-type RolesConst int
+//The integer values for the userrole enumeration
+type UserRole int
 
 const (
-	Administrator = 1 + iota
-	Contributor
+	SuperAdmin = 1 + iota
+	Admin
+	Viewer
+	Editor
 )
 
-//The string values for the producttype enumeration
-var RolesStrings = [...]string{
+//The string values for the userrole enumeration
+var UserRoleStrings = [...]string{
+	"Super Administrator",
 	"Administrator",
-	"Contributor",
+	"Viewer",
+	"Editor",
 }
 
-// String returns the English name of the Roles ("Administrator", "Contributor", ...).
-func (rt RolesConst) String() string { return RolesStrings[rt-1] }
+// String returns the English name of the Roles ("Administrator", "Viewer", ...).
+func (ur UserRole) String() string { return UserRoleStrings[ur-1] }

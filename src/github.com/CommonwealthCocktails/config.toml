@@ -1,0 +1,11 @@
+#BaseURL = ""
+#dbaddr = ""
+#dbpasswd = ""
+#user = ""
+#proto = ""
+#port = ""
+#dbname = ""
+#MySQL, SQLite
+#dbtype = ""
+#mc_server = ""
+

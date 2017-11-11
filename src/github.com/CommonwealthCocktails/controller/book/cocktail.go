@@ -1,5 +1,5 @@
 // Copyright 2017 Rough Industries LLC. All rights reserved.
-//controller/www/cocktail.go: Functions and handlers for dealing with cocktails.
+//controller/book/cocktail.go: Functions and handlers for dealing with cocktails.
 //TODO: migrate cocktail by meta or product id to a single function that
 //is passed a meta or a product id parameter
 package book
@@ -7,6 +7,7 @@ package book
 import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/golang/glog"
+	"html"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -46,7 +47,7 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 		page.Cocktail.Title = r.Form["cocktailTitle"][0]
 	}
 	if len(r.Form["cocktailName"]) > 0 && strings.TrimSpace(r.Form["cocktailName"][0]) != "" {
-		page.Cocktail.Name = r.Form["cocktailName"][0]
+		page.Cocktail.Name = template.HTML(html.EscapeString(r.Form["cocktailName"][0]))
 	}
 	if len(r.Form["cocktailDisplayName"]) > 0 {
 		page.Cocktail.DisplayName = r.Form["cocktailDisplayName"][0]

@@ -9,6 +9,7 @@ src/github.com/CommonwealthCocktails/sql/*sqlite*
 src/cloud.google.com
 src/golang.org
 src/google.golang.org
+src/gopkg.in
 pkg/*
 sensitive.config
 !pkg/.gitkeep

@@ -3,11 +3,12 @@
 package www
 
 import (
+	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
 	"github.com/golang/glog"
 	"github.com/microcosm-cc/bluemonday"
+	"html"
 	"html/template"
-	"github.com/CommonwealthCocktails/model"
 	"net/http"
 	"strconv"
 	"strings"
@@ -104,10 +105,9 @@ func ValidateMeta(w http.ResponseWriter, r *http.Request, page *page) bool {
 	}
 	//Can be blank
 	if len(r.Form["metaBlurb"]) > 0 && strings.TrimSpace(r.Form["metaBlurb"][0]) != "" {
-		if govalidator.IsPrintableASCII(r.Form["metaBlurb"][0]) {
+		if govalidator.IsASCII(r.Form["metaBlurb"][0]) {
 			//sanitize the input, we don't want XSS
-			html := pUGCP.Sanitize(r.Form["metaBlurb"][0])
-			page.Meta.Blurb = template.HTML(html)
+			page.Meta.Blurb = template.HTML(pSP.Sanitize(html.EscapeString(r.Form["metaBlurb"][0])))
 		} else {
 			page.Meta.Errors["MetaBlurb"] = "Please enter a valid meta blurb. "
 		}
@@ -121,13 +121,15 @@ func ValidateMeta(w http.ResponseWriter, r *http.Request, page *page) bool {
 }
 
 //Checks the page meta struct that required fields are filled in.
-func RequiredMetaMod(page *page) bool {
+func RequiredMetaMod(w http.ResponseWriter, r *http.Request, page *page) bool {
+	page.User.Errors = make(map[string]string)
+	r.ParseForm() // Required if you don't call r.FormValue()
 	missingRequired := false
-	if strings.TrimSpace(page.Meta.MetaName) == "" {
+	if r.Form["metaName"] == nil || len(r.Form["metaName"]) == 0 || strings.TrimSpace(r.Form["metaName"][0]) == "" {
 		page.Meta.Errors["MetaName"] = "Meta name is required."
 		missingRequired = true
 	}
-	if page.Meta.MetaType.ID == 0 {
+	if r.Form["metaType"] == nil || len(r.Form["metaType"]) == 0 {
 		page.Meta.Errors["MetaType"] = "Meta type is required."
 		missingRequired = true
 	}

@@ -11,7 +11,7 @@ import (
 type Cocktail struct {
 	ID              int
 	Title           string
-	Name            string
+	Name            template.HTML
 	DisplayName     string
 	AlternateName   []Name
 	SpokenName      string
@@ -40,6 +40,7 @@ type Cocktail struct {
 	Strength        []Meta
 	Difficulty      []Meta
 	TOD             []Meta
+	Style           []Meta
 	Ratio           []Meta
 	Family          []Meta
 	Drink           []Meta

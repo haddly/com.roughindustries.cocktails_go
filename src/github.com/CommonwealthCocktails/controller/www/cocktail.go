@@ -6,7 +6,10 @@ package www
 
 import (
 	"github.com/CommonwealthCocktails/model"
+	"github.com/asaskevich/govalidator"
 	"github.com/golang/glog"
+	"github.com/microcosm-cc/bluemonday"
+	"html"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -175,20 +178,26 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request, page *p
 func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Cocktail.Errors = make(map[string]string)
 	r.ParseForm() // Required if you don't call r.FormValue()
-
-	if len(r.Form["cocktailID"]) > 0 {
-		if _, err := strconv.Atoi(r.Form["cocktailID"][0]); err == nil {
+	pUGCP := bluemonday.UGCPolicy()
+	pUGCP.AllowElements("img")
+	pSP := bluemonday.StrictPolicy()
+	glog.Infoln("Cocktail Validate")
+	if len(r.Form["cocktailID"]) > 0 && strings.TrimSpace(r.Form["cocktailID"][0]) != "" {
+		if govalidator.IsInt(r.Form["cocktailID"][0]) {
 			page.Cocktail.ID, _ = strconv.Atoi(r.Form["cocktailID"][0])
 		} else {
-			glog.Errorln("Invalid CocktailID: " + r.Form["cocktailID"][0])
-			page.Cocktail.Errors["CocktailID"] = "Invalid CocktailID"
+			page.Cocktail.Errors["CocktailID"] = "Please enter a valid cocktail id. "
 		}
 	}
 	if len(r.Form["cocktailTitle"]) > 0 {
 		page.Cocktail.Title = r.Form["cocktailTitle"][0]
 	}
 	if len(r.Form["cocktailName"]) > 0 && strings.TrimSpace(r.Form["cocktailName"][0]) != "" {
-		page.Cocktail.Name = r.Form["cocktailName"][0]
+		if govalidator.IsPrintableASCII(r.Form["cocktailName"][0]) {
+			page.Cocktail.Name = template.HTML(pSP.Sanitize(html.EscapeString(r.Form["cocktailName"][0])))
+		} else {
+			page.Cocktail.Errors["CocktailName"] = "Please enter a valid product name. "
+		}
 	}
 	if len(r.Form["cocktailDisplayName"]) > 0 {
 		page.Cocktail.DisplayName = r.Form["cocktailDisplayName"][0]
@@ -394,6 +403,24 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 			}
 		}
 	}
+	if len(r.Form["Occasion"]) > 0 {
+		for _, id := range r.Form["Occasion"] {
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				page.Cocktail.Occasion = append(page.Cocktail.Occasion, m)
+			}
+		}
+	}
+	if len(r.Form["Style"]) > 0 {
+		for _, id := range r.Form["Style"] {
+			if id != "" {
+				var m model.Meta
+				m.ID, _ = strconv.Atoi(id)
+				page.Cocktail.Style = append(page.Cocktail.Style, m)
+			}
+		}
+	}
 	if len(r.Form["Ratio"]) > 0 {
 		for _, id := range r.Form["Ratio"] {
 			if id != "" {
@@ -416,4 +443,16 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 		page.Errors["cocktailErrors"] = "You have errors in your input"
 	}
 	return len(page.Cocktail.Errors) == 0
+}
+
+//Checks the page meta struct that required fields are filled in.
+func RequiredCocktailMod(w http.ResponseWriter, r *http.Request, page *page) bool {
+	page.Cocktail.Errors = make(map[string]string)
+	r.ParseForm() // Required if you don't call r.FormValue()
+	missingRequired := false
+	if r.Form["cocktailName"] == nil || len(r.Form["cocktailName"]) == 0 || strings.TrimSpace(r.Form["cocktailName"][0]) == "" {
+		page.Cocktail.Errors["CocktailName"] = "Cocktail name is required."
+		missingRequired = true
+	}
+	return missingRequired
 }

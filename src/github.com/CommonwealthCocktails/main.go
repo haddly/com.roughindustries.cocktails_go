@@ -10,6 +10,7 @@ import (
 	"github.com/CommonwealthCocktails/controller/www"
 	"github.com/golang/glog"
 	"github.com/gorilla/context"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"net/http"
@@ -38,6 +39,15 @@ func init() {
 		glog.Infoln(string(hashedPassword))
 		os.Exit(0)
 	}
+	glog.Infoln("Reading Configuration")
+
+	viper.SetConfigName("config") // name of config file (without extension)
+	viper.AddConfigPath(".")      // optionally look for config in the working directory
+	err := viper.ReadInConfig()   // Find and read the config file
+	if err != nil {               // Handle errors reading the config file
+		glog.Errorf("Fatal error config file: %s \n", err)
+		panic(err)
+	}
 	glog.Infoln("Start Init")
 	glog.Infoln(www.State)
 	glog.Infoln(os.TempDir())
@@ -49,16 +59,20 @@ func init() {
 	var port string
 	var dbname string
 	var dbtype connectors.DBTypesConst
-	//dbaddr = ??
-	//dbpasswd = ??
-	//user = ??
-	//proto = ??
-	//port = ??
-	//dbname = ??
-	//dbtype = connectors.MySQL
+	dbaddr = viper.GetString("dbaddr")
+	dbpasswd = viper.GetString("dbpasswd")
+	user = viper.GetString("user")
+	proto = viper.GetString("proto")
+	port = viper.GetString("port")
+	dbname = viper.GetString("dbname")
+	if viper.GetString("dbtype") == "MySQL" {
+		dbtype = connectors.MySQL
+	} else if viper.GetString("dbtype") == "SQLite" {
+		dbtype = connectors.SQLite
+	}
 
 	var mc_server string
-	//mc_server = ??
+	mc_server = viper.GetString("mc_server")
 
 	if dbaddr == "" || dbpasswd == "" || user == "" || proto == "" || port == "" || dbname == "" {
 		glog.Infoln("Not all DB parameters are set.  If your DB isn't connecting check these values.")
@@ -92,15 +106,15 @@ func AddLetsEncrypt() {
 	//})
 }
 
-func redirect(w http.ResponseWriter, req *http.Request) {
-	// remove/add not default ports from req.Host
-	target := "https://" + req.Host + req.URL.Path
-	if len(req.URL.RawQuery) > 0 {
-		target += "?" + req.URL.RawQuery
-	}
-	glog.Infoln("redirect to: %s", target)
-	http.Redirect(w, req, target, http.StatusTemporaryRedirect)
-}
+// func redirect(w http.ResponseWriter, req *http.Request) {
+// 	// remove/add not default ports from req.Host
+// 	target := "https://" + req.Host + req.URL.Path
+// 	if len(req.URL.RawQuery) > 0 {
+// 		target += "?" + req.URL.RawQuery
+// 	}
+// 	glog.Infoln("redirect to: %s", target)
+// 	http.Redirect(w, req, target, http.StatusTemporaryRedirect)
+// }
 
 func main() {
 	glog.Infoln(www.State)
@@ -114,6 +128,6 @@ func main() {
 	glog.Infoln("Starting Server ... \n")
 	//this starts up the server
 	// redirect every http request to https
-	go http.ListenAndServe(":80", http.HandlerFunc(redirect))
+	//go http.ListenAndServe(":80", http.HandlerFunc(redirect))
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
 }

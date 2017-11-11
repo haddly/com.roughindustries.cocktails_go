@@ -56,6 +56,7 @@ const (
 	TOD
 	Ratio
 	Drink
+	Style
 )
 
 //The string values for the metatype enumeration
@@ -80,6 +81,7 @@ var MetaTypeStrings = [...]string{
 	"Time of Day", //Evening, Dessert, Brunch, ...
 	"Ratio",       //3:4:8, ...
 	"Drink",       //On The Rocks, Neat, ...
+	"Style",       //Tiki, Blended, Hot Drink, Classic / Vintage, ...
 }
 
 // String returns the English name of the metatype ("Flavor", "Base Spirit", ...).

@@ -4,13 +4,13 @@ package model
 
 import (
 	"bytes"
-	"github.com/CommonwealthCocktails/connectors"
 	"encoding/gob"
 	"fmt"
+	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/golang/glog"
 	"html"
 	"html/template"
-	"github.com/golang/glog"
 	"strconv"
 	"strings"
 )
@@ -56,7 +56,7 @@ func (meta *Meta) processMeta() int {
 	} else {
 		buffer.WriteString(" `metaBlurb`=?,")
 	}
-	args = append(args, html.EscapeString(string(meta.Blurb)))
+	args = append(args, string(meta.Blurb))
 	metatype := meta.MetaType.SelectMetaType(true, true, true)
 	if meta.ID == 0 {
 		buffer.WriteString("`metaType`,")

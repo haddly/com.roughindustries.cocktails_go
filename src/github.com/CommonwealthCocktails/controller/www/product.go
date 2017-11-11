@@ -3,9 +3,12 @@
 package www
 
 import (
-	"github.com/golang/glog"
-	"html/template"
 	"github.com/CommonwealthCocktails/model"
+	"github.com/asaskevich/govalidator"
+	"github.com/golang/glog"
+	"github.com/microcosm-cc/bluemonday"
+	"html"
+	"html/template"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -105,6 +108,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 			gp.GroupProduct.ID = page.Product.ID
 			gp.Products = page.BaseProductWithBDG.GroupProducts
 			gp.UpdateGroupProduct()
+
 		}
 		glog.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
 		model.LoadMCWithProductData()
@@ -138,16 +142,26 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Product.Errors = make(map[string]string)
 	r.ParseForm()
-
-	if len(r.Form["productID"]) > 0 {
-		page.Product.ID, _ = strconv.Atoi(r.Form["productID"][0])
+	pUGCP := bluemonday.UGCPolicy()
+	pUGCP.AllowElements("img")
+	pSP := bluemonday.StrictPolicy()
+	pSP.AllowElements("sup")
+	glog.Infoln("Product Validate")
+	if len(r.Form["productID"]) > 0 && strings.TrimSpace(r.Form["productID"][0]) != "" {
+		if govalidator.IsInt(r.Form["productID"][0]) {
+			page.Product.ID, _ = strconv.Atoi(r.Form["productID"][0])
+		} else {
+			page.Product.Errors["ProductID"] = "Please enter a valid product id. "
+		}
 	}
 	if len(r.Form["productName"]) > 0 && strings.TrimSpace(r.Form["productName"][0]) != "" {
-		page.Product.ProductName = r.Form["productName"][0]
-	} else {
-		page.Product.Errors["ProductName"] = "Please enter a valid product name"
+		if govalidator.IsPrintableASCII(r.Form["productName"][0]) {
+			page.Product.ProductName = template.HTML(pSP.Sanitize(html.EscapeString(r.Form["productName"][0])))
+		} else {
+			page.Product.Errors["ProductName"] = "Please enter a valid product name. "
+		}
 	}
-	if len(r.Form["productType"]) > 0 {
+	if len(r.Form["productType"]) > 0 && strings.TrimSpace(r.Form["productType"][0]) != "" {
 		page.Product.ProductType.ID, _ = strconv.Atoi(r.Form["productType"][0])
 		glog.Infoln(page.Product.ProductType.ID)
 		if len(r.Form["productGroupType"+r.Form["productType"][0]]) > 0 {
@@ -173,9 +187,9 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 					page.BaseProductWithBDG.GroupProducts = dgp
 				}
 			}
+		} else {
+			page.Product.Errors["ProductType"] = "Please select a valid product type"
 		}
-	} else {
-		page.Product.Errors["ProductType"] = "Please select a valid product type"
 	}
 	if len(r.Form["productDescription"]) > 0 {
 		page.Product.Description = template.HTML(r.Form["productDescription"][0])
@@ -209,7 +223,24 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 		page.Product.SourceLink = r.Form["productSourceLink"][0]
 	}
 	if len(page.Product.Errors) > 0 {
+		if page.Errors == nil {
+			page.Errors = make(map[string]string)
+		}
 		page.Errors["productErrors"] = "You have errors in your input"
 	}
+
+	glog.Infoln(page.Product)
 	return len(page.Product.Errors) == 0
+}
+
+//Checks the page meta struct that required fields are filled in.
+func RequiredProductMod(w http.ResponseWriter, r *http.Request, page *page) bool {
+	page.Product.Errors = make(map[string]string)
+	r.ParseForm() // Required if you don't call r.FormValue()
+	missingRequired := false
+	if r.Form["productName"] == nil || len(r.Form["productName"]) == 0 || strings.TrimSpace(r.Form["productName"][0]) == "" {
+		page.Product.Errors["ProductName"] = "Product name is required."
+		missingRequired = true
+	}
+	return missingRequired
 }

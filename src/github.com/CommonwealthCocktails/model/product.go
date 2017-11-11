@@ -10,7 +10,7 @@ import (
 //Product data structure
 type Product struct {
 	ID               int
-	ProductName      string
+	ProductName      template.HTML
 	ProductType      ProductType
 	Description      template.HTML
 	Details          template.HTML

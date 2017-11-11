@@ -4,8 +4,8 @@ package model
 
 import (
 	"bytes"
-	"github.com/CommonwealthCocktails/connectors"
 	"encoding/gob"
+	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/glog"
 	"html"
@@ -32,70 +32,128 @@ func (cocktail *Cocktail) processCocktail() int {
 	var args []interface{}
 	var buffer bytes.Buffer
 	if cocktail.ID == 0 {
-		buffer.WriteString("INSERT INTO `cocktail` SET ")
+		buffer.WriteString("INSERT INTO `cocktail` ( ")
 	} else {
 		buffer.WriteString("UPDATE `cocktail` SET ")
 	}
 	if cocktail.Title != "" {
-		buffer.WriteString("`cocktailTitle`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailTitle`,")
+		} else {
+			buffer.WriteString("`cocktailTitle`=?,")
+		}
 		args = append(args, cocktail.Title)
 	}
 	if cocktail.Name != "" {
-		buffer.WriteString("`cocktailName`=?,")
-		args = append(args, cocktail.Name)
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailName`,")
+		} else {
+			buffer.WriteString("`cocktailName`=?,")
+		}
+		args = append(args, string(cocktail.Name))
 	}
 	if cocktail.Description != "" {
-		buffer.WriteString("`cocktailDescription`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailDescription`,")
+		} else {
+			buffer.WriteString("`cocktailDescription`=?,")
+		}
 		args = append(args, html.EscapeString(string(cocktail.Description)))
 	}
 	if cocktail.Comment != "" {
-		buffer.WriteString("`cocktailComment`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailComment`,")
+		} else {
+			buffer.WriteString("`cocktailComment`=?,")
+		}
 		args = append(args, html.EscapeString(string(cocktail.Comment)))
 	}
 	if cocktail.ImagePath != "" {
-		buffer.WriteString("`cocktailImagePath`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailImagePath`,")
+		} else {
+			buffer.WriteString("`cocktailImagePath`=?,")
+		}
 		args = append(args, cocktail.ImagePath)
 	}
 	if cocktail.Image != "" {
-		buffer.WriteString("`cocktailImage`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailImage`,")
+		} else {
+			buffer.WriteString("`cocktailImage`=?,")
+		}
 		args = append(args, cocktail.Image)
 	}
 	if cocktail.ImageSourceName != "" {
-		buffer.WriteString("`cocktailImageSourceName`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailImageSourceName`,")
+		} else {
+			buffer.WriteString("`cocktailImageSourceName`=?,")
+		}
 		args = append(args, cocktail.ImageSourceName)
 	}
 	if cocktail.ImageSourceLink != "" {
-		buffer.WriteString("`cocktailImageSourceLink`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailImageSourceLink`,")
+		} else {
+			buffer.WriteString("`cocktailImageSourceLink`=?,")
+		}
 		args = append(args, cocktail.ImageSourceLink)
 	}
 	if cocktail.SourceName != "" {
-		buffer.WriteString("`cocktailSourceName`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailSourceName`,")
+		} else {
+			buffer.WriteString("`cocktailSourceName`=?,")
+		}
 		args = append(args, cocktail.SourceName)
 	}
 	if cocktail.SourceLink != "" {
-		buffer.WriteString("`cocktailSourceLink`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailSourceLink`,")
+		} else {
+			buffer.WriteString("`cocktailSourceLink`=?,")
+		}
 		args = append(args, cocktail.SourceLink)
 	}
 	if cocktail.Rating != 0 {
-		buffer.WriteString(" `cocktailRating`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailRating`,")
+		} else {
+			buffer.WriteString("`cocktailRating`=?,")
+		}
 		args = append(args, strconv.Itoa(cocktail.Rating))
 	}
 	if cocktail.Origin != "" {
-		buffer.WriteString("`cocktailOrigin`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailOrigin`,")
+		} else {
+			buffer.WriteString("`cocktailOrigin`=?,")
+		}
 		args = append(args, html.EscapeString(string(cocktail.Origin)))
 	}
 	if cocktail.SpokenName != "" {
-		buffer.WriteString("`cocktailSpokenName`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailSpokenName`,")
+		} else {
+			buffer.WriteString("`cocktailSpokenName`=?,")
+		}
 		args = append(args, cocktail.SpokenName)
 	}
 	if cocktail.DisplayName != "" {
-		buffer.WriteString("`cocktailDisplayName`=?,")
+		if cocktail.ID == 0 {
+			buffer.WriteString("`cocktailDisplayName`,")
+		} else {
+			buffer.WriteString("`cocktailDisplayName`=?,")
+		}
 		args = append(args, cocktail.DisplayName)
 	}
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	if cocktail.ID == 0 {
-		query = query + ";"
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
 	} else {
 		query = query + " WHERE `idCocktail`=?;"
 		args = append(args, strconv.Itoa(cocktail.ID))
@@ -156,6 +214,10 @@ func (cocktail *Cocktail) processCocktail() int {
 	cocktail.processCocktailToMetas(cocktail.Difficulty, lastCocktailId, 0)
 	glog.Infoln("processing Cocktail to TOD")
 	cocktail.processCocktailToMetas(cocktail.TOD, lastCocktailId, 0)
+	glog.Infoln("processing Cocktail to Occasion")
+	cocktail.processCocktailToMetas(cocktail.Occasion, lastCocktailId, 0)
+	glog.Infoln("processing Cocktail to Style")
+	cocktail.processCocktailToMetas(cocktail.Style, lastCocktailId, 0)
 	glog.Infoln("processing Cocktail to Ratio")
 	cocktail.processCocktailToMetas(cocktail.Ratio, lastCocktailId, 0)
 
@@ -239,14 +301,16 @@ func (cocktail *Cocktail) processAKAs(names []Name, cocktailID int64) {
 	var args []interface{}
 	var buffer bytes.Buffer
 	for _, name := range names {
-		buffer.WriteString("INSERT INTO `altnames` SET ")
+		buffer.WriteString("INSERT INTO `altnames` ( ")
 		if name.Name != "" {
-			buffer.WriteString("`altNamesString`=?,")
+			buffer.WriteString("`altNamesString`,")
 			args = append(args, name.Name)
 		}
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
-		query = query + ";"
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
 		glog.Infoln(query)
 		res, err := conn.Exec(query, args...)
 		lastAltNameId, err := res.LastInsertId()
@@ -267,14 +331,16 @@ func (cocktail *Cocktail) processAltNames(names []Name, cocktailID int64) {
 	var args []interface{}
 	var buffer bytes.Buffer
 	for _, name := range names {
-		buffer.WriteString("INSERT INTO `altnames` SET ")
+		buffer.WriteString("INSERT INTO `altnames` ( ")
 		if name.Name != "" {
-			buffer.WriteString("`altNamesString`=?,")
+			buffer.WriteString("`altNamesString`,")
 			args = append(args, name.Name)
 		}
 		query := buffer.String()
 		query = strings.TrimRight(query, ",")
-		query = query + ";"
+		vals := strings.Repeat("?,", len(args))
+		vals = strings.TrimRight(vals, ",")
+		query = query + ") VALUES (" + vals + ");"
 		glog.Infoln(query)
 		res, err := conn.Exec(query, args...)
 		lastAltNameId, err := res.LastInsertId()
@@ -371,10 +437,12 @@ func (cocktail *Cocktail) SelectCocktailsByAlphaNums(ignoreCache bool) Cocktails
 		defer cba_rows.Close()
 		for cba_rows.Next() {
 			var cocktail Cocktail
-			err := cba_rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name)
+			var name string
+			err := cba_rows.Scan(&cocktail.ID, &cocktail.Title, &name)
 			if err != nil {
 				glog.Error(err)
 			}
+			cocktail.Name = template.HTML(html.UnescapeString(name))
 			if _, ok := ret.CBA[string(cocktail.Title[0])]; ok {
 				//append
 				glog.Infoln("Appending to " + string(cocktail.Title[0]) + " with " + cocktail.Title)
@@ -417,8 +485,8 @@ func (cocktail *Cocktail) SelectCocktailsByMeta(meta Meta) []Cocktail {
 	glog.Infoln(meta.MetaName)
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
-		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')" +
+	buffer.WriteString("SELECT cocktail.idCocktail, COALESCE(cocktail.cocktailTitle, ''), COALESCE(cocktail.cocktailName, ''), cocktail.cocktailRating," +
+		" COALESCE(cocktail.cocktailImagePath, ''), COALESCE(cocktail.cocktailImage, ''), COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')" +
 		" FROM cocktail" +
 		" JOIN cocktailToMetas ON cocktailToMetas.idCocktail=cocktail.idCocktail WHERE")
 	if meta.ID != 0 {
@@ -438,9 +506,11 @@ func (cocktail *Cocktail) SelectCocktailsByMeta(meta Meta) []Cocktail {
 		defer rows.Close()
 		for rows.Next() {
 			var cocktail Cocktail
+			var name string
 			var desc string
 			var comment string
-			err := rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name, &cocktail.Rating, &cocktail.ImagePath, &cocktail.Image, &desc, &comment)
+			err := rows.Scan(&cocktail.ID, &cocktail.Title, &name, &cocktail.Rating, &cocktail.ImagePath, &cocktail.Image, &desc, &comment)
+			cocktail.Name = template.HTML(html.UnescapeString(name))
 			cocktail.Description = template.HTML(html.UnescapeString(desc))
 			cocktail.Comment = template.HTML(html.UnescapeString(comment))
 			if err != nil {
@@ -465,8 +535,8 @@ func (cocktail *Cocktail) SelectCocktailsByProduct(product Product) []Cocktail {
 	glog.Infoln(product.ProductName)
 	var buffer bytes.Buffer
 	var canQuery = false
-	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
-		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')" +
+	buffer.WriteString("SELECT cocktail.idCocktail, COALESCE(cocktail.cocktailTitle, ''), COALESCE(cocktail.cocktailName, ''), cocktail.cocktailRating," +
+		" COALESCE(cocktail.cocktailImagePath, ''), COALESCE(cocktail.cocktailImage, ''), COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')" +
 		" FROM cocktail" +
 		" JOIN cocktailToProducts ON cocktailToProducts.idCocktail=cocktail.idCocktail WHERE")
 	if product.ID != 0 {
@@ -491,9 +561,11 @@ func (cocktail *Cocktail) SelectCocktailsByProduct(product Product) []Cocktail {
 		defer rows.Close()
 		for rows.Next() {
 			var cocktail Cocktail
+			var name string
 			var desc string
 			var comment string
-			err := rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name, &cocktail.Rating, &cocktail.ImagePath, &cocktail.Image, &desc, &comment)
+			err := rows.Scan(&cocktail.ID, &cocktail.Title, &name, &cocktail.Rating, &cocktail.ImagePath, &cocktail.Image, &desc, &comment)
+			cocktail.Name = template.HTML(html.UnescapeString(name))
 			cocktail.Description = template.HTML(html.UnescapeString(desc))
 			cocktail.Comment = template.HTML(html.UnescapeString(comment))
 			if err != nil {
@@ -515,11 +587,11 @@ func (cocktail *Cocktail) SelectAllCocktails(includeBDG bool) []Cocktail {
 	var c []Cocktail
 	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
-	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
-		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')," +
-		" cocktail.cocktailSourceName, cocktail.cocktailSourceLink, cocktail.cocktailImageSourceName, cocktail.cocktailImageSourceLink," +
+	buffer.WriteString("SELECT cocktail.idCocktail, COALESCE(cocktail.cocktailTitle, ''), COALESCE(cocktail.cocktailName, ''), cocktail.cocktailRating," +
+		" COALESCE(cocktail.cocktailImagePath, ''), COALESCE(cocktail.cocktailImage, ''), COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')," +
+		" COALESCE(cocktail.cocktailSourceName, ''), COALESCE(cocktail.cocktailSourceLink, ''), COALESCE(cocktail.cocktailImageSourceName, ''), COALESCE(cocktail.cocktailImageSourceLink, '')," +
 		" COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')" +
-		" FROM cocktail;")
+		" FROM cocktail ORDER BY cocktail.cocktailName;")
 	query := buffer.String()
 	glog.Infoln(query)
 	rows, err := conn.Query(query)
@@ -529,12 +601,14 @@ func (cocktail *Cocktail) SelectAllCocktails(includeBDG bool) []Cocktail {
 	defer rows.Close()
 	for rows.Next() {
 		var cocktail Cocktail
+		var name string
 		var desc string
 		var comment string
 		var origin string
-		err := rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name, &cocktail.Rating, &cocktail.ImagePath,
+		err := rows.Scan(&cocktail.ID, &cocktail.Title, &name, &cocktail.Rating, &cocktail.ImagePath,
 			&cocktail.Image, &desc, &comment, &cocktail.SourceName, &cocktail.SourceLink, &cocktail.ImageSourceName, &cocktail.ImageSourceLink,
 			&origin, &cocktail.SpokenName, &cocktail.DisplayName)
+		cocktail.Name = template.HTML(html.UnescapeString(name))
 		cocktail.Description = template.HTML(html.UnescapeString(desc))
 		cocktail.Comment = template.HTML(html.UnescapeString(comment))
 		cocktail.Origin = template.HTML(html.UnescapeString(origin))
@@ -562,9 +636,9 @@ func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailS
 	var args []interface{}
 	conn, _ := connectors.GetDB()
 	var buffer bytes.Buffer
-	buffer.WriteString("SELECT cocktail.idCocktail, cocktail.cocktailTitle, cocktail.cocktailName, cocktail.cocktailRating," +
-		" cocktail.cocktailImagePath, cocktail.cocktailImage, COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')," +
-		" cocktail.cocktailSourceName, cocktail.cocktailSourceLink, cocktail.cocktailImageSourceName, cocktail.cocktailImageSourceLink," +
+	buffer.WriteString("SELECT cocktail.idCocktail, COALESCE(cocktail.cocktailTitle, ''), COALESCE(cocktail.cocktailName, ''), cocktail.cocktailRating," +
+		" COALESCE(cocktail.cocktailImagePath, ''), COALESCE(cocktail.cocktailImage, ''), COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, '')," +
+		" COALESCE(cocktail.cocktailSourceName, ''), COALESCE(cocktail.cocktailSourceLink, ''), COALESCE(cocktail.cocktailImageSourceName, ''), COALESCE(cocktail.cocktailImageSourceLink, '')," +
 		" COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')" +
 		" FROM cocktail" +
 		" WHERE idCocktail=?;")
@@ -578,12 +652,14 @@ func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailS
 	defer rows.Close()
 	for rows.Next() {
 		var cocktail Cocktail
+		var name string
 		var desc string
 		var comment string
 		var origin string
-		err := rows.Scan(&cocktail.ID, &cocktail.Title, &cocktail.Name, &cocktail.Rating, &cocktail.ImagePath,
+		err := rows.Scan(&cocktail.ID, &cocktail.Title, &name, &cocktail.Rating, &cocktail.ImagePath,
 			&cocktail.Image, &desc, &comment, &cocktail.SourceName, &cocktail.SourceLink, &cocktail.ImageSourceName, &cocktail.ImageSourceLink,
 			&origin, &cocktail.SpokenName, &cocktail.DisplayName)
+		cocktail.Name = template.HTML(html.UnescapeString(name))
 		cocktail.Description = template.HTML(html.UnescapeString(desc))
 		cocktail.Comment = template.HTML(html.UnescapeString(comment))
 		cocktail.Origin = template.HTML(html.UnescapeString(origin))
@@ -606,6 +682,8 @@ func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailS
 		cocktail.Strength, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Strength))
 		cocktail.Difficulty, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Difficulty))
 		cocktail.TOD, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(TOD))
+		cocktail.Occasion, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Occasion))
+		cocktail.Style, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Style))
 		cocktail.Ratio, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Ratio))
 		cocktail.Family, cocktail.IsFamilyRoot = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Family))
 

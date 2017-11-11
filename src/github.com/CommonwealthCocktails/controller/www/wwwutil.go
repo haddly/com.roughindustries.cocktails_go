@@ -63,9 +63,14 @@ func RenderSetupTemplate(w http.ResponseWriter, rec interface{}) {
 //and false means that the CSRF is not the one past to the previous page.
 //This could indicate a CSRF attack.
 func ValidateCSRF(r *http.Request, page *page) bool {
+	r.ParseForm()
 	if len(r.Form["CSRF"]) > 0 {
 		if (r.Form["CSRF"][0] != page.UserSession.CSRF) || (decrypt([]byte(page.UserSession.CSRFKey), r.Form["CSRF"][0]) != page.UserSession.CSRFBase) {
-			page.Messages["metaModifyFail"] = "Metadata modification failed. You tried to navigate backwards and resubmit!"
+			glog.Infoln(r.Form["CSRF"][0])
+			glog.Infoln(page.UserSession.CSRF)
+			glog.Infoln(decrypt([]byte(page.UserSession.CSRFKey), r.Form["CSRF"][0]))
+			glog.Infoln(page.UserSession.CSRFBase)
+			page.Messages["modifyFail"] = "Modification failed. You tried to navigate backwards and resubmit!"
 			if r.Form["CSRF"][0] != page.UserSession.CSRF {
 				glog.Errorln("ERROR: Incorrect CSRF, possible CSRF attack!")
 			}
@@ -90,21 +95,34 @@ func FloatToVulgar(val float64) string {
 	}
 	if decimalPart == 0.0 {
 		return intStringPart
-	} else if decimalPart <= 0.125 {
-		return intStringPart + "⅛"
 	} else if decimalPart <= 0.25 {
 		return intStringPart + "¼"
-	} else if decimalPart <= 0.375 {
-		return intStringPart + "⅜"
 	} else if decimalPart <= .5 {
 		return intStringPart + "½"
-	} else if decimalPart <= .625 {
-		return intStringPart + "⅝"
 	} else if decimalPart <= .75 {
 		return intStringPart + "¾"
-	} else if decimalPart <= .875 {
-		return intStringPart + "⅞"
 	}
+	// if decimalPart == 0.0 {
+	// 	return intStringPart
+	// } else if decimalPart <= 0.125 {
+	// 	return intStringPart + "⅛"
+	// } else if decimalPart <= 0.25 {
+	// 	return intStringPart + "¼"
+	// } else if decimalPart <= 0.333 {
+	// 	return intStringPart + "⅓"
+	// } else if decimalPart <= 0.375 {
+	// 	return intStringPart + "⅜"
+	// } else if decimalPart <= .5 {
+	// 	return intStringPart + "½"
+	// } else if decimalPart <= .625 {
+	// 	return intStringPart + "⅝"
+	// } else if decimalPart <= .666 {
+	// 	return intStringPart + "⅔"
+	// } else if decimalPart <= .75 {
+	// 	return intStringPart + "¾"
+	// } else if decimalPart <= .875 {
+	// 	return intStringPart + "⅞"
+	// }
 	return strconv.Itoa(int(math.Ceil(realPart)))
 }
 
