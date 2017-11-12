@@ -15,13 +15,15 @@ import (
 	"time"
 )
 
-//Is the website public or private, i.e. do you want to offer admin
-//accessability to the website
-var AllowAdmin = true
+var (
+	//Is the website public or private, i.e. do you want to offer admin
+	//accessability to the website
+	AllowAdmin = true
 
-//Use Google Analytics in the page.  This is to stop using google analytics
-//code in the test environment.
-var UseGA = false
+	//Use Google Analytics in the page.  This is to stop using google analytics
+	//code in the test environment.
+	UseGA = false
+)
 
 //the page struct is all the things a template could display or use when it
 //generates a page
@@ -32,6 +34,8 @@ type page struct {
 	Authenticated        bool
 	AllowAdmin           bool
 	UseGA                bool
+	ReCAPTCHASiteKey     string
+	ReCAPTCHASiteKeyInv  string
 	CocktailSet          model.CocktailSet
 	MetasByTypes         model.MetasByTypes
 	Ingredients          model.ProductsByTypes
@@ -139,6 +143,8 @@ func NewPage(w http.ResponseWriter, r *http.Request) *page {
 	p.Errors = make(map[string]string)
 	p.AllowAdmin = AllowAdmin
 	p.UseGA = UseGA
+	p.ReCAPTCHASiteKey = sitekey
+	p.ReCAPTCHASiteKeyInv = sitekeyInv
 	if r != nil {
 		p.UserSession, p.Authenticated = GetSession(w, r)
 	}
@@ -152,6 +158,8 @@ func NewSetupPage(w http.ResponseWriter, r *http.Request) *page {
 	p.Errors = make(map[string]string)
 	p.AllowAdmin = AllowAdmin
 	p.UseGA = UseGA
+	p.ReCAPTCHASiteKey = sitekey
+	p.ReCAPTCHASiteKeyInv = sitekeyInv
 	p.UserSession = *new(model.UserSession)
 	p.Authenticated = false
 	return p

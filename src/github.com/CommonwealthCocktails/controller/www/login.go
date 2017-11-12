@@ -47,8 +47,13 @@ var (
 	re         reCAPTCHA
 	sitekeyInv string
 	reInv      reCAPTCHA
+
+	//registration email
+	registerFromEmailAddress string
+	registerEmailPasswd      string
 )
 
+//Init variables from config
 func LoginInit() {
 	glog.Infoln("Login Init")
 	//default user
@@ -79,6 +84,11 @@ func LoginInit() {
 		Scopes:       []string{"public_profile", "email", "pages_show_list", "manage_pages", "publish_pages"},
 		Endpoint:     facebook.Endpoint,
 	}
+
+	//I am using gmail smtp.  If you have 2 step authentication get an app
+	//password that corresponds to the from email account you use.
+	registerFromEmailAddress = viper.GetString("registerFromEmailAddress")
+	registerEmailPasswd = viper.GetString("registerEmailPasswd")
 }
 
 //Login page handler which displays the standard login page.
@@ -183,11 +193,6 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		return
 	}
 
-	//I am using gmail smtp.  If you have 2 step authentication get an app
-	//password that corresponds to the from email account you use.
-	//from := ""
-	//pass := ""
-
 	//check username and email against database, if it exists return to
 	//registration page with an error else add user to the database
 	users := page.User.SelectUsersByIdORUsernameOREmail()
@@ -234,7 +239,7 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	}
 
 	//Email setup.  This is designed ot send an html enabled email
-	msg := "From: " + from + "\n" +
+	msg := "From: " + registerFromEmailAddress + "\n" +
 		"To: " + page.User.Email + "\n" +
 		"MIME-Version: 1.0" + "\r\n" +
 		"Content-type: text/html" + "\r\n" +
@@ -243,8 +248,8 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 
 	//gmail smtp
 	err = smtp.SendMail("smtp.gmail.com:587",
-		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
-		from, []string{page.User.Email}, []byte(msg))
+		smtp.PlainAuth("", registerFromEmailAddress, registerEmailPasswd, "smtp.gmail.com"),
+		registerFromEmailAddress, []string{page.User.Email}, []byte(msg))
 
 	if err != nil {
 		glog.Infoln("smtp error: %s", err)
@@ -338,13 +343,8 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 			return
 		}
 
-		//I am using gmail smtp.  If you have 2 step authentication get an app
-		//password that corresponds to the from email account you use.
-		//from := ""
-		//pass := ""
-
 		//Email setup.  This is designed ot send an html enabled email
-		msg := "From: " + from + "\n" +
+		msg := "From: " + registerFromEmailAddress + "\n" +
 			"To: " + page.User.Email + "\n" +
 			"MIME-Version: 1.0" + "\r\n" +
 			"Content-type: text/html" + "\r\n" +
@@ -353,8 +353,8 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 
 		//gmail smtp
 		err = smtp.SendMail("smtp.gmail.com:587",
-			smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
-			from, []string{page.User.Email}, []byte(msg))
+			smtp.PlainAuth("", registerFromEmailAddress, registerEmailPasswd, "smtp.gmail.com"),
+			registerFromEmailAddress, []string{page.User.Email}, []byte(msg))
 
 		if err != nil {
 			glog.Infoln("smtp error: %s", err)

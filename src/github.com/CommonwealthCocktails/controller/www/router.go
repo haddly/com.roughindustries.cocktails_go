@@ -47,6 +47,7 @@ func WWWRouterInit() {
 	BaseURL = viper.GetString("BaseURL")
 	//Inits
 	LoginInit()
+	SessionInit()
 	//Page Routing
 	http.Handle("/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
 	//Cocktail Routing

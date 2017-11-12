@@ -19,5 +19,8 @@
 #googleOauthConfigClientSecret = ""
 #facebookOauthConfigClientID = ""
 #facebookOauthConfigClientSecret = ""
+#registerFromEmailAddress = ""
+#registerEmailPasswd = ""
+#cookieStoreKey = """
 
 
