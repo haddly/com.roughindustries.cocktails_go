@@ -1,0 +1,106 @@
+{{define "navbar"}}
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        </button>
+            <a style="color:#FFF; font-family: 'Poiret One';    font-weight: 700;" class="navbar-brand" href="/">Commonwealth Cocktails</a>
+        </div>
+
+        {{if eq .State 3}}
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a style="color:#FFF;" href="/cocktailsindex">Cocktails</a></li>
+                <li><a style="color:#FFF;" href="/products">Products</a></li>
+                <li><a style="color:#FFF;" href="/posts">Articles</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <!--<li>-->
+                <!--    <a style="color:#FFF;" href="/search">-->
+                <!--        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>&nbsp;Search-->
+                <!--    </a>-->
+                <!--</li>-->
+                <li>
+                
+                    {{if .Authenticated}}
+                    <li class="dropdown">
+                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{if not .UserSession.User.Username}}{{if .UserSession.IsDefaultUser}}default{{end}}{{end}}{{if .UserSession.User.Username}}{{.UserSession.User.Username}}{{end}} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {{if .AllowAdmin}}
+                            {{if eq .UserSession.User.Role 1 2}}
+                            <li class="dropdown-header">Modify</li>
+                            <li><a href="/cocktailModForm" onClick="toggleLoader()">Modify Cocktail</a></li>
+                            <li><a href="/productModForm" onClick="toggleLoader()">Modify Product</a></li>
+                            <li><a href="/metaModForm" onClick="toggleLoader()">Modify Meta</a></li>
+                            <li><a href="/postModForm" onClick="toggleLoader()">Modify Post</a></li>
+                            <li><a href="/imageModForm" onClick="toggleLoader()">Modify Image</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Data Stores</li>
+                            <li><a href="/db_tables" onClick="toggleLoader()">Load DB Tables</a></li>
+                            <li><a href="/db_data" onClick="toggleLoader()">Load DB Data</a></li>
+                            <li><a href="/db_test" onClick="toggleLoader()">Verify DB</a></li>
+                            <li><a href="/mc_delete" onClick="toggleLoader()">Delete Memcache</a></li>
+                            <li><a href="/mc_load" onClick="toggleLoader()">Add Memcache</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Admin</li>
+                            <li role="separator" class="divider"></li>
+                            {{end}}
+                            {{end}}
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                    <script>
+                        function toggleLoader() {
+                            $('#maindiv').addClass('hide');
+                            $('#loader').removeClass('hide');
+                        };
+                    </script>
+                    {{else}}
+                    <li class="dropdown">
+                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Login <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/loginIndex">Login</a></li>
+                            <li><a href="/GoogleLogin">Login with Google</a></li>
+                            <li><a href="/FacebookLogin">Login with Facebook</a></li>
+                            <li><a href="/registerForm">Signup</a></li>
+                        </ul>
+                    </li> {{end}}
+                </li>
+            </ul>
+        </div>
+        {{end}}
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+{{template "loader" .}}
+<!--used to taggles on the loader.  This is closed in the footer-->
+<div id="maindiv" name="maindiv">
+{{end}} 
+
+<!---->
+{{define "navbar404"}}
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+            <a style="color:#FFF; font-family: 'Poiret One';    font-weight: 700;" class="navbar-brand" href="/">Commonwealth Cocktails</a>
+        </div>
+
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+{{end}}

@@ -1,0 +1,123 @@
+{{define "head"}}
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="google-site-verification" content="QYDlNaPdm6WCJGnl-u44ewNSMwUFHDXMwckm9HZhrvs" />
+<meta name="p:domain_verify" content="39ee9b6f6af3427984a3886ac198e8c1"/>
+
+<meta name="twitter:card" content="summary" />
+{{if .CocktailSet.Cocktail.Name}}
+<title>{{.CocktailSet.Cocktail.Name}} from Commonwealth Cocktails</title>
+<meta name="description" content="{{.CocktailSet.Cocktail.Name}} from Commonwealth Cocktails">
+<meta property="og:title" content="{{sanitize .CocktailSet.Cocktail.Name}} from Commonwealth Cocktails" />
+<meta property="og:name" content="{{sanitize .CocktailSet.Cocktail.Name}} from Commonwealth Cocktails" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{{.BaseURL}}/cocktail?cocktailID={{.CocktailSet.Cocktail.ID}}&keywords={{.CocktailSet.Cocktail.Keywords}}" />
+<meta property="og:description" content="{{sanitize .CocktailSet.Cocktail.Name}} - {{if .CocktailSet.Cocktail.Description}}{{.CocktailSet.Cocktail.Description}}{{end}} Method: {{sanitize .CocktailSet.Cocktail.Recipe.Method}}" />
+<meta property="og:image" content="{{if .CocktailSet.Cocktail.Image}}{{if .CocktailSet.Cocktail.ImagePath}}{{.CocktailSet.Cocktail.ImagePath}}/{{.CocktailSet.Cocktail.Image}}{{end}}{{else}}https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=36&txt=CommonwealthCocktails.com&w=350&h=350&txttrack=0{{end}}" />
+{{if .CocktailSet.Cocktail.LabeledImageLink}}
+<meta property="og:image" content="{{.CocktailSet.Cocktail.LabeledImageLink}}" />
+{{end}}
+<meta property="og:image:alt" content="{{sanitize .CocktailSet.Cocktail.Name}} from Commonwealth Cocktails - ({{.CocktailSet.Cocktail.Keywords}})" />
+{{else}}
+{{if .Post.PostTitle}}
+<title>{{.Post.PostTitle}} from Commonwealth Cocktails</title>
+<meta name="description" content="{{.Post.PostTitle}} from Commonwealth Cocktails">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{{sanitize .Post.PostTitle}} from Commonwealth Cocktails" />
+<meta property="og:description" content="{{sanitize .Post.PostTitle}} - {{if .Post.PostExcerpt}}{{sanitize .Post.PostExcerpt}}{{else}}Post coming soon ...{{end}}" />
+<meta property="og:name" content="{{sanitize .Post.PostTitle}} from Commonwealth Cocktails" />
+<meta property="og:site_name" content="CommonwealthCocktails.com" />
+<meta property="article:published_time" content="{{now}}" />
+<meta property="article:author" content="Commonwealth Cocktails" />
+<meta property="og:image" content="{{if .Post.PostImage}}{{.Post.PostImage}}{{else}}https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=36&txt=CommonwealthCocktails.com&w=350&h=350&txttrack=0{{end}}" />
+{{else}}
+{{if .BaseProductWithBDG.Product.ProductName}}
+{{with .BaseProductWithBDG}}
+<title>{{.Product.ProductName}} from Commonwealth Cocktails</title>
+<meta name="description" content="{{.Product.ProductName}} from Commonwealth Cocktails">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{{sanitize .Product.ProductName}}" />
+<meta property="og:description" content="{{sanitize .Product.ProductName}} - {{if .Product.Description}}{{sanitize .Product.Description}}{{else}}Description coming soon ... {{end}}" />
+<meta property="og:site_name" content="CommonwealthCocktails.com" />
+<meta property="article:published_time" content="{{now}}" />
+<meta property="article:author" content="Commonwealth Cocktails" />
+{{if .Product.AmazonLink}}<meta property="og:referenced" content="{{.Product.AmazonLink}}" />{{end}}
+<meta property="og:image" content="{{if .Product.Image}}{{if .Product.ImagePath}}{{.Product.ImagePath}}/{{.Product.Image}}{{end}}{{else}}https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=36&txt=CommonwealthCocktails.com&w=350&h=350&txttrack=0{{end}}" />
+{{if .Product.LabeledImageLink}}
+<meta property="og:image" content="{{.Product.LabeledImageLink}}" />
+{{end}}
+<meta property="og:image:alt" content="{{.Product.ProductName}} - {{if .BaseProduct.ProductName}}{{.BaseProduct.ProductName}}{{end}}" />
+{{end}}
+{{else}}
+<title>Commonwealth Cocktails</title>
+<meta name="description" content="Commonwealth Cocktails at CommonwealthCocktails.com | Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset." />
+<meta property="og:title" content="Commonwealth Cocktails at CommonwealthCocktails.com" />
+<meta name="description" content="Commonwealth Cocktails at CommonwealthCocktails.com | Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset." />
+<meta property="og:description" content="Commonwealth Cocktails at CommonwealthCocktails.com | Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset." />
+<meta property="og:site_name" content="Commonwealth Cocktails at CommonwealthCocktails.com" />
+<meta property="og:name" content="Commonwealth Cocktails at CommonwealthCocktails.com" />
+<meta name="keywords" content="Commonwealth Cocktails at CommonwealthCocktails.com,cocktails,mixers,garnish,drinkware,metadata,spirits,liqueurs,cocktails made simple,commonwealthcocktails,cocktail of the day,libations for everyone,drinks,drinks posts,drinks articles">
+{{end}}
+{{end}}
+{{end}}
+
+<meta property="fb:app_id" content="440301159683076" />
+
+<!-- Bootstrap Core CSS -->
+<link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+<!-- favicon -->
+<link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+
+<link rel="stylesheet" type="text/css" href="/slick/slick.css" />
+<link rel="stylesheet" type="text/css" href="/slick/slick-theme.css" />
+<link href="/css/landing-page.css" rel="stylesheet">
+<link href="/css/commonwealth_cocktails.css" rel="stylesheet" />
+
+<!-- Custom Fonts -->
+<link href="/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css" />
+<link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet" />
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+<!--Javascript-->
+<!--<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>-->
+<script src="https://code.jquery.com/jquery-2.2.0.min.js" type="text/javascript"></script>
+<!--<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>-->
+<!--<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>-->
+<script type="text/javascript" src="/js/bootstrap.js"></script>
+<script type="text/javascript" src="/js/commonwealth_cocktails.js"></script>
+<script type="text/javascript" src="/slick/slick.js"></script>
+
+<!--<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.4/summernote.css" rel="stylesheet">-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.4/summernote.js"></script>-->
+
+<!--<script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=your_API_key"></script>-->
+<script>tinymce.init({
+  selector: 'textarea',
+  height: 150,
+  menubar: false,
+  plugins: [
+    'advlist autolink lists link image charmap print preview anchor textcolor',
+    'searchreplace visualblocks code fullscreen code table',
+    'insertdatetime media table contextmenu paste code help'
+  ],
+  toolbar: 'insert | undo redo |  styleselect | bold italic backcolor | table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help | code',
+  content_css: [
+    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+    '//www.tinymce.com/css/codepen.min.css']
+});
+</script>
+
+{{template "ga" .}} 
+<script src='https://www.google.com/recaptcha/api.js'></script>
+{{end}}

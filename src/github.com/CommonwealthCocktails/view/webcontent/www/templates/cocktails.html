@@ -1,0 +1,114 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	{{template "head" .}}
+
+
+	<style>
+		section:after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			bottom: -25px;
+			left: 0;
+			pointer-events: none;
+			background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
+			width: 100%;
+			height: 100px;
+		}
+	</style>
+</head>
+
+<body>
+	{{template "navbar" .}}
+
+	{{with .CocktailSet}}
+	<!-- Page Content -->
+	<div class="container">
+
+		<div class="row">
+			<div class="page-header">
+				<h1 align="center">Cocktails{{if .Metadata.MetaName}} - {{.Metadata.MetaName}}{{end}}{{if .Product.ProductName}} - {{.Product.ProductName}}{{end}}</h1>
+			</div>
+			<div class="col-md-12" >
+				<div class="row">
+					
+					{{template "metaBlurb" .}}
+					
+					{{template "cocktailBlocks" .}}
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	{{template "footer" .}}
+	{{end}}
+	<!-- /.container -->
+</body>
+
+</html>
+{{end}}
+
+{{define "metaBlurb"}}
+{{if .Metadata.Blurb}}
+<div class="col-xs-12 col-sm-6 col-md-4 col-lg-2" style="background-color: rgba(100, 100, 100, 0.1); height: 350px;">
+	<span style="display: block;">
+		<!--<div height="100%">-->
+		<p style="max-height: 350px; overflow:hidden;">{{.Metadata.Blurb}}</p>
+		<!--</div>-->
+	</span>
+</div>
+{{end}}
+{{end}}
+
+{{define "cocktailBlocks"}}
+{{range .ChildCocktails}}
+<div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 400px; overflow:hidden;">
+	<a href="/cocktail?cocktailID={{.ID}}&keywords={{.Keywords}}" style="text-decoration : none; color : #555;">
+		<div style="align:center;postition:relative;width:100%;">
+			<div align="center" style="margin-top: 25px;">
+				{{if .ImagePath}}
+				<img class="img-responsive" style="height:150px" src="{{.ImagePath}}/{{.Image}}"/>
+				{{else}}
+				<img class="img-responsive" style="height:150px" src="images/{{.Image}}"/>
+				{{end}}
+			</div>
+			<h4>
+			{{.Name}}
+			</h4>
+			<h5>
+			<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
+			</h5>
+			{{if gt .Top100Index 0}}
+			<h5>#{{.Top100Index}} in Top 100</h5>
+			{{end}}
+			<section style="overflow:hidden;">{{.Description}}</section>
+		</div>
+	</a>
+</div>
+<!--<div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 350px; margin-bottom: 50px;">-->
+<!--	<a href="/cocktail?cocktailID={{.ID}}" style="text-decoration : none; color : #555;">-->
+<!--		<span style="display: block;">-->
+<!--			<div align="center">-->
+<!--				{{if .ImagePath}}-->
+<!--				<img class="img-responsive" style="height:150px" src="{{.ImagePath}}/{{.Image}}"/>-->
+<!--				{{else}}-->
+<!--				<img class="img-responsive" style="height:150px" src="images/{{.Image}}"/>-->
+<!--				{{end}}-->
+<!--			</div>-->
+<!--			<h3>-->
+<!--			{{.Name}}-->
+<!--			</h3>-->
+<!--			<h5>-->
+<!--			<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>-->
+<!--			</h5>-->
+<!--			<section style="height:125px; overflow:hidden;">{{.Description}}</section>-->
+<!--		</span>-->
+<!--	</a>-->
+<!--</div>-->
+{{end}}
+{{end}}

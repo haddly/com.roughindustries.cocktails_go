@@ -1,0 +1,261 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{template "navbar" .}}
+
+
+	{{with .BaseProductWithBDG}}
+	<div class="container">
+		Portfolio Item Heading
+		<div class="page-header">
+			{{with .Product}}
+			<h1 align="center">{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}</h1>
+			{{end}} {{if .Product.Rating}}
+			<h5 align="center">
+				<div id="stars-existing" class="starrr" data-rating='{{.Product.Rating}}'></div>
+			</h5>
+			{{end}} {{if and .Product.SourceName .Product.SourceLink}}
+			<h6 align="center">Source: <a title="Go to {{.Product.SourceName}}" target="_blank" href="{{.Product.SourceLink}}" style="text-decoration : none; color : #555;">{{.Product.SourceName}}  <i class="fa fa-external-link"></i></a></h6>
+			{{end}}
+		</div>
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						&nbsp;
+					</div>
+					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+						<div align="center" style="position: relative; width: 100%;">
+
+							{{if .Product.Image}} {{if .Product.ImagePath}}
+							<img class="img-responsive" src="{{.Product.ImagePath}}/{{.Product.Image}}" alt="{{.Product.ProductName}} - {{if .BaseProduct.ProductName}}{{.BaseProduct.ProductName}}{{end}}" /> {{else}}
+							<img class="img-responsive" src="images/{{.Product.Image}}" alt="{{.Product.ProductName}}" /> {{end}} {{else}}
+							<img border="0" itemprop="image" style="max-height:150px" class="img-responsive" alt="{{.Product.ProductName}}" src="https://placeholdit.imgix.net/~text?&bg=FFFFFF&w=600&h=600"> {{end}}
+							<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source:
+								<a target="_blank" style="text-decoration : none; color : #555;" href="{{.Product.ImageSourceLink}}">
+								{{.Product.ImageSourceName}}
+								</a>
+							</h6>
+						</div>
+					</div>
+					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						&nbsp;
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12" align="center">
+					<a class="btn btn-default btn-sm fb-share-button" style="display: inline-block;" data-href="{{$.BaseURL}}/product?ID={{.Product.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fproduct%3FID={{.Product.ID}}&amp;src=sdkpreparse">
+						<i class="fa fa-facebook"></i>
+					</a>
+					<a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-sm" title="GitHub">
+						<i class="fa fa-github"></i>
+					</a>
+					<a target="_blank" class="twitter-share-button btn btn-default btn-sm" data-dnt="true"
+					  href="https://twitter.com/intent/tweet?text={{.Product.PreText}} {{.Product.ProductName}} {{.Product.PostText}}&url={{$.BaseURL}}%2Fproduct%3FID={{.Product.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
+							<i style="color: black;" class="fa fa-twitter"></i>
+					</a>
+					<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fproduct%3FID={{.Product.ID}}&media=&description={{.Product.Description}}">
+						<i style="color: black;" class="fa fa-pinterest"></i>
+					</a>
+					<a title="Related Cocktails" class="btn btn-default btn-sm" style="text-decoration : none; font-weight: bold;" href="/cocktailsByIngredientID?ID={{.Product.ID}}">
+						<i style="color: black;" class="fa fa-glass"></i>
+					</a>
+					{{if .Product.AmazonLink}}{{if showAffiliateLinks}}
+					<a target="_blank" class="btn btn-default btn-sm" style="display: inline-block;" href="{{.Product.AmazonLink}}">
+						<i style="color: black;" class="fa fa-amazon"></i>
+					</a>
+					{{end}}{{end}}
+				</div>
+				</div>
+				{{if .Product.Description}}
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Product Description</h3>
+						{{.Product.Description}}
+					</div>
+				</div>
+				{{end}} {{if .Product.Details}}
+				<div class="row">
+					<div class="col-xs-12">
+						<h3>Product Details</h3>
+						{{.Product.Details}}
+					</div>
+				</div>
+				{{end}} {{if or .DerivedProducts .BaseProduct.ProductName}}
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="btn-group" role="group">
+							{{if .DerivedProducts}}
+							<h3>Related Products</h3>
+							{{range .DerivedProducts}}
+							<a class="btn btn-default btn-xs" href="/product?ID={{.ID}}">
+								{{.ProductName}}
+							</a>
+							<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByIngredientID?ID={{.ID}}">
+								<i class="fa fa-glass"></i>
+							</a>
+							{{end}} {{else}} {{if .BaseProduct.ProductName}}{{with .BaseProduct}}
+							<h3>Base Product</h3>
+							<a class="btn btn-default btn-xs" href="/product?ID={{.ID}}">
+								{{.ProductName}}
+							</a>
+							<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByIngredientID?ID={{.ID}}">
+								<i class="fa fa-glass"></i>
+							</a>
+							{{end}} {{end}} {{end}}
+						</div>
+					</div>
+				</div>{{end}} {{if or .Product.Drink}}
+				<div class="row">
+					<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+						<h3>Product Metadata</h3>
+					</div>
+					<div class="row">
+						<div class="col-xs-12 text-center">
+							&nbsp;
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row">
+							<div class="col-sm-6 col-xs-12 clearfix x-recipe-terms recipe-link">
+								{{if .Product.Drink}}
+								<div class="row">
+									<div class="col-xs-5 text-right no-wrap">
+										<p>Drink: </div>
+									<div class="col-xs-7 x-recipe-spirit">
+										{{range .Product.Drink}}
+										<a style="text-decoration : none;" href="#"><span style="font-weight: bold;" class="btn btn-default btn-xs">{{.MetaName}}</span></a> {{end}}
+										</p>
+									</div>
+								</div>
+								{{end}}
+							</div>
+							<div class="col-sm-6 col-xs-12 clearfix">
+								<div class="row">
+									<div class="col-xs-5 text-right no-wrap">
+										<p>&nbsp;</div>
+									<div class="col-xs-7 x-recipe-preparation">
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>{{end}}
+			</div>
+			<hr style="border-color: #FFF;">
+			<div class="col-md-4">
+				<div class="row">
+					<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
+						<div class="row">
+							<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
+								<span style="font-size: 16px; background-color: white; padding: 0 10px;">Related Cocktails<!--Related Cocktails Padding is optional--></span>
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row" style="margin: auto;">
+								{{template "relatedCocktails" $}}
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr style="border-color: #FFF;">
+				<div class="row">
+					<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
+						<div class="row">
+							<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
+								<span style="font-size: 16px; background-color: white; padding: 0 10px;">Related Posts<!--Related Posts Padding is optional--></span>
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row" style="margin: auto;">
+								&nbsp;
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{end}}
+	
+	{{template "productadminsocialbar" .}}
+
+	{{template "footer" .}}
+	<!-- /.container -->
+	
+	<script async defer src="//assets.pinterest.com/js/pinit.js"></script>
+	
+</body>
+
+</html>
+{{end}}
+
+{{define "relatedCocktails"}}
+{{range mksliceCocktail $.Cocktails 3}}
+<div class="brightness col-xs-12 col-sm-4 col-md-12 col-lg-12" style="height: 225px; overflow:hidden;">
+	<a href="/cocktail?cocktailID={{.ID}}&keywords={{.Keywords}}" style="text-decoration : none; color : #555;">
+		<div>
+			<div align="center">
+				{{if .ImagePath}}
+				<img class="img-responsive" style="height:150px" src="{{.ImagePath}}/{{.Image}}"/>
+				{{else}}
+				<img class="img-responsive" style="height:150px" src="images/{{.Image}}"/>
+				{{end}}
+			</div>
+			<h4 >
+			{{.Name}}
+			</h4>
+			<h5>
+			<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
+			</h5>
+		</div>
+	</a>
+</div>
+{{end}}
+{{end}}
+
+<!--Product Admin Social Bar-->
+{{define "productadminsocialbar"}}
+{{if $.Authenticated}}{{if $.AllowAdmin}}
+{{with .BaseProductWithBDG}}{{with .Product}}
+<hr style="border-color: #FFF;">
+
+<div class="container">
+	<div class="row">
+		<div class="col-lg-12 text-center no-wrap" style="color:gray" align="center">
+			<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
+				<span style="font-size: 24px; background-color: white; padding: 0 10px;">Social Admin Section</span>
+			</div>
+		</div>
+	</div>
+	<hr style="border-color: #FFF;">
+
+	<div class="row">
+		<div class="col-lg-12">
+			<p align="center">
+				<span class="btn btn-default btn-sm adminsocialpost" title="Post on CC Facebook" id="adminsocialpost" name="adminsocialpost">
+					Post on CC Facebook&nbsp;&nbsp;<i class="fa fa-facebook"></i>
+				</span>
+				<script>
+				$('.adminsocialpost').click( function(){
+				   $.ajax({
+					        url: "/adminsocialpost?URLExt=product?ID={{.ID}}"
+					        ,success: function(response) {
+					        	console.log("Posted to Facebook")
+					        	alert("Posted to Facebook")
+					        }
+				    	})
+				   return false;
+				})
+				</script>
+			</p>
+		</div>
+	</div>
+	<hr/>
+</div>
+{{end}}{{end}}{{end}}{{end}}{{end}}
