@@ -6,7 +6,6 @@ import (
 	"flag"
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/CommonwealthCocktails/controller/alexa"
-	"github.com/CommonwealthCocktails/controller/book"
 	"github.com/CommonwealthCocktails/controller/www"
 	"github.com/golang/glog"
 	"github.com/gorilla/context"
@@ -89,7 +88,6 @@ func init() {
 	// init the routing
 	www.WWWRouterInit()
 	alexa.AlexaRouterInit()
-	book.BookRouterInit()
 	www.State = www.Setup
 	glog.Infoln("End Init")
 }

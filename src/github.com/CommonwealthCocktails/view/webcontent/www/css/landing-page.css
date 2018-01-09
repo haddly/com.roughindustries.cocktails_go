@@ -35,7 +35,7 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(/images/intro-bg.jpg) no-repeat center center;
+    background: url(https://s3.amazonaws.com/commonwealthcocktailsimages/intro-bg.jpg) no-repeat center center;
     background-size: cover;
 }
 
@@ -44,7 +44,7 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/banner_ad.jpg) no-repeat center center;
+    background: url(https://s3.ca-central-1.amazonaws.com/commonwealthcocktailsimages/banner_bg.jpg) no-repeat center center;
     background-size: cover;
 }
 
@@ -125,7 +125,7 @@ h6 {
 .banner {
     padding: 100px 0;
     color: #f8f8f8;
-    background: url(/images/banner-bg.jpg) no-repeat center center;
+    background: url(https://s3.amazonaws.com/commonwealthcocktailsimages/banner-bg.jpg) no-repeat center center;
     background-size: cover;
 }
 

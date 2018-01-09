@@ -21,6 +21,12 @@
 #facebookOauthConfigClientSecret = ""
 #registerFromEmailAddress = ""
 #registerEmailPasswd = ""
-#cookieStoreKey = """
+#cookieStoreKey = ""
+#AllowAdmin = true
+#UseGA = false 
+#TinymceAPIKey = ""
+#aws_access_key_id = ""
+#aws_secret_access_key = ""
+#ShowAffiliateLinks = false
 
 

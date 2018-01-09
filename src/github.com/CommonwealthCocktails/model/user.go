@@ -44,6 +44,11 @@ type UserSession struct {
 	LastXForwardedFor string
 }
 
+type OAuth struct {
+	Key  string
+	Time time.Time
+}
+
 //ENUMERATIONS - These must match the database one for one in both ID and order
 //The integer values for the userrole enumeration
 type UserRole int

@@ -7,11 +7,11 @@ import (
 	"github.com/golang/glog"
 	fb "github.com/huandu/facebook"
 	"net/http"
-	"strconv"
+	//"strconv"
 )
 
 //delete all the memcache entries
-func CocktailSocialPostHandler(w http.ResponseWriter, r *http.Request, page *page) {
+func SocialPostHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	page_res, err := fb.Get("/774837096005400", fb.Params{
 		"fields":       "access_token",
 		"access_token": page.UserSession.User.FBAccessToken,
@@ -20,7 +20,7 @@ func CocktailSocialPostHandler(w http.ResponseWriter, r *http.Request, page *pag
 	if err == nil {
 		glog.Infoln(page_res)
 		res, _ := fb.Post("/774837096005400/feed?", fb.Params{
-			"link":         page.BaseURL + "/cocktail?cocktailID=" + strconv.Itoa(page.Cocktail.ID),
+			"link":         page.BaseURL + "/" + page.SocialSource,
 			"access_token": page_res["access_token"],
 		})
 		glog.Infoln("here is the facebook results:", res)
@@ -30,16 +30,13 @@ func CocktailSocialPostHandler(w http.ResponseWriter, r *http.Request, page *pag
 
 //Validates the cocktail form request and populates the Cocktail
 //struct
-func ValidateCocktailSocialPost(w http.ResponseWriter, r *http.Request, page *page) bool {
+func ValidateSocialPost(w http.ResponseWriter, r *http.Request, page *page) bool {
 	r.ParseForm() // Required if you don't call r.FormValue()
-	if len(r.Form["cocktailID"]) > 0 {
-		if _, err := strconv.Atoi(r.Form["cocktailID"][0]); err == nil {
-			page.Cocktail.ID, _ = strconv.Atoi(r.Form["cocktailID"][0])
-		} else {
-			glog.Errorln("Invalid CocktailID: " + r.Form["cocktailID"][0])
-			return false
-		}
+	if len(r.Form["URLExt"]) > 0 {
+		page.SocialSource = r.Form["URLExt"][0]
+		glog.Infoln(page.SocialSource)
 	} else {
+		glog.Errorln("Invalid Source")
 		return false
 	}
 	return true

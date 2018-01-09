@@ -233,6 +233,74 @@ func (userSession *UserSession) UpdateUserSession(prevSessionKey string) int {
 	return ret
 }
 
+//Put an OAuth Key and time created into the database
+func (oauth *OAuth) InsertOAuth() int {
+	conn, _ := connectors.GetDB() //get db connection
+	var args []interface{}        //arguments for variables in the data struct
+	var buffer bytes.Buffer       //buffer for the query
+
+	buffer.WriteString("INSERT INTO `oauth` ( ")
+
+	//Append the correct columns to be added based on data available in the
+	//data structure
+	if oauth.Key != "" {
+		buffer.WriteString("`oauthKey`,")
+		args = append(args, oauth.Key)
+	} else {
+		return -1
+	}
+	buffer.WriteString("`oauthTime`,")
+	args = append(args, oauth.Time.Format(time.RFC3339))
+
+	//Cleanup the query and append where if it is an update
+	query := buffer.String()
+	query = strings.TrimRight(query, ",")
+	vals := strings.Repeat("?,", len(args))
+	vals = strings.TrimRight(vals, ",")
+	query = query + ") VALUES (" + vals + ");"
+
+	//Lets do this thing
+	glog.Infoln(query)
+	ret := -1
+	r, err := conn.Exec(query, args...)
+	if err != nil {
+		glog.Error(err)
+		return ret
+	}
+	id, _ := r.LastInsertId()
+	ret = int(id)
+	return ret
+}
+
+//Remove an OAuth Key and time from the database by OAuth Key
+func (oauth *OAuth) DeleteOAuth() int {
+	conn, _ := connectors.GetDB() //get db connection
+	var args []interface{}        //arguments for variables in the data struct
+	var buffer bytes.Buffer       //buffer for the query
+
+	buffer.WriteString("DELETE FROM `oauth` ")
+
+	buffer.WriteString("WHERE `oauthKey`=?")
+	args = append(args, oauth.Key)
+
+	//Cleanup the query and append where if it is an update
+	query := buffer.String()
+	query = strings.TrimRight(query, ",")
+	query = query + ";"
+
+	//Lets do this thing
+	glog.Infoln(query)
+	ret := -1
+	r, err := conn.Exec(query, args...)
+	if err != nil {
+		glog.Error(err)
+		return ret
+	}
+	aff, _ := r.RowsAffected()
+	ret = int(aff)
+	return ret
+}
+
 //SELECTS
 //Get a user from the user id and the user name both of which should be
 //unique.
@@ -473,4 +541,44 @@ func (us *UserSession) SelectUserSession() []UserSession {
 		}
 	}
 	return ret
+}
+
+//Get a OAuth key out of the database with the time the key was created
+func (oauth *OAuth) SelectOAuthByKey() *OAuth {
+	var ret OAuth
+	conn, _ := connectors.GetDB() //get db connection
+	var args []interface{}        //arguments for variables in the data struct
+	var buffer bytes.Buffer       //buffer for the query
+
+	buffer.WriteString("SELECT `oauthKey`, `oauthTime` FROM `oauth` ")
+
+	if oauth.Key != "" {
+		buffer.WriteString("WHERE `oauthKey`=?")
+		args = append(args, oauth.Key)
+	} else {
+		return nil
+	}
+
+	query := buffer.String()
+	query = query + ";"
+	glog.Infoln(query)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		glog.Error(err)
+		return nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&ret.Key, &ret.Time)
+		if err != nil {
+			glog.Error(err)
+		}
+		glog.Infoln(ret.Key, ret.Time)
+	}
+	err = rows.Err()
+	if err != nil {
+		glog.Error(err)
+	}
+
+	return &ret
 }

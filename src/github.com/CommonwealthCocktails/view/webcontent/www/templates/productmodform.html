@@ -55,6 +55,8 @@
                         <!---->
                         {{template "productImage" .}}
                         <!---->
+                        {{template "productLabeledImageLink" .}}
+                        <!---->
                         {{template "productImageSourceName" .}}
                         <!---->
                         {{template "productImageSourceLink" .}}
@@ -69,10 +71,11 @@
                         <!---->
                         {{template "productSourceLink" .}}
                         <!---->
+                        {{template "productAmazonLink" .}}
                     </form>
                     <script>
                         $(window).bind("pageshow", function() {
-                            $('#productModForm')[0].reset();
+                            
                             {{range .ProductsByTypes.PBT}}
                             {{if ne .ProductType.ID $.Product.ProductType.ID }}
                             $('#productGroupType{{.ProductType.ID}}').val('Base');
@@ -531,6 +534,45 @@
     <div class=" col-xs-10 form-group">
         <label for="productSourceLink">Product Source Link</label>
         <input type="text" class="form-control" id="productSourceLink" name="productSourceLink" {{with .Product.SourceLink}}value="{{.}}"{{end}}>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--AmazonLink string-->
+{{define "productAmazonLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productImageSourceName">Product Amazon Affiliate Link</label>
+        <input type="text" class="form-control" id="productAmazonLink" name="productAmazonLink" {{with .Product.AmazonLink}}value="{{.}}"{{end}}/>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--LabeledImageLink           string-->
+{{define "productLabeledImageLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="productLabeledImageLink">Product Labeled Image Link</label>
+        <input type="text" class="form-control" id="productLabeledImageLink" name="productLabeledImageLink" {{if .Product.LabeledImageLink}}value="{{.Product.LabeledImageLink}}"{{end}}>
+        <div style="text-align: center;"><img {{if .Product.LabeledImageLink}}src="{{.Product.LabeledImageLink}}"{{else}} style="display: none;"{{end}} height="200" width="200" id='productLabeledImagePreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value) {
+                        $('#productLabeledImagePreview').attr('src', input.value);
+                        $('#productLabeledImagePreview').show(); 
+                    }
+                    else {
+                        $('#productLabeledImagePreview').hide();
+                    }
+                }
+                $("#productLabeledImageLink").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
     </div>
     <div class=" col-xs-1"></div>
 </div>

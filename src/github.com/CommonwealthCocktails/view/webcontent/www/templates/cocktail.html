@@ -9,8 +9,8 @@
 </head>
 
 <body>
-	
-<div id="fb-root"></div>
+	{{$page := .}}
+	<div id="fb-root"></div>
 	<script>
 		(function(d, s, id) {
 			var js, fjs = d.getElementsByTagName(s)[0];
@@ -51,6 +51,7 @@
 				<div class="row">
 					<div class="col-md-12">
 						<h3>Cocktail Description</h3>
+						<meta itemprop="description" content="{{.Cocktail.Description}}">
 						<p itemprop="description">{{.Cocktail.Description}}</p>
 					</div>
 				</div>
@@ -170,19 +171,40 @@
 						</div>
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-xs-12">
+						{{template "footnotes" $}}
+					</div>
+				</div>
 			</div>
 			<!--<div class="col-md-1">-->
 			<!--</div>-->
 			<hr style="border-color: #FFF;">
 			<div class="col-md-4">
-				<div align="center" class="row">
-					&nbsp;
-				</div>
-				<br>
 				<div class="row">
 					<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
-						<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
-							<span style="font-size: 16px; background-color: white; padding: 0 10px;">Coming Soon<!--Related Cocktails Padding is optional--></span>
+						<div class="row">
+							<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
+								<span style="font-size: 16px; background-color: white; padding: 0 10px;">Related Cocktails<!--Related Cocktails Padding is optional--></span>
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row" style="margin: auto;">
+								{{template "relatedCocktails" $}}
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr style="border-color: #FFF;">
+				<div class="row">
+					<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
+						<div class="row">
+							<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
+								<span style="font-size: 16px; background-color: white; padding: 0 10px;">Related Posts<!--Related Posts Padding is optional--></span>
+						</div>
+						<hr style="border-color: #FFF;">
+						<div class="row" style="margin: auto;">
+								&nbsp;
+							</div>
 						</div>
 					</div>
 				</div>
@@ -205,8 +227,14 @@
 
 <!--Cocktail Page Header-->
 {{define "cocktailpageheader"}}
-<h1 itemprop="name" align="center">{{.Cocktail.Name}}</h1>
-<meta itemprop="headline" content="{{.Cocktail.Name}}" />
+<h1 align="center">{{.Cocktail.Name}}</h1>
+{{if gt .Cocktail.Top100Index 0}}
+<a href="/cocktailTop100" style="color : #555;">
+<h5 align="center">#{{.Cocktail.Top100Index}} in Top 100</h5>
+</a>
+{{end}}
+<meta itemprop="name" content="{{.Cocktail.Name}} from Commonwealth Cocktails" />
+<meta itemprop="headline" content="{{.Cocktail.Name}} from Commonwealth Cocktails" />
 {{if .Cocktail.AKA}}
 <h6 align="center">{{range .Cocktail.AKA}}({{.Name}}){{end}}</h6>{{end}}
 <h5 align="center" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
@@ -226,11 +254,14 @@
 {{define "cocktailimage"}}
 <div align="center" style="position: relative; width: 100%;">
 	{{if .Cocktail.Image}} {{if .Cocktail.ImagePath}}
-	<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" itemprop="image"/> 
+	<img class="img-responsive" src="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}" alt="{{sanitize .Cocktail.Name}} from Commonwealth Cocktails - ({{.Cocktail.Keywords}})" itemprop="image"/> 
+	<meta itemprop="image" content="{{.Cocktail.ImagePath}}/{{.Cocktail.Image}}"></meta>
 	{{else}}
-	<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{.Cocktail.Name}}" itemprop="image"/> 
+	<img class="img-responsive" src="images/{{.Cocktail.Image}}" alt="{{sanitize .Cocktail.Name}} from Commonwealth Cocktails - ({{.Cocktail.Keywords}})" itemprop="image"/> 
+	<meta itemprop="image" content="images/{{.Cocktail.Image}}"></meta>
 	{{end}} {{else}}
-	<img class="img-responsive" style="max-height:150px" src="https://placehold.it/600x600" itemprop="image"/> 
+	<img class="img-responsive" style="max-height:150px" src="https://placehold.it/600x600" alt="{{sanitize .Cocktail.Name}} from Commonwealth Cocktails - ({{.Cocktail.Keywords}})" itemprop="image"/> 
+	<meta itemprop="image" content="https://placehold.it/600x600"></meta>
 	{{end}}
 	<h6 align="center" style="color: #555; background: rgba(0, 0, 0, 0.0); width: 100%;">Source: 
 		<a target="_blank" style="text-decoration : none; color : #555;" href="{{.Cocktail.ImageSourceLink}}">{{.Cocktail.ImageSourceName}}  
@@ -243,11 +274,9 @@
 <!--Cocktail Link Bar-->
 {{define "cocktaillinkbar"}}
 {{with .CocktailSet}}
-<div class="fb-share-button" style="display: inline-block;" data-href="{{$.BaseURL}}/cocktail?cocktailID={{.Cocktail.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true">
-	<a class="btn btn-default btn-sm" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&amp;src=sdkpreparse">
-		<i class="fa fa-facebook"></i>
-	</a>
-</div>
+<a class="fb-share-button btn btn-default btn-sm" style="display: inline-block;" data-href="{{$.BaseURL}}/cocktail?cocktailID={{.Cocktail.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&amp;src=sdkpreparse">
+	<i class="fa fa-facebook"></i>
+</a>
 <!--<a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-sm" title="Facebook">-->
 	<!--<i class="fa fa-facebook"></i>-->
 <!--</a>-->
@@ -259,22 +288,18 @@
 <!--	<i class="fa fa-google-plus"></i>-->
 <!--</a>-->
 
-<div class="btn btn-default btn-sm" style="display: inline-block;" >
-	<a target="_blank" class="twitter-share-button" data-dnt="true"
-  href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
-		<i style="color: black;" class="fa fa-twitter"></i>
-	</a>
-</div>
+<a target="_blank" class="twitter-share-button btn btn-default btn-sm" data-dnt="true"
+href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
+	<i style="color: black;" class="fa fa-twitter"></i>
+</a>
 
 <!--<a href="mailto:someone@example.com?subject=Great Cocktail from Commonwealth Cocktails&body=Hi,I found this website and thought you might like it {{$.BaseURL}}/" class="btn btn-default btn-sm" title="Email">-->
 <!--	<i class="fa fa-envelope"></i>-->
 <!--</a>-->
 
-<div class="btn btn-default btn-sm" style="display: inline-block;" >
-<a data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&media=&description=">
+<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&media=&description=">
 	<i style="color: black;" class="fa fa-pinterest"></i>
 </a>
-</div>
 {{end}}
 {{end}}
 
@@ -311,11 +336,11 @@
 				<i style="display: table-cell; font-size: 0.73em; color: black; vertical-align: middle;" class="fa fa-glass"></i>
 			</a>
 			&nbsp;
-			{{if .OriginalIngredient.AmazonLink}}
+			{{if .OriginalIngredient.AmazonLink}}{{if showAffiliateLinks}}
 				<a title="Recommend Product" target="_blank" href="{{.OriginalIngredient.AmazonLink}}">
 					<i style="display: table-cell; font-size: 0.73em; color: black; vertical-align: middle;" class="fa fa-amazon"></i>
 				</a>
-			{{end}}
+			{{end}}{{end}}
 			{{end}}
 		</div>
 	</td>
@@ -331,9 +356,9 @@
 <div>
 	<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
 		{{if .AdIngredient.ImagePath}}
-		<img border="0" class="img-responsive" src="{{.AdIngredient.ImagePath}}/{{.AdIngredient.Image}}">
+		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}, {{.AdIngredient.ProductName}}" src="{{.AdIngredient.ImagePath}}/{{.AdIngredient.Image}}">
 		{{else}}
-		<img border="0" class="img-responsive" src="images/{{.AdIngredient.Image}}">
+		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}, {{.AdIngredient.ProductName}}" src="images/{{.AdIngredient.Image}}">
 		{{end}}
 	</a>
 </div>
@@ -341,11 +366,11 @@
 <div>
 	<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
 		{{if .OriginalIngredient.Image}} {{if .OriginalIngredient.ImagePath}}
-		<img border="0" class="img-responsive" src="{{.OriginalIngredient.ImagePath}}/{{.OriginalIngredient.Image}}">
+		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}" src="{{.OriginalIngredient.ImagePath}}/{{.OriginalIngredient.Image}}">
 		{{else}}
-		<img border="0" class="img-responsive" src="images/{{.OriginalIngredient.Image}}">
+		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}" src="images/{{.OriginalIngredient.Image}}">
 		{{end}}	{{else}}
-		<img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&txt={{.OriginalIngredient.ProductName}}&w=1200&h=900&txttrack=0">
+		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&txt={{.OriginalIngredient.ProductName}}&w=1200&h=900&txttrack=0">
 		<!--<img border="0" class="img-responsive" src="https://placehold.it/900x1200"> -->
 		{{end}}
 	</a>
@@ -355,12 +380,14 @@
 <script type="text/javascript">
 	$(document).on('ready', function() {
 		$(".regular").slick({
+			prevArrow:"<button type='button' class='slick-prev pull-left'><i class='fa fa-angle-left' aria-hidden='true'></i></button>",
+            nextArrow:"<button type='button' class='slick-next pull-right'><i class='fa fa-angle-right' aria-hidden='true'></i></button>",
 			dots: false,
 			infinite: true,
 			slidesToShow: 3,
 			slidesToScroll: 1,
 			centerMode: false,
-			variableWidth: false
+			variableWidth: false,
 		});
 	});
 </script>
@@ -401,11 +428,11 @@
 	<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByProductID?ID={{.ID}}">
 		<i class="fa fa-glass"></i>
 	</a>
-	{{if .AmazonLink}}
+	{{if .AmazonLink}}{{if showAffiliateLinks}}
 	<a title="Recommend Product" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" target="_blank" href="{{.AmazonLink}}">
 		<i class="fa fa-amazon"></i>
 	</a>
-	{{end}}
+	{{end}}{{end}}
 </div>
 {{end}}
 
@@ -597,6 +624,42 @@
 {{end}}
 
 <!--Cocktail Admin Social Bar-->
+{{define "footnotes"}}
+{{with .CocktailSet}}
+<div class="container">
+	<div class="row">
+		<div class="col-lg-12">
+			<h4>References</h4>
+			{{.Cocktail.Footnotes}}
+		</div>
+	</div>
+</div>
+{{end}}{{end}}
+
+{{define "relatedCocktails"}}
+{{range mksliceCocktail $.Cocktails 3}}
+<div class="brightness col-xs-12 col-sm-4 col-md-12 col-lg-12" style="height: 225px; overflow:hidden;">
+	<a href="/cocktail?cocktailID={{.ID}}&keywords={{.Keywords}}" style="text-decoration : none; color : #555;">
+		<div>
+			<div align="center">
+				{{if .ImagePath}}
+				<img class="img-responsive" style="height:150px" src="{{.ImagePath}}/{{.Image}}"/>
+				{{else}}
+				<img class="img-responsive" style="height:150px" src="images/{{.Image}}"/>
+				{{end}}
+			</div>
+			<h4 >
+			{{.Name}}
+			</h4>
+			<h5>
+			<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
+			</h5>
+		</div>
+	</a>
+</div>
+{{end}}{{end}}
+
+<!--Cocktail Admin Social Bar-->
 {{define "cocktailadminsocialbar"}}
 {{if $.Authenticated}}{{if $.AllowAdmin}}
 {{with .CocktailSet}}
@@ -615,13 +678,13 @@
 	<div class="row">
 		<div class="col-lg-12">
 			<p align="center">
-				<span class="btn btn-default btn-sm cocktailsocialpost" title="Post on CC Facebook" id="cocktailsocialpost" name="cocktailsocialpost">
+				<span class="btn btn-default btn-sm adminsocialpost" title="Post on CC Facebook" id="adminsocialpost" name="adminsocialpost">
 					Post on CC Facebook&nbsp;&nbsp;<i class="fa fa-facebook"></i>
 				</span>
 				<script>
-				$('.cocktailsocialpost').click( function(){
+				$('.adminsocialpost').click( function(){
 				   $.ajax({
-					        url: "/cocktailsocialpost?cocktailID={{.Cocktail.ID}}"
+					        url: "/adminsocialpost?URLExt=cocktail?cocktailID={{.Cocktail.ID}}"
 					        ,success: function(response) {
 					        	console.log("Posted to Facebook")
 					        }

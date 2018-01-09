@@ -5,7 +5,9 @@ package www
 import (
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/CommonwealthCocktails/model"
+	"github.com/asaskevich/govalidator"
 	"github.com/golang/glog"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/spf13/viper"
 	"net/http"
 	"os"
@@ -36,7 +38,7 @@ func (ss SystemStateConst) String() string { return SystemStateStrings[ss-1] }
 var (
 	State         = Initialize
 	BaseURL       = ""
-	Valid_Tables  = []string{"cc_usermeta", "cc_usermetatype", "altIngredient", "altnames", "cocktail", "cocktailToAKAs", "cocktailToAltNames", "cocktailToMetas", "cocktailToPosts", "cocktailToProducts", "cocktailToRecipe", "derivedProduct", "doze", "groupProduct", "grouptype", "meta", "metatype", "product", "producttype", "recipe", "recipeToRecipeSteps", "recipestep", "userroles", "users", "usersessions"}
+	Valid_Tables  = []string{"cc_usermeta", "cc_usermetatype", "altIngredient", "altnames", "cocktail", "cocktailToAKAs", "cocktailToAltNames", "cocktailToMetas", "cocktailToPosts", "cocktailToProducts", "cocktailToRecipe", "derivedProduct", "doze", "groupProduct", "grouptype", "meta", "metatype", "oauth", "product", "producttype", "post", "recipe", "recipeToRecipeSteps", "recipestep", "userroles", "users", "usersessions"}
 	Ignore_Tables = []string{"sqlite_sequence"}
 )
 
@@ -46,17 +48,19 @@ func WWWRouterInit() {
 	glog.Infoln(viper.GetString("BaseURL"))
 	BaseURL = viper.GetString("BaseURL")
 	//Inits
-	LoginInit()
-	SessionInit()
+	PageInit()
 	//Page Routing
 	http.Handle("/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
 	//Cocktail Routing
 	http.Handle("/cocktail", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
+	http.Handle("/cocktailOfTheDay", RecoverHandler(MethodsHandler(PageHandler(CocktailOfTheDayHandler), "GET")))
+	http.Handle("/cocktailTop100", RecoverHandler(MethodsHandler(PageHandler(CocktailsTop100Handler), "GET")))
 	http.Handle("/cocktails", RecoverHandler(MethodsHandler(PageHandler(CocktailsHandler), "GET")))
 	http.Handle("/cocktailsindex", RecoverHandler(MethodsHandler(PageHandler(CocktailsIndexHandler), "GET")))
 	http.Handle("/cocktailsindex/", RecoverHandler(MethodsHandler(PageHandler(CocktailsIndexHandler), "GET")))
 	http.Handle("/cocktailsByMetaID", RecoverHandler(MethodsHandler(PageHandler(CocktailsByMetaIDHandler), "GET")))
 	http.Handle("/cocktailsByProductID", RecoverHandler(MethodsHandler(PageHandler(CocktailsByProductIDHandler), "GET")))
+	http.Handle("/cocktailsByIngredientID", RecoverHandler(MethodsHandler(PageHandler(CocktailsByIngredientIDHandler), "GET")))
 	http.Handle("/cocktailModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktail, nil, CocktailModFormHandler, LandingHandler), "GET")))
 	http.Handle("/cocktailMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateCocktail, RequiredCocktailMod, CocktailModHandler, CocktailModFormHandler), "POST")))
 	//Meta Routing
@@ -68,8 +72,15 @@ func WWWRouterInit() {
 	http.Handle("/products", RecoverHandler(MethodsHandler(PageHandler(ProductsHandler), "GET")))
 	http.Handle("/productModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateProduct, nil, ProductModFormHandler, LandingHandler), "GET")))
 	http.Handle("/productMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateProduct, RequiredProductMod, ProductModHandler, ProductModFormHandler), "POST")))
+	//Post Routing
+	http.Handle("/post", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
+	http.Handle("/post/", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
+	http.Handle("/posts", RecoverHandler(MethodsHandler(PageHandler(PostsHandler), "GET")))
+	http.Handle("/postModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidatePost, nil, PostModFormHandler, LandingHandler), "GET")))
+	http.Handle("/postMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidatePost, RequiredPostMod, PostModHandler, PostModFormHandler), "POST")))
 	//Static routing
 	http.Handle("/images/", MethodsHandler(http.StripPrefix("/images/", http.FileServer(http.Dir("./view/webcontent/www/images"))), "GET"))
+	http.Handle("/tmp/", MethodsHandler(http.StripPrefix("/tmp/", http.FileServer(http.Dir("./view/webcontent/www/tmp"))), "GET"))
 	http.Handle("/font-awesome/", MethodsHandler(http.StripPrefix("/font-awesome/", http.FileServer(http.Dir("./view/webcontent/www/font-awesome"))), "GET"))
 	http.Handle("/css/", MethodsHandler(http.StripPrefix("/css/", http.FileServer(http.Dir("./view/webcontent/www/css"))), "GET"))
 	http.Handle("/js/", MethodsHandler(http.StripPrefix("/js/", http.FileServer(http.Dir("./view/webcontent/www/js"))), "GET"))
@@ -100,7 +111,12 @@ func WWWRouterInit() {
 	http.Handle("/passwdResetForm", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateEmailCode, RequiredEmailCode, resetPasswdHandler, resetPasswdHandler), "GET")))
 	http.Handle("/passwdReset", RecoverHandler(MethodsHandler(VandAPageHandler(true, true, true, ValidateResetPasswd, RequiredResetPasswd, resetPasswdFormHandler, resetPasswdHandler), "POST")))
 	//Social Routing
-	http.Handle("/cocktailsocialpost", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktailSocialPost, nil, CocktailSocialPostHandler, nil), "GET")))
+	http.Handle("/adminsocialpost", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateSocialPost, nil, SocialPostHandler, nil), "GET")))
+	//Image Routing
+	http.Handle("/imageModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateImage, nil, ImageModFormHandler, LandingHandler), "GET")))
+	http.Handle("/imageMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateImage, RequiredImageMod, ImageModHandler, ImageModFormHandler), "POST")))
+	http.Handle("/imageUpdate", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateImage, RequiredImageMod, ImageUpdateHandler, ImageModFormHandler), "POST")))
+
 }
 
 //This only loads the page into the page datastruct, there is no authentication
@@ -111,6 +127,13 @@ func PageHandler(next func(http.ResponseWriter, *http.Request, *page)) http.Hand
 			page := NewPage(w, r)
 			page.State = State
 			page.BaseURL = BaseURL
+			pSP := bluemonday.StrictPolicy()
+			r.ParseForm() // Required if you don't call r.FormValue()
+			if len(r.Form["view"]) > 0 && strings.TrimSpace(r.Form["view"][0]) != "" {
+				if govalidator.IsPrintableASCII(r.Form["view"][0]) {
+					page.View = pSP.Sanitize(r.Form["view"][0])
+				}
+			}
 			next(w, r, page)
 			return
 		}
@@ -147,6 +170,7 @@ func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, valid
 		page := NewPage(w, r)
 		page.State = State
 		page.BaseURL = BaseURL
+		glog.Infoln("VandAPageHandler")
 		if page.Authenticated || ignoreAuth {
 			//was a require fields method passed
 			if require != nil {

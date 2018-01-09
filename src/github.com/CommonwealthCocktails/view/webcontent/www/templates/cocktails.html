@@ -68,8 +68,8 @@
 {{define "cocktailBlocks"}}
 {{range .ChildCocktails}}
 <div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 400px; overflow:hidden;">
-	<a href="/cocktail?cocktailID={{.ID}}" style="text-decoration : none; color : #555;">
-		<div>
+	<a href="/cocktail?cocktailID={{.ID}}&keywords={{.Keywords}}" style="text-decoration : none; color : #555;">
+		<div style="align:center;postition:relative;width:100%;">
 			<div align="center" style="margin-top: 25px;">
 				{{if .ImagePath}}
 				<img class="img-responsive" style="height:150px" src="{{.ImagePath}}/{{.Image}}"/>
@@ -83,6 +83,9 @@
 			<h5>
 			<div id="stars-existing" class="starrr" data-rating='{{.Rating}}'></div>
 			</h5>
+			{{if gt .Top100Index 0}}
+			<h5>#{{.Top100Index}} in Top 100</h5>
+			{{end}}
 			<section style="overflow:hidden;">{{.Description}}</section>
 		</div>
 	</a>

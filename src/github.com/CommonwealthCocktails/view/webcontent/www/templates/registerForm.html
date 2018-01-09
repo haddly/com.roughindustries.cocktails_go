@@ -47,6 +47,9 @@
             <div class="col-lg-4 col-md-3 col-sm-3 col-xs-2"></div>
         </div>
     </div>
+    
+    {{template "footer" .}}
+    
 </body>
 
 </html>
@@ -85,8 +88,8 @@
     {{ end }}
     <div align="left">
         <label for="firstname">Name&nbsp;<font color="red">*</font></label><br>
-        <input type="text" id="firstname" name="firstname" placeholder="First name" value="{{with .User}}{{.FirstName}}{{end}}">&nbsp;&nbsp;
-        <input type="text" id="lastname" name="lastname" placeholder="Last name" value="{{with .User}}{{.LastName}}{{end}}"><br><br>
+        <input style="width: 45%;" type="text" id="firstname" name="firstname" placeholder="First name" value="{{with .User}}{{.FirstName}}{{end}}">&nbsp;&nbsp;
+        <input style="width: 45%;" type="text" id="lastname" name="lastname" placeholder="Last name" value="{{with .User}}{{.LastName}}{{end}}"><br><br>
     </div>
     {{ with .User.Errors.Username }}
         <div class="alert alert-danger" role="alert">
@@ -97,7 +100,7 @@
     {{ end }}
     <div align="left">
         <label align="left" for="username">Username&nbsp;<font color="red">*</font></label><br>
-        <input align="left" type="text" id="username" name="username" placeholder="Username" value="{{with .User}}{{.Username}}{{end}}"><br><br>
+        <input style="width: 92%;" align="left" type="text" id="username" name="username" placeholder="Username" value="{{with .User}}{{.Username}}{{end}}"><br><br>
     </div>
     {{ with .User.Errors.Email }}
         <div class="alert alert-danger" role="alert">
@@ -108,7 +111,7 @@
     {{ end }}
     <div align="left">
         <label for="email">Email&nbsp;<font color="red">*</font></label><br>
-        <input type="text" id="email" name="email" placeholder="Email" value="{{with .User}}{{.Email}}{{end}}"><br><br>
+        <input style="width: 92%;" type="text" id="email" name="email" placeholder="Email" value="{{with .User}}{{.Email}}{{end}}"><br><br>
     </div>
     {{ with .User.Errors.Password }}
     <div class="alert alert-danger" role="alert">
@@ -118,14 +121,16 @@
     {{ end }}
     <div align="left">
         <label for="password">Password&nbsp;<font color="red">*</font></label><br>
-        <input type="password" id="password" name="password" placeholder="Password"><br><br>
+        <input style="width: 92%;" type="password" id="password" name="password" placeholder="Password"><br><br>
     </div>
     <div align="left">
         <label for="passwordconfirm">Password&nbsp;Confirm&nbsp;<font color="red">*</font></label><br>
-        <input type="password" id="passwordconfirm" name="passwordconfirm" placeholder="Password"><br><br>
+        <input style="width: 92%;" type="password" id="passwordconfirm" name="passwordconfirm" placeholder="Password"><br><br>
     </div>
     <hr style="border-color: #FFF;">
-    <!--<div align="center"><button class="g-recaptcha" type="submit" data-sitekey="">Register</button></div>-->
+    <!-- <div align="center"><button class="g-recaptcha" type="submit" data-sitekey="">Register</button></div>-->
+    <hr style="border-color: #FFF;">
+    <button type="submit">Register</button>
     <hr style="border-color: #FFF;">
 </form>
 {{end}}

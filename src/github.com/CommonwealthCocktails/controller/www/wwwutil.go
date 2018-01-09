@@ -3,15 +3,24 @@
 package www
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awsutil"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/golang/glog"
+	"github.com/spf13/viper"
 	"io"
 	"math"
 	"net/http"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 )
@@ -30,6 +39,7 @@ func randSeq(n int) string {
 //panic
 func Error404(w http.ResponseWriter, rec interface{}) {
 	page := NewPage(nil, nil)
+	page.View = "www"
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -199,4 +209,56 @@ func GenerateRandomBytes(n int) ([]byte, error) {
 func GenerateRandomString(s int) (string, error) {
 	b, err := GenerateRandomBytes(s)
 	return base64.URLEncoding.EncodeToString(b), err
+}
+
+func LoadFileToS3(filename string, bucket string) {
+	aws_access_key_id := viper.GetString("aws_access_key_id")
+	aws_secret_access_key := viper.GetString("aws_secret_access_key")
+	token := ""
+	creds := credentials.NewStaticCredentials(aws_access_key_id, aws_secret_access_key, token)
+
+	_, err := creds.Get()
+	if err != nil {
+		glog.Infof("bad credentials: %s", err)
+	}
+
+	cfg := aws.NewConfig().WithRegion("us-east-1").WithCredentials(creds)
+
+	svc := s3.New(session.New(), cfg)
+
+	file, err := os.Open(filename)
+
+	if err != nil {
+		glog.Infof("err opening file: %s", err)
+	}
+
+	defer file.Close()
+
+	fileInfo, _ := file.Stat()
+
+	size := fileInfo.Size()
+
+	buffer := make([]byte, size) // read file content to buffer
+
+	file.Read(buffer)
+
+	fileBytes := bytes.NewReader(buffer)
+	fileType := http.DetectContentType(buffer)
+	path := filepath.Base(file.Name())
+
+	params := &s3.PutObjectInput{
+		Bucket:        aws.String(bucket),
+		Key:           aws.String(path),
+		Body:          fileBytes,
+		ContentLength: aws.Int64(size),
+		ContentType:   aws.String(fileType),
+		ACL:           aws.String("public-read"),
+	}
+
+	resp, err := svc.PutObject(params)
+	if err != nil {
+		glog.Infof("bad response: %s", err)
+	}
+
+	glog.Infof("response %s", awsutil.StringValue(resp))
 }

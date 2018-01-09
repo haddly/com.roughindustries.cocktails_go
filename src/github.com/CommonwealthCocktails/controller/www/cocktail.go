@@ -17,6 +17,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //Cocktail page handler which displays the standard cocktail page.
@@ -27,9 +28,32 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	} else {
 		cs = page.Cocktail.SelectCocktailsByID(page.Cocktail.ID, true)
 		page.CocktailSet = cs
+		var temp []string
+		for _, e := range cs.Cocktail.Recipe.RecipeSteps {
+			temp = append(temp, strconv.Itoa(e.OriginalIngredient.ID))
+		}
+		page.Cocktails = append(page.Cocktails, page.CocktailSet.Cocktail.SelectCocktailsByIngredientIDs(temp)...)
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "cocktail")
 	}
+}
+
+//Cocktail page handler which displays the standard cocktail page.
+func CocktailOfTheDayHandler(w http.ResponseWriter, r *http.Request, page *page) {
+	var cs model.CocktailSet
+	cs = page.Cocktail.SelectCocktailsByDayOfYear(time.Now().YearDay(), true)
+	page.CocktailSet = cs
+	if cs.Cocktail.ID == 0 {
+		page.RenderPageTemplate(w, r, "404")
+		return
+	}
+	var temp []string
+	for _, e := range cs.Cocktail.Recipe.RecipeSteps {
+		temp = append(temp, strconv.Itoa(e.OriginalIngredient.ID))
+	}
+	page.Cocktails = append(page.Cocktails, page.CocktailSet.Cocktail.SelectCocktailsByIngredientIDs(temp)...)
+	//apply the template page info to the index page
+	page.RenderPageTemplate(w, r, "cocktail")
 }
 
 //Cocktails page (i.e. all the cocktails) request handler which
@@ -39,6 +63,20 @@ func CocktailsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var c []model.Cocktail
 	c = page.Cocktail.SelectAllCocktails(false)
 	cs.ChildCocktails = c
+	page.CocktailSet = cs
+	//apply the template page info to the index page
+	page.RenderPageTemplate(w, r, "cocktails")
+}
+
+//Cocktails Top 100 pagerequest handler which
+//displays the top 100 the cocktails page.
+func CocktailsTop100Handler(w http.ResponseWriter, r *http.Request, page *page) {
+	var cs model.CocktailSet
+	var c []model.Cocktail
+	glog.Infoln("Top100 Request")
+	c = page.Cocktail.SelectTop100Cocktails()
+	cs.ChildCocktails = c
+	cs.Metadata.MetaName = "Top 100"
 	page.CocktailSet = cs
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, r, "cocktails")
@@ -141,11 +179,17 @@ func CocktailsByMetaIDHandler(w http.ResponseWriter, r *http.Request, page *page
 		glog.Infoln("Meta ID: " + r.Form["ID"][0])
 		var inMeta model.Meta
 		inMeta.ID = id
+
+		meta := inMeta.SelectMeta()
+		cs.Metadata = meta[0]
+		//hijack some meta datas for special views
+		if cs.Metadata.MetaName == "Top 100" {
+			CocktailsTop100Handler(w, r, page)
+			return
+		}
 		var c []model.Cocktail
 		c = page.Cocktail.SelectCocktailsByMeta(inMeta)
 		cs.ChildCocktails = c
-		meta := inMeta.SelectMeta()
-		cs.Metadata = meta[0]
 		page.CocktailSet = cs
 		page.RenderPageTemplate(w, r, "cocktails")
 	}
@@ -164,6 +208,27 @@ func CocktailsByProductIDHandler(w http.ResponseWriter, r *http.Request, page *p
 		inProduct.ID = id
 		var c []model.Cocktail
 		c = page.Cocktail.SelectCocktailsByProduct(inProduct)
+		cs.ChildCocktails = c
+		prod := inProduct.SelectProduct()
+		cs.Product = prod[0]
+		page.CocktailSet = cs
+		page.RenderPageTemplate(w, r, "cocktails")
+
+	}
+}
+
+//Cocktails by Ingredient id page handler that shows all the cocktails that are
+//related to the Ingredient id provided
+func CocktailsByIngredientIDHandler(w http.ResponseWriter, r *http.Request, page *page) {
+	var cs model.CocktailSet
+	if len(r.Form["ID"]) == 0 {
+		page.RenderPageTemplate(w, r, "404")
+	} else {
+		id, _ := strconv.Atoi(r.Form["ID"][0])
+		var inProduct model.Product
+		inProduct.ID = id
+		var c []model.Cocktail
+		c = page.Cocktail.SelectCocktailsByIngredientID(inProduct)
 		cs.ChildCocktails = c
 		prod := inProduct.SelectProduct()
 		cs.Product = prod[0]
@@ -223,9 +288,19 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 		re := regexp.MustCompile(`\r?\n`)
 		page.Cocktail.Comment = template.HTML(re.ReplaceAllString(r.Form["cocktailComment"][0], " "))
 	}
+	if len(r.Form["cocktailFootnotes"]) > 0 {
+		re := regexp.MustCompile(`\r?\n`)
+		page.Cocktail.Footnotes = template.HTML(re.ReplaceAllString(r.Form["cocktailFootnotes"][0], " "))
+	}
+	if len(r.Form["cocktailKeywords"]) > 0 {
+		page.Cocktail.Keywords = r.Form["cocktailKeywords"][0]
+	}
 	if len(r.Form["cocktailImage"]) > 0 {
 		page.Cocktail.ImagePath, page.Cocktail.Image = filepath.Split(r.Form["cocktailImage"][0])
 		page.Cocktail.ImagePath = strings.TrimSuffix(page.Cocktail.ImagePath, "/")
+	}
+	if len(r.Form["cocktailLabeledImageLink"]) > 0 {
+		page.Cocktail.LabeledImageLink = r.Form["cocktailLabeledImageLink"][0]
 	}
 	if len(r.Form["cocktailImageSourceName"]) > 0 {
 		page.Cocktail.ImageSourceName = r.Form["cocktailImageSourceName"][0]
@@ -245,6 +320,9 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 	if len(r.Form["recipeMethod"]) > 0 {
 		re := regexp.MustCompile(`\r?\n`)
 		page.Cocktail.Recipe.Method = template.HTML(re.ReplaceAllString(r.Form["recipeMethod"][0], " "))
+	}
+	if len(r.Form["ignoreRecipe"]) > 0 {
+		page.Cocktail.IgnoreRecipeUpdate, _ = strconv.ParseBool(r.Form["ignoreRecipe"][0])
 	}
 	if len(r.Form["recipeID"]) > 0 {
 		page.Cocktail.Recipe.ID, _ = strconv.Atoi(r.Form["recipeID"][0])
@@ -289,6 +367,9 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 			}
 		}
 	}
+	if len(r.Form["ignoreProducts"]) > 0 {
+		page.Cocktail.IgnoreProductUpdate, _ = strconv.ParseBool(r.Form["ignoreProducts"][0])
+	}
 	if len(r.Form["Garnish"]) > 0 {
 		for _, id := range r.Form["Garnish"] {
 			if id != "" {
@@ -317,6 +398,10 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 				page.Cocktail.Tool = append(page.Cocktail.Tool, p)
 			}
 		}
+	}
+
+	if len(r.Form["ignoreMetas"]) > 0 {
+		page.Cocktail.IgnoreMetaUpdate, _ = strconv.ParseBool(r.Form["ignoreMetas"][0])
 	}
 	if len(r.Form["Flavor"]) > 0 {
 		for _, id := range r.Form["Flavor"] {

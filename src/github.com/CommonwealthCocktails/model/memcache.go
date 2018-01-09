@@ -4,8 +4,8 @@ package model
 
 import (
 	"bytes"
-	"github.com/CommonwealthCocktails/connectors"
 	"encoding/gob"
+	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
@@ -111,4 +111,8 @@ func LoadMCWithMetaData() {
 
 		mc.Set(&memcache.Item{Key: "mbt_ft", Value: buf.Bytes()})
 	}
+}
+
+//Reinitialize the post lists in the memcache
+func LoadMCWithPostData() {
 }

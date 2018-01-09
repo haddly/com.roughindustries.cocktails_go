@@ -16,6 +16,7 @@ type Product struct {
 	Details          template.HTML
 	ImagePath        string
 	Image            string
+	LabeledImageLink string
 	ImageSourceName  string
 	ImageSourceLink  string
 	Recipe           Recipe

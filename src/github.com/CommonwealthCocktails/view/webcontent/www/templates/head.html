@@ -1,24 +1,69 @@
 {{define "head"}}
 <meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="">
-<meta name="author" content="">
 
 <meta name="google-site-verification" content="QYDlNaPdm6WCJGnl-u44ewNSMwUFHDXMwckm9HZhrvs" />
+<meta name="p:domain_verify" content="39ee9b6f6af3427984a3886ac198e8c1"/>
 
 <meta name="twitter:card" content="summary" />
 {{if .CocktailSet.Cocktail.Name}}
-<title>{{.CocktailSet.Cocktail.Name}}</title>
-<meta property="og:title" content="{{.CocktailSet.Cocktail.Name}}" />
-<meta property="og:name" content="{{.CocktailSet.Cocktail.Name}}" />
+<title>{{.CocktailSet.Cocktail.Name}} from Commonwealth Cocktails</title>
+<meta name="description" content="{{.CocktailSet.Cocktail.Name}} from Commonwealth Cocktails">
+<meta property="og:title" content="{{sanitize .CocktailSet.Cocktail.Name}} from Commonwealth Cocktails" />
+<meta property="og:name" content="{{sanitize .CocktailSet.Cocktail.Name}} from Commonwealth Cocktails" />
 <meta property="og:type" content="website" />
-<meta property="og:description" content="{{if .CocktailSet.Cocktail.Description}}{{.CocktailSet.Cocktail.Description}}{{end}}" />
-<meta property="og:image" content="{{if .CocktailSet.Cocktail.Image}}{{if .CocktailSet.Cocktail.ImagePath}}{{.CocktailSet.Cocktail.ImagePath}}/{{.CocktailSet.Cocktail.Image}}{{end}}{{end}}" />
+<meta property="og:url" content="{{.BaseURL}}/cocktail?cocktailID={{.CocktailSet.Cocktail.ID}}&keywords={{.CocktailSet.Cocktail.Keywords}}" />
+<meta property="og:description" content="{{sanitize .CocktailSet.Cocktail.Name}} - {{if .CocktailSet.Cocktail.Description}}{{.CocktailSet.Cocktail.Description}}{{end}} Method: {{sanitize .CocktailSet.Cocktail.Recipe.Method}}" />
+<meta property="og:image" content="{{if .CocktailSet.Cocktail.Image}}{{if .CocktailSet.Cocktail.ImagePath}}{{.CocktailSet.Cocktail.ImagePath}}/{{.CocktailSet.Cocktail.Image}}{{end}}{{else}}https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=36&txt=CommonwealthCocktails.com&w=350&h=350&txttrack=0{{end}}" />
+{{if .CocktailSet.Cocktail.LabeledImageLink}}
+<meta property="og:image" content="{{.CocktailSet.Cocktail.LabeledImageLink}}" />
+{{end}}
+<meta property="og:image:alt" content="{{sanitize .CocktailSet.Cocktail.Name}} from Commonwealth Cocktails - ({{.CocktailSet.Cocktail.Keywords}})" />
+{{else}}
+{{if .Post.PostTitle}}
+<title>{{.Post.PostTitle}} from Commonwealth Cocktails</title>
+<meta name="description" content="{{.Post.PostTitle}} from Commonwealth Cocktails">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{{sanitize .Post.PostTitle}} from Commonwealth Cocktails" />
+<meta property="og:description" content="{{sanitize .Post.PostTitle}} - {{if .Post.PostExcerpt}}{{sanitize .Post.PostExcerpt}}{{else}}Post coming soon ...{{end}}" />
+<meta property="og:name" content="{{sanitize .Post.PostTitle}} from Commonwealth Cocktails" />
+<meta property="og:site_name" content="CommonwealthCocktails.com" />
+<meta property="article:published_time" content="{{now}}" />
+<meta property="article:author" content="Commonwealth Cocktails" />
+<meta property="og:image" content="{{if .Post.PostImage}}{{.Post.PostImage}}{{else}}https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=36&txt=CommonwealthCocktails.com&w=350&h=350&txttrack=0{{end}}" />
+{{else}}
+{{if .BaseProductWithBDG.Product.ProductName}}
+{{with .BaseProductWithBDG}}
+<title>{{.Product.ProductName}} from Commonwealth Cocktails</title>
+<meta name="description" content="{{.Product.ProductName}} from Commonwealth Cocktails">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="{{sanitize .Product.ProductName}}" />
+<meta property="og:description" content="{{sanitize .Product.ProductName}} - {{if .Product.Description}}{{sanitize .Product.Description}}{{else}}Description coming soon ... {{end}}" />
+<meta property="og:site_name" content="CommonwealthCocktails.com" />
+<meta property="article:published_time" content="{{now}}" />
+<meta property="article:author" content="Commonwealth Cocktails" />
+{{if .Product.AmazonLink}}<meta property="og:referenced" content="{{.Product.AmazonLink}}" />{{end}}
+<meta property="og:image" content="{{if .Product.Image}}{{if .Product.ImagePath}}{{.Product.ImagePath}}/{{.Product.Image}}{{end}}{{else}}https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=36&txt=CommonwealthCocktails.com&w=350&h=350&txttrack=0{{end}}" />
+{{if .Product.LabeledImageLink}}
+<meta property="og:image" content="{{.Product.LabeledImageLink}}" />
+{{end}}
+<meta property="og:image:alt" content="{{.Product.ProductName}} - {{if .BaseProduct.ProductName}}{{.BaseProduct.ProductName}}{{end}}" />
+{{end}}
 {{else}}
 <title>Commonwealth Cocktails</title>
-<meta property="og:title" content="Commonwealth Cocktails" />
+<meta name="description" content="Commonwealth Cocktails at CommonwealthCocktails.com | Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset." />
+<meta property="og:title" content="Commonwealth Cocktails at CommonwealthCocktails.com" />
+<meta name="description" content="Commonwealth Cocktails at CommonwealthCocktails.com | Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset." />
+<meta property="og:description" content="Commonwealth Cocktails at CommonwealthCocktails.com | Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset." />
+<meta property="og:site_name" content="Commonwealth Cocktails at CommonwealthCocktails.com" />
+<meta property="og:name" content="Commonwealth Cocktails at CommonwealthCocktails.com" />
+<meta name="keywords" content="Commonwealth Cocktails at CommonwealthCocktails.com,cocktails,mixers,garnish,drinkware,metadata,spirits,liqueurs,cocktails made simple,commonwealthcocktails,cocktail of the day,libations for everyone,drinks,drinks posts,drinks articles">
 {{end}}
+{{end}}
+{{end}}
+
 <meta property="fb:app_id" content="440301159683076" />
 
 <!-- Bootstrap Core CSS -->

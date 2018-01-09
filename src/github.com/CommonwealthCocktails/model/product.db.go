@@ -26,6 +26,35 @@ func (product *Product) UpdateProduct() int {
 	return product.processProduct()
 }
 
+//Update Product images
+func (product *Product) UpdateProductImages() int {
+	conn, _ := connectors.GetDB()
+	var args []interface{} //arguments for variables in the data struct
+	var buffer bytes.Buffer
+	buffer.WriteString("UPDATE `product` SET ")
+	buffer.WriteString(" `productImagePath`=?,")
+	args = append(args, product.ImagePath)
+	buffer.WriteString(" `productImage`=?,")
+	args = append(args, product.Image)
+	buffer.WriteString("`productLabeledImageLink`=?,")
+	args = append(args, product.LabeledImageLink)
+	query := buffer.String()
+	query = strings.TrimRight(query, ",")
+	query = query + " WHERE `idProduct`=?;"
+	args = append(args, strconv.Itoa(int(product.ID)))
+	glog.Infoln(product)
+	glog.Infoln(args)
+	glog.Infoln(query)
+	lastProductId := int(product.ID)
+	res, _ := conn.Exec(query, args...)
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		glog.Error(err)
+	}
+	glog.Infoln("Product ID = %d, affected = %d\n", lastProductId, rowCnt)
+	return lastProductId
+}
+
 //Process an insert or an update
 func (product *Product) processProduct() int {
 	conn, _ := connectors.GetDB()
@@ -112,6 +141,14 @@ func (product *Product) processProduct() int {
 		}
 		args = append(args, product.Image)
 	}
+	if product.LabeledImageLink != "" {
+		if product.ID == 0 {
+			buffer.WriteString("`productLabeledImageLink`,")
+		} else {
+			buffer.WriteString("`productLabeledImageLink`=?,")
+		}
+		args = append(args, product.LabeledImageLink)
+	}
 	if product.ImageSourceName != "" {
 		if product.ID == 0 {
 			buffer.WriteString("`productImageSourceName`,")
@@ -144,6 +181,12 @@ func (product *Product) processProduct() int {
 		}
 		args = append(args, product.SourceLink)
 	}
+	if product.ID == 0 {
+		buffer.WriteString("`productAmazonLink`,")
+	} else {
+		buffer.WriteString(" `productAmazonLink`=?,")
+	}
+	args = append(args, product.AmazonLink)
 	query := buffer.String()
 	query = strings.TrimRight(query, ",")
 	if product.ID == 0 {
@@ -262,7 +305,7 @@ func (product *Product) SelectProduct() []Product {
 	glog.Infoln(product.ProductName)
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT `idProduct`, `productName`, `productType`, `productGroupType`, COALESCE(`productDescription`, ''), COALESCE(`productDetails`, ''), " +
-		"COALESCE(`productImageSourceName`, ''), COALESCE(`productImage`, ''), COALESCE(`productImagePath`, ''), COALESCE(`productImageSourceLink`, ''), " +
+		"COALESCE(`productImageSourceName`, ''), COALESCE(`productImage`, ''), COALESCE(`productImagePath`, ''), COALESCE(`productImageSourceLink`, ''), COALESCE(`productLabeledImageLink`, ''), " +
 		"COALESCE(`productPreText`, ''), COALESCE(`productPostText`, ''), COALESCE(`productRating`, 0), COALESCE(`productSourceName`, ''), COALESCE(`productSourceLink`, ''), " +
 		"COALESCE(`productAmazonLink`, '') " +
 		"FROM `product` WHERE ")
@@ -318,6 +361,10 @@ func (product *Product) SelectProduct() []Product {
 		buffer.WriteString("`productImageSourceLink`=? AND")
 		args = append(args, product.ImageSourceLink)
 	}
+	if product.LabeledImageLink != "" {
+		buffer.WriteString("`productLabeledImageLink`=? AND")
+		args = append(args, product.LabeledImageLink)
+	}
 	if product.SourceName != "" {
 		buffer.WriteString("`productSourceName`=? AND")
 		args = append(args, html.EscapeString(string(product.SourceName)))
@@ -342,7 +389,7 @@ func (product *Product) SelectProduct() []Product {
 		var name string
 		var desc string
 		var details string
-		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.LabeledImageLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
 		if err != nil {
 			glog.Error(err)
 		}
@@ -350,7 +397,7 @@ func (product *Product) SelectProduct() []Product {
 		prod.Description = template.HTML(html.UnescapeString(desc))
 		prod.Details = template.HTML(html.UnescapeString(details))
 		ret = append(ret, prod)
-		glog.Infoln(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.Description, prod.Details, prod.ImageSourceName, prod.Image, prod.ImagePath, prod.ImageSourceLink, prod.PreText, prod.PostText, prod.Rating, prod.SourceName, prod.SourceLink, prod.AmazonLink)
+		glog.Infoln(prod.ID, prod.ProductName, prod.ProductType.ID, prod.ProductGroupType, prod.Description, prod.Details, prod.ImageSourceName, prod.Image, prod.ImagePath, prod.ImageSourceLink, prod.LabeledImageLink, prod.PreText, prod.PostText, prod.Rating, prod.SourceName, prod.SourceLink, prod.AmazonLink)
 	}
 	err = rows.Err()
 	if err != nil {
@@ -574,7 +621,7 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT product.idProduct, product.productName, product.productType, product.productGroupType," +
 		" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, ''), COALESCE(product.productImageSourceName, '')," +
-		" COALESCE(product.productImage, ''), COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, '')," +
+		" COALESCE(product.productImage, ''), COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, ''), COALESCE(product.productLabeledImageLink, '')," +
 		" COALESCE(product.productPreText, ''), COALESCE(product.productPostText, ''), COALESCE(product.productRating, 0)," +
 		" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, ''), COALESCE(`productAmazonLink`, '')" +
 		" FROM product" +
@@ -595,7 +642,7 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 		var prod Product
 		var desc string
 		var details string
-		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.LabeledImageLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
 		if err != nil {
 			glog.Error(err)
 		}

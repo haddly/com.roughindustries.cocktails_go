@@ -25,8 +25,9 @@ func ProductHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(r.Form["ID"][0])
-
 		p = page.Product.SelectProductByIDWithBDG(id)
+		page.Cocktails = page.Cocktail.SelectCocktailsByProduct(p.Product)
+		page.Cocktails = append(page.Cocktails, page.Cocktail.SelectCocktailsByIngredientID(p.Product)...)
 		page.BaseProductWithBDG = *p
 		page.RenderPageTemplate(w, r, "product")
 	}
@@ -201,6 +202,9 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 		page.Product.ImagePath, page.Product.Image = filepath.Split(r.Form["productImage"][0])
 		page.Product.ImagePath = strings.TrimSuffix(page.Product.ImagePath, "/")
 	}
+	if len(r.Form["productLabeledImageLink"]) > 0 {
+		page.Product.LabeledImageLink = r.Form["productLabeledImageLink"][0]
+	}
 	if len(r.Form["productImageSourceName"]) > 0 {
 		page.Product.ImageSourceName = r.Form["productImageSourceName"][0]
 	}
@@ -221,6 +225,13 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 	}
 	if len(r.Form["productSourceLink"]) > 0 {
 		page.Product.SourceLink = r.Form["productSourceLink"][0]
+	}
+	if r.Form["productAmazonLink"] != nil {
+		if len(r.Form["productAmazonLink"]) == 0 {
+			page.Product.AmazonLink = ""
+		} else {
+			page.Product.AmazonLink = r.Form["productAmazonLink"][0]
+		}
 	}
 	if len(page.Product.Errors) > 0 {
 		if page.Errors == nil {

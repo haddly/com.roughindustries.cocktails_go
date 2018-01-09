@@ -19,19 +19,9 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/glog"
 	"github.com/gorilla/sessions"
-	"github.com/spf13/viper"
 	"net/http"
 	"time"
 )
-
-//the sessions are stored here in cookies
-var store_key string
-
-//Init variables from config
-func SessionInit() {
-	glog.Infoln("Session Init")
-	store_key = viper.GetString("cookieStoreKey")
-}
 
 //get the session from the cookies and cross reference it with the
 //memcache

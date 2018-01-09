@@ -13,11 +13,8 @@ import (
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/golang/glog"
 	"github.com/microcosm-cc/bluemonday"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/facebook"
-	"golang.org/x/oauth2/google"
 	"html"
 	"html/template"
 	"io/ioutil"
@@ -26,70 +23,6 @@ import (
 	"strings"
 	"time"
 )
-
-//Variables for use within the login package
-var (
-	//OAuth
-	googleOauthConfig   *oauth2.Config
-	facebookOauthConfig *oauth2.Config
-
-	// Some random string, random for each request
-	// this way could create a memory leak sense I don't clear out the map ever, just a heads up
-	oauthStateString = make(map[string]bool)
-
-	//Default user is the user you can get into the system with at all times
-	allowDefault    bool
-	defaultUser     string
-	defaultPassword string
-
-	//reCAPTCHA
-	sitekey    string
-	re         reCAPTCHA
-	sitekeyInv string
-	reInv      reCAPTCHA
-
-	//registration email
-	registerFromEmailAddress string
-	registerEmailPasswd      string
-)
-
-//Init variables from config
-func LoginInit() {
-	glog.Infoln("Login Init")
-	//default user
-	allowDefault = viper.GetBool("allowDefault")
-	defaultUser = viper.GetString("defaultUser")
-	//hash is = password
-	defaultPassword = viper.GetString("defaultPassword")
-
-	//reCAPTCHA
-	sitekey = viper.GetString("reCAPTCHASiteKey")
-	re = reCAPTCHA{
-		Secret: viper.GetString("reCAPTCHASecret"),
-	}
-	sitekeyInv = viper.GetString("reCAPTCHASiteKeyInv")
-	reInv = reCAPTCHA{
-		Secret: viper.GetString("reCAPTCHASecretInv"),
-	}
-
-	googleOauthConfig = &oauth2.Config{
-		ClientID:     viper.GetString("googleOauthConfigClientID"),
-		ClientSecret: viper.GetString("googleOauthConfigClientSecret"),
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
-		Endpoint:     google.Endpoint,
-	}
-	facebookOauthConfig = &oauth2.Config{
-		ClientID:     viper.GetString("facebookOauthConfigClientID"),
-		ClientSecret: viper.GetString("facebookOauthConfigClientSecret"),
-		Scopes:       []string{"public_profile", "email", "pages_show_list", "manage_pages", "publish_pages"},
-		Endpoint:     facebook.Endpoint,
-	}
-
-	//I am using gmail smtp.  If you have 2 step authentication get an app
-	//password that corresponds to the from email account you use.
-	registerFromEmailAddress = viper.GetString("registerFromEmailAddress")
-	registerEmailPasswd = viper.GetString("registerEmailPasswd")
-}
 
 //Login page handler which displays the standard login page.
 func loginIndexHandler(w http.ResponseWriter, r *http.Request, page *page) {
@@ -185,7 +118,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	pSP := bluemonday.StrictPolicy()
 	//check the recaptcha to make sure we don't have bot or something
-	isValid := reInv.Verify(*r)
+	isValid := re.Verify(*r)
 	if !isValid {
 		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
@@ -298,7 +231,7 @@ func verifyRegisterHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	pSP := bluemonday.StrictPolicy()
 	//check the recaptcha to make sure we don't have bot or something
-	isValid := reInv.Verify(*r)
+	isValid := re.Verify(*r)
 	if !isValid {
 		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
@@ -373,7 +306,7 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 func resetPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	pSP := bluemonday.StrictPolicy()
 	//check the recaptcha to make sure we don't have bot or something
-	isValid := reInv.Verify(*r)
+	isValid := re.Verify(*r)
 	if !isValid {
 		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
@@ -439,11 +372,8 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request, page *page) {
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
 		glog.Infoln("Bad memcache handleGoogleLogin")
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
+		oauth := model.OAuth{Key: str, Time: time.Now()}
+		oauth.InsertOAuth()
 	}
 	googleOauthConfig.RedirectURL = page.BaseURL + "/GoogleCallback"
 	url := googleOauthConfig.AuthCodeURL(str)
@@ -480,11 +410,19 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 		}
 	} else {
 		glog.Infoln("Bad memcache handleGoogleCallback")
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
+		oauth := model.OAuth{Key: state}
+		item := oauth.SelectOAuthByKey()
+		if item != nil {
+			item.DeleteOAuth()
+			if time.Since(item.Time).Seconds() > 30 {
+				glog.Infoln("invalid oauth state")
+				http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+				return
+			}
+		} else {
+			glog.Infoln("invalid oauth state")
+			return
+		}
 	}
 
 	code := r.FormValue("code")
@@ -534,11 +472,8 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request, page *page) {
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
 		glog.Infoln("Bad memcache handleGoogleLogin")
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
+		oauth := model.OAuth{Key: str, Time: time.Now()}
+		oauth.InsertOAuth()
 	}
 	oauthStateString[str] = true
 	facebookOauthConfig.RedirectURL = page.BaseURL + "/FacebookCallback"
@@ -576,11 +511,19 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 		}
 	} else {
 		glog.Infoln("Bad memcache handleFacebookCallback")
-		//Try the database here
-		// if db connection is good {
-		// } else {
-		// 	panic
-		// }
+		oauth := model.OAuth{Key: state}
+		item := oauth.SelectOAuthByKey()
+		if item != nil {
+			item.DeleteOAuth()
+			if time.Since(item.Time).Seconds() > 30 {
+				glog.Infoln("invalid oauth state")
+				http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+				return
+			}
+		} else {
+			glog.Infoln("invalid oauth state")
+			return
+		}
 	}
 
 	code := r.FormValue("code")

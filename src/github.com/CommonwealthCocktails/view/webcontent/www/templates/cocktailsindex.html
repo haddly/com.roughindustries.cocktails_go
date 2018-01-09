@@ -26,9 +26,8 @@
 				<div class=" col-xs-1"></div>
 				<div class=" col-xs-10">
 				{{template "top100" .}}
-				{{template "cocktailsByIngredient" .}}
+				{{template "cocktailsSearch" .}}
 				{{template "cocktailOfTheDay" .}}
-				{{template "cocktailsByStyle" .}}
 				</div>
 				<div class=" col-xs-1"></div>
 			</div>
@@ -60,11 +59,11 @@
 {{end}}
 
 {{define "top100"}}
-<div class="brightness col-xs-6 col-sm-6 col-md-5 col-lg-3" style="margin-bottom: 50px;">
-	<a href="#" style="text-decoration : none; color : #555;">
+<div class="brightness col-xs-12 col-sm-4 col-md-4 col-lg-4" style="margin-bottom: 50px;">
+	<a href="/cocktailTop100" style="text-decoration : none; color : #555;">
 		<span style="display: block;">
 			<div align="center">
-				<img border="0" style="max-height:250px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=EEEEEE&w=900&h=1200">
+				<img border="0" style="max-height:200px" class="img-responsive" src="https://s3.amazonaws.com/commonwealthcocktailsimages/top_100.jpg">
 				<!--<img class="img-responsive" style="max-height:250px" src="https://placehold.it/900x1200">-->
 			</div>
 			<h3 align="center">Top 100 Cocktails</h3>
@@ -73,43 +72,29 @@
 </div>
 {{end}}
 
-{{define "cocktailsByIngredient"}}
-<div class="brightness col-xs-6 col-sm-6 col-md-5 col-lg-3" style="margin-bottom: 50px;">
+{{define "cocktailsSearch"}}
+<div class="brightness col-xs-12 col-sm-4 col-md-4 col-lg-4" style="margin-bottom: 50px;">
 	<a href="#" style="text-decoration : none; color : #555;">
 		<span style="display: block;">
 			<div align="center">
-				<img border="0" style="max-height:250px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=EEEEEE&w=900&h=1200">
+				<img border="0" style="max-height:200px" class="img-responsive" src="https://s3.amazonaws.com/commonwealthcocktailsimages/cocktail_by_ingredients.jpg">
 				<!--<img class="img-responsive" style="max-height:250px" src="https://placehold.it/900x1200">-->
 			</div>
-			<h3 align="center">Cocktails By Ingredient</h3>
+			<h3 align="center">Cocktails Search</h3>
 		</span>
 	</a>
 </div>
 {{end}}
 
 {{define "cocktailOfTheDay"}}
-<div class="brightness col-xs-6 col-sm-6 col-md-5 col-lg-3" style="margin-bottom: 50px;">
-	<a href="#" style="text-decoration : none; color : #555;">
+<div class="brightness col-xs-12 col-sm-4 col-md-4 col-lg-4" style="margin-bottom: 50px;">
+	<a href="cocktailOfTheDay?day={{dayOfYear}}" style="text-decoration : none; color : #555;">
 		<span style="display: block;">
 			<div align="center">
-				<img border="0" style="max-height:250px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=EEEEEE&w=900&h=1200">
+				<img border="0" style="max-height:200px" class="img-responsive" src="https://s3.amazonaws.com/commonwealthcocktailsimages/cocktail_of_the_day.jpg">
 				<!--<img class="img-responsive" style="max-height:250px" src="https://placehold.it/900x1200">-->
 			</div>
 			<h3 align="center">Cocktail of the Day</h3>
-		</span>
-	</a>
-</div>
-{{end}}
-
-{{define "cocktailsByStyle"}}
-<div class="brightness col-xs-6 col-sm-6 col-md-5 col-lg-3" style="margin-bottom: 50px;">
-	<a href="#" style="text-decoration : none; color : #555;">
-		<span style="display: block;">
-			<div align="center">
-				<img border="0" style="max-height:250px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=EEEEEE&w=900&h=1200">
-				<!--<img class="img-responsive" style="max-height:250px" src="https://placehold.it/900x1200">-->
-			</div>
-			<h3 align="center">Cocktails By Style</h3>
 		</span>
 	</a>
 </div>
