@@ -1,0 +1,15 @@
+{{define "base"}}
+<p>{{.User.FirstName}} {{.User.LastName}}, you have requested a password reset. Please click the link below to change the password.</p>
+<p><a href='{{.BaseURL}}/passwdResetForm?code={{.User.VerificationCode}}&email={{.User.Email}}'><button style=" background-color: #555555; /* Black */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;" >Reset Password</button></a></p>
+<p>Please use this code as your temporary password:</p>
+<p>{{.User.Password}}</p>
+<p>You will have 24 hours from your request to reset you password before you will have to request another reset.</p>
+<p>Thanks, The Commonwealth.</p>
+{{end}}

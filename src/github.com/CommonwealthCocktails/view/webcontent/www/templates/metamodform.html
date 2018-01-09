@@ -1,0 +1,211 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <!-- Page Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <hr height="30px" style="border-color: #FFF;">
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="page-header">
+                    <h1 align="center">Meta Modification Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "metaResults" .}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "metaSelect" .}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{if .Authenticated}}{{if .AllowAdmin}}{{if .UserSession}}
+                    <form method="post" action="/metaMod" id="metaModForm" autocomplete="nope">
+                        <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+                        {{template "metaID" .}}
+                        <!---->
+                        {{template "metaName" .}}
+                        <!---->
+                        {{template "metaType" .}}
+                        <!---->
+                        {{template "metaBlurb" .}}
+                        <!---->
+                    </form>
+                    <script>
+                        $(window).bind("pageshow", function() {
+                            $('#metaModForm')[0].reset();
+                        });
+                    </script>
+                    <div style="text-align: center;">
+                        <button name="button" type="submit" value="add" id="addButton" form="metaModForm" class="btn btn-default">Add</button>
+                        {{if .Meta.ID}}
+                        <button name="button" type="submit" value="update" id="updateButton" form="metaModForm" class="btn btn-default">Update</button>
+                        <!--<button name="delete" type="submit" form="metaModForm" class="btn btn-default">Delete</button>-->
+                        {{end}}
+                        <script>
+                            $(function() {
+                                $('#addButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
+                                    $('#metaID').val("");
+                                });
+                                $('#updateButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
+                                });
+                            });
+                        </script>
+                    </div>
+                    {{end}}{{end}}{{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+{{end}}
+
+{{define "metaResults"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10">
+        {{ with .Messages.metaModifySuccess }}
+        <div class="alert alert-success alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+        {{ with .Messages.metaModifyFail }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "metaSelect"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="metaSelect">Select Meta</label>
+        <select class="form-control" id="metaSelect" name="metaSelect">
+            <option value="" selected>Blank Meta Item ...</option>
+            {{range .MetasByTypes.MBT}}
+            <optgroup label="{{.MetaType.MetaTypeName}}">
+            {{range .Metas}}
+            {{if eq $.Meta.ID .ID}}
+            <option value="{{.ID}}" selected>{{.MetaName}}</option>
+            {{else}}
+            <option value="{{.ID}}">{{.MetaName}}</option>
+            {{end}}
+            {{end}}
+            {{end}}
+            </optgroup>
+        </select>
+    </div>
+    <script>
+        $(function() {
+            // bind change event to select
+            $('#metaSelect').on('change', function() {
+                var id = $(this).val(); // get selected value
+                if (id) { // require a URL
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/metaModForm?metaID="+id; // redirect
+                } else {
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/metaModForm"; // redirect
+                }
+                return false;
+            });
+        });
+    </script>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--ID int-->
+{{define "metaID"}}
+<input type="text" class="form-control hide" id="metaID" name="metaID" value="{{if .Meta.ID}}{{.Meta.ID}}{{end}}">
+{{end}}
+
+<!--MetaName string-->
+{{define "metaName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Meta.Errors.MetaName }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="metaName">Meta Name</label>
+        <input type="text" class="form-control" id="metaName" name="metaName" value="{{if .Meta.MetaName}}{{.Meta.MetaName}}{{end}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--MetaType MetaType-->
+{{define "metaType"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Meta.Errors.MetaType }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="metaType">Meta Type</label>
+        <select class="form-control" name="metaType">
+            <option style="display:none" disabled value selected></option>
+            {{range .MetasByTypes.MBT}}
+            <option value="{{.MetaType.ID}}"{{if eq $.Meta.MetaType.ID .MetaType.ID}} selected {{else}}{{if $.Meta.ID}} disabled {{end}}{{end}}>{{.MetaType.MetaTypeName}}</option>
+            {{end}}
+        </select>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--Blurb    template.HTML-->
+{{define "metaBlurb"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="metaBlurb">Meta Blurb</label>
+        <!--<textarea id="metaBlurb" class="form-control hide" rows="3" name="metaBlurb">-->
+        <!--</textarea>-->
+        <textarea id="metaBlurb" name="metaBlurb">{{if .Meta.Blurb}}{{.Meta.Blurb}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}

@@ -1,0 +1,81 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+       function onSubmit(token) {
+         document.getElementById("forgotPasswdForm").submit();
+       }
+    </script>
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+
+    <div class="container">
+    	<div class="row">
+    		<div class="col-xs-12">
+    			<hr height="30px" style="border-color: #FFF;">
+    		</div>
+    	</div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1 align="center">Please enter your email:</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "forgotPasswdResults" .}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-3 col-sm-3 col-xs-2"></div>
+            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-8" align="center">
+                {{template "forgotPasswdForm" .}}
+            </div>
+            <div class="col-lg-4 col-md-3 col-sm-3 col-xs-2"></div>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}
+<!---->
+{{define "forgotPasswdResults"}}
+<div class="row">
+    <div class=" col-xs-3"></div>
+    <div class=" col-xs-6">
+        {{ with .User.Errors.Email }}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {{.}}
+        </div>
+        {{ end }}
+    </div>
+    <div class=" col-xs-3"></div>
+</div>
+{{end}}
+<!---->
+{{define "forgotPasswdForm"}}
+<form id='forgotPasswdForm' method="post" action="/forgotPasswd" autocomplete="off">
+    <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+    <div align="center">
+        <input type="text" id="email" name="email" placeholder="Email" value="{{with .User}}{{.Email}}{{end}}"><br><br>
+    </div>
+    <hr style="border-color: #FFF;">
+    <button type="submit">Submit</button>
+    <hr style="border-color: #FFF;">
+</form>
+{{end}}
