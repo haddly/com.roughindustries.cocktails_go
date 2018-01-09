@@ -1,0 +1,109 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{template "navbar" .}}
+	
+	<div class="container">
+		Portfolio Item Heading
+		<div class="page-header">
+			<h1 align="center">Image Test</h1>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+			    <div class="row">
+				    <img src="{{.Image.ImageSource}}" style="display: block; margin-left: auto; margin-right: auto;"/>
+				    <center><a target="_blank" href="{{.Image.ImageSource}}">{{.Image.ImageSource}}</a></center>
+				</div>
+				<hr style="border-color: #EEE;">
+				<div class="row">
+				    <img src="{{.Image.LabeledImageSource}}" style="display: block; margin-left: auto; margin-right: auto;"/>
+				    <center><a target="_blank" href="{{.Image.LabeledImageSource}}">{{.Image.LabeledImageSource}}</a></center>
+				</div>
+			</div>
+		</div>
+		<hr style="border-color: #FFF;">
+		<div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+					{{if .Authenticated}}{{if .AllowAdmin}}{{if .UserSession}}
+                    <form method="post" action="/imageUpdate" id="imageUpdateForm" autocomplete="nope">
+                        <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+                        <input type="hidden" id="imageSource" name="imageSource" value="{{.Image.ImageSource}}"/>
+                        <input type="hidden" id="imageLabeledImageSource" name="imageLabeledImageSource" value="{{.Image.LabeledImageSource}}"/>
+                        <input type="hidden" id="imageUpdate" name="imageUpdate" value=""/>
+                        <input type="hidden" class="form-control" id="imageText" name="imageText" value="{{.Image.Text}}">
+                        <input type="hidden" class="form-control" id="imageKeywords" name="imageKeywords" value="{{.Image.Keywords}}">
+                        {{if ne .Image.ImageGen "test"}}
+                        <div class="row">
+					    	<div class=" col-xs-1"></div>
+						    <div class=" col-xs-10 form-group">
+						        <label for="cocktailSelect">Select Cocktail</label>
+						        <select class="form-control" id="cocktailSelect" name="cocktailSelect">
+						            <option value="" selected>Blank Cocktail Item ...</option>
+						            {{range $key, $value := .CocktailsByAlphaNums.CBA}}
+						            <optgroup label="{{$key}}">
+						            {{range $value}}
+						            <option value="{{.ID}}" {{if eq $.Cocktail.ID .ID}}selected{{end}}>{{.Name}}</option>
+						            {{end}}
+						            {{end}}
+						            </optgroup>
+						        </select>
+						    </div>
+							<div class=" col-xs-1"></div>
+						</div>
+						<div class="row">
+						    <div class=" col-xs-1"></div>
+						    <div class=" col-xs-10 form-group">
+						        <label for="metaSelect">Select Product</label>
+						        <select class="form-control" id="productSelect" name="productSelect">
+						            <option value="" selected>Blank Product Item ...</option>
+						            {{range .ProductsByTypes.PBT}}
+						            <optgroup label="{{.ProductType.ProductTypeName}}">
+						            {{range .Products}}
+						            <option value="{{.ID}}" {{if eq $.Product.ID .ID}}selected{{end}}>{{if eq 1 .ProductGroupType}}(Base)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{else}}{{if eq 2 .ProductGroupType}}(Derived){{else}}{{if eq 3 .ProductGroupType}}(Group)&nbsp;&nbsp;&nbsp;{{end}}{{end}}{{end}} {{if .PreText}}{{.PreText}}&nbsp;{{end}}{{.ProductName}}{{if .PostText}}&nbsp;{{.PostText}}{{end}}</option>
+						            {{end}}
+						            {{end}}
+						            </optgroup>
+						        </select>
+						    </div>
+							<div class=" col-xs-1"></div>
+						</div>
+						{{end}}
+                    </form>
+                    <div style="text-align: center;">
+                    	{{if ne .Image.ImageGen "test"}}
+                        <button name="button" type="submit" id="loadCocktailButton" form="imageUpdateForm" class="btn btn-default">Load Images to Selected Cocktail</button>
+                        <button name="button" type="submit" id="loadProductButton" form="imageUpdateForm" class="btn btn-default">Load Images to Selected Product</button>
+                        {{end}}
+                        <button name="button" type="submit" id="restartButton" form="imageUpdateForm" class="btn btn-default">Back</button>
+                    </div>
+                    <script>
+                            $(function() {
+                                $('#loadCocktailButton').on('click', function() {
+                                    $('#imageUpdate').val("cocktail");
+                                });
+                                $('#loadProductButton').on('click', function() {
+                                    $('#imageUpdate').val("product");
+                                });
+                                $('#restartButton').on('click', function() {
+                                    $('#imageUpdate').val("restart");
+                                });
+                            });
+                    </script>
+                    {{end}}{{end}}{{end}}
+                </div>
+            </div>
+        </div>
+	</div>
+	<!-- /.container -->
+    {{template "footer" .}}
+</body>
+</html>
+{{end}}

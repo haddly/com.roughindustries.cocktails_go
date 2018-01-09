@@ -1,0 +1,197 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <!-- Page Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <hr height="30px" style="border-color: #FFF;">
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="page-header">
+                    <h1 align="center">Image Modification Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{if .Authenticated}}{{if .AllowAdmin}}{{if .UserSession}}
+                    <form method="post" action="/imageMod" id="imageModForm" autocomplete="nope">
+                        <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+                        <input type="hidden" id="imageGen" name="imageGen" value="test"/>
+                        {{template "selectProductOrCocktail" .}}
+                        <!---->
+                        {{template "imageText" .}}
+                        <!---->
+                        {{template "imageKeywords" .}}
+                        <!---->
+                        {{template "imageSource" .}}
+                        <!---->
+                    </form>
+                    <div style="text-align: center;">
+                        <button name="button" type="submit" id="genButton" form="imageModForm" class="btn btn-default">Gen Test Images</button>
+                        <button name="button" type="submit" id="gendepButton" form="imageModForm" class="btn btn-default">Gen and Deploy Images</button>
+                    </div>
+                    <script>
+                            $(function() {
+                                $('#genButton').on('click', function() {
+                                    $('#imageGen').val("test");
+                                });
+                                $('#gendepButton').on('click', function() {
+                                    $('#imageGen').val("deploy");
+                                });
+                            });
+                    </script>
+                    {{end}}{{end}}{{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+
+{{end}}
+
+{{define "selectProductOrCocktail"}}
+<div class="row">
+<div class=" col-xs-1"></div>
+<div class=" col-xs-10 form-group">
+    <label for="cocktailSelect">Select Cocktail</label>
+    <select class="form-control" id="cocktailSelect" name="cocktailSelect">
+        <option value="" selected>Blank Cocktail Item ...</option>
+        {{range $key, $value := .CocktailsByAlphaNums.CBA}}
+        <optgroup label="{{$key}}">
+        {{range $value}}
+        <option value="{{.ID}}" {{if eq $.Cocktail.ID .ID}}selected{{end}}>{{.Name}}</option>
+        {{end}}
+        {{end}}
+        </optgroup>
+    </select>
+</div>
+<div class=" col-xs-1"></div>
+</div>
+<div class="row">
+<div class=" col-xs-1"></div>
+<div class=" col-xs-10 form-group">
+    <label for="metaSelect">Select Product</label>
+    <select class="form-control" id="productSelect" name="productSelect">
+        <option value="" selected>Blank Product Item ...</option>
+        {{range .ProductsByTypes.PBT}}
+        <optgroup label="{{.ProductType.ProductTypeName}}">
+        {{range .Products}}
+        <option value="{{.ID}}" {{if eq $.Product.ID .ID}}selected{{end}}>{{if eq 1 .ProductGroupType}}(Base)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{else}}{{if eq 2 .ProductGroupType}}(Derived){{else}}{{if eq 3 .ProductGroupType}}(Group)&nbsp;&nbsp;&nbsp;{{end}}{{end}}{{end}} {{if .PreText}}{{.PreText}}&nbsp;{{end}}{{.ProductName}}{{if .PostText}}&nbsp;{{.PostText}}{{end}}</option>
+        {{end}}
+        {{end}}
+        </optgroup>
+    </select>
+</div>
+<div class=" col-xs-1"></div>
+</div>
+<script>
+$(function() {
+    // bind change event to select
+    $('#cocktailSelect').on('change', function() {
+        var id = $(this).val(); // get selected value
+        if (id) { // require a URL
+            window.location = "/imageModForm?cocktailID="+id; // redirect
+        } else {
+            window.location = "/imageModForm"; // redirect
+        }
+        return false;
+    });
+    $('#productSelect').on('change', function() {
+        var id = $(this).val(); // get selected value
+        if (id) { // require a URL
+            window.location = "/imageModForm?productID="+id; // redirect
+        } else {
+            window.location = "/imageModForm"; // redirect
+        }
+        return false;
+    });
+});
+</script>
+{{end}}
+
+{{define "imageText"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="imageText">Image Text</label>
+        {{if .Image.Text}}
+        <input type="text" class="form-control" id="imageText" name="imageText" value="{{.Image.Text}}">
+        {{else}}
+        {{if .Cocktail.Name}}
+        <input type="text" class="form-control" id="imageText" name="imageText" value="{{.Cocktail.Name}}">
+        {{else}}
+        {{if .Product.ProductName}}
+        <input type="text" class="form-control" id="imageText" name="imageText" value="{{.Product.ProductName}}">
+        {{else}}
+        <input type="text" class="form-control" id="imageText" name="imageText" value="">
+        {{end}}
+        {{end}}
+        {{end}}
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "imageSource"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="imageSource">Image Source</label>
+        {{if .Image.Text}}
+        <input type="text" class="form-control" id="imageSource" name="imageSource" value="{{.Image.ImageSource}}">
+        {{else}}
+        {{if .Cocktail.Name}}
+        <input type="text" class="form-control" id="imageSource" name="imageSource" value="{{if $.Cocktail.Image}}{{$.Cocktail.ImagePath}}/{{$.Cocktail.Image}}{{end}}">
+        {{else}}
+        {{if .Product.ProductName}}
+        <input type="text" class="form-control" id="imageSource" name="imageSource" value="{{if $.Product.Image}}{{$.Product.ImagePath}}/{{$.Product.Image}}{{end}}">
+        {{else}}
+        <input type="text" class="form-control" id="imageSource" name="imageSource" value="">
+        {{end}}
+        {{end}}
+        {{end}}
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "imageKeywords"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="imageKeywords">Image Keywords</label>
+        {{if .Image.Text}}
+        <input type="text" class="form-control" id="imageKeywords" name="imageKeywords" value="{{.Image.Keywords}}">
+        {{else}}
+        {{if .Cocktail.Name}}
+        <input type="text" class="form-control" id="imageKeywords" name="imageKeywords" value="{{replaceSpaceWithDash .Cocktail.Name}}">
+        {{else}}
+        {{if .Product.ProductName}}
+        <input type="text" class="form-control" id="imageKeywords" name="imageKeywords" value="{{replaceSpaceWithDash .Product.ProductName}}">
+        {{else}}
+        <input type="text" class="form-control" id="imageKeywords" name="imageKeywords" value="">
+        {{end}}
+        {{end}}
+        {{end}}
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
