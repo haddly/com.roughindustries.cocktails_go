@@ -342,3 +342,46 @@ func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool
 
 	return ret, isRoot
 }
+
+//Select a set of meta records based on a cocktail id
+func (meta *Meta) SelectMetasByCocktail(ID int) []Meta {
+	var ret []Meta
+	var isRoot bool
+	isRoot = false
+	conn, _ := connectors.GetDB()
+	var args []interface{} //arguments for variables in the data struct
+	var buffer bytes.Buffer
+	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType, cocktailToMetas.isRootCocktailForMeta" +
+		" FROM meta" +
+		" JOIN cocktailToMetas ON meta.idMeta=cocktailToMetas.idMeta" +
+		" JOIN cocktail ON cocktailToMetas.idCocktail=cocktail.idCocktail" +
+		" WHERE cocktail.idCocktail=?;")
+	args = append(args, strconv.Itoa(ID))
+	query := buffer.String()
+	glog.Infoln(query)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		glog.Error(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var meta Meta
+		var root string
+		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
+		if err != nil {
+			glog.Error(err)
+		}
+		if !isRoot {
+			isRoot, _ = strconv.ParseBool(root)
+			meta.IsRoot = isRoot
+		}
+		ret = append(ret, meta)
+		glog.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, meta.IsRoot)
+	}
+	err = rows.Err()
+	if err != nil {
+		glog.Error(err)
+	}
+
+	return ret
+}

@@ -45,6 +45,7 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	prods = prod.SelectProduct()
 	page.Products = prods
 	page.ProductsByTypes = pbt
+	page.IsForm = true
 	if len(r.Form["ID"]) == 0 {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "productmodform")
@@ -72,6 +73,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	prods = prod.SelectProduct()
 	page.Products = prods
 	page.ProductsByTypes = pbt
+	page.IsForm = true
 	//did we get an add, update, or something else request
 	if r.Form["button"][0] == "add" {
 		ret_id := page.Product.InsertProduct()

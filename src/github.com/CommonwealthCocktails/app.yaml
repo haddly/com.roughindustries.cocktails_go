@@ -1,2 +1,9 @@
 runtime: go
-env: flex
+api_version: go1
+env: flexible
+threadsafe: true
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 1
+  cpu_utilization:
+    target_utilization: 0.5

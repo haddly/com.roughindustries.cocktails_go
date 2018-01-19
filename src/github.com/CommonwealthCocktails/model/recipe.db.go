@@ -239,7 +239,7 @@ func processRecipeToRecipeStep(recipeID int64, stepID int64) {
 //SELECTS
 //Get the recipe that is associated with a cocktail id.  The include BDG flag
 //adds the group related information
-func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
+func SelectRecipeByCocktailMultiStep(cocktail Cocktail, includeBDG bool) Recipe {
 	var ret Recipe
 	conn, _ := connectors.GetDB()
 	var args []interface{}
@@ -261,6 +261,70 @@ func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
 		err := rows.Scan(&ret.ID, &method)
 		ret.Method = template.HTML(html.UnescapeString(method))
 		ret.RecipeSteps = SelectRecipeStepsByCocktail(cocktail, includeBDG)
+		if err != nil {
+			glog.Error(err)
+		}
+		glog.Infoln(ret.ID, ret.Method)
+	}
+	err = rows.Err()
+	if err != nil {
+		glog.Error(err)
+	}
+
+	return ret
+}
+
+//Get the recipe that is associated with a cocktail id.  The include BDG flag
+//adds the group related information.  This is the quick query which is not
+//great for debugging
+func SelectRecipeByCocktail(cocktail Cocktail, includeBDG bool) Recipe {
+	var ret Recipe
+	conn, _ := connectors.GetDB()
+	var args []interface{}
+	var buffer bytes.Buffer
+	buffer.WriteString("SELECT recipe.idRecipe, COALESCE(recipe.recipeMethod, '')," +
+		" recipestep.idRecipeStep, recipestep.recipestepOriginalIngredient, recipestep.recipestepRecipeOrdinal, recipestep.recipestepRecipeCardinalFloat," +
+		" COALESCE(recipestep.recipestepRecipeCardinalString, ''), recipestep.recipestepRecipeDoze," +
+		" product.idProduct, product.productName, product.productType, product.productGroupType," +
+		" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, '')," +
+		" COALESCE(product.productImageSourceName, ''), COALESCE(product.productImage, '')," +
+		" COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, '')," +
+		" COALESCE(product.productLabeledImageLink, ''), COALESCE(product.productPreText, '')," +
+		" COALESCE(product.productPostText, ''), COALESCE(product.productRating, 0)," +
+		" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, '')," +
+		" COALESCE(product.productAmazonLink, '') " +
+		" FROM recipestep" +
+		" JOIN product ON recipestep.recipestepOriginalIngredient=product.idProduct " +
+		" JOIN recipeToRecipeSteps ON recipeToRecipeSteps.idRecipeStep=recipestep.idRecipeStep" +
+		" JOIN recipe ON  recipeToRecipeSteps.idRecipe=recipe.idRecipe" +
+		" JOIN cocktailToRecipe ON cocktailToRecipe.idRecipe=recipe.idRecipe" +
+		" JOIN  cocktail ON cocktailToRecipe.idCocktail=cocktail.idCocktail" +
+		" WHERE cocktail.idCocktail=? ORDER BY recipestepRecipeOrdinal;")
+	args = append(args, strconv.Itoa(cocktail.ID))
+	query := buffer.String()
+	glog.Infoln(query)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		glog.Error(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var method string
+		var rs RecipeStep
+		var oiID int
+		var doze int
+		var prod Product
+		var name string
+		var desc string
+		var details string
+		err := rows.Scan(&ret.ID, &method, &rs.ID, &oiID, &rs.RecipeOrdinal, &rs.RecipeCardinalFloat, &rs.RecipeCardinalString, &doze, &prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.LabeledImageLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+		prod.ProductName = template.HTML(html.UnescapeString(name))
+		prod.Description = template.HTML(html.UnescapeString(desc))
+		prod.Details = template.HTML(html.UnescapeString(details))
+		rs.OriginalIngredient = prod
+		rs.RecipeDoze = Doze{ID: doze}
+		ret.RecipeSteps = append(ret.RecipeSteps, rs)
+		ret.Method = template.HTML(html.UnescapeString(method))
 		if err != nil {
 			glog.Error(err)
 		}

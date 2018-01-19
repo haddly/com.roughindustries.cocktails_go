@@ -20,6 +20,7 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var mbt model.MetasByTypes
 	mbt = page.Meta.SelectMetaByTypes(false, true, false)
 	page.MetasByTypes = mbt
+	page.IsForm = true
 	if page.Meta.ID == 0 {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "metamodform")
@@ -38,6 +39,7 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var mbt model.MetasByTypes
 	mbt = page.Meta.SelectMetaByTypes(false, true, false)
 	page.MetasByTypes = mbt
+	page.IsForm = true
 	//did we get an add, update, or something else request
 	if page.SubmitButtonString == "add" {
 		ret_id := page.Meta.InsertMeta()
