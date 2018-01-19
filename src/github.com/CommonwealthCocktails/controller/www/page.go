@@ -39,6 +39,7 @@ type page struct {
 	ReCAPTCHASiteKeyInv  string
 	TinymceAPIKey        string
 	SocialSource         string
+	IsForm               bool
 	CocktailSet          model.CocktailSet
 	MetasByTypes         model.MetasByTypes
 	Ingredients          model.ProductsByTypes

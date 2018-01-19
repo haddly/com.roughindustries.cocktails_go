@@ -28,11 +28,15 @@ func CocktailHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	} else {
 		cs = page.Cocktail.SelectCocktailsByID(page.Cocktail.ID, true)
 		page.CocktailSet = cs
-		var temp []string
-		for _, e := range cs.Cocktail.Recipe.RecipeSteps {
-			temp = append(temp, strconv.Itoa(e.OriginalIngredient.ID))
+		if len(page.CocktailSet.Cocktail.RelatedCocktails) <= 0 {
+			var temp []string
+			for _, e := range cs.Cocktail.Recipe.RecipeSteps {
+				temp = append(temp, strconv.Itoa(e.OriginalIngredient.ID))
+			}
+			page.Cocktails = append(page.Cocktails, page.CocktailSet.Cocktail.SelectCocktailsByIngredientIDs(temp)...)
+		} else {
+			page.Cocktails = page.CocktailSet.Cocktail.RelatedCocktails
 		}
-		page.Cocktails = append(page.Cocktails, page.CocktailSet.Cocktail.SelectCocktailsByIngredientIDs(temp)...)
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "cocktail")
 	}
@@ -102,6 +106,7 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request, page *page) 
 	nonIngredients = page.Product.SelectProductsByTypes(false, true, false)
 	page.NonIngredients = nonIngredients
 	glog.Infoln(r.Form["ID"])
+	page.IsForm = true
 	if len(r.Form["ID"]) == 0 {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "cocktailmodform")
@@ -134,6 +139,7 @@ func CocktailModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var nonIngredients model.ProductsByTypes
 	nonIngredients = page.Product.SelectProductsByTypes(false, true, false)
 	page.NonIngredients = nonIngredients
+	page.IsForm = true
 	if r.Form["button"][0] == "add" {
 		ret_id := page.Cocktail.InsertCocktail()
 		model.LoadMCWithCocktailByAlphaNumsData()

@@ -52,7 +52,9 @@ type Cocktail struct {
 	Family              []Meta
 	Drink               []Meta
 	IsFamilyRoot        bool
-	Errors              map[string]string
+	RelatedCocktails    []Cocktail
+
+	Errors map[string]string
 }
 
 //The name struct allows for easier access to an array of strings in

@@ -7,6 +7,8 @@ import (
 	"encoding/gob"
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/golang/glog"
+	"strconv"
 )
 
 //Clears out the whole memcache
@@ -22,6 +24,8 @@ func LoadAllMemcache() {
 	LoadMCWithProductData()
 	LoadMCWithMetaData()
 	LoadMCWithCocktailByAlphaNumsData()
+	LoadMCWithCocktailData()
+	//LoadMCWithPostData()
 }
 
 //Reinitialize the memcache with all the cocktails in alpha numeric order
@@ -115,4 +119,59 @@ func LoadMCWithMetaData() {
 
 //Reinitialize the post lists in the memcache
 func LoadMCWithPostData() {
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		post := new(Post)
+		mc.Delete("posts")
+
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		var p []Post
+		p = post.SelectAllPosts()
+		enc.Encode(p)
+
+		mc.Set(&memcache.Item{Key: "posts", Value: buf.Bytes()})
+	}
+}
+
+//Reinitialize the cocktail lists in the memcache
+func LoadMCWithCocktailData() {
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		cocktail := new(Cocktail)
+		//mc.Delete("cocktails")
+
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		var c []Cocktail
+		c = cocktail.SelectAllCocktails(false)
+		c = c[0:25]
+		for i, _ := range c {
+			var cs CocktailSet
+			cs = c[i].SelectCocktailsByID(c[i].ID, true)
+			c[i] = cs.Cocktail
+			var temp []string
+			for _, e := range c[i].Recipe.RecipeSteps {
+				temp = append(temp, strconv.Itoa(e.OriginalIngredient.ID))
+			}
+			//c[i].RelatedCocktails = c[i].SelectCocktailsByIngredientIDs(temp)
+			enc.Encode(c[i])
+			mc.Set(&memcache.Item{Key: "cocktail_" + strconv.Itoa(c[i].ID), Value: buf.Bytes()})
+		}
+		var cocktails Cocktail
+		//cocktails.List = c
+		// enc.Encode(cocktails)
+		// mc.Set(&memcache.Item{Key: "cocktails", Value: buf.Bytes()})
+
+		item := new(memcache.Item)
+		item, _ = mc.Get("cocktail_6")
+		read := bytes.NewReader(item.Value)
+		dec := gob.NewDecoder(read)
+		dec.Decode(&cocktails)
+		glog.Infoln("\n\n\n")
+		glog.Infoln(cocktails)
+		for i, _ := range c {
+			glog.Infoln(c[i].ID)
+		}
+	}
 }
