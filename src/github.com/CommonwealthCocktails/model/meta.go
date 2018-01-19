@@ -23,6 +23,7 @@ type Meta struct {
 	ID       int
 	MetaName string
 	MetaType MetaType
+	IsRoot   bool
 	Blurb    template.HTML
 	Errors   map[string]string
 }

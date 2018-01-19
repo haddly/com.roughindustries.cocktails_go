@@ -659,3 +659,49 @@ func (product *Product) SelectProductsByCocktailAndProductType(ID int, pt int) [
 
 	return ret
 }
+
+//Select a set of products by an associated cocktail id number
+func (product *Product) SelectProductsByCocktail(ID int) []Product {
+	var ret []Product
+	conn, _ := connectors.GetDB()
+	var args []interface{}
+	var buffer bytes.Buffer
+	buffer.WriteString("SELECT product.idProduct, product.productName, product.productType, product.productGroupType," +
+		" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, ''), COALESCE(product.productImageSourceName, '')," +
+		" COALESCE(product.productImage, ''), COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, ''), COALESCE(product.productLabeledImageLink, '')," +
+		" COALESCE(product.productPreText, ''), COALESCE(product.productPostText, ''), COALESCE(product.productRating, 0)," +
+		" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, ''), COALESCE(`productAmazonLink`, '')" +
+		" FROM product" +
+		" JOIN cocktailToProducts ON product.idProduct=cocktailToProducts.idProduct" +
+		" JOIN cocktail ON cocktailToProducts.idCocktail=cocktail.idCocktail" +
+		" WHERE cocktail.idCocktail=?;")
+	args = append(args, strconv.Itoa(ID))
+	query := buffer.String()
+	glog.Infoln(query)
+	rows, err := conn.Query(query, args...)
+	if err != nil {
+		glog.Error(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var name string
+		var prod Product
+		var desc string
+		var details string
+		err := rows.Scan(&prod.ID, &name, &prod.ProductType.ID, &prod.ProductGroupType, &desc, &details, &prod.ImageSourceName, &prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.LabeledImageLink, &prod.PreText, &prod.PostText, &prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+		if err != nil {
+			glog.Error(err)
+		}
+		prod.ProductName = template.HTML(html.UnescapeString(name))
+		prod.Description = template.HTML(html.UnescapeString(desc))
+		prod.Details = template.HTML(html.UnescapeString(details))
+		glog.Infoln(prod.ID, prod.ProductName, int(prod.ProductType.ID), prod.Description, prod.ImagePath, prod.Image)
+		ret = append(ret, prod)
+	}
+	err = rows.Err()
+	if err != nil {
+		glog.Error(err)
+	}
+
+	return ret
+}

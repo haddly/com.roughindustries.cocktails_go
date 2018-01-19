@@ -40,6 +40,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //Form page.
 func PostModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	page.Posts = page.Post.SelectAllPosts()
+	page.IsForm = true
 	if page.Post.ID == 0 {
 		page.Post.PostAuthor = page.UserSession.User
 		//apply the template page info to the index page
@@ -56,6 +57,7 @@ func PostModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //modify the post data based on the request.
 func PostModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//did we get an add, update, or something else request
+	page.IsForm = true
 	if page.SubmitButtonString == "add" {
 		ret_id := page.Post.InsertPost()
 		model.LoadMCWithPostData()

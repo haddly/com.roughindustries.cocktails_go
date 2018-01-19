@@ -909,74 +909,179 @@ func (cocktail *Cocktail) SelectAllCocktails(includeBDG bool) []Cocktail {
 func (cocktail *Cocktail) SelectCocktailsByID(ID int, includeBDG bool) CocktailSet {
 	glog.Infoln(ID)
 	var cs CocktailSet
-	var args []interface{}
-	conn, _ := connectors.GetDB()
-	var buffer bytes.Buffer
-	buffer.WriteString("SELECT cocktail.idCocktail, COALESCE(cocktail.cocktailTitle, ''), COALESCE(cocktail.cocktailName, ''), cocktail.cocktailRating," +
-		" COALESCE(cocktail.cocktailImagePath, ''), COALESCE(cocktail.cocktailImage, ''), COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, ''), COALESCE(cocktail.cocktailFootnotes, '')," +
-		" COALESCE(cocktail.cocktailSourceName, ''), COALESCE(cocktail.cocktailSourceLink, ''), COALESCE(cocktail.cocktailImageSourceName, ''), COALESCE(cocktail.cocktailImageSourceLink, '')," +
-		" COALESCE(cocktail.cocktailLabeledImageLink, ''), COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')," +
-		" COALESCE(cocktail.cocktailKeywords, ''), COALESCE(cocktailTop100Index, 0)" +
-		" FROM cocktail" +
-		" WHERE idCocktail=?;")
-	args = append(args, strconv.Itoa(ID))
-	query := buffer.String()
-	glog.Infoln(query)
-	rows, err := conn.Query(query, args...)
-	if err != nil {
-		glog.Error(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var cocktail Cocktail
-		var name string
-		var desc string
-		var comment string
-		var footnotes string
-		var origin string
-		err := rows.Scan(&cocktail.ID, &cocktail.Title, &name, &cocktail.Rating, &cocktail.ImagePath,
-			&cocktail.Image, &desc, &comment, &footnotes, &cocktail.SourceName, &cocktail.SourceLink, &cocktail.ImageSourceName, &cocktail.ImageSourceLink,
-			&cocktail.LabeledImageLink, &origin, &cocktail.SpokenName, &cocktail.DisplayName, &cocktail.Keywords, &cocktail.Top100Index)
-		cocktail.Name = template.HTML(html.UnescapeString(name))
-		cocktail.Description = template.HTML(html.UnescapeString(desc))
-		cocktail.Comment = template.HTML(html.UnescapeString(comment))
-		cocktail.Footnotes = template.HTML(html.UnescapeString(footnotes))
-		cocktail.Origin = template.HTML(html.UnescapeString(origin))
+	ret := cocktail.memcachedCocktailsByID(ID)
+	if ret == nil {
+		var args []interface{}
+		conn, _ := connectors.GetDB()
+		var buffer bytes.Buffer
+		buffer.WriteString("SELECT cocktail.idCocktail, COALESCE(cocktail.cocktailTitle, ''), COALESCE(cocktail.cocktailName, ''), cocktail.cocktailRating," +
+			" COALESCE(cocktail.cocktailImagePath, ''), COALESCE(cocktail.cocktailImage, ''), COALESCE(cocktail.cocktailDescription, ''), COALESCE(cocktail.cocktailComment, ''), COALESCE(cocktail.cocktailFootnotes, '')," +
+			" COALESCE(cocktail.cocktailSourceName, ''), COALESCE(cocktail.cocktailSourceLink, ''), COALESCE(cocktail.cocktailImageSourceName, ''), COALESCE(cocktail.cocktailImageSourceLink, '')," +
+			" COALESCE(cocktail.cocktailLabeledImageLink, ''), COALESCE(cocktail.cocktailOrigin, ''), COALESCE(cocktail.cocktailSpokenName, ''), COALESCE(cocktail.cocktailDisplayName, '')," +
+			" COALESCE(cocktail.cocktailKeywords, ''), COALESCE(cocktailTop100Index, 0)," +
+			" recipe.idRecipe, COALESCE(recipe.recipeMethod, '')," +
+			" recipestep.idRecipeStep, recipestep.recipestepOriginalIngredient, recipestep.recipestepRecipeOrdinal, recipestep.recipestepRecipeCardinalFloat," +
+			" COALESCE(recipestep.recipestepRecipeCardinalString, ''), recipestep.recipestepRecipeDoze," +
+			" product.idProduct, product.productName, product.productType, product.productGroupType," +
+			" COALESCE(product.productDescription, ''), COALESCE(product.productDetails, '')," +
+			" COALESCE(product.productImageSourceName, ''), COALESCE(product.productImage, '')," +
+			" COALESCE(product.productImagePath, ''), COALESCE(product.productImageSourceLink, '')," +
+			" COALESCE(product.productLabeledImageLink, ''), COALESCE(product.productPreText, '')," +
+			" COALESCE(product.productPostText, ''), COALESCE(product.productRating, 0)," +
+			" COALESCE(product.productSourceName, ''), COALESCE(product.productSourceLink, '')," +
+			" COALESCE(product.productAmazonLink, '') " +
+			" FROM recipestep" +
+			" JOIN product ON recipestep.recipestepOriginalIngredient=product.idProduct " +
+			" JOIN recipeToRecipeSteps ON recipeToRecipeSteps.idRecipeStep=recipestep.idRecipeStep" +
+			" JOIN recipe ON  recipeToRecipeSteps.idRecipe=recipe.idRecipe" +
+			" JOIN cocktailToRecipe ON cocktailToRecipe.idRecipe=recipe.idRecipe" +
+			" JOIN  cocktail ON cocktailToRecipe.idCocktail=cocktail.idCocktail" +
+			" WHERE cocktail.idCocktail=? ORDER BY recipestepRecipeOrdinal;")
+		args = append(args, strconv.Itoa(ID))
+		query := buffer.String()
+		glog.Infoln(query)
+		rows, err := conn.Query(query, args...)
 		if err != nil {
 			glog.Error(err)
 		}
-		meta := new(Meta)
-		product := new(Product)
-		//add recipe to cocktail
-		cocktail.Recipe = SelectRecipeByCocktail(cocktail, includeBDG)
-		cocktail.Drinkware = product.SelectProductsByCocktailAndProductType(cocktail.ID, int(Drinkware))
-		cocktail.Garnish = product.SelectProductsByCocktailAndProductType(cocktail.ID, int(Garnish))
-		cocktail.Tool = product.SelectProductsByCocktailAndProductType(cocktail.ID, int(Tool))
-		cocktail.Flavor, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Flavor))
-		cocktail.BaseSpirit, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(BaseSpirit))
-		cocktail.Type, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Type))
-
-		cocktail.Served, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Served))
-		cocktail.Technique, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Technique))
-		cocktail.Strength, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Strength))
-		cocktail.Difficulty, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Difficulty))
-		cocktail.TOD, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(TOD))
-		cocktail.Occasion, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Occasion))
-		cocktail.Style, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Style))
-		cocktail.Ratio, _ = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Ratio))
-		cocktail.Family, cocktail.IsFamilyRoot = meta.SelectMetasByCocktailAndMetaType(cocktail.ID, int(Family))
-
-		//add cocktail to cocktail family
-		cs.Cocktail = cocktail
+		defer rows.Close()
+		var cocktail Cocktail
+		var r Recipe
+		for rows.Next() {
+			var name string
+			var desc string
+			var comment string
+			var footnotes string
+			var origin string
+			var method string
+			var rs RecipeStep
+			var oiID int
+			var doze int
+			var prod Product
+			var prod_name string
+			var prod_desc string
+			var details string
+			err := rows.Scan(&cocktail.ID, &cocktail.Title, &name, &cocktail.Rating, &cocktail.ImagePath,
+				&cocktail.Image, &desc, &comment, &footnotes, &cocktail.SourceName, &cocktail.SourceLink, &cocktail.ImageSourceName, &cocktail.ImageSourceLink,
+				&cocktail.LabeledImageLink, &origin, &cocktail.SpokenName, &cocktail.DisplayName, &cocktail.Keywords, &cocktail.Top100Index,
+				&r.ID, &method, &rs.ID, &oiID, &rs.RecipeOrdinal, &rs.RecipeCardinalFloat, &rs.RecipeCardinalString, &doze,
+				&prod.ID, &prod_name, &prod.ProductType.ID, &prod.ProductGroupType, &prod_desc, &details, &prod.ImageSourceName,
+				&prod.Image, &prod.ImagePath, &prod.ImageSourceLink, &prod.LabeledImageLink, &prod.PreText, &prod.PostText,
+				&prod.Rating, &prod.SourceName, &prod.SourceLink, &prod.AmazonLink)
+			prod.ProductName = template.HTML(html.UnescapeString(prod_name))
+			prod.Description = template.HTML(html.UnescapeString(prod_desc))
+			prod.Details = template.HTML(html.UnescapeString(details))
+			rs.OriginalIngredient = prod
+			rs.RecipeDoze = Doze{ID: doze}
+			r.RecipeSteps = append(r.RecipeSteps, rs)
+			r.Method = template.HTML(html.UnescapeString(method))
+			//add recipe to cocktail
+			//cocktail.Recipe = SelectRecipeByCocktail(cocktail, includeBDG)
+			cocktail.Recipe = r
+			cocktail.Name = template.HTML(html.UnescapeString(name))
+			cocktail.Description = template.HTML(html.UnescapeString(desc))
+			cocktail.Comment = template.HTML(html.UnescapeString(comment))
+			cocktail.Footnotes = template.HTML(html.UnescapeString(footnotes))
+			cocktail.Origin = template.HTML(html.UnescapeString(origin))
+			if err != nil {
+				glog.Error(err)
+			}
+		}
+		err = rows.Err()
+		if err != nil {
+			glog.Error(err)
+		}
 
 		glog.Infoln(cocktail.ID, cocktail.Title, cocktail.Name, cocktail.Rating, cocktail.ImagePath,
 			cocktail.Image, cocktail.Description, cocktail.Comment, cocktail.Footnotes, cocktail.SourceName, cocktail.SourceLink, cocktail.ImageSourceName, cocktail.ImageSourceLink,
 			cocktail.LabeledImageLink, cocktail.SpokenName, cocktail.DisplayName, cocktail.Keywords, cocktail.Top100Index)
-	}
-	err = rows.Err()
-	if err != nil {
-		glog.Error(err)
-	}
 
+		meta := new(Meta)
+		product := new(Product)
+
+		products := product.SelectProductsByCocktail(cocktail.ID)
+		for _, e := range products {
+			if e.ProductType.ID == Drinkware {
+				cocktail.Drinkware = append(cocktail.Drinkware, e)
+			} else if e.ProductType.ID == Garnish {
+				cocktail.Garnish = append(cocktail.Garnish, e)
+			} else if e.ProductType.ID == Tool {
+				cocktail.Tool = append(cocktail.Tool, e)
+			}
+		}
+
+		metas := meta.SelectMetasByCocktail(cocktail.ID)
+		for _, e := range metas {
+			if e.MetaType.ID == Flavor {
+				cocktail.Flavor = append(cocktail.Flavor, e)
+			} else if e.MetaType.ID == BaseSpirit {
+				cocktail.BaseSpirit = append(cocktail.BaseSpirit, e)
+			} else if e.MetaType.ID == Type {
+				cocktail.Type = append(cocktail.Type, e)
+			} else if e.MetaType.ID == Served {
+				cocktail.Served = append(cocktail.Served, e)
+			} else if e.MetaType.ID == Technique {
+				cocktail.Technique = append(cocktail.Technique, e)
+			} else if e.MetaType.ID == Strength {
+				cocktail.Strength = append(cocktail.Strength, e)
+			} else if e.MetaType.ID == Difficulty {
+				cocktail.Difficulty = append(cocktail.Difficulty, e)
+			} else if e.MetaType.ID == TOD {
+				cocktail.TOD = append(cocktail.TOD, e)
+			} else if e.MetaType.ID == Occasion {
+				cocktail.Occasion = append(cocktail.Occasion, e)
+			} else if e.MetaType.ID == Style {
+				cocktail.Style = append(cocktail.Style, e)
+			} else if e.MetaType.ID == Ratio {
+				cocktail.Ratio = append(cocktail.Ratio, e)
+			} else if e.MetaType.ID == Family {
+				cocktail.Family = append(cocktail.Family, e)
+				for _, f := range cocktail.Family {
+					if f.IsRoot {
+						cocktail.IsFamilyRoot = true
+					}
+				}
+			}
+		}
+		cs.Cocktail = cocktail
+
+	} else {
+		cs = *ret
+	}
 	return cs
+}
+
+//Memcache retrieval of cocktail by id
+func (cocktail *Cocktail) memcachedCocktailsByID(ID int) *CocktailSet {
+	var cs CocktailSet
+	var cocktails Cocktail
+	mc, _ := connectors.GetMC()
+	if mc != nil {
+		item := new(memcache.Item)
+		item, _ = mc.Get("cocktail_" + strconv.Itoa(ID))
+		if item != nil {
+			if len(item.Value) > 0 {
+				read := bytes.NewReader(item.Value)
+				dec := gob.NewDecoder(read)
+				dec.Decode(&cocktails)
+			}
+			cs.Cocktail = cocktails
+		} else {
+			return nil
+		}
+		// var found bool
+		// found = false
+		// for _, ct := range cocktails.List {
+		// 	if ct.ID == ID {
+		// 		//add cocktail to cocktail family
+		// 		cs.Cocktail = ct
+		// 		found = true
+		// 		break
+		// 	}
+		// }
+		// if !found {
+		// 	return nil
+		// }
+	}
+	return &cs
 }
