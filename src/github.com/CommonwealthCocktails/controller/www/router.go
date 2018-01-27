@@ -6,8 +6,9 @@ import (
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
-	"github.com/golang/glog"
+	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"net/http"
 	"os"
@@ -44,15 +45,21 @@ var (
 
 //Init to setup the http handlers
 func WWWRouterInit() {
-	glog.Infoln("Init in www/router.go")
-	glog.Infoln(viper.GetString("BaseURL"))
+	rtr := mux.NewRouter()
+	log.Infoln("Init in www/router.go")
+	log.Infoln(viper.GetString("BaseURL"))
 	BaseURL = viper.GetString("BaseURL")
 	//Inits
 	PageInit()
 	//Page Routing
-	http.Handle("/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
+	rtr.Handle("/", PageHandler(LandingHandler))
+	//http.Handle("/", RecoverHandler(MethodsHandler(PageHandler(LandingHandler), "GET")))
 	//Cocktail Routing
-	http.Handle("/cocktail", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
+	rtr.Handle("/cocktail/{cocktailID}", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
+	rtr.Handle("/cocktail/{cocktailID}/", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
+	rtr.Handle("/cocktail/{cocktailID}/{keywords}", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
+	rtr.Handle("/cocktail/{cocktailID}/{keywords}/", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
+	//http.Handle("/cocktail", RecoverHandler(MethodsHandler(PageHandler(CocktailHandler), "GET")))
 	http.Handle("/cocktailOfTheDay", RecoverHandler(MethodsHandler(PageHandler(CocktailOfTheDayHandler), "GET")))
 	http.Handle("/cocktailTop100", RecoverHandler(MethodsHandler(PageHandler(CocktailsTop100Handler), "GET")))
 	http.Handle("/cocktails", RecoverHandler(MethodsHandler(PageHandler(CocktailsHandler), "GET")))
@@ -67,14 +74,20 @@ func WWWRouterInit() {
 	http.Handle("/metaModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateMeta, nil, MetaModFormHandler, LandingHandler), "GET")))
 	http.Handle("/metaMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateMeta, RequiredMetaMod, MetaModHandler, MetaModFormHandler), "POST")))
 	//Products Routing
-	http.Handle("/product", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
-	http.Handle("/product/", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
+	rtr.Handle("/product/{productID}", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
+	rtr.Handle("/product/{productID}/", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
+	rtr.Handle("/product/{productID}/{keywords}", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
+	rtr.Handle("/product/{productID}/{keywords}/", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
+	//http.Handle("/product", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
+	//http.Handle("/product/", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
 	http.Handle("/products", RecoverHandler(MethodsHandler(PageHandler(ProductsHandler), "GET")))
 	http.Handle("/productModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateProduct, nil, ProductModFormHandler, LandingHandler), "GET")))
 	http.Handle("/productMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateProduct, RequiredProductMod, ProductModHandler, ProductModFormHandler), "POST")))
 	//Post Routing
-	http.Handle("/post", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
-	http.Handle("/post/", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
+	rtr.Handle("/post/{postID}", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
+	rtr.Handle("/post/{postID}/", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
+	//http.Handle("/post", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
+	//http.Handle("/post/", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
 	http.Handle("/posts", RecoverHandler(MethodsHandler(PageHandler(PostsHandler), "GET")))
 	http.Handle("/postModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidatePost, nil, PostModFormHandler, LandingHandler), "GET")))
 	http.Handle("/postMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidatePost, RequiredPostMod, PostModHandler, PostModFormHandler), "POST")))
@@ -117,12 +130,22 @@ func WWWRouterInit() {
 	http.Handle("/imageMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateImage, RequiredImageMod, ImageModHandler, ImageModFormHandler), "POST")))
 	http.Handle("/imageUpdate", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateImage, RequiredImageMod, ImageUpdateHandler, ImageModFormHandler), "POST")))
 
+	//Set the 404 page not found handler
+	rtr.NotFoundHandler = http.HandlerFunc(notFound)
+	//Apply the router
+	http.Handle("/", rtr)
+}
+
+//This handler is designed to return a 404 error
+func notFound(w http.ResponseWriter, r *http.Request) {
+	Error404(w, "ERROR: Page not found!")
 }
 
 //This only loads the page into the page datastruct, there is no authentication
 //validation
 func PageHandler(next func(http.ResponseWriter, *http.Request, *page)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Infoln("PageHandler")
 		if isReadyState(w, r) {
 			page := NewPage(w, r)
 			page.State = State
@@ -152,11 +175,11 @@ func AuthenticatedPageHandler(pass func(http.ResponseWriter, *http.Request, *pag
 			pass(w, r, page)
 			return
 		} else if ignoreLogout {
-			glog.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
+			log.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
 			http.Redirect(w, r, "/", 302)
 			return
 		} else {
-			glog.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
+			log.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
 			http.Redirect(w, r, "/logout", 302)
 			return
 		}
@@ -170,7 +193,7 @@ func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, valid
 		page := NewPage(w, r)
 		page.State = State
 		page.BaseURL = BaseURL
-		glog.Infoln("VandAPageHandler")
+		log.Infoln("VandAPageHandler")
 		if page.Authenticated || ignoreAuth {
 			//was a require fields method passed
 			if require != nil {
@@ -189,13 +212,13 @@ func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, valid
 						}
 					} else {
 						//Validation failed
-						glog.Infoln("Bad validation!")
+						log.Infoln("Bad validation!")
 						fail(w, r, page)
 						return
 					}
 				} else {
 					//check for required failed
-					glog.Infoln("Missing required fields!")
+					log.Infoln("Missing required fields!")
 					fail(w, r, page)
 					return
 				}
@@ -213,17 +236,17 @@ func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, valid
 					}
 				} else {
 					//Validation failed
-					glog.Infoln("Bad validation!")
+					log.Infoln("Bad validation!")
 					fail(w, r, page)
 					return
 				}
 			}
 		} else if ignoreLogout {
-			glog.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
+			log.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
 			http.Redirect(w, r, "/", 302)
 			return
 		} else {
-			glog.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
+			log.Errorln("ERROR: User not authenticated and requesting restricted content, possible attack!")
 			http.Redirect(w, r, "/logout", 302)
 			return
 		}
@@ -233,6 +256,7 @@ func VandAPageHandler(ignoreAuth bool, ignoreLogout bool, ignoreCSRF bool, valid
 //This handler is designed to return a 404 error after a panic has occured
 func MethodsHandler(h http.Handler, methods ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Infoln("MethodsHandler")
 		isValidMethod := false
 		for _, v := range methods {
 			if strings.ToUpper(v) == r.Method {
@@ -240,7 +264,7 @@ func MethodsHandler(h http.Handler, methods ...string) http.Handler {
 			}
 		}
 		if !isValidMethod {
-			glog.Errorln("ERROR: Invalid Method used to access content, possible attack!")
+			log.Errorln("ERROR: Invalid Method used to access content, possible attack!")
 			Error404(w, "ERROR: Invalid Method used to access content, possible attack!")
 			return
 		}
@@ -252,13 +276,14 @@ func MethodsHandler(h http.Handler, methods ...string) http.Handler {
 //This handler is designed to return a 404 error after a panic has occured
 func RecoverHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Infoln("RecoverHandler")
 		// catch all errors and return 404
 		defer func() {
 			// recover from panic if one occured. Set err to nil otherwise.
 			if rec := recover(); rec != nil {
 				switch State {
 				case Initialize:
-					glog.Errorln("We didn't get past the initialization")
+					log.Errorln("We didn't get past the initialization")
 					os.Exit(3)
 				case Setup:
 					RenderSetupTemplate(w, rec)
@@ -267,7 +292,7 @@ func RecoverHandler(h http.Handler) http.Handler {
 					Error404(w, rec)
 					return
 				case Down:
-					glog.Errorln("This instance seems to have gone down.  Shutting it off.")
+					log.Errorln("This instance seems to have gone down.  Shutting it off.")
 					os.Exit(3)
 				default:
 					return
@@ -284,17 +309,17 @@ func RecoverHandler(h http.Handler) http.Handler {
 func isReadyState(w http.ResponseWriter, r *http.Request) bool {
 	switch State {
 	case Initialize:
-		glog.Errorln("We didn't get past the initialization")
+		log.Errorln("We didn't get past the initialization")
 		os.Exit(3)
 	case Setup:
-		glog.Infoln("In setup mode.  Waiting for all setup requirements to be completed before moving to new state.")
+		log.Infoln("In setup mode.  Waiting for all setup requirements to be completed before moving to new state.")
 		page := NewSetupPage(w, r)
 		page.State = State
 		//Check DB
 		conn, _ := connectors.GetDB()
 		err := conn.Ping()
 		if err != nil {
-			glog.Errorln("No database connection.  Fix the connection issue and then retry setup.")
+			log.Errorln("No database connection.  Fix the connection issue and then retry setup.")
 			page.RenderSetupTemplate(w, r, "/setup")
 			return false
 		}
@@ -307,7 +332,7 @@ func isReadyState(w http.ResponseWriter, r *http.Request) bool {
 			found := false
 			for _, val_table := range Valid_Tables {
 				if val_table == table {
-					glog.Infoln("Validated table " + table)
+					log.Infoln("Validated table " + table)
 					found = true
 					break
 				}
@@ -316,20 +341,20 @@ func isReadyState(w http.ResponseWriter, r *http.Request) bool {
 				ignore_table := false
 				for _, ign_table := range Ignore_Tables {
 					if ign_table == table {
-						glog.Infoln("Ignoring table " + table)
+						log.Infoln("Ignoring table " + table)
 						ignore_table = true
 						break
 					}
 				}
 				if !ignore_table {
-					glog.Errorln("Missing a table! " + table)
+					log.Errorln("Missing a table! " + table)
 					found_all_tables = false
 				}
 			}
 		}
 		if !found_all_tables {
 			//try loading the tables
-			glog.Infoln("Trying to load the tables")
+			log.Infoln("Trying to load the tables")
 			DBTablesHandler(w, r, page)
 		}
 		State = Ready
@@ -337,7 +362,7 @@ func isReadyState(w http.ResponseWriter, r *http.Request) bool {
 	case Ready:
 		return true
 	case Down:
-		glog.Errorln("This instance seems to have gone down.  Shutting it off.")
+		log.Errorln("This instance seems to have gone down.  Shutting it off.")
 		os.Exit(3)
 	default:
 		return false

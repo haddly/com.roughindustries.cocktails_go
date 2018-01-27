@@ -35,17 +35,17 @@
 			<h6 align="center">By: {{if .PostAuthor}}{{.PostAuthor.FirstName}}&nbsp;{{.PostAuthor.LastName}}{{end}}</h6>
 			<div class="row">
 				<div class="col-md-12" align="center">
-					<a class="fb-share-button btn btn-default btn-sm" style="display: inline-block;" data-href="{{$.BaseURL}}/post?ID={{.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fpost%3FID={{.ID}}&amp;src=sdkpreparse">
+					<a class="fb-share-button btn btn-default btn-sm" style="display: inline-block;" data-href="{{$.BaseURL}}/post/{{.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fpost%2F{{.ID}}&amp;src=sdkpreparse">
 						<i class="fa fa-facebook"></i>
 					</a>
 					<a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-sm" title="GitHub">
 						<i class="fa fa-github"></i>
 					</a>
 					<a target="_blank" class="btn btn-default btn-sm twitter-share-button" data-dnt="true"
-				  href="https://twitter.com/intent/tweet?text={{.PostTitle}}&url={{$.BaseURL}}%2Fpost%3FID={{.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
+				  href="https://twitter.com/intent/tweet?text={{.PostTitle}}&url={{$.BaseURL}}%2Fpost%2F{{.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
 						<i style="color: black;" class="fa fa-twitter"></i>
 					</a>
-					<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fpost%3FID={{.ID}}&media=&description=">
+					<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fpost%2F{{.ID}}&media=&description=">
 						<i style="color: black;" class="fa fa-pinterest"></i>
 					</a>
 				</div>

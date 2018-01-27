@@ -6,7 +6,7 @@ package connectors
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	//_ "github.com/mattn/go-sqlite3"
 )
 
@@ -47,11 +47,11 @@ func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto st
 	port = in_port
 	dbname = in_dbname
 	DBType = in_dbtype
-	glog.Infoln(DBType)
+	log.Infoln(DBType)
 	if DBType == MySQL {
-		glog.Infoln(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?parseTime=true&timeout=1m")
+		log.Infoln(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?parseTime=true&timeout=1m")
 	} else if DBType == SQLite {
-		glog.Infoln("SQLite connecting to ./sql/commonwealthcocktails.db")
+		log.Infoln("SQLite connecting to ./sql/commonwealthcocktails.db")
 	}
 }
 
@@ -62,15 +62,15 @@ func GetDB() (*sql.DB, error) {
 		var err error
 		var d *sql.DB
 		if DBType == MySQL {
-			glog.Infoln("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
+			log.Infoln("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
 			d, err = sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
 		} else if DBType == SQLite {
-			glog.Infoln("Creating a new connection: sqllite to commonwealthcocktails.db")
+			log.Infoln("Creating a new connection: sqllite to commonwealthcocktails.db")
 			d, err = sql.Open("sqlite3", "./sql/commonwealthcocktails.db")
 		}
 		if err != nil {
-			glog.Infoln("Error connecting to database")
-			glog.Error(err)
+			log.Infoln("Error connecting to database")
+			log.Error(err)
 			return nil, err
 		}
 		db = d

@@ -68,7 +68,7 @@
 {{define "cocktailBlocks"}}
 {{range .ChildCocktails}}
 <div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 400px; overflow:hidden;">
-	<a href="/cocktail?cocktailID={{.ID}}&keywords={{.Keywords}}" style="text-decoration : none; color : #555;">
+	<a href="/cocktail/{{.ID}}/{{.Keywords}}" style="text-decoration : none; color : #555;">
 		<div style="align:center;postition:relative;width:100%;">
 			<div align="center" style="margin-top: 25px;">
 				{{if .ImagePath}}
@@ -91,7 +91,7 @@
 	</a>
 </div>
 <!--<div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-2" style="height: 350px; margin-bottom: 50px;">-->
-<!--	<a href="/cocktail?cocktailID={{.ID}}" style="text-decoration : none; color : #555;">-->
+<!--	<a href="/cocktail/{{.ID}}" style="text-decoration : none; color : #555;">-->
 <!--		<span style="display: block;">-->
 <!--			<div align="center">-->
 <!--				{{if .ImagePath}}-->

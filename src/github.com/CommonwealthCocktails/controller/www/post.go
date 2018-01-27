@@ -5,6 +5,7 @@ import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
 	"github.com/golang/glog"
+	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
 	"html"
 	"html/template"
@@ -16,12 +17,12 @@ import (
 //Post page handler which displays the standard post page.
 func PostHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//Process Form gets an ID if it was passed
-	r.ParseForm()
-	if len(r.Form["ID"]) == 0 {
+	params := mux.Vars(r)
+	if len(params["postID"]) == 0 {
 		page.RenderPageTemplate(w, r, "404")
 	} else {
 		//apply the template page info to the index page
-		id, _ := strconv.Atoi(r.Form["ID"][0])
+		id, _ := strconv.Atoi(params["postID"])
 		page.Post = page.Post.SelectPostByID(id)
 		page.RenderPageTemplate(w, r, "post")
 	}

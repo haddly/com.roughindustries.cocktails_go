@@ -4,15 +4,15 @@ package alexa
 
 import (
 	"github.com/codegangsta/negroni"
-	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	alexa "github.com/mikeflynn/go-alexa/skillserver"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 //Init to setup the http handlers
 func AlexaRouterInit() {
-	glog.Infoln("Init in alexa/hello.go")
+	log.Infoln("Init in alexa/hello.go")
 	router := mux.NewRouter()
 	alexa.Init(Applications, router)
 

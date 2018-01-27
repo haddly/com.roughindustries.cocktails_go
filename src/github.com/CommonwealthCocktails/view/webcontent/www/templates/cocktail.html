@@ -274,7 +274,7 @@
 <!--Cocktail Link Bar-->
 {{define "cocktaillinkbar"}}
 {{with .CocktailSet}}
-<a class="fb-share-button btn btn-default btn-sm" style="display: inline-block;" data-href="{{$.BaseURL}}/cocktail?cocktailID={{.Cocktail.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&amp;src=sdkpreparse">
+<a class="fb-share-button btn btn-default btn-sm" style="display: inline-block;" data-href="{{$.BaseURL}}/cocktail/{{.Cocktail.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2Fcocktail%2F{{.Cocktail.ID}}&amp;src=sdkpreparse">
 	<i class="fa fa-facebook"></i>
 </a>
 <!--<a target="_blank" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-sm" title="Facebook">-->
@@ -289,7 +289,7 @@
 <!--</a>-->
 
 <a target="_blank" class="twitter-share-button btn btn-default btn-sm" data-dnt="true"
-href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
+href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.BaseURL}}%2Fcocktail%2F{{.Cocktail.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
 	<i style="color: black;" class="fa fa-twitter"></i>
 </a>
 
@@ -297,7 +297,7 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 <!--	<i class="fa fa-envelope"></i>-->
 <!--</a>-->
 
-<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fcocktail%3FcocktailID={{.Cocktail.ID}}&media=&description=">
+<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2Fcocktail%2F{{.Cocktail.ID}}&media=&description=">
 	<i style="color: black;" class="fa fa-pinterest"></i>
 </a>
 {{end}}
@@ -320,13 +320,13 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 	<td>
 		<div class="iconlink">
 			{{if .AdIngredient.ProductName}}
-			<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
+			<a href="/product/{{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
 				{{if .AdIngredient.PreText}}
 				{{.AdIngredient.PreText}}&nbsp; 
 				{{end}} 
 				{{.AdIngredient.ProductName}}&nbsp;{{.AdIngredient.PostText}} </a>
 			</a> {{else}}
-			<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
+			<a href="/product/{{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
 				{{if .OriginalIngredient.PreText}}
 				{{.OriginalIngredient.PreText}}&nbsp; 
 				{{end}} 
@@ -354,7 +354,7 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 <section class="regular slider">
  {{with .Cocktail.Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
 <div>
-	<a href="/product?ID={{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
+	<a href="/product/{{.AdIngredient.ID}}" style="text-decoration : none; color : #000;">
 		{{if .AdIngredient.ImagePath}}
 		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}, {{.AdIngredient.ProductName}}" src="{{.AdIngredient.ImagePath}}/{{.AdIngredient.Image}}">
 		{{else}}
@@ -364,7 +364,7 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 </div>
 {{else}}
 <div>
-	<a href="/product?ID={{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
+	<a href="/product/{{.OriginalIngredient.ID}}" style="text-decoration : none; color : #000;">
 		{{if .OriginalIngredient.Image}} {{if .OriginalIngredient.ImagePath}}
 		<img border="0" class="img-responsive" alt="{{.OriginalIngredient.ProductName}}" src="{{.OriginalIngredient.ImagePath}}/{{.OriginalIngredient.Image}}">
 		{{else}}
@@ -408,11 +408,11 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 {{define "alternativeingredients"}}
 <h3>Alternative Ingredients</h3>
 {{with .Cocktail.Recipe}} {{range .RecipeSteps}} {{if .AdIngredient.ProductName}}
-<a style="text-decoration : none;" href="/product?ID={{.OriginalIngredient.ID}}">
+<a style="text-decoration : none;" href="/product/{{.OriginalIngredient.ID}}">
 	<!--<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.OriginalIngredient.ProductName}}</span>-->
 	{{template "productbutton" .}}
 </a>{{end}} {{if ne (len .AltIngredient) 0}}{{with .OriginalIngredient.ProductName}}{{.}}:&nbsp;{{end}}{{end}}{{range .AltIngredient}}
-<a style="text-decoration : none;" href="/product?ID={{.ID}}">
+<a style="text-decoration : none;" href="/product/{{.ID}}">
 	<!--<span style="font-weight: bold;" class="btn btn-default btn-xs">{{.ProductName}}</span>-->
 	{{template "productbutton" .}}
 </a>{{end}}{{if ne (len .AltIngredient) 0}}&nbsp;&nbsp;{{end}}{{end}}{{end}}
@@ -422,7 +422,7 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 <!--Product Buttons-->
 {{define "productbutton"}}
 <div class="btn-group" role="group">
-	<a title="Product Info" class="btn btn-default btn-xs" style="font-weight: bold; text-decoration : none;" href="/product?ID={{.ID}}">
+	<a title="Product Info" class="btn btn-default btn-xs" style="font-weight: bold; text-decoration : none;" href="/product/{{.ID}}">
 		{{.PreText}}&nbsp;{{.ProductName}}&nbsp;{{.PostText}}
 	</a>
 	<a title="Related Cocktails" style="text-decoration : none; font-weight: bold;" class="btn btn-default btn-xs" href="/cocktailsByProductID?ID={{.ID}}">
@@ -639,7 +639,7 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 {{define "relatedCocktails"}}
 {{range mksliceCocktail $.Cocktails 3}}
 <div class="brightness col-xs-12 col-sm-4 col-md-12 col-lg-12" style="height: 225px; overflow:hidden;">
-	<a href="/cocktail?cocktailID={{.ID}}&keywords={{.Keywords}}" style="text-decoration : none; color : #555;">
+	<a href="/cocktail/{{.ID}}/{{.Keywords}}" style="text-decoration : none; color : #555;">
 		<div>
 			<div align="center">
 				{{if .ImagePath}}
@@ -684,7 +684,7 @@ href="https://twitter.com/intent/tweet?text=The {{.Cocktail.Title}}&url={{$.Base
 				<script>
 				$('.adminsocialpost').click( function(){
 				   $.ajax({
-					        url: "/adminsocialpost?URLExt=cocktail?cocktailID={{.Cocktail.ID}}"
+					        url: "/adminsocialpost?URLExt=cocktail/{{.Cocktail.ID}}"
 					        ,success: function(response) {
 					        	console.log("Posted to Facebook")
 					        }

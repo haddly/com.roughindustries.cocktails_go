@@ -8,7 +8,7 @@ package www
 
 import (
 	"github.com/CommonwealthCocktails/model"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"html/template"
 	"net/http"
 	//"strings"
@@ -113,7 +113,7 @@ var (
 
 //Init variables from config
 func PageInit() {
-	glog.Infoln("Login Init")
+	log.Infoln("Login Init")
 	//default user
 	allowDefault = viper.GetBool("allowDefault")
 	defaultUser = viper.GetString("defaultUser")
@@ -200,8 +200,8 @@ func (this *page) RenderPageTemplate(w http.ResponseWriter, r *http.Request, tmp
 			this.UserSession.CSRF = ""
 		} else {
 			this.UserSession.CSRF = encrypt([]byte(this.UserSession.CSRFKey), this.UserSession.CSRFBase)
-			glog.Infoln(this.UserSession.CSRF)
-			glog.Infoln(this.UserSession.CSRFBase)
+			log.Infoln(this.UserSession.CSRF)
+			log.Infoln(this.UserSession.CSRFBase)
 		}
 		SetSession(w, r, &this.UserSession, false)
 	}
@@ -233,7 +233,7 @@ func parseTempFiles(page page, tmpl string) (*template.Template, error) {
 			// Make a Regex to say we only want
 			reg, err := regexp.Compile("[^a-zA-Z0-9 ().-]+")
 			if err != nil {
-				glog.Fatal(err)
+				log.Fatal(err)
 			}
 			processedString := reg.ReplaceAllString(string(unescaped), "")
 			return processedString
@@ -244,7 +244,7 @@ func parseTempFiles(page page, tmpl string) (*template.Template, error) {
 			// Make a Regex to say we only want
 			reg, err := regexp.Compile("[^a-zA-Z0-9 -]+")
 			if err != nil {
-				glog.Fatal(err)
+				log.Fatal(err)
 			}
 			processedString := reg.ReplaceAllString(string(unescaped), "")
 			processedString = strings.Replace(processedString, " ", "-", -1)
@@ -277,14 +277,14 @@ func parseTempFiles(page page, tmpl string) (*template.Template, error) {
 
 // The main index page handler
 func LandingHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	glog.Infoln("Landing")
+	log.Infoln("Landing")
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, r, "index")
 }
 
 // The main index page handler
 func TestHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	glog.Infoln("Test")
+	log.Infoln("Test")
 	//apply the template page info to the index page
 	page.RenderPageTemplate(w, r, "index")
 }

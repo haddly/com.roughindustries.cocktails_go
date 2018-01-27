@@ -6,6 +6,7 @@ import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
 	"github.com/golang/glog"
+	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
 	"html"
 	"html/template"
@@ -19,12 +20,12 @@ import (
 func ProductHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var p *model.BaseProductWithBDG
 	//Process Form gets an ID if it was passed
-	r.ParseForm()
-	if len(r.Form["ID"]) == 0 {
+	params := mux.Vars(r)
+	if len(params["productID"]) == 0 {
 		page.RenderPageTemplate(w, r, "404")
 	} else {
 		//apply the template page info to the index page
-		id, _ := strconv.Atoi(r.Form["ID"][0])
+		id, _ := strconv.Atoi(params["productID"])
 		p = page.Product.SelectProductByIDWithBDG(id)
 		page.Cocktails = page.Cocktail.SelectCocktailsByProduct(p.Product)
 		page.Cocktails = append(page.Cocktails, page.Cocktail.SelectCocktailsByIngredientID(p.Product)...)
@@ -138,6 +139,28 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	p = page.Product.SelectAllProducts()
 	page.Products = p
 	page.RenderPageTemplate(w, r, "products")
+}
+
+//Validates the cocktail form request and populates the Cocktail
+//struct
+func ValidateProductPath(w http.ResponseWriter, r *http.Request, page *page) bool {
+	page.Product.Errors = make(map[string]string)
+	params := mux.Vars(r)
+	pUGCP := bluemonday.UGCPolicy()
+	pUGCP.AllowElements("img")
+	glog.Infoln("Product Validate")
+	glog.Infoln(params["productID"])
+	if len(params["productID"]) > 0 {
+		if govalidator.IsInt(params["productID"]) {
+			page.Product.ID, _ = strconv.Atoi(params["productID"])
+		} else {
+			page.Product.Errors["productID"] = "Please enter a valid product id. "
+		}
+	}
+	if len(page.Product.Errors) > 0 {
+		page.Errors["productErrors"] = "You have errors in your input"
+	}
+	return len(page.Product.Errors) == 0
 }
 
 //Parses the form and then validates the product form request

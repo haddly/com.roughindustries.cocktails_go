@@ -8,6 +8,7 @@ import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
 	"github.com/golang/glog"
+	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
 	"html"
 	"html/template"
@@ -22,8 +23,9 @@ import (
 
 //Cocktail page handler which displays the standard cocktail page.
 func CocktailHandler(w http.ResponseWriter, r *http.Request, page *page) {
+	glog.Infoln("CocktailHandler")
 	var cs model.CocktailSet
-	if !ValidateCocktail(w, r, page) {
+	if !ValidateCocktailPath(w, r, page) {
 		page.RenderPageTemplate(w, r, "404")
 	} else {
 		cs = page.Cocktail.SelectCocktailsByID(page.Cocktail.ID, true)
@@ -242,6 +244,28 @@ func CocktailsByIngredientIDHandler(w http.ResponseWriter, r *http.Request, page
 		page.RenderPageTemplate(w, r, "cocktails")
 
 	}
+}
+
+//Validates the cocktail form request and populates the Cocktail
+//struct
+func ValidateCocktailPath(w http.ResponseWriter, r *http.Request, page *page) bool {
+	page.Cocktail.Errors = make(map[string]string)
+	params := mux.Vars(r)
+	pUGCP := bluemonday.UGCPolicy()
+	pUGCP.AllowElements("img")
+	glog.Infoln("Cocktail Validate")
+	glog.Infoln(params["cocktailID"])
+	if len(params["cocktailID"]) > 0 {
+		if govalidator.IsInt(params["cocktailID"]) {
+			page.Cocktail.ID, _ = strconv.Atoi(params["cocktailID"])
+		} else {
+			page.Cocktail.Errors["CocktailID"] = "Please enter a valid cocktail id. "
+		}
+	}
+	if len(page.Cocktail.Errors) > 0 {
+		page.Errors["cocktailErrors"] = "You have errors in your input"
+	}
+	return len(page.Cocktail.Errors) == 0
 }
 
 //Validates the cocktail form request and populates the Cocktail
