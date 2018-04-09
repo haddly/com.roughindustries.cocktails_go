@@ -1,0 +1,44 @@
+{
+  "navbar_brandtitle" : {
+  "translation": "Green Hat Cocktails"
+  },
+  "index_slogan" : {
+  "translation": "Distilled Gin"
+  },
+  "index_cocktail_description" : {
+  "translation": "There's a drink for every mood or occasion. Find your favorite cocktail recipes here at Green Hat Gin. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away."
+  },
+  "index_product_description" : {
+  "translation": "At Green Hat Gin we’ve compiled an extensive library of information about an our gin and other ingredients to make your cocktails the best they can be. "
+  },
+  "index_post_description" : {
+  "translation": "Green Hat Gin articles and opinions."
+  },
+  "index_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "index_productsindex_link" : {
+  "translation": "Products"    
+  },
+  "index_postsindex_link" : {
+  "translation": "Articles"    
+  },
+  "navbar_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "navbar_productsindex_link" : {
+  "translation": "Products"    
+  },
+  "navbar_postsindex_link" : {
+  "translation": "Articles"    
+  },
+  "navbar_cocktailsearch_link" : {
+  "translation": "Cocktail Search"    
+  },
+  "navbar_quicksearch_link" : {
+  "translation": "Quick Search"    
+  },
+  "navbar_loginindex_link" : {
+  "translation": "Login"    
+  }
+}

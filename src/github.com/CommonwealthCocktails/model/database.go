@@ -4,52 +4,52 @@ package model
 
 import (
 	"github.com/CommonwealthCocktails/connectors"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 //SELECTS
 //Get the current name of the database being used.
-func SelectCurrentDB() string {
-	glog.Infoln("Getting CurrentDB")
-	conn, _ := connectors.GetDB()
-	glog.Infoln("Getting Databases")
+func SelectCurrentDB(site string) string {
+	log.Infoln("Getting CurrentDB")
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln("Getting Databases")
 	var dbname string
-	if connectors.DBType == connectors.MySQL {
+	if connectors.GetDBType(site) == connectors.MySQL {
 		rows, _ := conn.Query("SELECT DATABASE();")
-		glog.Infoln("Got Databases")
+		log.Infoln("Got Databases")
 		if rows.Next() {
 			rows.Scan(&dbname)
-			glog.Infoln(dbname)
+			log.Infoln(dbname)
 		}
-	} else if connectors.DBType == connectors.SQLite {
+	} else if connectors.GetDBType(site) == connectors.SQLite {
 		dbname = "./sql/commonwealthcocktails.db"
 	}
 
 	return dbname
 }
 
-func SelectTables() []string {
-	conn, _ := connectors.GetDB()
-	glog.Infoln("Getting Tables")
+func SelectTables(site string) []string {
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln("Getting Tables")
 	var tables []string
-	if connectors.DBType == connectors.MySQL {
+	if connectors.GetDBType(site) == connectors.MySQL {
 		rows, _ := conn.Query("SELECT table_name FROM information_schema.tables where table_schema='commonwealthcocktails';")
-		glog.Infoln("Got Tables")
+		log.Infoln("Got Tables")
 		var table string
 		for rows.Next() {
 			rows.Scan(&table)
 			tables = append(tables, table)
 		}
-	} else if connectors.DBType == connectors.SQLite {
+	} else if connectors.GetDBType(site) == connectors.SQLite {
 		rows, _ := conn.Query("SELECT name FROM SQLITE_MASTER WHERE type='table' ORDER BY name;")
-		glog.Infoln("Got Tables")
+		log.Infoln("Got Tables")
 		var table string
 		for rows.Next() {
 			rows.Scan(&table)
 			tables = append(tables, table)
 		}
 	}
-	glog.Infoln(tables)
+	log.Infoln(tables)
 	return tables
 
 }

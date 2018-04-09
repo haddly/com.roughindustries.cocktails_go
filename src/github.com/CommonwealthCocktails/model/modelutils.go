@@ -4,7 +4,7 @@ package model
 
 import (
 	"database/sql"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 )
 
 //Checks the count return for the number of rows
@@ -12,7 +12,7 @@ func checkCount(rows *sql.Rows) (count int, err error) {
 	for rows.Next() {
 		err = rows.Scan(&count)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return 0, err
 		}
 	}

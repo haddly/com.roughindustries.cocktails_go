@@ -41,7 +41,7 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="row">
-                    <form method="post" action="/productMod" id="productModForm" autocomplete="nope">
+                    <form method="post" action="/{{$.View}}/productMod" id="productModForm" autocomplete="nope">
                         <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
                         {{template "productID" .}}
                         <!---->
@@ -166,11 +166,11 @@
                 if (id) { // require a URL
                     $('#maindiv').addClass('hide');
                     $('#loader').removeClass('hide');
-                    window.location = "/productModForm?ID="+id; // redirect
+                    window.location = "/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/productModForm/"+id; // redirect
                 } else {
                     $('#maindiv').addClass('hide');
                     $('#loader').removeClass('hide');
-                    window.location = "/productModForm"; // redirect
+                    window.location = "/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/productModForm"; // redirect
                 }
                 return false;
             });

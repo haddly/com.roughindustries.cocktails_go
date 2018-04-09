@@ -7,7 +7,7 @@ import (
 	"encoding/gob"
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 )
 
@@ -20,16 +20,16 @@ func DeleteAllMemcache() {
 }
 
 //Calls all the loaders to reinitialize the memcache
-func LoadAllMemcache() {
-	LoadMCWithProductData()
-	LoadMCWithMetaData()
-	LoadMCWithCocktailByAlphaNumsData()
-	LoadMCWithCocktailData()
+func LoadAllMemcache(site string) {
+	LoadMCWithProductData(site)
+	LoadMCWithMetaData(site)
+	LoadMCWithCocktailByAlphaNumsData(site)
+	LoadMCWithCocktailData(site)
 	//LoadMCWithPostData()
 }
 
 //Reinitialize the memcache with all the cocktails in alpha numeric order
-func LoadMCWithCocktailByAlphaNumsData() {
+func LoadMCWithCocktailByAlphaNumsData(site string) {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		cocktail := new(Cocktail)
@@ -38,7 +38,7 @@ func LoadMCWithCocktailByAlphaNumsData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var cba CocktailsByAlphaNums
-		cba = cocktail.SelectCocktailsByAlphaNums(true)
+		cba = cocktail.SelectCocktailsByAlphaNums(true, site)
 		enc.Encode(cba)
 
 		mc.Set(&memcache.Item{Key: "cba", Value: buf.Bytes()})
@@ -47,7 +47,7 @@ func LoadMCWithCocktailByAlphaNumsData() {
 
 //Reinitialize the products lists in the memcache for both ingredients and
 //non-ingredients, ingredients only, and non-ingredients only lists
-func LoadMCWithProductData() {
+func LoadMCWithProductData(site string) {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		product := new(Product)
@@ -59,21 +59,21 @@ func LoadMCWithProductData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var pbt ProductsByTypes
-		pbt = product.SelectProductsByTypes(true, true, true)
+		pbt = product.SelectProductsByTypes(true, true, true, site)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_tt", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		pbt = product.SelectProductsByTypes(true, false, true)
+		pbt = product.SelectProductsByTypes(true, false, true, site)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_tf", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		pbt = product.SelectProductsByTypes(false, true, true)
+		pbt = product.SelectProductsByTypes(false, true, true, site)
 		enc.Encode(pbt)
 
 		mc.Set(&memcache.Item{Key: "pbt_ft", Value: buf.Bytes()})
@@ -84,7 +84,7 @@ func LoadMCWithProductData() {
 //index ordered by metatype ordinal, just the list of meta values to show
 //in the cocktail index with no order by, and all the metas and ordered by
 //ordinal
-func LoadMCWithMetaData() {
+func LoadMCWithMetaData(site string) {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		meta := new(Meta)
@@ -96,21 +96,21 @@ func LoadMCWithMetaData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var mbt MetasByTypes
-		mbt = meta.SelectMetaByTypes(true, true, true)
+		mbt = meta.SelectMetaByTypes(true, true, true, site)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_tt", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		mbt = meta.SelectMetaByTypes(true, false, true)
+		mbt = meta.SelectMetaByTypes(true, false, true, site)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_tf", Value: buf.Bytes()})
 
 		buf = new(bytes.Buffer)
 		enc = gob.NewEncoder(buf)
-		mbt = meta.SelectMetaByTypes(false, true, true)
+		mbt = meta.SelectMetaByTypes(false, true, true, site)
 		enc.Encode(mbt)
 
 		mc.Set(&memcache.Item{Key: "mbt_ft", Value: buf.Bytes()})
@@ -118,7 +118,7 @@ func LoadMCWithMetaData() {
 }
 
 //Reinitialize the post lists in the memcache
-func LoadMCWithPostData() {
+func LoadMCWithPostData(site string) {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		post := new(Post)
@@ -127,7 +127,7 @@ func LoadMCWithPostData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var p []Post
-		p = post.SelectAllPosts()
+		p = post.SelectAllPosts(site)
 		enc.Encode(p)
 
 		mc.Set(&memcache.Item{Key: "posts", Value: buf.Bytes()})
@@ -135,7 +135,7 @@ func LoadMCWithPostData() {
 }
 
 //Reinitialize the cocktail lists in the memcache
-func LoadMCWithCocktailData() {
+func LoadMCWithCocktailData(site string) {
 	mc, _ := connectors.GetMC()
 	if mc != nil {
 		cocktail := new(Cocktail)
@@ -144,11 +144,11 @@ func LoadMCWithCocktailData() {
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
 		var c []Cocktail
-		c = cocktail.SelectAllCocktails(false)
+		c = cocktail.SelectAllCocktails(site)
 		c = c[0:25]
 		for i, _ := range c {
 			var cs CocktailSet
-			cs = c[i].SelectCocktailsByID(c[i].ID, true)
+			cs = c[i].SelectCocktailsByID(c[i].ID, true, site)
 			c[i] = cs.Cocktail
 			var temp []string
 			for _, e := range c[i].Recipe.RecipeSteps {
@@ -168,10 +168,10 @@ func LoadMCWithCocktailData() {
 		read := bytes.NewReader(item.Value)
 		dec := gob.NewDecoder(read)
 		dec.Decode(&cocktails)
-		glog.Infoln("\n\n\n")
-		glog.Infoln(cocktails)
+		log.Infoln("\n\n\n")
+		log.Infoln(cocktails)
 		for i, _ := range c {
-			glog.Infoln(c[i].ID)
+			log.Infoln(c[i].ID)
 		}
 	}
 }

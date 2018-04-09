@@ -1,0 +1,230 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+    <!-- /.container -->
+    <!-- Header -->
+    <!--<div class="intro-header"  style="background-repeat: repeat;background-image: url('/images/news-bg.jpg');">-->
+    <div class="intro-header">
+        <div class="container">
+            {{template "headerbanner" .}}
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.intro-header -->
+
+    <!-- Page Content -->
+    <!--<a name="splash"></a>-->
+    <!--<div class="content-section-b">-->
+    <!--    <div class="container">-->
+    <!--        {{template "introcarousel" .}}-->
+    <!--    </div>-->
+        <!-- /.container -->
+
+    <!--</div>-->
+
+    <a name="cocktails"></a>
+    <div class="content-section-a" id="IndexCocktailsSectionStyle">
+    <!--<div class="content-section-a">-->
+        <div class="container">
+            {{template "cocktailrow" .}}
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+
+    <a name="products"></a>
+    <div class="content-section-b" id="IndexProductssSectionStyle">
+        <div class="container">
+           {{template "productrow" .}}
+        </div>
+        <!-- /.container -->
+
+    </div>
+    
+    <a name="posts"></a>
+    <div class="content-section-a" id="IndexArticlesSectionStyle">
+        <div class="container">
+           {{template "postrow" .}}
+        </div>
+        <!-- /.container -->
+
+    </div>
+    
+    <hr style="border-color: #FFF;">
+
+    <div class="container">
+        {{template "bottomshortcuts" .}}
+    </div> 
+    
+    <!-- Footer -->
+    {{template "footer" .}}
+
+</body>
+
+</html>
+{{end}}
+
+{{define "headerbanner"}}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="intro-message">
+            <p><a href="#home"><img src="/{{.View}}/images/logo.gif" alt="Green Hat Gin" /></a></p>
+            <p><img class="feature" src="/{{.View}}/images/index-bottle.jpg" alt=""/></p>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{define "introcarousel"}}
+<div class="row">
+    <div class="col-xs-1">
+        &nbsp;
+    </div>
+    <div class="col-xs-10" align="center">
+        <section class="header slider">
+            <div class="brightness" align="center" style="position: relative; width: 100%;">
+                <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Cocktail+Mega+Search&w=1200&h=900&txttrack=0">
+            </div>
+            <div class="brightness" align="center" style="position: relative; width: 100%;">
+                <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Valentine's Day Cocktails&w=1200&h=900&txttrack=0">
+            </div>
+            <div class="brightness" align="center" style="position: relative; width: 100%;">
+                <img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=120&txt=Most Romantic Bars in Washington D.C.&w=1200&h=900&txttrack=0">
+            </div>
+        </section>
+        <script type="text/javascript">
+            $(document).on('ready', function() {
+                $(".header").slick({
+                    dots: true,
+                    infinite: true,
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    centerMode: false,
+                    variableWidth: false,
+                    autoplay: true,
+                    autoplaySpeed: 2000
+                });
+            });
+        </script>
+    </div>
+    <div class="col-xs-1">
+        &nbsp;
+    </div>
+</div>
+{{end}}
+
+
+{{define "cocktailrow"}}
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 class="section-heading" style="font-family:'Arial';">{{I18n .View .Locale "index_cocktailsindex_link"}}</h2>
+        <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktails" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-glass"></i>
+            <span class="network-name">{{I18n .View .Locale "index_cocktailsindex_link"}}</span>
+        </a>
+    </div>
+    <div class="col-md-1 col-sm-0">
+        &nbsp; </div>
+    <div class="col-md-6 col-sm-6 network-name">
+        {{I18n .View .Locale "index_cocktail_description"}}
+    </div>
+
+</div>
+{{end}}
+
+{{define "productrow"}}
+<div class="row">
+    <div class="col-md-4 col-lg-push-8 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 style="font-family:'Arial';" class="section-heading">{{I18n .View .Locale "index_productsindex_link"}}</h2>
+        <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/products" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-tag"></i>
+            <span class="network-name">{{I18n .View .Locale "index_productsindex_link"}}</span>
+        </a>
+    </div>
+    <div class="col-md-2  col-sm-0">
+        &nbsp; </div>
+
+    <div class="col-lg-pull-6 col-md-6 col-sm-6 network-name">
+        {{I18n .View .Locale "index_product_description"}}
+    </div>
+</div>
+{{end}}
+
+{{define "postrow"}}
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 style="font-family:'Arial';"class="section-heading">{{I18n .View .Locale "index_postsindex_link"}}</h2>
+        <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/posts" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-file"></i>
+            <span class="network-name">{{I18n .View .Locale "index_postsindex_link"}}</span>
+        </a>
+    </div>
+    <div class="col-md-1 col-sm-0">
+        &nbsp; </div>
+    <div class="col-md-6 col-sm-6 network-name">
+                {{I18n .View .Locale "index_post_description"}}
+    </div>
+</div>
+{{end}}
+
+{{define "searchrow"}}
+<div class="row">
+    <div class="col-md-4 col-sm-6">
+        <hr class="section-heading-spacer">
+        <div class="clearfix"></div>
+        <h2 class="section-heading">{{I18n .View .Locale "index_searchindex_link"}}</h2>
+        <a href="{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktails" class="btn btn-default btn-lg">
+            <i class="glyphicon glyphicon-search"></i>
+            <span class="network-name">{{I18n .View .Locale "index_searchindex_link"}}</span>
+        </a>
+    </div>
+    <div class="col-md-1 col-sm-0">
+        &nbsp; </div>
+    <div class="col-md-6 col-sm-6 network-name">
+        {{I18n .View .Locale "index_search_description"}}
+    </div>
+
+</div>
+{{end}}
+
+{{define "bottomshortcuts"}}
+<div class="row">
+    <div class="col-lg-12" align="center">
+        <ul class="list-inline">
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#">Home</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#cocktails">Cocktails</a>
+            </li>
+            <li class="footer-menu-divider">&sdot;</li>
+            <li>
+                <a style="text-decoration : none; color : #555;" href="#products">Products</a>
+            </li>
+            <!--<li class="footer-menu-divider">&sdot;</li>-->
+            <!--<li>-->
+            <!--    <a style="text-decoration : none; color : #555;" href="#search">Search</a>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</div>
+{{end}}

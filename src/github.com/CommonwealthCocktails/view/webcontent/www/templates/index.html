@@ -11,7 +11,9 @@
 <body>
 
     {{template "navbar" .}}
+    <!-- /.container -->
     <!-- Header -->
+    <!--<div class="intro-header"  style="background-repeat: repeat;background-image: url('/images/news-bg.jpg');">-->
     <div class="intro-header">
         <div class="container">
             {{template "headerbanner" .}}
@@ -31,8 +33,8 @@
     <!--</div>-->
 
     <a name="cocktails"></a>
-    <div class="content-section-a">
-
+    <div class="content-section-a" id="IndexCocktailsSectionStyle">
+    <!--<div class="content-section-a">-->
         <div class="container">
             {{template "cocktailrow" .}}
         </div>
@@ -43,8 +45,7 @@
 
 
     <a name="products"></a>
-    <div class="content-section-b">
-
+    <div class="content-section-b" id="IndexProductssSectionStyle">
         <div class="container">
            {{template "productrow" .}}
         </div>
@@ -53,8 +54,8 @@
     </div>
     
     <a name="posts"></a>
+    <!--<div class="content-section-a" style="background:#fff3e3;">-->
     <div class="content-section-a">
-
         <div class="container">
            {{template "postrow" .}}
         </div>
@@ -63,8 +64,8 @@
     </div>
     
     <a name="project"></a>
+    <!--<div class="content-section-b" style="background-repeat: repeat;background-image: url('/images/contact-map.jpg');">-->
     <div class="content-section-b">
-
         <div class="container">
            {{template "projectrow" .}}
         </div>
@@ -79,7 +80,7 @@
     <!--<div class="content-section-a">-->
 
     <!--    <div class="container">-->
-    <!--        {{template "searchrow" .}}-->
+    <!--        {{template "searchrow" .}} -->
     <!--    </div>-->
         <!-- /.container -->
 
@@ -87,16 +88,11 @@
     <!-- /.content-section-a -->
 
     <div class="banner">
-
         <div class="container">
-
-            {{template "bottombannerrow" .}}
-
+            {{template "bottombannerrow" .}} 
         </div>
-        <!-- /.container -->
-
     </div>
-    <!-- /.banner -->
+     <!--/.banner -->
     <hr style="border-color: #FFF;">
 
     <div class="container">
@@ -117,7 +113,7 @@
         <div class="intro-message">
             <h1 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Commonwealth Cocktails</h1>
             <h4 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Est. 2016</h4>
-            <h2 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">Libations for Everyone</h2>
+            <h2 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">{{I18n .View .Locale "index_slogan"}}</h2>
             <hr class="intro-divider">
             <ul class="list-inline intro-social-buttons">
                 <li>
@@ -180,16 +176,16 @@
     <div class="col-md-4 col-sm-6">
         <hr class="section-heading-spacer">
         <div class="clearfix"></div>
-        <h2 class="section-heading">Cocktails</h2>
-        <a href="/cocktails" class="btn btn-default btn-lg">
+        <h2 class="section-heading">{{I18n .View .Locale "index_cocktailsindex_link"}}</h2>
+        <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktails" class="btn btn-default btn-lg">
             <i class="glyphicon glyphicon-glass"></i>
-            <span class="network-name">Cocktails</span>
+            <span class="network-name">{{I18n .View .Locale "index_cocktailsindex_link"}}</span>
         </a>
     </div>
     <div class="col-md-1 col-sm-0">
         &nbsp; </div>
     <div class="col-md-6 col-sm-6 network-name">
-        There's a drink for every mood or occasion. Find your favorite cocktail recipes here at Commonwealth Cocktails. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away.
+        {{I18n .View .Locale "index_cocktail_description"}}
     </div>
 
 </div>
@@ -200,17 +196,17 @@
     <div class="col-md-4 col-lg-push-8 col-sm-6">
         <hr class="section-heading-spacer">
         <div class="clearfix"></div>
-        <h2 class="section-heading">Prodcuts</h2>
-        <a href="/products" class="btn btn-default btn-lg">
+        <h2 class="section-heading">{{I18n .View .Locale "index_productsindex_link"}}</h2>
+        <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/products" class="btn btn-default btn-lg">
             <i class="glyphicon glyphicon-tag"></i>
-            <span class="network-name">Products</span>
+            <span class="network-name">{{I18n .View .Locale "index_productsindex_link"}}</span>
         </a>
     </div>
     <div class="col-md-2  col-sm-0">
         &nbsp; </div>
 
     <div class="col-lg-pull-6 col-md-6 col-sm-6 network-name">
-        At Commonwealth Cocktails we’ve compiled an extensive library of information about an array of liquor brands and spirits. Whether you're reading about a favorite bourbon or a new craft gin, you just might learn a thing or two.
+        {{I18n .View .Locale "index_product_description"}}
     </div>
 </div>
 {{end}}
@@ -220,16 +216,16 @@
     <div class="col-md-4 col-sm-6">
         <hr class="section-heading-spacer">
         <div class="clearfix"></div>
-        <h2 class="section-heading">Posts</h2>
-        <a href="/posts" class="btn btn-default btn-lg">
+        <h2 class="section-heading">{{I18n .View .Locale "index_postsindex_link"}}</h2>
+        <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/posts" class="btn btn-default btn-lg">
             <i class="glyphicon glyphicon-file"></i>
-            <span class="network-name">Posts</span>
+            <span class="network-name">{{I18n .View .Locale "index_postsindex_link"}}</span>
         </a>
     </div>
     <div class="col-md-1 col-sm-0">
         &nbsp; </div>
     <div class="col-md-6 col-sm-6 network-name">
-                Commonwealth Cocktail recipe articles and opinions.
+                {{I18n .View .Locale "index_post_description"}}
     </div>
 </div>
 {{end}}
@@ -239,16 +235,16 @@
     <div class="col-md-4 col-sm-6">
         <hr class="section-heading-spacer">
         <div class="clearfix"></div>
-        <h2 class="section-heading">Search</h2>
-        <a href="/cocktails" class="btn btn-default btn-lg">
+        <h2 class="section-heading">{{I18n .View .Locale "index_searchindex_link"}}</h2>
+        <a href="{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktails" class="btn btn-default btn-lg">
             <i class="glyphicon glyphicon-search"></i>
-            <span class="network-name">Search</span>
+            <span class="network-name">{{I18n .View .Locale "index_searchindex_link"}}</span>
         </a>
     </div>
     <div class="col-md-1 col-sm-0">
         &nbsp; </div>
     <div class="col-md-6 col-sm-6 network-name">
-        This is what it is all about. The Super Mega Cocktail Search. It all started because of this. We wanted a way to find the right cocktail. At the right time. With the right ingredients, that we had on hand.
+        {{I18n .View .Locale "index_search_description"}}
     </div>
 
 </div>
@@ -259,7 +255,7 @@
     <div class="col-md-4 col-lg-push-8 col-sm-6">
         <hr class="section-heading-spacer">
         <div class="clearfix"></div>
-        <h2 class="section-heading">The Commonwealth Cocktails Project</h2>
+        <h2 class="section-heading">{{I18n .View .Locale "index_ccpindex_link"}}</h2>
         <a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-lg">
             <i class="fa fa-github fa-fw"></i>
             <span class="network-name">Github</span>
@@ -269,7 +265,7 @@
         &nbsp; </div>
 
     <div class="col-lg-pull-6 col-md-6 col-sm-6 network-name">
-        Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset.
+        {{I18n .View .Locale "index_ccp_description"}}
     </div>
 </div>
 {{end}}
@@ -286,6 +282,7 @@
                 <a target="_blank" alt="Commonwealth Cocktails on Facebook" title="Commonwealth Cocktails on Facebook" href="https://www.facebook.com/commonwealthcocktail" class="btn btn-default btn-lg">
                     <i class="fa fa-facebook fa-fw"></i>
                     <span class="network-name">Facebook</span></a>
+            </li>
         </ul>
     </div>
     <div class="col-lg-1"></div>

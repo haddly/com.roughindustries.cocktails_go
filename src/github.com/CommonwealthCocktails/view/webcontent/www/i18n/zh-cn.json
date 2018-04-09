@@ -1,0 +1,56 @@
+{
+  "navbar_brandtitle" : {
+  "translation": "Commonwealth Cocktails"
+  },
+  "index_slogan" : {
+  "translation": "為大家喝"
+  },
+  "index_cocktail_description" : {
+  "translation": "每種情緒或場合都有一杯飲料。 在Commonwealth Cocktails找到您最喜愛的雞尾酒食譜。 或者在玻璃杯外思考並嘗試一種全新的飲料。 你最喜歡的可能是震動或攪動。"
+  },
+  "index_product_description" : {
+  "translation": "在Commonwealth Cocktails，我們編制了一系列關於酒品牌和烈酒的大量信息。 無論您是閱讀最喜歡的波旁酒或新的工藝杜松子酒，您都可能會學到一兩樣東西。"
+  },
+  "index_post_description" : {
+  "translation": "英聯邦雞尾酒配方文章和意見。"
+  },
+  "index_search_description" : {
+  "translation": "這就是它的全部內容。 超級巨型雞尾酒搜索。 一切都因此而開始。 我們想要一種方法來找到合適的雞尾酒。 在正確的時間。 用正確的成分，我們手頭上。"
+  },
+  "index_ccp_description" : {
+  "translation": "Commonwealth Cocktails是一個用Go編寫的開源項目，旨在探索創建和呈現雞尾酒的新方法。 英聯邦雞尾酒包括OAuth，社交媒體，GCP，AWS等等，以滿足實際的實際數據集。"
+  },
+  "index_cocktailsindex_link" : {
+  "translation": "雞尾酒"    
+  },
+  "index_productsindex_link" : {
+  "translation": "製品"    
+  },
+  "index_postsindex_link" : {
+  "translation": "用品"    
+  },
+  "index_searchindex_link" : {
+  "translation": "搜索"    
+  },
+  "index_ccpindex_link" : {
+  "translation": "英聯邦雞尾酒項目"    
+  },
+  "navbar_cocktailsindex_link" : {
+  "translation": "雞尾酒"    
+  },
+  "navbar_productsindex_link" : {
+  "translation": "製品"    
+  },
+  "navbar_postsindex_link" : {
+  "translation": "用品"    
+  },
+  "navbar_cocktailsearch_link" : {
+  "translation": "雞尾酒搜索"    
+  },
+  "navbar_quicksearch_link" : {
+  "translation": "快速搜索"    
+  },
+  "navbar_loginindex_link" : {
+  "translation": "登錄"    
+  }
+}

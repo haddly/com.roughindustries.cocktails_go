@@ -5,9 +5,9 @@ package www
 import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
-	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"html"
 	"html/template"
 	"net/http"
@@ -26,9 +26,9 @@ func ProductHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(params["productID"])
-		p = page.Product.SelectProductByIDWithBDG(id)
-		page.Cocktails = page.Cocktail.SelectCocktailsByProduct(p.Product)
-		page.Cocktails = append(page.Cocktails, page.Cocktail.SelectCocktailsByIngredientID(p.Product)...)
+		p = page.Product.SelectProductByIDWithBDG(id, page.View)
+		page.Cocktails = page.Cocktail.SelectCocktailsByProduct(p.Product, page.View)
+		page.Cocktails = append(page.Cocktails, page.Cocktail.SelectCocktailsByIngredientID(p.Product, page.View)...)
 		page.BaseProductWithBDG = *p
 		page.RenderPageTemplate(w, r, "product")
 	}
@@ -40,10 +40,10 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//Process Form gets an ID if it was passed
 	r.ParseForm()
 	var pbt model.ProductsByTypes
-	pbt = page.Product.SelectProductsByTypes(true, true, false)
+	pbt = page.Product.SelectProductsByTypes(true, true, false, page.View)
 	var prods []model.Product
 	var prod model.Product
-	prods = prod.SelectProduct()
+	prods = prod.SelectProduct(page.View)
 	page.Products = prods
 	page.ProductsByTypes = pbt
 	page.IsForm = true
@@ -54,9 +54,9 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		id, _ := strconv.Atoi(r.Form["ID"][0])
 		var in model.Product
 		in.ID = id
-		out := in.SelectProduct()
+		out := in.SelectProduct(page.View)
 		page.Product = out[0]
-		page.BaseProductWithBDG = *page.Product.SelectBDGByProduct()
+		page.BaseProductWithBDG = *page.Product.SelectBDGByProduct(page.View)
 		page.RenderPageTemplate(w, r, "productmodform")
 	}
 }
@@ -68,57 +68,57 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	r.ParseForm()
 	//Get the generic data that all product mod pages need
 	var pbt model.ProductsByTypes
-	pbt = page.Product.SelectProductsByTypes(true, true, false)
+	pbt = page.Product.SelectProductsByTypes(true, true, false, page.View)
 	var prods []model.Product
 	var prod model.Product
-	prods = prod.SelectProduct()
+	prods = prod.SelectProduct(page.View)
 	page.Products = prods
 	page.ProductsByTypes = pbt
 	page.IsForm = true
 	//did we get an add, update, or something else request
 	if r.Form["button"][0] == "add" {
-		ret_id := page.Product.InsertProduct()
+		ret_id := page.Product.InsertProduct(page.View)
 		//handle add of bdg if derived or group
 		if page.Product.ProductGroupType == model.Derived {
 			var dp model.DerivedProduct
 			dp.Product.ID = ret_id
 			dp.BaseProduct.ID = page.BaseProductWithBDG.BaseProduct.ID
-			dp.InsertDerivedProduct()
+			dp.InsertDerivedProduct(page.View)
 		} else if page.Product.ProductGroupType == model.Group {
 			var gp model.GroupProduct
 			gp.GroupProduct.ID = ret_id
 			gp.Products = page.BaseProductWithBDG.GroupProducts
-			gp.InsertGroupProduct()
+			gp.InsertGroupProduct(page.View)
 		}
-		model.LoadMCWithProductData()
-		pbt = page.Product.SelectProductsByTypes(true, true, false)
+		model.LoadMCWithProductData(page.View)
+		pbt = page.Product.SelectProductsByTypes(true, true, false, page.View)
 		page.ProductsByTypes = pbt
 		page.Product.ID = ret_id
-		outProduct := page.Product.SelectProduct()
+		outProduct := page.Product.SelectProduct(page.View)
 		page.Product = outProduct[0]
 		page.Messages["productModifySuccess"] = "Product modified successfully and memcache updated!"
 		page.RenderPageTemplate(w, r, "productmodform")
 		return
 	} else if r.Form["button"][0] == "update" {
-		rows_updated := page.Product.UpdateProduct()
+		rows_updated := page.Product.UpdateProduct(page.View)
 		//handle add of bdg if derived or group, requires the
 		if page.Product.ProductGroupType == model.Derived {
 			var dp model.DerivedProduct
 			dp.Product.ID = page.Product.ID
 			dp.BaseProduct.ID = page.BaseProductWithBDG.BaseProduct.ID
-			dp.UpdateDerivedProduct()
+			dp.UpdateDerivedProduct(page.View)
 		} else if page.Product.ProductGroupType == model.Group {
 			var gp model.GroupProduct
 			gp.GroupProduct.ID = page.Product.ID
 			gp.Products = page.BaseProductWithBDG.GroupProducts
-			gp.UpdateGroupProduct()
+			gp.UpdateGroupProduct(page.View)
 
 		}
-		glog.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
-		model.LoadMCWithProductData()
-		pbt = page.Product.SelectProductsByTypes(true, true, false)
+		log.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
+		model.LoadMCWithProductData(page.View)
+		pbt = page.Product.SelectProductsByTypes(true, true, false, page.View)
 		page.ProductsByTypes = pbt
-		outProduct := page.Product.SelectProduct()
+		outProduct := page.Product.SelectProduct(page.View)
 		page.Product = outProduct[0]
 		page.Messages["productModifySuccess"] = "Product modified successfully and memcache updated!"
 		page.RenderPageTemplate(w, r, "productmodform")
@@ -136,8 +136,17 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //displays the all the products page.
 func ProductsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var p []model.Product
-	p = page.Product.SelectAllProducts()
+	p = page.Product.SelectAllProducts(page.View)
+	totalP := len(p)
+	diff := len(p) - ((page.Pagination.CurrentPage - 1) * 25)
+	if diff > 25 {
+		p = p[(page.Pagination.CurrentPage-1)*25 : ((page.Pagination.CurrentPage-1)*25)+25]
+	} else {
+		p = p[(page.Pagination.CurrentPage-1)*25 : ((page.Pagination.CurrentPage-1)*25)+diff]
+	}
 	page.Products = p
+	PaginationCalculate(page, page.Pagination.CurrentPage, 25, totalP, 3)
+	page.SubrouteURL = "products"
 	page.RenderPageTemplate(w, r, "products")
 }
 
@@ -148,8 +157,8 @@ func ValidateProductPath(w http.ResponseWriter, r *http.Request, page *page) boo
 	params := mux.Vars(r)
 	pUGCP := bluemonday.UGCPolicy()
 	pUGCP.AllowElements("img")
-	glog.Infoln("Product Validate")
-	glog.Infoln(params["productID"])
+	log.Infoln("Product Validate")
+	log.Infoln(params["productID"])
 	if len(params["productID"]) > 0 {
 		if govalidator.IsInt(params["productID"]) {
 			page.Product.ID, _ = strconv.Atoi(params["productID"])
@@ -172,7 +181,7 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 	pUGCP.AllowElements("img")
 	pSP := bluemonday.StrictPolicy()
 	pSP.AllowElements("sup")
-	glog.Infoln("Product Validate")
+	log.Infoln("Product Validate")
 	if len(r.Form["productID"]) > 0 && strings.TrimSpace(r.Form["productID"][0]) != "" {
 		if govalidator.IsInt(r.Form["productID"][0]) {
 			page.Product.ID, _ = strconv.Atoi(r.Form["productID"][0])
@@ -189,7 +198,7 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 	}
 	if len(r.Form["productType"]) > 0 && strings.TrimSpace(r.Form["productType"][0]) != "" {
 		page.Product.ProductType.ID, _ = strconv.Atoi(r.Form["productType"][0])
-		glog.Infoln(page.Product.ProductType.ID)
+		log.Infoln(page.Product.ProductType.ID)
 		if len(r.Form["productGroupType"+r.Form["productType"][0]]) > 0 {
 			pgt, _ := r.Form["productGroupType"+r.Form["productType"][0]]
 			if pgt[0] == "Base" {
@@ -265,7 +274,7 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 		page.Errors["productErrors"] = "You have errors in your input"
 	}
 
-	glog.Infoln(page.Product)
+	log.Infoln(page.Product)
 	return len(page.Product.Errors) == 0
 }
 

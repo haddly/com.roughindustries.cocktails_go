@@ -28,7 +28,6 @@ func init() {
 	//account.
 	passwdPtr := flag.String("password", "", "Gives a password hash, but doesn't start the server. Don't forget special characters need to be escaped on the command-line, i.e. ! ? $ % $ # & * ( ) blank tab | ' ; \" < > \\ ~ ` [ ] { }")
 	//Add the log command line config option to print everything to stderr
-	os.Args = append(os.Args, "-logtostderr=true")
 	flag.Parse()
 
 	if *passwdPtr != "" {
@@ -59,42 +58,100 @@ func init() {
 		log.Errorf("Fatal error config file: %s \n", err)
 		panic(err)
 	}
+	viper.SetConfigName("ui")
+	viper.AddConfigPath(".")
+	viper.MergeInConfig()
+	if err != nil { // Handle errors reading the config file
+		log.Errorf("Fatal error config file: %s \n", err)
+		panic(err)
+	}
+	viper.SetConfigName("config.db")
+	viper.AddConfigPath(".")
+	viper.MergeInConfig()
+	if err != nil { // Handle errors reading the config file
+		log.Errorf("Fatal error config file: %s \n", err)
+		panic(err)
+	}
+	viper.SetConfigName("config.i18n")
+	viper.AddConfigPath(".")
+	viper.MergeInConfig()
+	if err != nil { // Handle errors reading the config file
+		log.Errorf("Fatal error config file: %s \n", err)
+		panic(err)
+	}
 	log.Infoln("Start Init")
 	log.Infoln(www.State)
 	log.Infoln(os.TempDir())
-	//SET THESE LINES AND ADD #gitignore to the end of the line as a comment to ignore your info
-	var dbaddr string
-	var dbpasswd string
-	var user string
-	var proto string
-	var port string
-	var dbname string
-	var dbtype connectors.DBTypesConst
-	dbaddr = viper.GetString("dbaddr")
-	dbpasswd = viper.GetString("dbpasswd")
-	user = viper.GetString("user")
-	proto = viper.GetString("proto")
-	port = viper.GetString("port")
-	dbname = viper.GetString("dbname")
-	if viper.GetString("dbtype") == "MySQL" {
-		dbtype = connectors.MySQL
-	} else if viper.GetString("dbtype") == "SQLite" {
-		dbtype = connectors.SQLite
+
+	db_list := viper.Get("database")
+	list := db_list.([]interface{})
+	dbs := make(map[string]connectors.DBItem)
+	for _, val := range list {
+		tmp := val.(map[string]interface{})
+		var dbItem connectors.DBItem
+		if tmp["site"] != nil {
+			if tmp["site"] != nil {
+				dbItem.Site = tmp["site"].(string)
+			} else {
+				dbItem.Site = ""
+			}
+			if tmp["dbaddr"] != nil {
+				dbItem.DBaddr = tmp["dbaddr"].(string)
+			} else {
+				dbItem.DBaddr = ""
+			}
+			if tmp["dbpasswd"] != nil {
+				dbItem.DBpasswd = tmp["dbpasswd"].(string)
+			} else {
+				dbItem.DBpasswd = ""
+			}
+			if tmp["user"] != nil {
+				dbItem.DBuser = tmp["user"].(string)
+			} else {
+				dbItem.DBuser = ""
+			}
+			if tmp["proto"] != nil {
+				dbItem.DBproto = tmp["proto"].(string)
+			} else {
+				dbItem.DBproto = ""
+			}
+			if tmp["port"] != nil {
+				dbItem.DBport = tmp["port"].(string)
+			} else {
+				dbItem.DBport = ""
+			}
+			if tmp["dbname"] != nil {
+				dbItem.DBname = tmp["dbname"].(string)
+			} else {
+				dbItem.DBname = ""
+			}
+			if tmp["dbtype"] != nil {
+				dbtype := tmp["dbtype"].(string)
+				if dbtype == "MySQL" {
+					dbItem.DBType = connectors.MySQL
+				} else if dbtype == "SQLite" {
+					dbItem.DBType = connectors.SQLite
+				}
+			} else {
+				dbItem.DBType = connectors.MySQL
+			}
+			dbs[dbItem.Site] = dbItem
+		}
 	}
+	connectors.SetDBMap(dbs)
 
 	var mc_server string
 	mc_server = viper.GetString("mc_server")
 
-	if dbaddr == "" || dbpasswd == "" || user == "" || proto == "" || port == "" || dbname == "" {
-		log.Infoln("Not all DB parameters are set.  If your DB isn't connecting check these values.")
-	}
-	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname, dbtype)
 	if mc_server != "" {
 		connectors.SetMCVars(mc_server)
 	} else {
 		log.Infoln("No Memcache server set. If you want to use memcaching you will " +
 			"have to set this value in main.go.")
 	}
+
+	www.GetI18nMap()
+
 	// wanted it to be more random so i seed it time now
 	rand.Seed(time.Now().UnixNano())
 	// init the routing
@@ -122,8 +179,8 @@ func AddLetsEncrypt() {
 // 	if len(req.URL.RawQuery) > 0 {
 // 		target += "?" + req.URL.RawQuery
 // 	}
-// 	log.Infoln("redirect to: %s", target)
-// 	http.Redirect(w, req, target, http.StatusTemporaryRedirect)
+// 	log.Infoln("redirect to: " + target)
+// 	http.Redirect(w, req, target, http.StatusPermanentRedirect)
 // }
 
 func main() {

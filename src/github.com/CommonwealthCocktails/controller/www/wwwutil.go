@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"io"
 	"math"
@@ -37,15 +37,15 @@ func randSeq(n int) string {
 
 //Helper function for producing a standard 404 page error when we through an
 //panic
-func Error404(w http.ResponseWriter, rec interface{}) {
-	page := NewPage(nil, nil)
-	page.View = "www"
+func Error404(w http.ResponseWriter, rec interface{}, site string) {
+	page := NewPage(nil, nil, site)
+	page.View = site
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
 	file, line := f.FileLine(pc[0])
-	glog.Infoln("Recovered %s:%d %s\n", file, line, f.Name())
-	glog.Infoln(rec)
+	log.Infoln("Recovered " + file + ":" + strconv.Itoa(line) + " " + f.Name())
+	log.Infoln(rec)
 	page.RenderPageTemplate(w, nil, "404")
 }
 
@@ -55,7 +55,7 @@ func RenderSetupTemplate(w http.ResponseWriter, rec interface{}) {
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if rec := recover(); rec != nil {
-			Error404(w, rec)
+			Error404(w, rec, "www")
 		}
 	}()
 	// CATCH ONLY HEADER START
@@ -64,8 +64,8 @@ func RenderSetupTemplate(w http.ResponseWriter, rec interface{}) {
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
 	file, line := f.FileLine(pc[0])
-	glog.Infoln("Setup Failed %s:%d %s\n", file, line, f.Name())
-	glog.Infoln(rec)
+	log.Infoln("Setup Failed %s:%d %s\n", file, line, f.Name())
+	log.Infoln(rec)
 	page.RenderSetupTemplate(w, nil, "setup")
 }
 
@@ -76,18 +76,18 @@ func ValidateCSRF(r *http.Request, page *page) bool {
 	r.ParseForm()
 	if len(r.Form["CSRF"]) > 0 {
 		if (r.Form["CSRF"][0] != page.UserSession.CSRF) || (decrypt([]byte(page.UserSession.CSRFKey), r.Form["CSRF"][0]) != page.UserSession.CSRFBase) {
-			glog.Infoln(r.Form["CSRF"][0])
-			glog.Infoln(page.UserSession.CSRF)
-			glog.Infoln(decrypt([]byte(page.UserSession.CSRFKey), r.Form["CSRF"][0]))
-			glog.Infoln(page.UserSession.CSRFBase)
+			log.Infoln(r.Form["CSRF"][0])
+			log.Infoln(page.UserSession.CSRF)
+			log.Infoln(decrypt([]byte(page.UserSession.CSRFKey), r.Form["CSRF"][0]))
+			log.Infoln(page.UserSession.CSRFBase)
 			page.Messages["modifyFail"] = "Modification failed. You tried to navigate backwards and resubmit!"
 			if r.Form["CSRF"][0] != page.UserSession.CSRF {
-				glog.Errorln("ERROR: Incorrect CSRF, possible CSRF attack!")
+				log.Errorln("ERROR: Incorrect CSRF, possible CSRF attack!")
 			}
 			return false
 		}
 	} else {
-		glog.Errorln("ERROR: No CSRF ID provided, possible CSRF attack!")
+		log.Errorln("ERROR: No CSRF ID provided, possible CSRF attack!")
 	}
 	return true
 }
@@ -143,7 +143,7 @@ func encrypt(key []byte, text string) string {
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		glog.Errorln(err)
+		log.Errorln(err)
 		panic(err)
 	}
 
@@ -219,7 +219,7 @@ func LoadFileToS3(filename string, bucket string) {
 
 	_, err := creds.Get()
 	if err != nil {
-		glog.Infof("bad credentials: %s", err)
+		log.Infof("bad credentials: %s", err)
 	}
 
 	cfg := aws.NewConfig().WithRegion("us-east-1").WithCredentials(creds)
@@ -229,7 +229,7 @@ func LoadFileToS3(filename string, bucket string) {
 	file, err := os.Open(filename)
 
 	if err != nil {
-		glog.Infof("err opening file: %s", err)
+		log.Infof("err opening file: %s", err)
 	}
 
 	defer file.Close()
@@ -257,8 +257,8 @@ func LoadFileToS3(filename string, bucket string) {
 
 	resp, err := svc.PutObject(params)
 	if err != nil {
-		glog.Infof("bad response: %s", err)
+		log.Infof("bad response: %s", err)
 	}
 
-	glog.Infof("response %s", awsutil.StringValue(resp))
+	log.Infof("response %s", awsutil.StringValue(resp))
 }

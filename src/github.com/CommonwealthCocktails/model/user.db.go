@@ -5,7 +5,7 @@ package model
 import (
 	"bytes"
 	"github.com/CommonwealthCocktails/connectors"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"html"
 	"strconv"
 	"strings"
@@ -14,22 +14,22 @@ import (
 
 //CREATE, UPDATE, DELETE
 //Insert a user record into the database
-func (user *User) InsertUser() int {
+func (user *User) InsertUser(site string) int {
 	//set the ID to zero to indicate an insert
 	user.ID = 0
-	return user.processUser()
+	return user.processUser(site)
 }
 
 //Update a user record in the database based on ID
-func (user *User) UpdateUser() int {
-	return user.processUser()
+func (user *User) UpdateUser(site string) int {
+	return user.processUser(site)
 }
 
 //process a user record into the database for update and insert
-func (user *User) processUser() int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (user *User) processUser(site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	//If the ID is zero then do an insert else do an update based on the ID
 	if user.ID == 0 {
@@ -114,11 +114,11 @@ func (user *User) processUser() int {
 	}
 
 	//Lets do this thing
-	glog.Infoln(query)
+	log.Infoln(query)
 	ret := -1
 	r, err := conn.Exec(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return ret
 	}
 	id, _ := r.LastInsertId()
@@ -127,10 +127,10 @@ func (user *User) processUser() int {
 }
 
 //Insert a user session record into the database
-func (userSession *UserSession) InsertUserSession() int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (userSession *UserSession) InsertUserSession(site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	buffer.WriteString("INSERT INTO `usersessions` ( ")
 
@@ -147,7 +147,7 @@ func (userSession *UserSession) InsertUserSession() int {
 	buffer.WriteString("`usersessionCSRFBase`,")
 	args = append(args, userSession.CSRFBase)
 	buffer.WriteString("`usersessionCSRFKey`,")
-	glog.Infoln(userSession.CSRFKey)
+	log.Infoln(userSession.CSRFKey)
 	args = append(args, userSession.CSRFKey)
 	buffer.WriteString("`usersessionCSRFGenTime`,")
 	args = append(args, userSession.CSRFGenTime.Format(time.RFC3339))
@@ -166,11 +166,11 @@ func (userSession *UserSession) InsertUserSession() int {
 	query = query + ") VALUES (" + vals + ");"
 
 	//Lets do this thing
-	glog.Infoln(query)
+	log.Infoln(query)
 	ret := -1
 	r, err := conn.Exec(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return ret
 	}
 	id, _ := r.LastInsertId()
@@ -180,10 +180,10 @@ func (userSession *UserSession) InsertUserSession() int {
 
 //Update a user session record in the database based on previous session id if
 //not empty else based on the user session object's session key.
-func (userSession *UserSession) UpdateUserSession(prevSessionKey string) int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (userSession *UserSession) UpdateUserSession(prevSessionKey string, site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	buffer.WriteString("UPDATE `usersessions` SET ")
 
@@ -221,11 +221,11 @@ func (userSession *UserSession) UpdateUserSession(prevSessionKey string) int {
 	}
 
 	//Lets do this thing
-	glog.Infoln(query)
+	log.Infoln(query)
 	ret := -1
 	r, err := conn.Exec(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return ret
 	}
 	id, _ := r.LastInsertId()
@@ -234,10 +234,10 @@ func (userSession *UserSession) UpdateUserSession(prevSessionKey string) int {
 }
 
 //Put an OAuth Key and time created into the database
-func (oauth *OAuth) InsertOAuth() int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (oauth *OAuth) InsertOAuth(site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	buffer.WriteString("INSERT INTO `oauth` ( ")
 
@@ -260,11 +260,11 @@ func (oauth *OAuth) InsertOAuth() int {
 	query = query + ") VALUES (" + vals + ");"
 
 	//Lets do this thing
-	glog.Infoln(query)
+	log.Infoln(query)
 	ret := -1
 	r, err := conn.Exec(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return ret
 	}
 	id, _ := r.LastInsertId()
@@ -273,10 +273,10 @@ func (oauth *OAuth) InsertOAuth() int {
 }
 
 //Remove an OAuth Key and time from the database by OAuth Key
-func (oauth *OAuth) DeleteOAuth() int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (oauth *OAuth) DeleteOAuth(site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	buffer.WriteString("DELETE FROM `oauth` ")
 
@@ -289,11 +289,11 @@ func (oauth *OAuth) DeleteOAuth() int {
 	query = query + ";"
 
 	//Lets do this thing
-	glog.Infoln(query)
+	log.Infoln(query)
 	ret := -1
 	r, err := conn.Exec(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return ret
 	}
 	aff, _ := r.RowsAffected()
@@ -304,10 +304,10 @@ func (oauth *OAuth) DeleteOAuth() int {
 //SELECTS
 //Get a user from the user id and the user name both of which should be
 //unique.
-func (user *User) SelectUser() *User {
+func (user *User) SelectUser(site string) *User {
 	var ret User
-	conn, _ := connectors.GetDB()
-	glog.Infoln(user.Username)
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln(user.Username)
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
@@ -327,32 +327,32 @@ func (user *User) SelectUser() *User {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		glog.Infoln(query)
+		log.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email, &ret.FirstName, &ret.LastName, &ret.VerificationInitTime, &ret.VerificationCode, &ret.VerificationComplete, &ret.Role)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
-			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
+			log.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
 		}
 		err = rows.Err()
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}
 	return &ret
 }
 
 //Get a user from the the user name or the email
-func (user *User) SelectUsersByIdORUsernameOREmail() []User {
+func (user *User) SelectUsersByIdORUsernameOREmail(site string) []User {
 	var ret []User
-	conn, _ := connectors.GetDB()
-	glog.Infoln(user.Username)
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln(user.Username)
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
@@ -377,34 +377,34 @@ func (user *User) SelectUsersByIdORUsernameOREmail() []User {
 		query := buffer.String()
 		query = strings.TrimRight(query, " OR")
 		query = query + ";"
-		glog.Infoln(query)
+		log.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			var user User
 			err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.Email, &user.FirstName, &user.LastName, &user.VerificationInitTime, &user.VerificationCode, &user.VerificationComplete, &user.Role)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
-			glog.Infoln(user.ID, user.Username, user.Password, user.Email, user.FirstName, user.LastName, user.VerificationInitTime, user.VerificationCode, user.VerificationComplete, user.Role)
+			log.Infoln(user.ID, user.Username, user.Password, user.Email, user.FirstName, user.LastName, user.VerificationInitTime, user.VerificationCode, user.VerificationComplete, user.Role)
 			ret = append(ret, user)
 		}
 		err = rows.Err()
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}
 	return ret
 }
 
 //Check the database for a user based on verification code and email address
-func (user *User) SelectUserForVerification() *User {
+func (user *User) SelectUserForVerification(site string) *User {
 	var ret User
-	conn, _ := connectors.GetDB()
-	glog.Infoln(user.Username)
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln(user.Username)
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
@@ -423,23 +423,23 @@ func (user *User) SelectUserForVerification() *User {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		glog.Infoln(query)
+		log.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return nil
 		}
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email, &ret.FirstName, &ret.LastName, &ret.VerificationInitTime, &ret.VerificationCode, &ret.VerificationComplete, &ret.Role)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
-			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
+			log.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
 		}
 		err = rows.Err()
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}
 	return &ret
@@ -447,10 +447,10 @@ func (user *User) SelectUserForVerification() *User {
 
 //Check the database for a user based on user name and password, if Ouath is
 //set then check the user based on email
-func (user *User) SelectUserForLogin(isOauth bool) *User {
+func (user *User) SelectUserForLogin(isOauth bool, site string) *User {
 	var ret User
-	conn, _ := connectors.GetDB()
-	glog.Infoln(user.Username)
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln(user.Username)
 	var buffer bytes.Buffer
 	var canQuery = false
 	var args []interface{}
@@ -472,23 +472,23 @@ func (user *User) SelectUserForLogin(isOauth bool) *User {
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		glog.Infoln(query)
+		log.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return nil
 		}
 		defer rows.Close()
 		for rows.Next() {
 			err := rows.Scan(&ret.ID, &ret.Username, &ret.Password, &ret.Email, &ret.FirstName, &ret.LastName, &ret.VerificationInitTime, &ret.VerificationCode, &ret.VerificationComplete, &ret.Role)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
-			glog.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
+			log.Infoln(ret.ID, ret.Username, ret.Password, ret.Email, ret.FirstName, ret.LastName, ret.VerificationInitTime, ret.VerificationCode, ret.VerificationComplete, ret.Role)
 		}
 		err = rows.Err()
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}
 	return &ret
@@ -499,9 +499,9 @@ func (user *User) SelectUserForLogin(isOauth bool) *User {
 //TODO: right now this calls the select user function.  This should really get
 //the user information all in one query so I don't have to hit the DB twice
 //each time a user goes to a new page.
-func (us *UserSession) SelectUserSession() []UserSession {
+func (us *UserSession) SelectUserSession(site string) []UserSession {
 	var ret []UserSession
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	var canQuery = false
@@ -513,10 +513,10 @@ func (us *UserSession) SelectUserSession() []UserSession {
 	}
 	if canQuery {
 		query := buffer.String()
-		glog.Infoln(query)
+		log.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return ret
 		}
 		defer rows.Close()
@@ -525,18 +525,18 @@ func (us *UserSession) SelectUserSession() []UserSession {
 			var isDefaultUser string
 			err := rows.Scan(&us.User.ID, &us.SessionKey, &us.CSRFGenTime, &us.CSRFBase, &us.CSRFKey, &us.LoginTime, &us.LastSeenTime, &isDefaultUser)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
 			us.IsDefaultUser, _ = strconv.ParseBool(isDefaultUser)
 			if us.User.ID != 0 && !us.IsDefaultUser {
-				us.User = *us.User.SelectUser()
+				us.User = *us.User.SelectUser(site)
 			}
 			ret = append(ret, us)
-			glog.Infoln(us.User.ID, us.SessionKey, us.CSRFBase, us.CSRFKey, us.CSRFGenTime, us.LoginTime, us.LastSeenTime, us.IsDefaultUser)
+			log.Infoln(us.User.ID, us.SessionKey, us.CSRFBase, us.CSRFKey, us.CSRFGenTime, us.LoginTime, us.LastSeenTime, us.IsDefaultUser)
 		}
 		err = rows.Err()
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 			return ret
 		}
 	}
@@ -544,11 +544,11 @@ func (us *UserSession) SelectUserSession() []UserSession {
 }
 
 //Get a OAuth key out of the database with the time the key was created
-func (oauth *OAuth) SelectOAuthByKey() *OAuth {
+func (oauth *OAuth) SelectOAuthByKey(site string) *OAuth {
 	var ret OAuth
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	buffer.WriteString("SELECT `oauthKey`, `oauthTime` FROM `oauth` ")
 
@@ -561,23 +561,23 @@ func (oauth *OAuth) SelectOAuthByKey() *OAuth {
 
 	query := buffer.String()
 	query = query + ";"
-	glog.Infoln(query)
+	log.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		return nil
 	}
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&ret.Key, &ret.Time)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
-		glog.Infoln(ret.Key, ret.Time)
+		log.Infoln(ret.Key, ret.Time)
 	}
 	err = rows.Err()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 
 	return &ret

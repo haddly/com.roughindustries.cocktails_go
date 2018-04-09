@@ -1,0 +1,33 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{with .BaseProductWithBDG}}
+	{{with .Product}}
+	<!-- Page Content -->
+	<table border="0" style="max-width:500px">
+		<tbody >
+			<tr align="center" width="100%">
+				<td align="center" colspan="2">{{template "productpageheader" .}}</td>
+			</tr>
+			
+		</tbody>
+	</table>
+	{{end}}
+	{{end}}
+</body>
+
+</html>
+{{end}}
+
+<!--Product Page Header-->
+{{define "productpageheader"}}
+<h3 itemprop="name" align="center">{{.ProductName}}</h3>
+{{end}}

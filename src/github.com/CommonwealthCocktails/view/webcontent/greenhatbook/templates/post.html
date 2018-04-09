@@ -1,0 +1,18 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{with .Post}}
+	<h1 align="left">{{.PostTitle}}</h1>
+	<h6 align="left">By: {{if .PostAuthor}}{{.PostAuthor.FirstName}}&nbsp;{{.PostAuthor.LastName}}{{end}}</h6>
+	{{.PostContent}} {{end}}
+</body>
+
+</html>
+{{end}}

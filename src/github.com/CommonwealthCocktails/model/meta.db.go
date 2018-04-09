@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"html"
 	"html/template"
 	"strconv"
@@ -17,22 +17,22 @@ import (
 
 //CREATE, UPDATE, DELETE
 //Insert a meta record into the database
-func (meta *Meta) InsertMeta() int {
+func (meta *Meta) InsertMeta(site string) int {
 	//set the ID to zero to indicate an insert
 	meta.ID = 0
-	return meta.processMeta()
+	return meta.processMeta(site)
 }
 
 //Update a meta record in the database based on ID
-func (meta *Meta) UpdateMeta() int {
-	return meta.processMeta()
+func (meta *Meta) UpdateMeta(site string) int {
+	return meta.processMeta(site)
 }
 
 //Process an insert or an update
-func (meta *Meta) processMeta() int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (meta *Meta) processMeta(site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	//If the ID is zero then do an insert else do an update based on the ID
 	if meta.ID == 0 {
@@ -57,7 +57,7 @@ func (meta *Meta) processMeta() int {
 		buffer.WriteString(" `metaBlurb`=?,")
 	}
 	args = append(args, string(meta.Blurb))
-	metatype := meta.MetaType.SelectMetaType(true, true, true)
+	metatype := meta.MetaType.SelectMetaType(true, true, true, site)
 	if meta.ID == 0 {
 		buffer.WriteString("`metaType`,")
 	} else {
@@ -78,7 +78,7 @@ func (meta *Meta) processMeta() int {
 	}
 
 	//Lets do this thing
-	glog.Infoln(query)
+	log.Infoln(query)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
 	ret := int(id)
@@ -89,9 +89,9 @@ func (meta *Meta) processMeta() int {
 //Select from the metatype table based on the attributes set in the metatype
 //object.  Also ignores the showincocktailsindex column or ignoreHasRoot column
 //or the ignoreIsOneToMany column based on the flags provided
-func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool) []MetaType {
+func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignoreHasRoot bool, ignoreIsOneToMany bool, site string) []MetaType {
 	var ret []MetaType
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	var canQuery = false
@@ -139,33 +139,33 @@ func (metatype *MetaType) SelectMetaType(ignoreShowInCocktailsIndex bool, ignore
 		query := buffer.String()
 		query = strings.TrimRight(query, " AND")
 		query = query + ";"
-		glog.Infoln(query)
+		log.Infoln(query)
 		rows, err := conn.Query(query, args...)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			var metatype MetaType
 			err := rows.Scan(&metatype.ID, &metatype.MetaTypeName, &metatype.Ordinal, &metatype.ShowInCocktailsIndex, &metatype.HasRoot, &metatype.IsOneToMany)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
 			ret = append(ret, metatype)
-			glog.Infoln(metatype.ID, metatype.MetaTypeName, metatype.Ordinal, metatype.ShowInCocktailsIndex, metatype.HasRoot, metatype.IsOneToMany)
+			log.Infoln(metatype.ID, metatype.MetaTypeName, metatype.Ordinal, metatype.ShowInCocktailsIndex, metatype.HasRoot, metatype.IsOneToMany)
 		}
 		err = rows.Err()
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}
 	return ret
 }
 
 //Select from the meta table based on the attributes set in the meta object.
-func (meta *Meta) SelectMeta() []Meta {
+func (meta *Meta) SelectMeta(site string) []Meta {
 	var ret []Meta
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT `idMeta`, `metaName`, `metaType`, COALESCE(`metaBlurb`, '') FROM `meta` WHERE ")
@@ -186,10 +186,10 @@ func (meta *Meta) SelectMeta() []Meta {
 	query = strings.TrimRight(query, " WHERE")
 	query = strings.TrimRight(query, " AND")
 	query = query + ";"
-	glog.Infoln(query)
+	log.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -197,15 +197,15 @@ func (meta *Meta) SelectMeta() []Meta {
 		var blurb string
 		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &blurb)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		meta.Blurb = template.HTML(html.UnescapeString(blurb))
 		ret = append(ret, meta)
-		glog.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, meta.Blurb)
+		log.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, meta.Blurb)
 	}
 	err = rows.Err()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 
 	return ret
@@ -214,7 +214,7 @@ func (meta *Meta) SelectMeta() []Meta {
 //Select a set of meta records based on the flags passed in via the metatypes
 //table. If ignore cache is true then the database query is run otherwise the
 //cache is checked first.
-func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool) MetasByTypes {
+func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, ignoreCache bool, site string) MetasByTypes {
 	ret := new(MetasByTypes)
 	ret = nil
 	if !ignoreCache {
@@ -223,7 +223,7 @@ func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, i
 	if ret == nil {
 		ret = new(MetasByTypes)
 		var mtList []int
-		conn, _ := connectors.GetDB()
+		conn, _ := connectors.GetDBFromMap(site)
 		query := "SELECT `idMetaType` FROM  `metatype`"
 		if byShowInCocktailsIndex {
 			query += " WHERE metatypeShowInCocktailsIndex=1"
@@ -242,11 +242,11 @@ func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, i
 			for rows.Next() {
 				var item int
 				rows.Scan(&item)
-				glog.Infoln(item)
+				log.Infoln(item)
 				mtList = append(mtList, item)
 			}
 		}
-		//glog.Infoln("Meta Types Found " + strconv.Itoa(count))
+		//log.Infoln("Meta Types Found " + strconv.Itoa(count))
 		if rows != nil {
 			rows.Close()
 		}
@@ -258,12 +258,12 @@ func (meta *Meta) SelectMetaByTypes(byShowInCocktailsIndex bool, orderBy bool, i
 		for mbt_rows.Next() {
 			err = mbt_rows.Scan(&mbt.MetaType.ID, &mbt.MetaType.MetaTypeName, &mbt.MetaType.ShowInCocktailsIndex, &mbt.MetaType.Ordinal, &mbt.MetaType.HasRoot, &mbt.MetaType.IsOneToMany)
 			if err != nil {
-				glog.Error(err)
+				log.Error(err)
 			}
 			mbt.MetaType.MetaTypeNameNoSpaces = strings.Join(strings.Fields(mbt.MetaType.MetaTypeName), "")
 			var inMeta Meta
 			inMeta.MetaType = mbt.MetaType
-			outMeta := inMeta.SelectMeta()
+			outMeta := inMeta.SelectMeta(site)
 			mbt.Metas = outMeta
 			ret.MBT = append(ret.MBT, mbt)
 		}
@@ -301,11 +301,11 @@ func (meta *Meta) memcachedMetaByTypes(byShowInCocktailsIndex bool, orderBy bool
 }
 
 //Select a set of meta records based on a cocktail id nad metatype id
-func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool) {
+func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int, site string) ([]Meta, bool) {
 	var ret []Meta
 	var isRoot bool
 	isRoot = false
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType, cocktailToMetas.isRootCocktailForMeta" +
@@ -316,10 +316,10 @@ func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool
 	args = append(args, strconv.Itoa(ID))
 	args = append(args, strconv.Itoa(mt))
 	query := buffer.String()
-	glog.Infoln(query)
+	log.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -327,28 +327,28 @@ func (meta *Meta) SelectMetasByCocktailAndMetaType(ID int, mt int) ([]Meta, bool
 		var root string
 		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		if !isRoot {
 			isRoot, _ = strconv.ParseBool(root)
 		}
 		ret = append(ret, meta)
-		glog.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
+		log.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, isRoot)
 	}
 	err = rows.Err()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 
 	return ret, isRoot
 }
 
 //Select a set of meta records based on a cocktail id
-func (meta *Meta) SelectMetasByCocktail(ID int) []Meta {
+func (meta *Meta) SelectMetasByCocktail(ID int, site string) []Meta {
 	var ret []Meta
 	var isRoot bool
 	isRoot = false
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT meta.idMeta, meta.metaName, meta.metaType, cocktailToMetas.isRootCocktailForMeta" +
@@ -358,10 +358,10 @@ func (meta *Meta) SelectMetasByCocktail(ID int) []Meta {
 		" WHERE cocktail.idCocktail=?;")
 	args = append(args, strconv.Itoa(ID))
 	query := buffer.String()
-	glog.Infoln(query)
+	log.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -369,18 +369,18 @@ func (meta *Meta) SelectMetasByCocktail(ID int) []Meta {
 		var root string
 		err := rows.Scan(&meta.ID, &meta.MetaName, &meta.MetaType.ID, &root)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		if !isRoot {
 			isRoot, _ = strconv.ParseBool(root)
 			meta.IsRoot = isRoot
 		}
 		ret = append(ret, meta)
-		glog.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, meta.IsRoot)
+		log.Infoln(meta.ID, meta.MetaName, meta.MetaType.ID, meta.IsRoot)
 	}
 	err = rows.Err()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 
 	return ret

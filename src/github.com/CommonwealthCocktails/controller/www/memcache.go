@@ -6,8 +6,8 @@ package www
 
 import (
 	"bytes"
-	"html/template"
 	"github.com/CommonwealthCocktails/model"
+	"html/template"
 	"net/http"
 )
 
@@ -28,7 +28,7 @@ func MCDeleteHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func MCAddHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var buffer bytes.Buffer
 	buffer.WriteString("<b>Memcache Add</b>:<br/>")
-	model.LoadAllMemcache()
+	model.LoadAllMemcache(page.View)
 	//apply the template page info to the index page
 	statStr := buffer.String()
 	page.Messages["Status"] = template.HTML(statStr)

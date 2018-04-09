@@ -1,0 +1,843 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    <!-- Page Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <hr height="30px" style="border-color: #FFF;">
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="page-header">
+                    <h1 align="center">Cocktail Modification Form</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "cocktailResults" .}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <form method="post" action="/{{$.View}}/cocktailMod" id="cocktailModForm">
+                        {{template "cocktailSelect" .}}
+                        <!---->
+                        {{template "cocktailID" .}}
+                        <!---->
+                        {{template "cocktailTitle" .}}
+                        <!---->
+                        {{template "cocktailName" .}}
+                        <!---->
+                        {{template "cocktailDisplayName" .}}
+                        <!---->
+                        {{template "cocktailSpokenName" .}}
+                        <!---->
+                        {{template "cocktailAlternateName" .}}
+                        <!---->
+                        {{template "cocktailAKA" .}}
+                        <!---->
+                        {{template "cocktailOrigin" .}}
+                        <!---->
+                        {{template "cocktailDescription".}}
+                        <!---->
+                        {{template "cocktailComment" .}}
+                        <!---->
+                        {{template "cocktailFootnotes" .}}
+                        <!---->
+                        {{template "cocktailKeywords" .}}
+                        <!---->
+                        {{template "cocktailImage" .}}
+                        <!---->
+                        {{template "cocktailLabeledImageLink" .}}
+                        <!---->
+                        {{template "cocktailImageSourceName" .}}
+                        <!---->
+                        {{template "cocktailImageSourceLink" .}}
+                        <!---->
+                        {{template "cocktailSourceName" .}}
+                        <!---->
+                        {{template "cocktailSourceLink".}}
+                        <!---->
+                        {{template "cocktailRating" .}}
+                        <!---->
+                        {{template "recipeForm" .}}
+                        <!---->
+                        {{template "cocktailNonIngredients" .}}
+                        <!---->
+                        {{template "cocktailMetas" .}}
+                        <!---->
+                    </form>
+                    <div style="text-align: center;">
+                        <button name="button" type="submit" value="add" id="addButton" form="cocktailModForm" class="btn btn-default">Add</button>
+                        {{if .Cocktail.ID}}
+                        <button name="button" type="submit" value="update" id="updateButton" form="cocktailModForm" class="btn btn-default">Update</button>
+                        <!--<button name="button" type="submit" value="delete" id="deleteButton" form="productModForm" class="btn btn-default">Delete</button>-->
+                        {{end}}
+                        <script>
+                            $(function() {
+                                $('#addButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
+                                    $('#cocktailID').val("");
+                                });
+                                $('#updateButton').on('click', function() {
+                                    $('#maindiv').addClass('hide');
+                                    $('#loader').removeClass('hide');
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+{{end}}
+
+{{define "cocktailResults"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10">
+        {{ with .Messages.cocktailModifySuccess }}
+        <div class="alert alert-success alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+        {{ with .Messages.cocktailModifyFail }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "cocktailSelect"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSelect">Select Cocktail</label>
+        <select class="form-control" id="cocktailSelect" name="cocktailSelect">
+            <option value="" selected>Blank Cocktail Item ...</option>
+            {{range $key, $value := .CocktailsByAlphaNums.CBA}}
+            <optgroup label="{{$key}}">
+            {{range $value}}
+            <option value="{{.ID}}" {{if eq $.Cocktail.ID .ID}}selected{{end}}>{{.Name}}</option>
+            {{end}}
+            {{end}}
+            </optgroup>
+        </select>
+    </div>
+    <script>
+        $(function() {
+            // bind change event to select
+            $('#cocktailSelect').on('change', function() {
+                var id = $(this).val(); // get selected value
+                if (id) { // require a URL
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/{{$.View}}/cocktailModForm?ID="+id; // redirect
+                } else {
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/{{$.View}}/cocktailModForm"; // redirect
+                }
+                return false;
+            });
+        });
+    </script>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+
+<!--ID int-->
+{{define "cocktailID"}}
+<input type="text" class="form-control hide" id="cocktailID" name="cocktailID" value="{{if .Cocktail.ID}}{{.Cocktail.ID}}{{end}}">
+{{end}}
+<!--Title           string-->
+{{define "cocktailTitle"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Cocktail.Errors.CocktailTitle }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="cocktailTitle">Cocktail Title</label>
+        <input type="text" class="form-control" id="cocktailTitle" name="cocktailTitle" value="{{$.Cocktail.Title}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Name            string-->
+{{define "cocktailName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Cocktail.Errors.CocktailName }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="cocktailName">Cocktail Name</label>
+        <input type="text" class="form-control" id="cocktailName" name="cocktailName" value="{{$.Cocktail.Name}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--DisplayName     string-->
+{{define "cocktailDisplayName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Cocktail.Errors.CocktailDisplayName }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="cocktailDisplayName">Cocktail Display Name</label>
+        <input type="text" class="form-control" id="cocktailDisplayName" name="cocktailDisplayName" value="{{$.Cocktail.DisplayName}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--AlternateName   []Name-->
+{{define "cocktailAlternateName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailAlternateNames">Cocktail Alternate Names (comma seperated value list)</label>
+        <input type="text" class="form-control" id="cocktailAlternateNames" name="cocktailAlternateNames" value="">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SpokenName      string-->
+{{define "cocktailSpokenName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSpokenName">Cocktail Spoken Name</label>
+        <input type="text" class="form-control" id="cocktailSpokenName" name="cocktailSpokenName" value="{{$.Cocktail.SpokenName}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Origin          string-->
+{{define "cocktailOrigin"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailOrigin">Cocktail Origin</label>
+        <div class=" col-xs-12"></div>        
+        <textarea id="cocktailOrigin" class="form-control" rows="3" name="cocktailOrigin">{{with .Cocktail.Origin}}{{.}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--AKA             []Name-->
+{{define "cocktailAKA"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailAKA">Cocktail Also Known As (comma seperated value list)</label>
+        <input type="text" class="form-control" id="cocktailAKA" name="cocktailAKA" value="">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Description     template.HTML-->
+{{define "cocktailDescription"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailDescription">Cocktail Description</label>
+        <div class=" col-xs-12"></div>        
+        <textarea id="cocktailDescription" class="form-control" rows="3" name="cocktailDescription">{{with .Cocktail.Description}}{{.}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Comment         template.HTML-->
+{{define "cocktailComment"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailComment">Cocktail Comment</label>
+        <div class=" col-xs-12"></div>        
+        <textarea id="cocktailComment" class="form-control" rows="3" name="cocktailComment">{{with .Cocktail.Comment}}{{.}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Footnotes         template.HTML-->
+{{define "cocktailFootnotes"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailFootnotes">Cocktail Footnotes</label>
+        <div class=" col-xs-12"></div>        
+        <textarea id="cocktailFootnotes" class="form-control" rows="3" name="cocktailFootnotes">{{with .Cocktail.Footnotes}}{{.}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Keywords     string-->
+{{define "cocktailKeywords"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Cocktail.Errors.CocktailKeywords }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="cocktailKeywords">Cocktail Keywords</label>
+        <input type="text" class="form-control" id="cocktailKeywords" name="cocktailKeywords" value="{{$.Cocktail.Keywords}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Recipe          Recipe-->
+{{define "recipeForm"}}
+<div class="row">
+    <div class="row">
+    	<div class="col-lg-12 text-center no-wrap" style="color:gray" align="center">
+    		<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
+    			<span style="font-size: 24px; background-color: white; padding: 0 10px;">Recipe Items</span>
+    		</div>
+    	</div>
+    </div>
+    <hr style="border-color: #FFF;">
+    <div class="row">
+        <div class=" col-xs-1"></div>
+        <div class=" col-xs-10 ">
+            <input type="checkbox" id="ignoreRecipe" name="ignoreRecipe" value="1">&nbsp;Ignore Recipe in Update
+        </div>
+        <div class=" col-xs-1"></div>
+    </div>
+    <hr style="border-color: #FFF;">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">Recipe</h2>
+            </div>
+            <div class="panel-body">
+                <label class="col-xs-12">Recipe Steps</label>
+                <!--Steps START-->
+                <input type="text" class="form-control hide" id="recipeSteps" name="recipeSteps" value="">
+                {{if len .Cocktail.Recipe.RecipeSteps}}
+                    {{range $si, $se := .Cocktail.Recipe.RecipeSteps}}
+                    <div class="form-group" data-recipestep-index="{{$si}}">
+                        <div class="col-xs-5">
+                            <label for="recipestep[{{$si}}].Ingredient" class="col-xs-12">Ingredient</label>
+                            <select class="form-control" id="recipestep[{{$si}}].Ingredient" name="recipestep[{{$si}}].Ingredient">
+                                {{range $.Ingredients.PBT}}
+                                <optgroup label="{{.ProductType.ProductTypeName}}">
+                                    {{range .Products}}
+                                    <option value="{{.ID}}" {{if eq $se.OriginalIngredient.ID .ID}}selected{{end}}>{{.ProductName}}</option>
+                                    {{end}}
+                                </optgroup>
+                                {{end}}
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="recipestep[{{$si}}].Quantity" class="col-xs-12">Quantity</label>
+                            <input type="text" class="form-control" id="recipestep[{{$si}}].Quantity" name="recipestep[{{$si}}].Quantity" placeholder="Quantity" {{if $se.RecipeCardinalFloat}}value="{{.RecipeCardinalFloat}}"{{end}}/>
+                        </div>
+                        <div class="col-xs-2">
+                            <label for="recipestep[{{$si}}].Doze" class="col-xs-12">Dose</label>
+                            <select class="form-control" id="recipestep[{{$si}}].Doze" name="recipestep[{{$si}}].Doze">
+                                {{range $.Doze}}
+                                <option value="{{.ID}}" {{if eq $se.RecipeDoze.ID .ID}}selected{{end}}>{{.DozeName}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        
+                        {{if eq $si 0}}
+                        <div class="col-xs-1">
+                            <label class="col-xs-11">&nbsp;</label>
+                            <button type="button" class="btn btn-default addRecipeStepButton"><i class="fa fa-plus"></i></button>
+                        </div>
+                        {{else}}
+                        <div class="col-xs-1">
+                            <label class="col-xs-11">&nbsp;</label>
+                            <button type="button" class="btn btn-default removeRecipeStepButton"><i class="fa fa-minus"></i></button>
+                        </div>
+                        {{end}}
+                        <div class="col-xs-12">&nbsp;</div>
+                        <div class="col-xs-11">
+                            <label for="recipestep[{{$si}}].AltIngredients" class="col-xs-12">Alternate Ingredients</label>
+                            <select class="form-control" id="recipestep[{{$si}}].AltIngredients" name="recipestep[{{$si}}].AltIngredients" multiple="multiple" size="3">
+                                {{range $.Ingredients.PBT}}
+                                <optgroup label="{{.ProductType.ProductTypeName}}">
+                                        {{range $pi, $pe := .Products}}
+                                        <option value="{{$pe.ID}}" {{range $ai, $ae := $se.AltIngredient}}{{if eq $ae.ID $pe.ID}} {{$ae.ID}} {{$pe.ID}} selected {{end}}{{end}}>{{$pe.ProductName}}</option>
+                                        {{end}}
+                                </optgroup>
+                                {{end}}
+                             </select>
+                        </div>
+                        <div class="col-xs-12">
+                            <hr height="30px" style="border-color: #AAA;">
+                        </div>
+                    </div>
+                    {{end}}
+                {{else}}
+                    <div class="form-group">
+                        <div class="col-xs-5">
+                            <label for="Ingredient" class="col-xs-12">Ingredient</label>
+                            <select class="form-control" name="recipestep[0].Ingredient">
+                                {{range $.Ingredients.PBT}}
+                                <optgroup label="{{.ProductType.ProductTypeName}}">
+                                    {{range .Products}}
+                                    <option value="{{.ID}}">{{.ProductName}}</option>
+                                    {{end}}
+                                </optgroup>
+                                {{end}}
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="recipestep[0].Quantity" class="col-xs-12">Quantity</label>
+                            <input type="text" class="form-control" id="recipestep[0].Quantity" name="recipestep[0].Quantity" placeholder="Quantity" />
+                        </div>
+                        <div class="col-xs-2">
+                            <label for="recipestep[0].Doze" class="col-xs-12">Dose</label>
+                            <select class="form-control" id="recipestep[0].Doze" name="recipestep[0].Doze">
+                                {{range $.Doze}}
+                                <option value="{{.ID}}">{{.DozeName}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <div class="col-xs-1">
+                            <button type="button" class="btn btn-default addRecipeStepButton"><i class="fa fa-plus"></i></button>
+                        </div>
+                        <div class="col-xs-12">&nbsp;</div>
+                        <div class="col-xs-11">
+                            <label for="recipestep[0].AltIngredients" class="col-xs-12">Alternate Ingredients</label>
+                            <select class="form-control" id="recipestep[0].AltIngredients" name="recipestep[0].AltIngredients" multiple="multiple" size="3">
+                                {{range $.Ingredients.PBT}}
+                                <optgroup label="{{.ProductType.ProductTypeName}}">
+                                        {{range .Products}}
+                                        <option value="{{.ID}}">{{.ProductName}}</option>
+                                        {{end}}
+                                </optgroup>
+                                {{end}}
+                             </select>
+                        </div>
+                        <div class="col-xs-12">
+                            <hr height="30px" style="border-color: #AAA;">
+                        </div>
+                    </div>
+                {{end}}
+                <!--Steps END-->
+                <!-- The template for adding new field -->
+                <div class="form-group hide" id="recipestepTemplate">
+                    <div class="col-xs-5">
+                        <label for="Ingredient" class="col-xs-12">Ingredient</label>
+                        <select class="form-control" name="Ingredient">
+                            {{range .Ingredients.PBT}}
+                            <optgroup label="{{.ProductType.ProductTypeName}}">
+                                {{range .Products}}
+                                <option value="{{.ID}}">{{.ProductName}}</option>
+                                {{end}}
+                            </optgroup>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="Quantity" class="col-xs-12">Quantity</label>
+                        <input type="text" class="form-control" name="Quantity" placeholder="Quantity" />
+                    </div>
+                    <div class="col-xs-2">
+                        <label for="Doze" class="col-xs-12">Dose</label>
+                        <select class="form-control" name="Doze">
+                            {{range .Doze}}
+                            <option value="{{.ID}}">{{.DozeName}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="col-xs-1">
+                        <button type="button" class="btn btn-default removeRecipeStepButton"><i class="fa fa-minus"></i></button>
+                    </div>
+                    <div class="col-xs-12">&nbsp;</div>
+                    <div class="col-xs-11">
+                        <label class="col-xs-12">Alternate Ingredients</label>
+                        <select class="form-control" name="AltIngredients" multiple="multiple" size="3">
+                            {{range $.Ingredients.PBT}}
+                            <optgroup label="{{.ProductType.ProductTypeName}}">
+                                    {{range .Products}}
+                                    <option value="{{.ID}}">{{.ProductName}}</option>
+                                    {{end}}
+                            </optgroup>
+                            {{end}}
+                         </select>
+                    </div>
+                    <div class="col-xs-12">
+                        <hr height="30px" style="border-color: #AAA;">
+                    </div>
+                </div>
+                <script>
+                    $(document).ready(function() {
+                        recipestepIndex = {{len .Cocktail.Recipe.RecipeSteps}}-1;
+                        if (recipestepIndex < 0) {
+                            recipestepIndex = 0;
+                        }
+                        var recipestepArray = [];
+                        for (i = 0; i <= recipestepIndex; i++) { recipestepArray.push(i); }
+                        $('#recipeSteps').val(recipestepArray.join());
+                        $('#cocktailModForm')
+                            // Add button click handler
+                            .on('click', '.addRecipeStepButton', function() {
+                                recipestepIndex++;
+                                var $template = $('#recipestepTemplate'),
+                                    $clone = $template
+                                    .clone()
+                                    .removeClass('hide')
+                                    .removeAttr('id')
+                                    .attr('data-recipestep-index', recipestepIndex)
+                                    .insertBefore($template);
+                                // Update the name attributes
+                                $clone
+                                    .find('[name="Ingredient"]').attr('name', 'recipestep[' + recipestepIndex + '].Ingredient').end()
+                                    .find('[name="Quantity"]').attr('name', 'recipestep[' + recipestepIndex + '].Quantity').end()
+                                    .find('[name="Doze"]').attr('name', 'recipestep[' + recipestepIndex + '].Doze').end()
+                                    .find('[name="AltIngredients"]').attr('name', 'recipestep[' + recipestepIndex + '].AltIngredients').end();
+                                recipestepArray[recipestepIndex] = recipestepIndex;
+                                $('#recipeSteps').val(recipestepArray.join());
+                            })
+                            // Remove button click handler
+                            .on('click', '.removeRecipeStepButton', function() {
+                                var $row = $(this).parents('.form-group'),
+                                    index = $row.attr('data-recipestep-index');
+                                recipestepArray[index] = -1;
+                                $('#recipeSteps').val(recipestepArray.join());
+                                // Remove element containing the fields
+                                $row.remove();
+                            });
+                    });
+                </script>
+                <div class="col-xs-12">
+                    {{with .Cocktail.Recipe.ID}}<input type="hidden" name="recipeID" value="{{.}}">{{end}}
+                    <label for="recipeMethod">Recipe Method</label>
+                    <textarea id="recipeMethod" class="form-control" rows="3" name="recipeMethod">{{with .Cocktail.Recipe.Method}}{{.}}{{end}}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Garnish         []Product-->
+<!--Drinkware       []Product-->
+<!--Tool            []Product-->
+{{define "cocktailNonIngredients"}}
+<!---->
+<div class="row">
+	<div class="col-lg-12 text-center no-wrap" style="color:gray" align="center">
+		<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
+			<span style="font-size: 24px; background-color: white; padding: 0 10px;">Product Items</span>
+		</div>
+	</div>
+</div>
+<hr style="border-color: #FFF;">
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <input type="checkbox" id="ignoreProducts" name="ignoreProducts" value="1">&nbsp;Ignore Products in Update
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+<hr style="border-color: #FFF;">
+{{range .NonIngredients.PBT}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{.ProductType.ProductTypeName}}</h2>
+            </div>
+            <div class="panel-body">
+                <div id="primary{{.ProductType.ProductTypeName}}" class="col-xs-12">
+                    <select class="form-control" name="{{.ProductType.ProductTypeName}}" multiple="multiple" size="5">
+                        {{if eq .ProductType.ID 6}} {{range $pi, $pe := .Products}}
+                        <option value="{{$pe.ID}}" {{range $ci, $ce := $.Cocktail.Garnish}}{{if eq $ce.ID $pe.ID}}selected{{end}}{{end}}>{{if $pe.PreText}}{{$pe.PreText}}&nbsp;{{end}}{{$pe.ProductName}}{{if $pe.PostText}}&nbsp;{{$pe.PostText}}{{end}}</option>
+                        {{end}} {{end}}
+                        {{if eq .ProductType.ID 7}} {{range $pi, $pe := .Products}}
+                        <option value="{{$pe.ID}}" {{range $ci, $ce := $.Cocktail.Drinkware}}{{if eq $ce.ID $pe.ID}}selected{{end}}{{end}}>{{if $pe.PreText}}{{$pe.PreText}}&nbsp;{{end}}{{$pe.ProductName}}{{if $pe.PostText}}&nbsp;{{$pe.PostText}}{{end}}</option>
+                        {{end}} {{end}}
+                        {{if eq .ProductType.ID 8}} {{range $pi, $pe := .Products}}
+                        <option value="{{$pe.ID}}" {{range $ci, $ce := $.Cocktail.Tool}}{{if eq $ce.ID $pe.ID}}selected{{end}}{{end}}>{{if $pe.PreText}}{{$pe.PreText}}&nbsp;{{end}}{{$pe.ProductName}}{{if $pe.PostText}}&nbsp;{{$pe.PostText}}{{end}}</option>
+                        {{end}} {{end}}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}} {{end}}
+<!--ImagePath       string-->
+<!--Image           string-->
+{{define "cocktailImage"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailImage">Cocktail Image</label>
+        <input type="text" class="form-control" id="cocktailImage" name="cocktailImage" {{if $.Cocktail.Image}}value="{{$.Cocktail.ImagePath}}/{{$.Cocktail.Image}}"{{end}}>
+        <div style="text-align: center;"><img {{if $.Cocktail.Image}}src="{{$.Cocktail.ImagePath}}/{{$.Cocktail.Image}}"{{else}} style="display: none;"{{end}} height="200" width="200" id='cocktailImagePreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value) {
+                        $('#cocktailImagePreview').attr('src', input.value);
+                        $('#cocktailImagePreview').show(); 
+                    }
+                    else {
+                        $('#cocktailImagePreview').hide();
+                    }
+                }
+                $("#cocktailImage").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--LabeledImageLink           string-->
+{{define "cocktailLabeledImageLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailLabeledImageLink">Cocktail Labeled Image Link</label>
+        <input type="text" class="form-control" id="cocktailLabeledImageLink" name="cocktailLabeledImageLink" {{if $.Cocktail.LabeledImageLink}}value="{{$.Cocktail.LabeledImageLink}}"{{end}}>
+        <div style="text-align: center;"><img {{if $.Cocktail.LabeledImageLink}}src="{{$.Cocktail.LabeledImageLink}}"{{else}} style="display: none;"{{end}} height="200" width="200" id='cocktailLabeledImagePreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value) {
+                        $('#cocktailLabeledImagePreview').attr('src', input.value);
+                        $('#cocktailLabeledImagePreview').show(); 
+                    }
+                    else {
+                        $('#cocktailLabeledImagePreview').hide();
+                    }
+                }
+                $("#cocktailLabeledImageLink").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImageSourceName string-->
+{{define "cocktailImageSourceName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailImageSourceName">Cocktail Image Source Name</label>
+        <input type="text" class="form-control" id="cocktailImageSourceName" name="cocktailImageSourceName"  value="{{$.Cocktail.ImageSourceName}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--ImageSourceLink string-->
+{{define "cocktailImageSourceLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailImageSourceLink">Cocktail Image Source Link</label>
+        <input {{if $.Cocktail.ImageSourceLink}} value="{{$.Cocktail.ImageSourceLink}}"{{end}} type="text" class="form-control" id="cocktailImageSourceLink" name="cocktailImageSourceLink">
+        <div style="text-align: center;"><img {{if $.Cocktail.ImageSourceLink}}src="{{$.Cocktail.ImageSourceLink}}"{{else}} style="display: none;"{{end}} height="200" width="200" id='cocktailImageSourceLinkPreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value) {
+                        $('#cocktailImageSourceLinkPreview').attr('src', input.value);
+                        $('#cocktailImageSourceLinkPreview').show();
+                    }
+                    else {
+                        $('#cocktailImageSourceLinkPreview').hide();
+                    }
+                }
+                $("#cocktailImageSourceLink").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SourceName      string-->
+{{define "cocktailSourceName"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSourceName">Cocktail Source Name</label>
+        <input type="text" class="form-control" id="cocktailSourceName" name="cocktailSourceName" value="{{$.Cocktail.SourceName}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--SourceLink      string-->
+{{define "cocktailSourceLink"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailSourceLink">Cocktail Source Link</label>
+        <input type="text" class="form-control" id="cocktailSourceLink" name="cocktailSourceLink" value="{{$.Cocktail.SourceLink}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!--Rating          int-->
+{{define "cocktailRating"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="cocktailRating">Cocktail Rating</label>
+        <input type="text" class="form-control" id="cocktailRating" name="cocktailRating" value="{{$.Cocktail.Rating}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+<!---->
+
+<!--Flavor          []Meta-->
+<!--Type            []Meta-->
+<!--BaseSpirit      []Meta-->
+<!--Served          []Meta-->
+<!--Technique       []Meta-->
+<!--Strength        []Meta-->
+<!--Difficulty      []Meta-->
+<!--TOD             []Meta-->
+<!--Ratio           []Meta-->
+<!--Family          []Meta-->
+<!--Style           []Meta-->
+<!--etc-->
+{{define "cocktailMetas"}}
+<!---->
+<div class="row">
+	<div class="col-lg-12 text-center no-wrap" style="color:gray" align="center">
+		<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
+			<span style="font-size: 24px; background-color: white; padding: 0 10px;">Meta Items</span>
+		</div>
+	</div>
+</div>
+<hr style="border-color: #FFF;">
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <input type="checkbox" id="ignoreMetas" name="ignoreMetas" value="1">&nbsp;Ignore Meta in Update
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+<hr style="border-color: #FFF;">
+{{range .MetasByTypes.MBT}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 ">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2 class="panel-title">{{.MetaType.MetaTypeName}}</h2>
+            </div>
+            <div class="panel-body">
+                <div id="primary{{.MetaType.MetaTypeNameNoSpaces}}" class="col-xs-12">
+                    {{if .MetaType.IsOneToMany}}
+                     <select class="form-control" name="{{.MetaType.MetaTypeNameNoSpaces}}" multiple="multiple" size="5">
+                        {{if eq .MetaType.ID 1}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Flavor}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 3}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Type}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 4}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Occasion}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 6}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Formula}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 7}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Served}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 8}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Technique}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 11}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.TOD}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 14}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Style}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                    {{else}}
+                    <select class="form-control" name="{{.MetaType.MetaTypeNameNoSpaces}}">
+                        <option selected></option>
+                        {{if eq .MetaType.ID 2}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.BaseSpirit}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 5}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Family}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 9}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Strength}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 10}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Difficulty}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 12}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Ratio}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                        {{if eq .MetaType.ID 13}} {{range $mi, $me := .Metas}}
+                        <option value="{{$me.ID}}" {{range $ci, $ce := $.Cocktail.Drink}}{{if eq $ce.ID $me.ID}}selected{{end}}{{end}}>{{$me.MetaName}}</option>
+                        {{end}} {{end}}
+                    {{end}}
+                    </select>
+                </div>
+                <div class="col-xs-12">&nbsp;</div>
+                {{if .MetaType.HasRoot}}
+                <div class="checkbox col-xs-11">
+                    {{if eq .MetaType.ID 5}}
+                    <label><input type="checkbox" id="Is{{.MetaType.MetaTypeNameNoSpaces}}Root" name="Is{{.MetaType.MetaTypeNameNoSpaces}}Root" {{if $.Cocktail.IsFamilyRoot}}checked{{end}}>Is this a root cocktail for {{.MetaType.MetaTypeName}}</label>
+                    {{else}}
+                    <label><input type="checkbox" id="Is{{.MetaType.MetaTypeNameNoSpaces}}Root" name="Is{{.MetaType.MetaTypeNameNoSpaces}}Root">Is this a root cocktail for {{.MetaType.MetaTypeName}}</label>
+                    {{end}}
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}} {{end}}

@@ -11,8 +11,8 @@ import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/golang/glog"
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/oauth2"
 	"html"
@@ -51,7 +51,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//check the recaptcha to make sure we don't have bot or something
 	isValid := re.Verify(*r)
 	if !isValid {
-		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
+		log.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
 		page.RenderPageTemplate(w, r, "loginindex")
 		return
@@ -59,7 +59,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 
 	//this is in case you need to perform DB actions before the DB is setup
 	//otherwise you wouldn't have an users
-	glog.Infoln(allowDefault)
+	log.Infoln(allowDefault)
 	if allowDefault && page.User.Username == defaultUser {
 		//if page.User.Password == defaultPassword {
 		if bcrypt.CompareHashAndPassword([]byte(defaultPassword), []byte(page.User.Password)) == nil {
@@ -69,9 +69,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 			page.UserSession.LastSeenTime = time.Now()
 			page.UserSession.User.VerificationComplete = true
 			page.UserSession.User.Role = 1
-			ClearSession(w, r)
-			SetSession(w, r, &page.UserSession, true)
-			http.Redirect(w, r, "/", 302)
+			ClearSession(w, r, page.View)
+			SetSession(w, r, &page.UserSession, true, page.View)
+			http.Redirect(w, r, "/"+page.View+"/", 302)
 			return
 		} else {
 			page.UserSession.IsDefaultUser = false
@@ -80,33 +80,33 @@ func loginHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		page.UserSession.IsDefaultUser = false
 	}
 	//Confirm the username is in DB and password after getting user from DB
-	usr := page.User.SelectUserForLogin(false)
-	glog.Infoln(usr.Password)
-	glog.Infoln(page.User.Password)
+	usr := page.User.SelectUserForLogin(false, page.View)
+	log.Infoln(usr.Password)
+	log.Infoln(page.User.Password)
 	if bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(page.User.Password)) == nil {
-		glog.Infoln("Passed password")
+		log.Infoln("Passed password")
 		if len(usr.Username) > 0 {
 			if !usr.VerificationComplete {
-				glog.Infoln("User has not finished verification process: " + page.User.Username)
+				log.Infoln("User has not finished verification process: " + page.User.Username)
 				page.Errors["loginErrors"] = "Unverified Account! Please either signup or check your email to verify it if you have already registered."
 				page.RenderPageTemplate(w, r, "/loginindex")
 				return
 			}
 			page.UserSession.User = *usr
-			glog.Infoln(page.UserSession.User.VerificationComplete)
+			log.Infoln(page.UserSession.User.VerificationComplete)
 			page.UserSession.LoginTime = time.Now()
 			page.UserSession.LastSeenTime = time.Now()
-			SetSession(w, r, &page.UserSession, true)
-			http.Redirect(w, r, "/", 302)
+			SetSession(w, r, &page.UserSession, true, page.View)
+			http.Redirect(w, r, "/"+page.View+"/", 302)
 			return
 		} else {
-			glog.Infoln("Bad username or password: " + page.User.Username)
+			log.Infoln("Bad username or password: " + page.User.Username)
 			page.Errors["loginErrors"] = "Bad Username and/or Password!"
 			page.RenderPageTemplate(w, r, "/loginindex")
 			return
 		}
 	} else {
-		glog.Infoln("Bad username or password: " + page.User.Username)
+		log.Infoln("Bad username or password: " + page.User.Username)
 		page.Errors["loginErrors"] = "Bad Username and/or Password!"
 		page.RenderPageTemplate(w, r, "/loginindex")
 		return
@@ -120,7 +120,7 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//check the recaptcha to make sure we don't have bot or something
 	isValid := re.Verify(*r)
 	if !isValid {
-		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
+		log.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
 		page.RenderPageTemplate(w, r, "registerForm")
 		return
@@ -128,7 +128,7 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 
 	//check username and email against database, if it exists return to
 	//registration page with an error else add user to the database
-	users := page.User.SelectUsersByIdORUsernameOREmail()
+	users := page.User.SelectUsersByIdORUsernameOREmail(page.View)
 	if len(users) > 0 {
 		for _, user := range users {
 			if user.Username == page.User.Username {
@@ -142,32 +142,32 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		return
 	} else {
 		//update the password so that it is salted and hashed with bcrypt
-		glog.Infoln("Password:", page.User.Password)
+		log.Infoln("Password:", page.User.Password)
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(page.User.Password), bcrypt.DefaultCost)
 		page.User.Password = string(hashedPassword)
-		glog.Infoln("Hash:    ", hashedPassword)
+		log.Infoln("Hash:    ", hashedPassword)
 		//set the verification code and time created
 		code, _ := GenerateRandomString(64)
 		page.User.VerificationCode = html.EscapeString(pSP.Sanitize(code))
 		page.User.VerificationInitTime = time.Now()
 		page.User.VerificationComplete = false
 		//add user to database
-		page.User.InsertUser()
+		page.User.InsertUser(page.View)
 	}
 
 	//load up the verification email
 	t, err := template.ParseFiles("./view/webcontent/www/templates/verificationemail.html")
 	if err != nil {
-		glog.Errorln(err)
-		Error404(w, err)
+		log.Errorln(err)
+		Error404(w, err, page.View)
 		return
 	}
 	buf := new(bytes.Buffer)
 	err = t.ExecuteTemplate(buf, "base", page)
 	body := buf.String()
 	if err != nil {
-		glog.Errorln(err)
-		Error404(w, err)
+		log.Errorln(err)
+		Error404(w, err, page.View)
 		return
 	}
 
@@ -185,8 +185,8 @@ func registerFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		registerFromEmailAddress, []string{page.User.Email}, []byte(msg))
 
 	if err != nil {
-		glog.Infoln("smtp error: %s", err)
-		Error404(w, err)
+		log.Infoln("smtp error: %s", err)
+		Error404(w, err, page.View)
 		return
 	}
 	page.RenderPageTemplate(w, r, "verifyregisternotice")
@@ -198,17 +198,17 @@ func verifyRegisterHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	pSP := bluemonday.StrictPolicy()
 	if len(page.User.Errors) > 0 {
 		page.User.VerificationComplete = false
-		glog.Errorln("Someone tried to verify with a bad link, potential attack!")
+		log.Errorln("Someone tried to verify with a bad link, potential attack!")
 	} else {
 		//confirm the user's email and code
-		usr := page.User.SelectUserForVerification()
+		usr := page.User.SelectUserForVerification(page.View)
 		if usr.ID != 0 {
 			//check that the time sense the user requested addition hasn't been
 			//more the 24 hours
 			delta := time.Now().Sub(usr.VerificationInitTime)
 			if delta.Hours() > 24 {
 				page.User.Errors["User"] = "You have waited to long for verification."
-				glog.Errorln("Someone tried to verify with a verification that is to old, potential attack!")
+				log.Errorln("Someone tried to verify with a verification that is to old, potential attack!")
 			} else {
 				//update the verification code and time of init and complete
 				page.User = *usr
@@ -217,11 +217,11 @@ func verifyRegisterHandler(w http.ResponseWriter, r *http.Request, page *page) {
 				page.User.VerificationInitTime = time.Time{}
 				page.User.VerificationComplete = true
 				//update the user in the database
-				page.User.UpdateUser()
+				page.User.UpdateUser(page.View)
 			}
 		} else {
 			page.User.Errors["User"] = "You have provided bad information for verification."
-			glog.Errorln("Someone tried to verify with a bad code and email, potential attack!")
+			log.Errorln("Someone tried to verify with a bad code and email, potential attack!")
 		}
 	}
 	page.RenderPageTemplate(w, r, "verifyregisternotice")
@@ -233,7 +233,7 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 	//check the recaptcha to make sure we don't have bot or something
 	isValid := re.Verify(*r)
 	if !isValid {
-		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
+		log.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
 		page.RenderPageTemplate(w, r, "forgotpasswdform")
 		return
@@ -241,7 +241,7 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 
 	//check username and email against database, if it exists return to
 	//registration page with an error else add user to the database
-	users := page.User.SelectUsersByIdORUsernameOREmail()
+	users := page.User.SelectUsersByIdORUsernameOREmail(page.View)
 	if len(users) == 0 {
 		page.User.Errors["Email"] = "No account with that email found."
 		forgotPasswdHandler(w, r, page)
@@ -249,30 +249,30 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 	} else if len(users) == 1 {
 		page.User = users[0]
 		tempPasswd, _ := GenerateRandomString(15)
-		glog.Infoln("Passwd: ", tempPasswd)
+		log.Infoln("Passwd: ", tempPasswd)
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(tempPasswd), bcrypt.DefaultCost)
 		page.User.Password = string(hashedPassword)
-		glog.Infoln("Hash:    ", hashedPassword)
+		log.Infoln("Hash:    ", hashedPassword)
 		//update the verification code for a password reset
 		code, _ := GenerateRandomString(64)
 		page.User.VerificationCode = html.EscapeString(pSP.Sanitize(code))
 		page.User.VerificationInitTime = time.Now()
 		//update the user in the db
-		page.User.UpdateUser()
+		page.User.UpdateUser(page.View)
 		page.User.Password = tempPasswd
 		//load up the verification email
 		t, err := template.ParseFiles("./view/webcontent/www/templates/forgotpasswdemail.html")
 		if err != nil {
-			glog.Errorln(err)
-			Error404(w, err)
+			log.Errorln(err)
+			Error404(w, err, page.View)
 			return
 		}
 		buf := new(bytes.Buffer)
 		err = t.ExecuteTemplate(buf, "base", page)
 		body := buf.String()
 		if err != nil {
-			glog.Errorln(err)
-			Error404(w, err)
+			log.Errorln(err)
+			Error404(w, err, page.View)
 			return
 		}
 
@@ -290,13 +290,13 @@ func forgotPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page)
 			registerFromEmailAddress, []string{page.User.Email}, []byte(msg))
 
 		if err != nil {
-			glog.Infoln("smtp error: %s", err)
-			Error404(w, err)
+			log.Infoln("smtp error: %s", err)
+			Error404(w, err, page.View)
 			return
 		}
 	} else {
-		glog.Errorln("We have more then one account with the same email address.")
-		Error404(w, nil)
+		log.Errorln("We have more then one account with the same email address.")
+		Error404(w, nil, page.View)
 		return
 	}
 	page.RenderPageTemplate(w, r, "forgotpasswdnotice")
@@ -308,46 +308,46 @@ func resetPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page) 
 	//check the recaptcha to make sure we don't have bot or something
 	isValid := re.Verify(*r)
 	if !isValid {
-		glog.Infoln("Invalid! These errors ocurred: %v", re.LastError())
+		log.Infoln("Invalid! These errors ocurred: %v", re.LastError())
 		page.Errors["loginErrors"] = "You failed the reCAPTCHA test.  You might be bot or something"
 		page.RenderPageTemplate(w, r, "index")
 		return
 	}
 
 	//check password and code against database
-	users := page.User.SelectUsersByIdORUsernameOREmail()
+	users := page.User.SelectUsersByIdORUsernameOREmail(page.View)
 	if len(users) == 1 {
 		//check that the time sense the user requested addition hasn't been
 		//more the 24 hours
 		delta := time.Now().Sub(users[0].VerificationInitTime)
 		if delta.Hours() > 24 {
 			page.Errors["passwdResetErrors"] = "You have waited to long to reset your password.  Please request another reset."
-			glog.Errorln("Someone tried to reset a password that is to old, potential attack!")
+			log.Errorln("Someone tried to reset a password that is to old, potential attack!")
 			page.RenderPageTemplate(w, r, "passwdresetform")
 			return
 		} else {
 			if (bcrypt.CompareHashAndPassword([]byte(users[0].Password), []byte(page.User.Password)) == nil) && (page.User.VerificationCode == users[0].VerificationCode) {
 				//update the password so that it is salted and hashed with bcrypt
-				glog.Infoln("Password:", page.User.NewPassword)
+				log.Infoln("Password:", page.User.NewPassword)
 				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(page.User.NewPassword), bcrypt.DefaultCost)
 				users[0].Password = string(hashedPassword)
-				glog.Infoln("Hash:    ", hashedPassword)
+				log.Infoln("Hash:    ", hashedPassword)
 				//set the verification code and time created
 				code, _ := GenerateRandomString(64)
 				users[0].VerificationCode = html.EscapeString(pSP.Sanitize(code))
 				users[0].VerificationInitTime = time.Time{}
 				page.User = users[0]
 				//update the user in the db
-				page.User.UpdateUser()
+				page.User.UpdateUser(page.View)
 			} else {
-				glog.Errorln("Someone is trying to reset passwords with bad data.  This could be an attack.")
-				Error404(w, nil)
+				log.Errorln("Someone is trying to reset passwords with bad data.  This could be an attack.")
+				Error404(w, nil, page.View)
 				return
 			}
 		}
 	} else {
-		glog.Errorln("We have zero or more then one accounts with this email address.")
-		Error404(w, nil)
+		log.Errorln("We have zero or more then one accounts with this email address.")
+		Error404(w, nil, page.View)
 		return
 	}
 	page.RenderPageTemplate(w, r, "loginindex")
@@ -356,8 +356,8 @@ func resetPasswdFormHandler(w http.ResponseWriter, r *http.Request, page *page) 
 //Logout page request handler which process the standard logout request.  This
 //will close the user's session
 func logoutHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	ClearSession(w, r)
-	http.Redirect(w, r, "/", 302)
+	ClearSession(w, r, page.View)
+	http.Redirect(w, r, "/"+page.View+"/", 302)
 }
 
 //Initial request from the website that then submits the request to google
@@ -371,11 +371,11 @@ func handleGoogleLogin(w http.ResponseWriter, r *http.Request, page *page) {
 		enc.Encode(time.Now())
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
-		glog.Infoln("Bad memcache handleGoogleLogin")
+		log.Infoln("Bad memcache handleGoogleLogin")
 		oauth := model.OAuth{Key: str, Time: time.Now()}
-		oauth.InsertOAuth()
+		oauth.InsertOAuth(page.View)
 	}
-	googleOauthConfig.RedirectURL = page.BaseURL + "/GoogleCallback"
+	googleOauthConfig.RedirectURL = page.BaseURL + "/" + page.View + "/GoogleCallback"
 	url := googleOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -396,31 +396,31 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 				dec := gob.NewDecoder(read)
 				dec.Decode(&timeForState)
 				if time.Since(timeForState).Seconds() > 30 {
-					glog.Infoln("invalid oauth state")
-					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+					log.Infoln("invalid oauth state")
+					http.Redirect(w, r, "/"+page.View+"/", http.StatusTemporaryRedirect)
 					return
 				}
 			} else {
-				glog.Infoln("invalid oauth state")
+				log.Infoln("invalid oauth state")
 				return
 			}
 		} else {
-			glog.Infoln("invalid oauth state")
+			log.Infoln("invalid oauth state")
 			return
 		}
 	} else {
-		glog.Infoln("Bad memcache handleGoogleCallback")
+		log.Infoln("Bad memcache handleGoogleCallback")
 		oauth := model.OAuth{Key: state}
-		item := oauth.SelectOAuthByKey()
+		item := oauth.SelectOAuthByKey(page.View)
 		if item != nil {
-			item.DeleteOAuth()
+			item.DeleteOAuth(page.View)
 			if time.Since(item.Time).Seconds() > 30 {
-				glog.Infoln("invalid oauth state")
-				http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+				log.Infoln("invalid oauth state")
+				http.Redirect(w, r, "/"+page.View+"/", http.StatusTemporaryRedirect)
 				return
 			}
 		} else {
-			glog.Infoln("invalid oauth state")
+			log.Infoln("invalid oauth state")
 			return
 		}
 	}
@@ -428,8 +428,8 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 	code := r.FormValue("code")
 	token, err := googleOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		glog.Infoln("Code exchange failed with '%s'\n", err)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		log.Infoln("Code exchange failed with '%s'\n", err)
+		http.Redirect(w, r, "/"+page.View+"/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -437,16 +437,16 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
-	//glog.Infoln("Content: %s\n", contents)
+	//log.Infoln("Content: %s\n", contents)
 	s := string(contents[:])
 	//Get the email address
 	email := strings.Replace(strings.Replace(strings.Split(strings.Split(s, ",")[1], ":")[1], "\"", "", -1), " ", "", -1)
-	glog.Infoln(email)
+	log.Infoln(email)
 	var user model.User
 	user.Email = email
-	usr := user.SelectUserForLogin(true)
+	usr := user.SelectUserForLogin(true, page.View)
 	if !usr.VerificationComplete {
-		glog.Infoln("User has not finished verification process: " + page.User.Username)
+		log.Infoln("User has not finished verification process: " + page.User.Username)
 		page.Errors["loginErrors"] = "Unverified Account! Please either signup or check your email to verify it if you have already registered."
 		page.RenderPageTemplate(w, r, "/loginindex")
 		return
@@ -456,8 +456,8 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request, page *page) {
 	us.LastSeenTime = time.Now()
 	usr.GoogleAccessToken = token.AccessToken
 	us.User = *usr
-	SetSession(w, r, us, true)
-	http.Redirect(w, r, "/", 302)
+	SetSession(w, r, us, true, page.View)
+	http.Redirect(w, r, "/"+page.View+"/", 302)
 }
 
 //Initial request from the website that then submits the request to facebook
@@ -471,12 +471,12 @@ func handleFacebookLogin(w http.ResponseWriter, r *http.Request, page *page) {
 		enc.Encode(time.Now())
 		mc.Set(&memcache.Item{Key: str, Value: buf.Bytes()})
 	} else {
-		glog.Infoln("Bad memcache handleGoogleLogin")
+		log.Infoln("Bad memcache handleGoogleLogin")
 		oauth := model.OAuth{Key: str, Time: time.Now()}
-		oauth.InsertOAuth()
+		oauth.InsertOAuth(page.View)
 	}
 	oauthStateString[str] = true
-	facebookOauthConfig.RedirectURL = page.BaseURL + "/FacebookCallback"
+	facebookOauthConfig.RedirectURL = page.BaseURL + "/" + page.View + "/FacebookCallback"
 	url := facebookOauthConfig.AuthCodeURL(str)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -497,31 +497,31 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 				dec := gob.NewDecoder(read)
 				dec.Decode(&timeForState)
 				if time.Since(timeForState).Seconds() > 30 {
-					glog.Infoln("invalid oauth state")
-					http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+					log.Infoln("invalid oauth state")
+					http.Redirect(w, r, "/"+page.View+"/", http.StatusTemporaryRedirect)
 					return
 				}
 			} else {
-				glog.Infoln("invalid oauth state")
+				log.Infoln("invalid oauth state")
 				return
 			}
 		} else {
-			glog.Infoln("invalid oauth state")
+			log.Infoln("invalid oauth state")
 			return
 		}
 	} else {
-		glog.Infoln("Bad memcache handleFacebookCallback")
+		log.Infoln("Bad memcache handleFacebookCallback")
 		oauth := model.OAuth{Key: state}
-		item := oauth.SelectOAuthByKey()
+		item := oauth.SelectOAuthByKey(page.View)
 		if item != nil {
-			item.DeleteOAuth()
+			item.DeleteOAuth(page.View)
 			if time.Since(item.Time).Seconds() > 30 {
-				glog.Infoln("invalid oauth state")
-				http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+				log.Infoln("invalid oauth state")
+				http.Redirect(w, r, "/"+page.View+"/", http.StatusTemporaryRedirect)
 				return
 			}
 		} else {
-			glog.Infoln("invalid oauth state")
+			log.Infoln("invalid oauth state")
 			return
 		}
 	}
@@ -530,8 +530,8 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 	//_, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
 	token, err := facebookOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
-		glog.Infoln("Code exchange failed with '%s'\n", err)
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		log.Infoln("Code exchange failed with '%s'\n", err)
+		http.Redirect(w, r, "/"+page.View+"/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -541,14 +541,14 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 	contents, err := ioutil.ReadAll(response.Body)
 	var dat map[string]interface{}
 	json.Unmarshal([]byte(contents), &dat)
-	glog.Infoln(dat)
+	log.Infoln(dat)
 	// //Get the email address
 	email := dat["email"]
 	var user model.User
 	user.Email = email.(string)
-	usr := user.SelectUserForLogin(true)
+	usr := user.SelectUserForLogin(true, page.View)
 	if !usr.VerificationComplete {
-		glog.Infoln("User has not finished verification process: " + page.User.Username)
+		log.Infoln("User has not finished verification process: " + page.User.Username)
 		page.Errors["loginErrors"] = "Unverified Account! Please either signup or check your email to verify it if you have already registered."
 		page.RenderPageTemplate(w, r, "/loginindex")
 		return
@@ -558,9 +558,9 @@ func handleFacebookCallback(w http.ResponseWriter, r *http.Request, page *page) 
 	us.LastSeenTime = time.Now()
 	usr.FBAccessToken = token.AccessToken
 	us.User = *usr
-	SetSession(w, r, us, true)
+	SetSession(w, r, us, true, page.View)
 
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/"+page.View+"/", 302)
 }
 
 //Parses the form and then validates the login form request

@@ -5,19 +5,19 @@ package connectors_test
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	//_ "github.com/mattn/go-sqlite3"
-	"github.com/spf13/viper"
 	"github.com/CommonwealthCocktails/connectors"
+	"github.com/spf13/viper"
 	"testing"
 )
 
 func TestMySQLConnection(t *testing.T) {
 	viper.SetConfigName("unit_test_config") // name of config file (without extension)
-	viper.AddConfigPath(".")      // optionally look for config in the working directory
-	err := viper.ReadInConfig()   // Find and read the config file
-	if err != nil {               // Handle errors reading the config file
-		glog.Errorf("Fatal error config file: %s \n", err)
+	viper.AddConfigPath(".")                // optionally look for config in the working directory
+	err := viper.ReadInConfig()             // Find and read the config file
+	if err != nil {                         // Handle errors reading the config file
+		log.Errorf("Fatal error config file: %s \n", err)
 		panic(err)
 	}
 	var dbaddr string
@@ -35,10 +35,10 @@ func TestMySQLConnection(t *testing.T) {
 	dbname = viper.GetString("dbname")
 	dbtype = connectors.MySQL
 	connectors.SetDBVars(dbaddr, dbpasswd, user, proto, port, dbname, dbtype)
-	conn, _ := connectors.GetDB() //get db connection
+	conn, _ := connectors.GetDBFromMap("www") //get db connection
 	if conn == nil {
 		t.Errorf("Failed to connect to database")
 	} else {
-	    t.Logf("Successful MySQL DB connection established.")
+		t.Logf("Successful MySQL DB connection established.")
 	}
 }

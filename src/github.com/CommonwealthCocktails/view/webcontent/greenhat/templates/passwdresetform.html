@@ -1,0 +1,147 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+       function onSubmit(token) {
+         document.getElementById("passwdResetForm").submit();
+       }
+    </script>
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+
+    <div class="container">
+    	<div class="row">
+    		<div class="col-xs-12">
+    			<hr height="30px" style="border-color: #FFF;">
+    		</div>
+    	</div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1 align="center">Reset Password</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "resetPasswdResults" .}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-3 col-sm-3 col-xs-2"></div>
+            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-8" align="center">
+                {{ if not .Errors.passwdResetErrors }}
+                    {{template "resetPasswdForm" .}}
+                {{else}}
+                    {{ with .User.Errors.CurrentPassword }}
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span> {{.}}
+                    </div>
+                    {{ end }}
+                    <input type="hidden" id="code" name="code" value="{{.User.VerificationCode}}">
+                    <input type="hidden" id="email" name="email" value="{{.User.Email}}">
+                    {{ with .User.Errors.Password }}
+                    <div class="alert alert-danger" role="alert">
+                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span class="sr-only">Error:</span> {{.}}
+                    </div>
+                    {{ end }}
+                    Please refer to the email we sent you and try again.
+                {{end}}
+            </div>
+            <div class="col-lg-4 col-md-3 col-sm-3 col-xs-2"></div>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}
+<!---->
+{{define "resetPasswdResults"}}
+<div class="row">
+    <div class=" col-xs-3"></div>
+    <div class=" col-xs-6">
+        {{ with .Errors.passwdResetErrors }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+    </div>
+    <div class=" col-xs-3"></div>
+</div>
+{{end}}
+<!---->
+{{define "resetPasswdForm"}}
+<form id='passwdResetForm' method="post" action="/passwdReset" autocomplete="off">
+    <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+    {{ with .User.Errors.CurrentPassword }}
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span> {{.}}
+    </div>
+    {{ end }}
+    <input type="hidden" id="code" name="code" value="{{.User.VerificationCode}}">
+    <input type="hidden" id="email" name="email" value="{{.User.Email}}">
+    {{ with .User.Errors.Password }}
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span> {{.}}
+    </div>
+    {{ end }}
+    <hr style="border-color: #FFF;">
+    <table>
+        <tr>
+            <td>
+                <label>Current Password&nbsp;<font color="red">*</font>&nbsp;</label>
+            </td>
+            <td>
+                <input type="password" id="currentpassword" name="currentpassword" placeholder="Current Password">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <hr style="border-color: #FFF;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>New Password&nbsp;<font color="red">*</font>&nbsp;</label>
+            </td>
+            <td>
+                <input type="password" id="password" name="password" placeholder="Password">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <hr style="border-color: #FFF;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Password&nbsp;Confirm&nbsp;<font color="red">*</font>&nbsp;</label>
+            </td>
+            <td>
+                <input type="password" id="passwordconfirm" name="passwordconfirm" placeholder="Password">
+            </td>
+        </tr>
+    </table>
+    <hr style="border-color: #FFF;">
+    <!--<div align="center"><button class="g-recaptcha" type="submit" data-sitekey="">Register</button></div>-->
+    <hr style="border-color: #FFF;">
+    <button type="submit">Reset</button>
+    <hr style="border-color: #FFF;">
+</form>
+{{end}}
