@@ -1,0 +1,133 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{template "navbar" .}}
+
+	{{with .Post}}
+	<div itemscope itemtype="http://schema.org/BlogPosting" class="container">
+		Portfolio Item Heading 
+		{{if .PostTitle}}
+		<meta itemprop="headline" content="{{.PostTitle}} from Commonwealth Cocktails" />
+		<meta itemprop="author" content="{{if .PostAuthor}}{{.PostAuthor.FirstName}} {{.PostAuthor.LastName}}{{end}}" />
+		<meta itemprop="datePublished" content="{{.PostCreateDate}}" />
+		<div itemprop="publisher" itemscope itemtype="https://schema.org/Organization" style="display: none;">
+		    <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject" style="display: none;">
+		      <img src="http://www.commonwealthcocktails.com/images/intro-bg.jpg" style="display: none;"/>
+		      <meta itemprop="url" content="http://www.commonwealthcocktails.com/images/intro-bg.jpg">
+		      <meta itemprop="width" content="400">
+		      <meta itemprop="height" content="60">
+		    </div>
+		    <meta itemprop="name" content="CommonwealthCocktails.com">
+		</div>
+		<meta itemprop="image" content="http://www.commonwealthcocktails.com/images/intro-bg.jpg" />
+		<meta itemprop="dateModified" content="{{.PostModifiedDate}}" />
+		{{end}}
+		<div class="row">
+			&nbsp;
+			<h1 align="center">{{.PostTitle}}</h1>
+			<h6 align="center">By: {{if .PostAuthor}}{{.PostAuthor.FirstName}}&nbsp;{{.PostAuthor.LastName}}{{end}}</h6>
+			<div class="row">
+				<div class="col-md-12" align="center">
+					<a class="fb-share-button btn btn-default btn-sm" style="display: inline-block;" data-href="{{$.BaseURL}}/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/post/{{.ID}}" data-layout="button" data-size="small" data-mobile-iframe="true" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{$.BaseURL}}%2F{{$.View}}{{if ne $.Locale ""}}%2F{{$.Locale}}{{end}}%2Fpost%2F{{.ID}}&amp;src=sdkpreparse">
+						<i class="fa fa-facebook"></i>
+					</a>
+					<a target="_blank" href="https://github.com/RoughIndustries/com.roughindustries.cocktails_go" class="btn btn-default btn-sm" title="GitHub">
+						<i class="fa fa-github"></i>
+					</a>
+					<a target="_blank" class="btn btn-default btn-sm twitter-share-button" data-dnt="true"
+				  href="https://twitter.com/intent/tweet?text={{.PostTitle}}&url={{$.BaseURL}}%2F{{$.View}}{{if ne $.Locale ""}}%2F{{$.Locale}}{{end}}%2Fpost%2F{{.ID}}&hashtags=commonwealthcocktails,cocktails&via=CommonCocktails">
+						<i style="color: black;" class="fa fa-twitter"></i>
+					</a>
+					<a class="btn btn-default btn-sm" data-pin-do="buttonPin" data-pin-custom="true" href="https://www.pinterest.com/pin/create/button/?url={{$.BaseURL}}%2F{{$.View}}{{if ne $.Locale ""}}%2F{{$.Locale}}{{end}}%2Fpost%2F{{.ID}}&media=&description=">
+						<i style="color: black;" class="fa fa-pinterest"></i>
+					</a>
+				</div>
+			</div>
+			<hr style="border-color: #EEEEEE;">
+		</div>
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+						<hr style="border-color: #FFF;">
+							{{if .PostImage}}
+								<img class="img-responsive" style="height:150px; margin:0px 20px 10px 0px" src="{{.PostImage}}" align="left"/> {{end}} {{.PostContent}}
+						<hr style="border-color: #FFF;">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div align="center" class="row">
+					&nbsp;
+				</div>
+				<br>
+				<div class="row">
+					<div style="color:gray" align="center">
+						<div style="width: 100%; height: 10px; border-bottom: 1px solid #EEEEEE; text-align: center">
+							<span style="font-size: 16px; background-color: white; padding: 0 10px;">Coming Soon <!--Padding is optional--></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{end}}
+	
+	{{template "postadminsocialbar" .}}
+	
+	{{template "footer" .}}
+	<!-- /.container -->
+	
+	<script async defer src="//assets.pinterest.com/js/pinit.js"></script>
+	
+</body>
+
+</html>
+{{end}}
+
+<!--Post Admin Social Bar-->
+{{define "postadminsocialbar"}}
+{{if $.Authenticated}}{{if $.AllowAdmin}}
+{{with .Post}}
+<hr style="border-color: #FFF;">
+
+<div class="container">
+	<div class="row">
+		<div class="col-lg-12 text-center no-wrap" style="color:gray" align="center">
+			<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
+				<span style="font-size: 24px; background-color: white; padding: 0 10px;">Social Admin Section</span>
+			</div>
+		</div>
+	</div>
+	<hr style="border-color: #FFF;">
+
+	<div class="row">
+		<div class="col-lg-12">
+			<p align="center">
+				<span class="btn btn-default btn-sm adminsocialpost" title="Post on CC Facebook" id="adminsocialpost" name="adminsocialpost">
+					Post on CC Facebook&nbsp;&nbsp;<i class="fa fa-facebook"></i>
+				</span>
+				<script>
+				$('.adminsocialpost').click( function(){
+				   $.ajax({
+					        url: "/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/adminsocialpost?URLExt=/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/post/{{.ID}}"
+					        ,success: function(response) {
+					        	console.log("Posted to Facebook")
+					        }
+				    	})
+				   return false;
+				})
+				</script>
+			</p>
+		</div>
+	</div>
+	<hr/>
+</div>
+{{end}}{{end}}{{end}}{{end}}

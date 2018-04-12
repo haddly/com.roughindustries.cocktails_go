@@ -1,0 +1,32 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+    <div class="container">
+        <div class="page-header">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1>DB Verify Results: </h1>
+                    {{with .Messages}}{{.Status}}{{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    {{template "footer" .}}
+
+</body>
+
+</html>
+{{end}}

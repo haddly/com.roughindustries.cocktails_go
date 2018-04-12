@@ -650,13 +650,17 @@ func (product *Product) SelectBDGByProduct(site string) *BaseProductWithBDG {
 }
 
 //Select all products in the database
-func (product *Product) SelectAllProducts(site string) []Product {
+func (product *Product) SelectAllProducts(site string, indexOnly bool) []Product {
 	var ret []Product
 	conn, _ := connectors.GetDBFromMap(site)
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT idProduct, productName, productType, COALESCE(productDescription, ''), COALESCE(productImagePath, ''), " +
 		"COALESCE(productImage, ''), COALESCE(`productPreText`, ''), COALESCE(`productPostText`, ''), producttype.`productTypeIsIngredient` " +
-		"FROM product JOIN producttype ON producttype.idProductType=product.productType ORDER BY productName;")
+		"FROM product JOIN producttype ON producttype.idProductType=product.productType ")
+	if indexOnly {
+		buffer.WriteString("WHERE productShowInProductsIndex=1 ")
+	}
+	buffer.WriteString("ORDER BY productName;")
 	query := buffer.String()
 	log.Infoln(query)
 	rows, err := conn.Query(query)

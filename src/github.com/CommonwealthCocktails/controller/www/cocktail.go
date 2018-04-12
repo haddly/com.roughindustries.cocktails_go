@@ -111,7 +111,6 @@ func CocktailsTop100Handler(w http.ResponseWriter, r *http.Request, page *page) 
 func CocktailModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	u, _ := url.Parse(r.URL.String())
 	log.Infoln(u)
-	r.ParseForm()
 	var cba model.CocktailsByAlphaNums
 	cba = page.Cocktail.SelectCocktailsByAlphaNums(false, page.View)
 	page.CocktailsByAlphaNums = cba
@@ -127,14 +126,13 @@ func CocktailModFormHandler(w http.ResponseWriter, r *http.Request, page *page) 
 	page.NonIngredients = nonIngredients
 	log.Infoln(r.Form["ID"])
 	page.IsForm = true
-	if len(r.Form["ID"]) == 0 {
+	if page.Cocktail.ID == 0 {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "cocktailmodform")
 	} else {
-		id, _ := strconv.Atoi(r.Form["ID"][0])
 		var in model.Cocktail
-		in.ID = id
-		out := page.Cocktail.SelectCocktailsByID(id, false, page.View)
+		in.ID = page.Cocktail.ID
+		out := in.SelectCocktailsByID(page.Cocktail.ID, false, page.View)
 		page.Cocktail = out.Cocktail
 		page.RenderPageTemplate(w, r, "cocktailmodform")
 	}
@@ -323,6 +321,7 @@ func ValidateCocktailPath(w http.ResponseWriter, r *http.Request, page *page) bo
 func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Cocktail.Errors = make(map[string]string)
 	r.ParseForm() // Required if you don't call r.FormValue()
+	params := mux.Vars(r)
 	pUGCP := bluemonday.UGCPolicy()
 	pUGCP.AllowElements("img")
 	pSP := bluemonday.StrictPolicy()
@@ -333,7 +332,14 @@ func ValidateCocktail(w http.ResponseWriter, r *http.Request, page *page) bool {
 		} else {
 			page.Cocktail.Errors["CocktailID"] = "Please enter a valid cocktail id. "
 		}
+	} else {
+		if govalidator.IsInt(params["cocktailID"]) {
+			page.Cocktail.ID, _ = strconv.Atoi(params["cocktailID"])
+		} else {
+			page.Cocktail.Errors["CocktailID"] = "Please enter a valid cocktail id. "
+		}
 	}
+
 	if len(r.Form["cocktailTitle"]) > 0 {
 		page.Cocktail.Title = r.Form["cocktailTitle"][0]
 	}

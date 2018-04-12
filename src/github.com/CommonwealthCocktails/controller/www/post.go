@@ -41,7 +41,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		p = p[(page.Pagination.CurrentPage-1)*25 : ((page.Pagination.CurrentPage-1)*25)+diff]
 	}
 	page.Posts = p
-	PaginationCalculate(page, page.Pagination.CurrentPage, 25, totalP, 3)
+	PaginationCalculate(page, page.Pagination.CurrentPage, 25, totalP, 2)
 	page.SubrouteURL = "posts"
 	page.RenderPageTemplate(w, r, "posts")
 }
@@ -56,7 +56,9 @@ func PostModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "postmodform")
 	} else {
-		out := page.Post.SelectPost(page.View)
+		var in model.Post
+		in.ID = page.Post.ID
+		out := in.SelectPost(page.View)
 		page.Post = out[0]
 		page.RenderPageTemplate(w, r, "postmodform")
 	}
@@ -101,6 +103,7 @@ func PostModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func ValidatePost(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Post.Errors = make(map[string]string)
 	r.ParseForm() // Required if you don't call r.FormValue()
+	params := mux.Vars(r)
 	pUGCP := bluemonday.UGCPolicy()
 	pUGCP.AllowElements("img")
 	pSP := bluemonday.StrictPolicy()
@@ -108,6 +111,12 @@ func ValidatePost(w http.ResponseWriter, r *http.Request, page *page) bool {
 	if len(r.Form["postID"]) > 0 && strings.TrimSpace(r.Form["postID"][0]) != "" {
 		if govalidator.IsInt(r.Form["postID"][0]) {
 			page.Post.ID, _ = strconv.Atoi(r.Form["postID"][0])
+		} else {
+			page.Post.Errors["PostID"] = "Please enter a valid post id. "
+		}
+	} else {
+		if govalidator.IsInt(params["postID"]) {
+			page.Post.ID, _ = strconv.Atoi(params["postID"])
 		} else {
 			page.Post.Errors["PostID"] = "Please enter a valid post id. "
 		}

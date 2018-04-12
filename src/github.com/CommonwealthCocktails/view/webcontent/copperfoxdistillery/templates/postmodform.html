@@ -1,0 +1,264 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    {{template "navbar" .}}
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <hr height="30px" style="border-color: #FFF;">
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="page-header">
+                    <h1 align="center">Post Modification Form</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        {{template "postResults" .}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        {{template "postSelect" .}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="row">
+                        {{if .Authenticated}}{{if .AllowAdmin}}{{if .UserSession}}
+                        <form method="post" action="/{{$.View}}/postMod" id="postModForm" autocomplete="nope">
+                            <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+                            {{template "postID" .}}
+                            <!---->
+                            {{template "postTitle" .}}
+                            <!---->
+                            {{template "postExcerpt" .}}
+                            <!---->
+                            {{template "postContent" .}}
+                            <!---->
+                            {{template "postImage" .}}
+                            <!---->
+                            {{template "postStatus" .}}
+                            <!---->
+                            {{template "postAuthor" .}}
+                            <!---->
+                        </form>
+                        <script>
+                            $(window).bind("pageshow", function() {
+                                $('#postModForm')[0].reset();
+                            });
+                        </script>
+                        <div style="text-align: center;">
+                            <button name="button" type="submit" value="add" id="addButton" form="postModForm" class="btn btn-default">Add</button>
+                            {{if .Post.ID}}
+                            <button name="button" type="submit" value="update" id="updateButton" form="postModForm" class="btn btn-default">Update</button>
+                            <!--<button name="delete" type="submit" form="postModForm" class="btn btn-default">Delete</button>-->
+                            {{end}}
+                            <script>
+                                $(function() {
+                                    $('#addButton').on('click', function() {
+                                        $('#maindiv').addClass('hide');
+                                        $('#loader').removeClass('hide');
+                                        $('#postID').val("");
+                                    });
+                                    $('#updateButton').on('click', function() {
+                                        $('#maindiv').addClass('hide');
+                                        $('#loader').removeClass('hide');
+                                    });
+                                });
+                            </script>
+                        </div>
+                        {{end}}{{end}}{{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    {{template "footer" .}}
+</body>
+
+</html>
+{{end}}        
+
+{{define "postResults"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10">
+        {{ with .Messages.postModifySuccess }}
+        <div class="alert alert-success alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+        {{ with .Messages.postModifyFail }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "postSelect"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="postSelect">Select Post</label>
+        <select class="form-control" id="postSelect" name="postSelect">
+            <option value="" selected>Blank Post Item ...</option>
+            {{range .Posts}}
+            {{if eq $.Post.ID .ID}}
+            <option value="{{.ID}}" selected>{{.PostTitle}}</option>
+            {{else}}
+            <option value="{{.ID}}">{{.PostTitle}}</option>
+            {{end}}
+            {{end}}
+        </select>
+    </div>
+    <script>
+        $(function() {
+            // bind change event to select
+            $('#postSelect').on('change', function() {
+                var id = $(this).val(); // get selected value
+                if (id) { // require a URL
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/{{$.View}}/postModForm?postID="+id; // redirect
+                } else {
+                    $('#maindiv').addClass('hide');
+                    $('#loader').removeClass('hide');
+                    window.location = "/{{$.View}}/postModForm"; // redirect
+                }
+                return false;
+            });
+        });
+    </script>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--ID int-->
+{{define "postID"}}
+<input type="text" class="form-control hide" id="postID" name="postID" value="{{if .Post.ID}}{{.Post.ID}}{{end}}">
+{{end}}
+
+<!--PostTitle string-->
+{{define "postTitle"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        {{ with .Post.Errors.PostTitle }}
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span> {{.}}
+        </div>
+        {{ end }}
+        <label for="postTitle">Post Title</label>
+        <input type="text" class="form-control" id="postTitle" name="postTitle" value="{{if .Post.PostTitle}}{{.Post.PostTitle}}{{end}}">
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--Excerpt    template.HTML-->
+{{define "postExcerpt"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="postExcerpt">Post Excerpt</label>
+        <textarea id="postExcerpt" name="postExcerpt">{{if .Post.PostExcerpt}}{{.Post.PostExcerpt}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--Content    template.HTML-->
+{{define "postContent"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="postContent">Post Content</label>
+        <textarea id="postContent" name="postContent">{{if .Post.PostContent}}{{.Post.PostContent}}{{end}}</textarea>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+<!--PostImage string-->
+{{define "postImage"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="postImage">Post Image</label>
+        <input type="text" class="form-control" id="postImage" name="postImage" {{if $.Post.PostImage}}value="{{$.Post.PostImage}}"{{end}}>
+        <div style="text-align: center;"><img {{if $.Post.PostImage}}src="{{$.Post.PostImage}}"{{else}} style="display: none;"{{end}} height="200" width="200" id='postImagePreview' /></div>
+        <script>
+            $(document).ready(function() {
+                function readURL(input) {
+                    if (input.value) {
+                        $('#postImagePreview').attr('src', input.value);
+                        $('#postImagePreview').show();
+                    }
+                    else {
+                        $('#postImagePreview').hide();
+                    }
+                }
+                $("#postImage").change(function() {
+                    readURL(this);
+                });
+            });
+        </script>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "postStatus"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="postStatus">Post Status</label>
+        <select class="form-control" id="postStatus" name="postStatus">
+            {{if eq $.Post.PostStatus 1}}
+            <option value="1" selected>Draft</option>
+            {{else}}
+            <option value="1">Draft</option>
+            {{end}}
+            {{if eq $.Post.PostStatus 2}}
+            <option value="2" selected>Publish</option>
+            {{else}}
+            <option value="2">Publish</option>
+            {{end}}
+        </select>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}
+
+{{define "postAuthor"}}
+<div class="row">
+    <div class=" col-xs-1"></div>
+    <div class=" col-xs-10 form-group">
+        <label for="postAuthor">Post Author</label>
+        <input type="hidden" class="form-control" id="postAuthor" name="postAuthor" value="{{if .Post.PostAuthor}}{{.Post.PostAuthor.ID}}{{end}}">
+        <input type="text" class="form-control" id="postAuthorName" name="postAuthorName" value="{{if .Post.PostAuthor}}{{.Post.PostAuthor.FirstName}}&nbsp;{{.Post.PostAuthor.LastName}}{{end}}" disabled>
+    </div>
+    <div class=" col-xs-1"></div>
+</div>
+{{end}}

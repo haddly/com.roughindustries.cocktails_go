@@ -1,0 +1,42 @@
+{{define "footer"}}
+<!--Close the navbar container for doing loader toggles-->
+</div>
+<!-- Footer -->
+<!--<footer>-->
+	<hr style="border-color: #FFF;">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <p align="center">Follow Us:&nbsp;
+                    <a target="_blank" alt="Chesapeake Bay Distillery on Facebook" title="Chesapeake Bay Distillery on Facebook" style="text-decoration : none; font-weight: bold;" href="https://www.facebook.com/blueridgevodka/" title="Facebook">
+                        <i style="color: black;" class="fa fa-facebook"></i>
+                    </a>
+                    &nbsp;
+                    <a target="_blank" alt="Chesapeake Bay Distillery on Instagram" title="Chesapeake Bay Distillery on Instagram" style="text-decoration : none; font-weight: bold;" href="https://www.instagram.com/chesapeakebaydistillery/" title="Instagram">
+                    	<i style="color: black;" class="fa fa-instagram"></i>
+                    </a>
+                </p>
+            </div>
+            <div class="col-lg-3">
+                <p align="center"><a style="text-decoration : none; color: black;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/about">About Us</a></p>
+            </div>
+            <div class="col-lg-3">
+                <p align="center">Terms & Policies</p>
+            </div>
+            <div class="col-lg-3">
+                <p align="center"><a style="text-decoration : none; color: black;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/contact">Contact Us</a></p>
+            </div>
+        </div>
+        <hr style="border-color: #FFF;">
+        <div class="row">
+            <div class="col-lg-12">
+                <hr />
+                <p align="center">Copyright &copy; Chesapeake Bay Distillery 2018. All Rights Reserved</p>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+<!--</footer>-->
+{{end}}
+ 

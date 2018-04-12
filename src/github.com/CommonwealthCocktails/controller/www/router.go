@@ -148,9 +148,13 @@ func WWWRouterInit() {
 	cocktailsByIngredientLocaleSubRoute.Handle("/{page:(?:|[0-9]+)}/", RecoverHandler(MethodsHandler(PageHandler(CocktailsByIngredientIDHandler), "GET")))
 
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/cocktailModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktail, nil, CocktailModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/cocktailModForm/", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktail, nil, CocktailModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/cocktailModForm/{cocktailID:(?:|[0-9]+)}", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateCocktail, nil, CocktailModFormHandler, LandingHandler), "GET")))
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/cocktailMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateCocktail, RequiredCocktailMod, CocktailModHandler, CocktailModFormHandler), "POST")))
 	//Meta Routing
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/metaModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateMeta, nil, MetaModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/metaModForm/", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateMeta, nil, MetaModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/metaModForm/{metaID:(?:|[0-9]+)}", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateMeta, nil, MetaModFormHandler, LandingHandler), "GET")))
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/metaMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateMeta, RequiredMetaMod, MetaModHandler, MetaModFormHandler), "POST")))
 	//Products Routing
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/product/{productID}", RecoverHandler(MethodsHandler(PageHandler(ProductHandler), "GET")))
@@ -174,6 +178,8 @@ func WWWRouterInit() {
 	productsLocaleSubRoute.Handle("/{page:(?:|[0-9]+)}/", RecoverHandler(MethodsHandler(PageHandler(ProductsHandler), "GET")))
 
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/productModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateProduct, nil, ProductModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/productModForm/", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateProduct, nil, ProductModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/productModForm/{productID:(?:|[0-9]+)}", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidateProduct, nil, ProductModFormHandler, LandingHandler), "GET")))
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/productMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidateProduct, RequiredProductMod, ProductModHandler, ProductModFormHandler), "POST")))
 	//Post Routing
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/post/{postID}", RecoverHandler(MethodsHandler(PageHandler(PostHandler), "GET")))
@@ -193,6 +199,8 @@ func WWWRouterInit() {
 	postsLocaleSubRoute.Handle("/{page:(?:|[0-9]+)}/", RecoverHandler(MethodsHandler(PageHandler(PostsHandler), "GET")))
 
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/postModForm", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidatePost, nil, PostModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/postModForm/", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidatePost, nil, PostModFormHandler, LandingHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/postModForm/{postID:(?:|[0-9]+)}", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, true, ValidatePost, nil, PostModFormHandler, LandingHandler), "GET")))
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/postMod", RecoverHandler(MethodsHandler(VandAPageHandler(false, false, false, ValidatePost, RequiredPostMod, PostModHandler, PostModFormHandler), "POST")))
 	//Search Routing
 	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/search", RecoverHandler(MethodsHandler(PageHandler(SearchHandler), "GET")))
@@ -247,8 +255,11 @@ func WWWRouterInit() {
 	rtr.PathPrefix("/{view:(?:|[a-zA-Z0-9]+)}/js/").Handler(MethodsHandler(StaticFileHandler("/js"), "GET"))
 	rtr.PathPrefix("/{view:(?:|[a-zA-Z0-9]+)}/fonts/").Handler(MethodsHandler(StaticFileHandler("/fonts"), "GET"))
 	rtr.PathPrefix("/{view:(?:|[a-zA-Z0-9]+)}/slick/").Handler(MethodsHandler(StaticFileHandler("/slick"), "GET"))
-	rtr.PathPrefix("/{view:(?:|[a-zA-Z0-9]+)}/static/").Handler(MethodsHandler(StaticFileHandler("/static"), "GET"))
-	rtr.PathPrefix("/{view:(?:|[a-zA-Z0-9]+)}/{locale:(?:|[a-z][a-z]-[A-Z][A-Z])}/static/").Handler(MethodsHandler(StaticFileHandler("/static"), "GET"))
+
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/static/{file:(?:|[a-zA-Z0-9]+)}", RecoverHandler(MethodsHandler(PageHandler(PassthroughFileHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/static/{file:(?:|[a-zA-Z0-9]+)}/", RecoverHandler(MethodsHandler(PageHandler(PassthroughFileHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/{locale:(?:|[a-z][a-z]-[A-Z][A-Z])}/static/{file:(?:|[a-zA-Z0-9]+)}", RecoverHandler(MethodsHandler(PageHandler(PassthroughFileHandler), "GET")))
+	rtr.Handle("/{view:(?:|[a-zA-Z0-9]+)}/{locale:(?:|[a-z][a-z]-[A-Z][A-Z])}/static/{file:(?:|[a-zA-Z0-9]+)}/", RecoverHandler(MethodsHandler(PageHandler(PassthroughFileHandler), "GET")))
 
 	//Set the 404 page not found handler
 	rtr.NotFoundHandler = http.HandlerFunc(notFound)
@@ -287,6 +298,31 @@ func StaticFileHandler(subfolder string) http.Handler {
 		}
 		return
 	})
+}
+
+func PassthroughFileHandler(w http.ResponseWriter, r *http.Request, page *page) {
+	view := ""
+	locale := ""
+	file := ""
+	params := mux.Vars(r)
+	if govalidator.IsASCII(params["view"]) {
+		view, _ = params["view"]
+	}
+	if len(view) == 0 {
+		view = "www"
+	}
+	if govalidator.IsASCII(params["file"]) {
+		file, _ = params["file"]
+	}
+	if len(file) == 0 {
+		file = "about"
+	}
+	if govalidator.IsASCII(params["locale"]) {
+		locale, _ = params["locale"]
+	}
+	page.View = view
+	page.Locale = locale
+	page.RenderPageTemplate(w, r, file)
 }
 
 //This only loads the page into the page datastruct, there is no authentication

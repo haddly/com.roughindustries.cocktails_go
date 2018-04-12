@@ -36,19 +36,7 @@
 				<hr height="30px" style="border-color: #FFF;">
 			</div>
 		</div>
-		{{with .MetasByTypes}}
-		<div class="row">
-			<div class="col-md-12">
-				<div class="row">
-					{{range .MBT}}
-					{{if .MetaType.ShowInCocktailsIndex}}
-					{{template "cocktailsby" .}}
-					{{end}}{{end}}
-				</div>
-			</div>
-		</div>
-		{{end}}
-	</div>
+		{{template "cocktailsby" .}}
 	</div>
 
 	{{template "footer" .}}
@@ -102,48 +90,56 @@
 {{end}}
 
 {{define "cocktailsby"}}
+{{with .MetasByTypes}}
 <div class="row">
-	<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
-		<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
-			<span style="font-size: 24px; background-color: white; padding: 0 10px;">Cocktails by {{.MetaType.MetaTypeName}}</span>
+	<div class="col-md-12">
+		<div class="row">
+			{{range .MBT}}
+			{{if .MetaType.ShowInCocktailsIndex}}
+			<div class="row">
+				<div class="col-xs-12 text-center no-wrap" style="color:gray" align="center">
+					<div style="width: 100%; height: 18px; border-bottom: 1px solid #EEEEEE; text-align: center">
+						<span style="font-size: 24px; background-color: white; padding: 0 10px;">Cocktails by {{.MetaType.MetaTypeName}}</span>
+					</div>
+				</div>
+			</div>
+			<hr style="border-color: #FFF;">
+			
+			<div class="row">
+				<div class="col-xs-1">
+					&nbsp;
+				</div>
+				<div class="col-xs-10" align="center">
+					<section class="regular slider">
+						{{range .Metas}}
+						<div class="brightness" align="center" style="position: relative; width: 100%;">
+							<a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/cocktailsByMetaID/{{.ID}}">
+								<img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&txt={{.MetaName}}&w=1200&h=900&txttrack=0">
+							</a>
+						</div>
+						{{end}}
+					</section>
+					<script type="text/javascript">
+						$(document).on('ready', function() {
+							$(".regular").slick({
+								dots: true,
+								infinite: true,
+								slidesToShow: 2,
+								slidesToScroll: 2,
+								centerMode: false,
+								variableWidth: false
+							});
+						});
+					</script>
+				</div>
+				<div class="col-xs-1">
+					&nbsp;
+				</div>
+			</div>
+			<br> 
+			{{end}}{{end}}
 		</div>
 	</div>
 </div>
-<hr style="border-color: #FFF;">
-
-<div class="row">
-	<div class="col-xs-1">
-		&nbsp;
-	</div>
-	<div class="col-xs-10" align="center">
-		{{template "metaslider" .}}
-	</div>
-	<div class="col-xs-1">
-		&nbsp;
-	</div>
-</div>
-<br> {{end}}
-
-{{define "metaslider"}}
-<section class="regular slider">
-	{{range .Metas}}
-	<div class="brightness" align="center" style="position: relative; width: 100%;">
-		<a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/cocktailsByMetaID/{{.ID}}">
-			<img border="0" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&txt={{.MetaName}}&w=1200&h=900&txttrack=0">
-		</a>
-	</div>
-	{{end}}
-</section>
-<script type="text/javascript">
-	$(document).on('ready', function() {
-		$(".regular").slick({
-			dots: true,
-			infinite: true,
-			slidesToShow: 2,
-			slidesToScroll: 2,
-			centerMode: false,
-			variableWidth: false
-		});
-	});
-</script>
+{{end}}
 {{end}}

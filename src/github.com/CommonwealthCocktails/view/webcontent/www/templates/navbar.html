@@ -9,7 +9,6 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         </button>
-        
             <a class="navbar-brand" id="NavBrandStyle" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/">{{I18n .View .Locale "navbar_brandtitle"}}</a>
             {{if ne .Template "index"}}<a id="searchXSButton" class="navbar-toggle navbar-right" style="background-color: transparent; border-width: 0 0 0px; padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px; " href="#" onclick="toggleSearch()"><i class="fa fa-inverse fa-search" ></i></a>{{end}}
         </div>
@@ -30,24 +29,29 @@
                     (function($, document, window, viewport){
                         // Executes once whole document has been loaded
                         $(document).ready(function() {
-                            if( viewport.is("sm") ) {
-                                console.log('Current breakpoint:', viewport.current());
+                            console.log('Current breakpoint:', viewport.current());
+                            if( viewport.is("xs") ) {
                                 $("#searchButton").hide();
+                                console.log('Ready XS Current breakpoint:', viewport.current());
+                            }
+                            if( viewport.is("sm") ) {
+                                $("#searchButton").hide();
+                                console.log('Ready SM Current breakpoint:', viewport.current());
                             }
                             if( viewport.is(">sm") ) {
-                                console.log('Current breakpoint:', viewport.current());
                                 $("#searchButton").show();
+                                console.log('Ready GT MD Current breakpoint:', viewport.current());
                             }
                         });
                         $(window).resize(
                             viewport.changed(function(){
                             if( viewport.is("sm") ) {
-                                console.log('Current breakpoint:', viewport.current());
                                 $("#searchButton").hide();
+                                console.log('Resize SM Current breakpoint:', viewport.current());
                             }
                             if( viewport.is(">sm") ) {
-                                console.log('Current breakpoint:', viewport.current());
                                 $("#searchButton").show();
+                                console.log('Resize GT SMCurrent breakpoint:', viewport.current());
                             }
                             })
                         );
@@ -99,6 +103,7 @@
                         };
                     </script>
                     {{else}}
+                    {{if .AllowAdmin}}
                     <li class="dropdown">
                         <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{I18n .View .Locale "navbar_loginindex_link"}}
@@ -110,6 +115,7 @@
                             <li><a href="/{{.View}}/registerForm">Signup</a></li>
                         </ul>
                     </li> {{end}}
+                    {{end}}
                 </li>
             </ul>
         </div>
@@ -130,7 +136,7 @@
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" placeholder="{{I18n .View .Locale "navbar_quicksearch_link"}}" id="keywords" name="keywords">
                         <span class="input-group-btn">
-                            <button name="button" id="quickSearchButton" value="quickSearch" class="btn btn-default" type="button" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
+                            <button name="button" id="quickSearchButton" value="quickSearch" class="btn btn-default" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
                         </span>
                     </div>
                 </div>

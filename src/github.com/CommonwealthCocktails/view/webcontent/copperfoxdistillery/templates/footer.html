@@ -1,0 +1,50 @@
+{{define "footer"}}
+<!--Close the navbar container for doing loader toggles-->
+</div>
+<!-- Footer -->
+<!--<footer>-->
+	<hr style="border-color: #FFF;">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <p align="center">Follow Us:&nbsp;
+                    <a target="_blank" alt="Copper Fox Distillery on Facebook" title="Copper Fox Distillery on Facebook" style="text-decoration : none; font-weight: bold;" href="https://www.facebook.com/copperfoxdistillery/" title="Facebook">
+                        <i style="color: black;" class="fa fa-facebook"></i>
+                    </a>
+                    &nbsp;
+                    <a target="_blank" alt="Copper Fox Distillery on Instagram" title="Copper Fox Distillery on Instagram" style="text-decoration : none; font-weight: bold;" href="https://www.instagram.com/copperfoxdistillery/" title="Instagram">
+                    	<i style="color: black;" class="fa fa-instagram"></i>
+                    </a>
+                    &nbsp;
+                    <a target="_blank" alt="Copper Fox Distillery on Twitter" title="Copper Fox Distillery on Twitter" style="text-decoration : none; font-weight: bold;" href="https://twitter.com/WasmundsWhisky" title="Twitter">
+                    	<i style="color: black;" class="fa fa-twitter"></i>
+                    </a>
+                    &nbsp;
+                    <a target="_blank" alt="Copper Fox Distillery on YouTube" title="Copper Fox Distillery on YouTube" style="text-decoration : none; font-weight: bold;" href="http://www.youtube.com/channel/UCzyU0brUli5fM3XLmG9O9kw" title="YouTube">
+                    	<i style="color: black;" class="fa fa-youtube"></i>
+                    </a>
+                </p>
+            </div>
+            <div class="col-lg-3">
+                <p align="center"><a style="text-decoration : none; color: black;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/about">About Us</a></p>
+            </div>
+            <div class="col-lg-3">
+                <p align="center">Terms & Policies</p>
+            </div>
+            <div class="col-lg-3">
+                <p align="center"><a style="text-decoration : none; color: black;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/contact">Contact Us</a></p>
+            </div>
+        </div>
+        <hr style="border-color: #FFF;">
+        <div class="row">
+            <div class="col-lg-12">
+                <hr />
+                <p align="center">Copyright &copy; Copper Fox Distillery 2018. All Rights Reserved</p>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+<!--</footer>-->
+{{end}}
+ 

@@ -1,0 +1,51 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+	
+{{template "navbar" .}}
+    
+    <div class="container">
+
+		<div class="row">
+			<div class="page-header">
+				<h1 align="center">Contact Us</h1>
+			</div>
+			<div class="col-md-12">
+				<div class="row">
+				    <div class="col-md-5 col-xs-1"></div>
+				    <div class="col-md-3 col-xs-10">
+                              <div class="rte rte--indented-images">
+                                <p><strong><span style="color: #666666;">Chesapeake Bay Distillery LLC</span></strong></p>
+                                <p><span style="color: #666666;">437 Virginia Beach Boulevard</span></p>
+                                <p><span style="color: #666666;">Virginia Beach, VA  23451</span></p>
+                                <p> </p>
+                                <p><span style="color: #073763;"><strong>Showroom &amp; Tasting Hours:</strong></span></p>
+                                <p><span style="color: #073763;">Tuesday - Saturday 12p-7p</span></p>
+                                <p><span style="color: #073763;">Sunday 1p-6p</span></p>
+                                <p> </p>
+                                <p><span style="color: #990000;"><strong>Give us a call! 757.498.4210</strong></span></p>
+                                <p> </p>
+                              </div>
+                    </div>
+                    <div class="col-md-4 col-xs-1"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<hr style="border-color: #FFF;">
+	<!-- Footer -->
+    {{template "footer" .}}
+
+    </body>
+
+</html>
+{{end}}

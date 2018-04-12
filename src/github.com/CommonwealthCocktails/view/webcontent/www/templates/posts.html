@@ -62,8 +62,7 @@
 	</div>
 
 	{{end}}
-	
-	
+	{{ $length := len .Pagination.PageNums }} {{ if gt $length 1 }}
 	<div class="container">
 		<div class="row">
 			<div style="text-align:center;" >
@@ -83,6 +82,7 @@
 			</div>
 		</div>
 	</div>
+	{{end}}
 	
 	{{template "footer" .}}
 	

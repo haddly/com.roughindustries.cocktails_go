@@ -74,6 +74,29 @@
 	</div>
 
 	{{end}}
+	
+	{{ $length := len .Pagination.PageNums }} {{ if gt $length 1 }}
+	<div class="container">
+		<div class="row">
+			<div style="text-align:center;" >
+				<ul class="pagination">
+					{{if .Pagination.HasPrev}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/1" style="text-decoration : none; color : #555;"><<</a></li>
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.Pagination.PrevPage}}" style="text-decoration : none; color : #555;"><</a></li>
+					{{end}}
+					{{range .Pagination.PageNums}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.}}" style="text-decoration : none; color : #555;">{{.}}</a></li>
+					{{end}}
+					{{if .Pagination.HasNext}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.Pagination.NextPage}}" style="text-decoration : none; color : #555;">></a></li>
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.Pagination.NumPages}}" style="text-decoration : none; color : #555;">>></a></li>
+					{{end}}
+				</ul> 
+			</div>
+		</div>
+	</div>
+	{{end}}
+	
 	{{template "footer" .}}
 	
 	<!-- /.container -->

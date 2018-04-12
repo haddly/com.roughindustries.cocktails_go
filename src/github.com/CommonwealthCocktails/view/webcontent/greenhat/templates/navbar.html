@@ -29,13 +29,18 @@
                     (function($, document, window, viewport){
                         // Executes once whole document has been loaded
                         $(document).ready(function() {
-                            if( viewport.is("sm") ) {
-                                console.log('Current breakpoint:', viewport.current());
+                            console.log('Current breakpoint:', viewport.current());
+                            if( viewport.is("xs") ) {
                                 $("#searchButton").hide();
+                                console.log('Ready XS Current breakpoint:', viewport.current());
+                            }
+                            if( viewport.is("sm") ) {
+                                $("#searchButton").hide();
+                                console.log('Ready SM Current breakpoint:', viewport.current());
                             }
                             if( viewport.is(">sm") ) {
-                                console.log('Current breakpoint:', viewport.current());
                                 $("#searchButton").show();
+                                console.log('Ready GT MD Current breakpoint:', viewport.current());
                             }
                         });
                         $(window).resize(
@@ -98,6 +103,7 @@
                         };
                     </script>
                     {{else}}
+                    {{if .AllowAdmin}}
                     <li class="dropdown">
                         <a style="color: #FFF;font-family:'Domine';" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{I18n .View .Locale "navbar_loginindex_link"}}
@@ -109,6 +115,7 @@
                             <li><a href="/{{.View}}/registerForm">Signup</a></li>
                         </ul>
                     </li> {{end}}
+                    {{end}}
                 </li>
             </ul>
         </div>
@@ -129,7 +136,7 @@
                     <div class="input-group input-group-sm">
                         <input type="text" class="form-control" placeholder="{{I18n .View .Locale "navbar_quicksearch_link"}}" id="keywords" name="keywords">
                         <span class="input-group-btn">
-                            <button name="button" id="quickSearchButton" value="quickSearch" class="btn btn-default" type="button" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
+                            <button name="button" id="quickSearchButton" value="quickSearch" class="btn btn-default" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
                         </span>
                     </div>
                 </div>

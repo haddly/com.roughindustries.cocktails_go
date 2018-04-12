@@ -1,0 +1,159 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+    <!-- Custom styles for this template -->
+    <link href="/{{.View}}/css/simple-sidebar.css" rel="stylesheet">
+
+<style>
+body {
+    padding-top: 0px;
+    /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+a {
+    text-decoration: none !important;
+}
+a:hover {
+    opacity: .7;
+}
+
+.carousel-item:after {    /* create a full-height inline block pseudo=element */
+    content: ' ';
+    display: inline-block;
+    vertical-align: middle;  /* vertical alignment of the inline element */
+    height: 100%;
+}
+
+#over {
+    display: inline-block;
+    vertical-align: middle;  /* vertical alignment of the inline element */
+    font: 16px/1 Arial sans-serif;        /* <-- reset the font property */
+}
+
+</style>
+
+</head>
+
+<body>
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper" style="">
+            <ul class="sidebar-nav" >
+                <li class="sidebar-brand">
+                    <a href="#menu-toggle-menu" id="menu-toggle-menu" style="font-weight:700;">
+                        x
+                    </a>
+                </li>
+                <li>
+                    <img class="img-responsive" style="display:inline-block;max-width:150px;"src="http://static1.squarespace.com/static/5398d9e5e4b0607e19473805/t/57acc5dfd2b8577f723089c6/1522352532440/?format=300w">
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}" style="">HOME</a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/products" style="">PRODUCTS</a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktailsindex" style="">COCKTAILS</a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/posts" style="">ARTICLES</a>
+                </li>
+                <li>&nbsp;</li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/search" style="">Search</a>
+                </li>
+                <li>
+                    <a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/about" style="">About</a>
+                </li>
+                <li>
+                    <a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/contact" style="">Contact</a>
+                </li>
+                <li>&nbsp;</li>
+                <li>
+                    <form method="post" action="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/quickSearchForm" id="quickSearchForm" role="search" autocomplete="nope">
+                        <input style="margin-left:20px;width:75%" type="text" class="form-control" placeholder="{{I18n .View .Locale "navbar_quicksearch_link"}}" id="keywords" name="keywords">
+                        <button style="margin-left:20px;" class="btn btn-default" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <header>
+            <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
+            <div class="carousel-inner" role="listbox">
+              <!-- Slide One - Set the background image for this slide in the line below -->
+                
+              <div class="carousel-item active" style="text-align: center;background-image: url('https://static1.squarespace.com/static/5398d9e5e4b0607e19473805/5422fee7e4b0be8eb0296754/54230077e4b0f9b681d75b54/1411580033030/624A1411.jpg?format=1500w')">
+                <div id="over">
+                    <img src="http://static1.squarespace.com/static/5398d9e5e4b0607e19473805/t/57acc5dfd2b8577f723089c6/1522352532440/?format=300w">
+                </div>
+              </div>
+              <!-- Slide Two - Set the background image for this slide in the line below -->
+              <!--<div class="carousel-item" style="background-image: url('https://cdn.shopify.com/s/files/1/1210/9990/t/4/assets/hero_slide_2_2048x2048.jpg?13881972216364796518"></div>-->
+              <!-- Slide Three - Set the background image for this slide in the line below -->
+              <!--<div class="carousel-item" style="background-image: url('https://cdn.shopify.com/s/files/1/1210/9990/t/4/assets/hero_slide_3_2048x2048.jpg?13881972216364796518')"></div>-->
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button">
+                <div style="position: absolute;top: 25px;left: 25px;">
+                    <a href="#menu-toggle" class="" id="menu-toggle">
+                        <div>
+                            <div style="width: 25px;height: 3px;background-color: white;margin: 3px 0;"></div>
+                            <div style="width: 25px;height: 3px;background-color: white;margin: 3px 0;"></div>
+                            <div style="width: 25px;height: 3px;background-color: white;margin: 3px 0;"></div>
+                        </div>
+                    </a>  
+                </div>
+            </a>
+          </div>
+        </header>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12" align="center">
+                        <div align="center"></div>
+                        <p>&nbsp;</p>
+                        <p>At Copper Fox Distillery, we dedicate ourselves to making great American spirits. We emphasize the combination of innovation and tradition to produce a whisky that is truly unique.</p>
+                        <p>&nbsp;</p>
+                        <p>Our whisky is hand-crafted with original ideas. We start from scratch, hand-malting our own barley, and then flavoring the grain with apple and cherry wood smoke. The spirit is aged with a progressive series of new and used apple wood and oak chips inside used bourbon barrels.</p>
+                    </div>
+                </div>
+                {{template "footer" .}}
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="/{{.View}}/js/jquery-3.1.1.min.js"></script>
+    <script src="/{{.View}}/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        console.log("Toggle")
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        $("#menu-toggle").hide();
+    });
+    $("#menu-toggle-menu").click(function(e) {
+        console.log("Toggle")
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        $("#menu-toggle").show();
+    });
+    </script>
+
+</body>
+
+</html>
+{{end}}

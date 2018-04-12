@@ -38,7 +38,6 @@ func ProductHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //Form page.
 func ProductModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//Process Form gets an ID if it was passed
-	r.ParseForm()
 	var pbt model.ProductsByTypes
 	pbt = page.Product.SelectProductsByTypes(true, true, false, page.View)
 	var prods []model.Product
@@ -47,13 +46,12 @@ func ProductModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	page.Products = prods
 	page.ProductsByTypes = pbt
 	page.IsForm = true
-	if len(r.Form["ID"]) == 0 {
+	if page.Product.ID == 0 {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "productmodform")
 	} else {
-		id, _ := strconv.Atoi(r.Form["ID"][0])
 		var in model.Product
-		in.ID = id
+		in.ID = page.Product.ID
 		out := in.SelectProduct(page.View)
 		page.Product = out[0]
 		page.BaseProductWithBDG = *page.Product.SelectBDGByProduct(page.View)
@@ -136,7 +134,7 @@ func ProductModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //displays the all the products page.
 func ProductsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var p []model.Product
-	p = page.Product.SelectAllProducts(page.View)
+	p = page.Product.SelectAllProducts(page.View, true)
 	totalP := len(p)
 	diff := len(p) - ((page.Pagination.CurrentPage - 1) * 25)
 	if diff > 25 {
@@ -145,7 +143,7 @@ func ProductsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		p = p[(page.Pagination.CurrentPage-1)*25 : ((page.Pagination.CurrentPage-1)*25)+diff]
 	}
 	page.Products = p
-	PaginationCalculate(page, page.Pagination.CurrentPage, 25, totalP, 3)
+	PaginationCalculate(page, page.Pagination.CurrentPage, 25, totalP, 2)
 	page.SubrouteURL = "products"
 	page.RenderPageTemplate(w, r, "products")
 }
@@ -177,6 +175,7 @@ func ValidateProductPath(w http.ResponseWriter, r *http.Request, page *page) boo
 func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Product.Errors = make(map[string]string)
 	r.ParseForm()
+	params := mux.Vars(r)
 	pUGCP := bluemonday.UGCPolicy()
 	pUGCP.AllowElements("img")
 	pSP := bluemonday.StrictPolicy()
@@ -188,13 +187,20 @@ func ValidateProduct(w http.ResponseWriter, r *http.Request, page *page) bool {
 		} else {
 			page.Product.Errors["ProductID"] = "Please enter a valid product id. "
 		}
-	}
-	if len(r.Form["productName"]) > 0 && strings.TrimSpace(r.Form["productName"][0]) != "" {
-		if govalidator.IsPrintableASCII(r.Form["productName"][0]) {
-			page.Product.ProductName = template.HTML(pSP.Sanitize(html.EscapeString(r.Form["productName"][0])))
+	} else {
+		if govalidator.IsInt(params["productID"]) {
+			page.Product.ID, _ = strconv.Atoi(params["productID"])
 		} else {
-			page.Product.Errors["ProductName"] = "Please enter a valid product name. "
+			page.Product.Errors["ProductID"] = "Please enter a valid product id. "
 		}
+	}
+
+	if len(r.Form["productName"]) > 0 && strings.TrimSpace(r.Form["productName"][0]) != "" {
+		//if govalidator.IsASCII(r.Form["productName"][0]) {
+		page.Product.ProductName = template.HTML(pSP.Sanitize(html.EscapeString(r.Form["productName"][0])))
+		//} else {
+		//	page.Product.Errors["ProductName"] = "Please enter a valid product name. "
+		//}
 	}
 	if len(r.Form["productType"]) > 0 && strings.TrimSpace(r.Form["productType"][0]) != "" {
 		page.Product.ProductType.ID, _ = strconv.Atoi(r.Form["productType"][0])

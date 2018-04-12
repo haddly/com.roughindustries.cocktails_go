@@ -1,0 +1,111 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+
+    {{template "navbar" .}}
+
+    <div class="container">
+        <div class="row">
+    		<div class="col-xs-12">
+    			<hr height="30px" style="border-color: #FFF;">
+    		</div>
+	    </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <h1 align="center">Login</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    {{template "loginResults" .}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="row">
+                    <div class="col-xs-3"></div>
+                    <div class="col-xs-6" align="center">
+                        <div class="row">
+                            {{template "loginForm" .}}
+                        </div>
+                    </div>
+                    <div class="col-xs-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}
+<!---->
+{{define "loginResults"}}
+<div class="row">
+    <div class=" col-xs-3"></div>
+    <div class=" col-xs-6">
+        {{ with .Errors.loginErrors }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          {{.}}
+        </div>
+        {{ end }}
+    </div>
+    <div class=" col-xs-3"></div>
+</div>
+{{end}}
+<!---->
+{{define "loginForm"}}
+<form method="post" action="/{{.View}}/login" autocomplete="off">
+    <input type="hidden" id="CSRF" name="CSRF" value="{{.UserSession.CSRF}}"/>
+    {{ with .User.Errors.Username }}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {{.}}
+        </div>
+    {{ end }}
+    <label for="name">Username</label>
+    <input type="text" id="name" name="name" value="{{with .User}}{{.Username}}{{end}}"><br><br>
+    {{ with .User.Errors.Password }}
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span> {{.}}
+    </div>
+    {{ end }}
+   
+    <table>
+        <tr>
+            <td>
+                <label for="password">Password&nbsp;</label>
+            </td>
+            <td>
+                <input type="password" id="password" name="password">
+    
+            </td>
+        </tr>
+        <tr>
+            <td>
+                &nbsp;
+            </td>
+            <td>
+                <a style="text-decoration: none;" href="/forgotPasswdForm">Forgot Password?</a>
+            </td>
+        </tr>
+    </table>
+    <br><br>
+    <div class="g-recaptcha" data-sitekey="{{$.ReCAPTCHASiteKey}}"></div>
+    <hr style="border-color: #FFF;">
+    <button type="submit">Login</button>
+</form>
+{{end}}

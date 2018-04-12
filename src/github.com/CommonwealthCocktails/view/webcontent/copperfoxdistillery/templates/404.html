@@ -1,0 +1,39 @@
+{{define "base"}}
+<!DOCTYPE html>
+<!--Copyright 2017 Rough Industries LLC. All rights reserved.-->
+<html lang="en">
+<head>
+    {{template "head" .}}
+</head>
+<body>
+    {{template "navbar404" .}}
+
+    <!-- Header -->
+    <div class="intro-header">
+        <div class="container">
+            <div class="row">
+                {{template "header404" .}}
+            </div>
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /.intro-header -->
+    {{template "message404" .}}
+    <!-- Footer -->
+    {{template "footer" .}}
+</body>
+</html>
+{{end}}
+
+{{define "header404"}}
+<div class="col-lg-12">
+    <div class="intro-message">
+        <h1 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;"><a href="/{{.View}}" style="text-decoration : none; color : #FFF;">Commonwealth Cocktails</a></h1>
+        <h2 style="color:#FFF; font-family: 'Poiret One'; font-weight: 700;">404 Error</h2>
+    </div>
+</div>
+{{end}}
+
+{{define "message404"}}
+<h3 align="center">Oops something bad happened, find yourself a <a href="/{{.View}}">cocktail</a> and make yourself feel better. </h3>
+{{end}}
