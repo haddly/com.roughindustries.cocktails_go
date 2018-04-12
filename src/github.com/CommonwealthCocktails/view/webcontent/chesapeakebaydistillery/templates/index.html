@@ -1,0 +1,165 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+    <!-- Custom styles for this template -->
+    <link href="/{{.View}}/css/simple-sidebar.css" rel="stylesheet">
+
+<style>
+body {
+    padding-top: 0px;
+    /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+a {
+    text-decoration: none !important;
+}
+a:hover {
+    opacity: .7;
+}
+
+.carousel-item:after {    /* create a full-height inline block pseudo=element */
+    content: ' ';
+    display: inline-block;
+    vertical-align: middle;  /* vertical alignment of the inline element */
+    height: 100%;
+}
+
+#over {
+    display: inline-block;
+    vertical-align: middle;  /* vertical alignment of the inline element */
+    font: 16px/1 Arial sans-serif;        /* <-- reset the font property */
+}
+
+</style>
+
+</head>
+
+<body>
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper" style="background-color: #fff;">
+            <ul class="sidebar-nav" >
+                <li class="sidebar-brand">
+                    <a href="#menu-toggle-menu" id="menu-toggle-menu" style="color:#a42d2d; background-color: #fff;font-weight:700;">
+                        x
+                    </a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">HOME</a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/products" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">PRODUCTS</a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktailsindex" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">COCKTAILS</a>
+                </li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/posts" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">ARTICLES</a>
+                </li>
+                <li>&nbsp;</li>
+                <li>
+                    <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/search" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">Search</a>
+                </li>
+                <li>
+                    <a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/about" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">About Us</a>
+                </li>
+                <li>
+                    <a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/contact" style="color:#a42d2d; background-color: #fff;font-family: 'Arvo',serif;">Contact</a>
+                </li>
+                <li>&nbsp;</li>
+                <li>
+                    <form method="post" action="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/quickSearchForm" id="quickSearchForm" role="search" autocomplete="nope">
+                        <input style="margin-left:20px;width:75%" type="text" class="form-control" placeholder="{{I18n .View .Locale "navbar_quicksearch_link"}}" id="keywords" name="keywords">
+                        <button style="margin-left:20px;" class="btn btn-default" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <header>
+            <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-ride="carousel">
+            <div class="carousel-inner" role="listbox">
+              <!-- Slide One - Set the background image for this slide in the line below -->
+                
+              <div class="carousel-item active" style="text-align: center;background-image: url('https://cdn.shopify.com/s/files/1/1210/9990/t/4/assets/hero_slide_1_2048x2048.jpg?13881972216364796518')">
+                <div id="over">
+                    <img src="https://cdn.shopify.com/s/files/1/1210/9990/t/4/assets/hero-logo.png?13881972216364796518">
+                </div>
+              </div>
+              <!-- Slide Two - Set the background image for this slide in the line below -->
+              <!--<div class="carousel-item" style="background-image: url('https://cdn.shopify.com/s/files/1/1210/9990/t/4/assets/hero_slide_2_2048x2048.jpg?13881972216364796518"></div>-->
+              <!-- Slide Three - Set the background image for this slide in the line below -->
+              <!--<div class="carousel-item" style="background-image: url('https://cdn.shopify.com/s/files/1/1210/9990/t/4/assets/hero_slide_3_2048x2048.jpg?13881972216364796518')"></div>-->
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button">
+                <div style="position: absolute;top: 25px;left: 25px;">
+                    <a href="#menu-toggle" class="" id="menu-toggle">
+                        <div>
+                            <div style="width: 25px;height: 3px;background-color: white;margin: 3px 0;"></div>
+                            <div style="width: 25px;height: 3px;background-color: white;margin: 3px 0;"></div>
+                            <div style="width: 25px;height: 3px;background-color: white;margin: 3px 0;"></div>
+                        </div>
+                    </a>  
+                </div>
+            </a>
+          </div>
+        </header>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12" align="center">
+                        <div class="row">
+                            <!--<div class="col-sm-1"></div>-->
+                            <div class="col-sm-3" align="center"><a style="background-color: #fff;font-size: large;color:#a42d2d; font-family: 'Arvo',serif;">HOME</a></div>
+                            <div class="col-sm-3" align="center"><a style="font-size: large;font-family: 'Arvo',serif;text-decoration:none;" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/products">PRODUCTS</a></div>
+                            <!--<div class="col-sm-2" align="center"><a style="font-size: large;font-family: 'Arvo',serif;" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktailsindex">COCKTAILS</a></div>-->
+                            <div class="col-sm-3" align="center"><a style="font-size: large;font-family: 'Arvo',serif;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/about.html">ABOUT US</a></div>
+                            <div class="col-sm-3" align="center"><a style="font-size: large;font-family: 'Arvo',serif;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/contact.html">CONTACT US</a></div>
+                            <!--<div class="col-sm-1"></div>-->
+                        </div>
+                        <div align="center"></div>
+                        <p>&nbsp;</p>
+                        <p>Located at the intersection of 17<sup>th</sup> Street and Baltic Avenue, our new facility features a Vabc store and the Blue Ridge Tasting Room.&nbsp; Per Virginia ABC requirements, the tasting event allows for four one half ounce samples of alcohol.&nbsp; These are available for our patrons at $7.&nbsp; Tours are available 12p-4p on Saturdays at no charge for our patrons.&nbsp; Please inquire on private events.</p>
+                        <p>&nbsp;</p>
+                        <p>Bottles available through our Vabc onsite store include Spirits of the Blue Ridge Vodka, Ghost Pepper Flavored Vodka, Lemon Liqueur, and Chick’s Beach Rum.</p>
+                    </div>
+                </div>
+                {{template "footer" .}}
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="/{{.View}}/js/jquery-3.1.1.min.js"></script>
+    <script src="/{{.View}}/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        console.log("Toggle")
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        $("#menu-toggle").hide();
+    });
+    $("#menu-toggle-menu").click(function(e) {
+        console.log("Toggle")
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        $("#menu-toggle").show();
+    });
+    </script>
+
+</body>
+
+</html>
+{{end}}

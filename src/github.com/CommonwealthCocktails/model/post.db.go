@@ -5,7 +5,7 @@ package model
 import (
 	"bytes"
 	"github.com/CommonwealthCocktails/connectors"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"html"
 	"html/template"
 	"strconv"
@@ -15,27 +15,27 @@ import (
 
 //CREATE, UPDATE, DELETE
 //Insert a post record into the database
-func (post *Post) InsertPost() int {
+func (post *Post) InsertPost(site string) int {
 	//set the ID to zero to indicate an insert
 	post.ID = 0
 	post.PostCreateDate = time.Now()
 	post.PostModifiedDate = time.Now()
-	return post.processPost()
+	return post.processPost(site)
 }
 
 //Update a post record in the database based on ID
-func (post *Post) UpdatePost() int {
-	p := post.SelectPost()
+func (post *Post) UpdatePost(site string) int {
+	p := post.SelectPost(site)
 	post.PostCreateDate = p[0].PostCreateDate
 	post.PostModifiedDate = time.Now()
-	return post.processPost()
+	return post.processPost(site)
 }
 
 //Process an insert or an update
-func (post *Post) processPost() int {
-	conn, _ := connectors.GetDB() //get db connection
-	var args []interface{}        //arguments for variables in the data struct
-	var buffer bytes.Buffer       //buffer for the query
+func (post *Post) processPost(site string) int {
+	conn, _ := connectors.GetDBFromMap(site) //get db connection
+	var args []interface{}                   //arguments for variables in the data struct
+	var buffer bytes.Buffer                  //buffer for the query
 
 	//If the ID is zero then do an insert else do an update based on the ID
 	if post.ID == 0 {
@@ -115,8 +115,8 @@ func (post *Post) processPost() int {
 	}
 
 	//Lets do this thing
-	glog.Infoln(query)
-	glog.Infoln(args)
+	log.Infoln(query)
+	log.Infoln(args)
 	r, _ := conn.Exec(query, args...)
 	id, _ := r.LastInsertId()
 	ret := int(id)
@@ -125,17 +125,17 @@ func (post *Post) processPost() int {
 
 //SELECTS
 //Select a post by an id number
-func (post *Post) SelectPostByID(ID int) Post {
+func (post *Post) SelectPostByID(ID int, site string) Post {
 	var inPost Post
 	inPost.ID = ID
-	p := inPost.SelectPost()
+	p := inPost.SelectPost(site)
 	return p[0]
 }
 
 //Select from the post table based on the attributes set in the post object.
-func (post *Post) SelectPost() []Post {
+func (post *Post) SelectPost(site string) []Post {
 	var ret []Post
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
 	var args []interface{} //arguments for variables in the data struct
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT idPost, postAuthor, postCreateDate, postContent, postTitle, postExcerpt, postStatus, postModifiedDate, COALESCE(postImage, '') FROM `post` WHERE ")
@@ -147,10 +147,10 @@ func (post *Post) SelectPost() []Post {
 	query = strings.TrimRight(query, " WHERE")
 	query = strings.TrimRight(query, " AND")
 	query = query + ";"
-	glog.Infoln(query)
+	log.Infoln(query)
 	rows, err := conn.Query(query, args...)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -161,35 +161,36 @@ func (post *Post) SelectPost() []Post {
 		var status string
 		err := rows.Scan(&post.ID, &post.PostAuthor.ID, &post.PostCreateDate, &content, &title, &excerpt, &status, &post.PostModifiedDate, &post.PostImage)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		post.PostContent = template.HTML(html.UnescapeString(content))
 		post.PostTitle = template.HTML(html.UnescapeString(title))
 		post.PostExcerpt = template.HTML(html.UnescapeString(excerpt))
 		post.PostStatus = PostStatusConst(PostStatusStringToInt(status))
-		glog.Infoln(post.ID, post.PostAuthor.ID, post.PostCreateDate, post.PostContent, post.PostTitle, post.PostExcerpt, post.PostStatus, post.PostModifiedDate, post.PostImage)
-		post.PostAuthor = *post.PostAuthor.SelectUser()
+		log.Infoln(post.ID, post.PostAuthor.ID, post.PostCreateDate, post.PostContent, post.PostTitle, post.PostExcerpt, post.PostStatus, post.PostModifiedDate, post.PostImage)
+		post.PostAuthor = *post.PostAuthor.SelectUser(site)
 		ret = append(ret, post)
 	}
 	err = rows.Err()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 
 	return ret
 }
 
 //Select all posts in the database
-func (post *Post) SelectAllPosts() []Post {
+func (post *Post) SelectAllPosts(site string) []Post {
 	var ret []Post
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(site)
+	log.Infoln(site)
 	var buffer bytes.Buffer
 	buffer.WriteString("SELECT idPost, postAuthor, postCreateDate, postContent, postTitle, postExcerpt, postStatus, postModifiedDate, COALESCE(postImage, '') FROM commonwealthcocktails.post;")
 	query := buffer.String()
-	glog.Infoln(query)
+	log.Infoln(query)
 	rows, err := conn.Query(query)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -200,19 +201,19 @@ func (post *Post) SelectAllPosts() []Post {
 		var status string
 		err := rows.Scan(&post.ID, &post.PostAuthor.ID, &post.PostCreateDate, &content, &title, &excerpt, &status, &post.PostModifiedDate, &post.PostImage)
 		if err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 		post.PostContent = template.HTML(html.UnescapeString(content))
 		post.PostTitle = template.HTML(html.UnescapeString(title))
 		post.PostExcerpt = template.HTML(html.UnescapeString(excerpt))
 		post.PostStatus = PostStatusConst(PostStatusStringToInt(status))
-		glog.Infoln(post.ID, post.PostAuthor.ID, post.PostCreateDate, post.PostContent, post.PostTitle, post.PostExcerpt, post.PostStatus, post.PostModifiedDate, post.PostImage)
-		post.PostAuthor = *post.PostAuthor.SelectUser()
+		log.Infoln(post.ID, post.PostAuthor.ID, post.PostCreateDate, post.PostContent, post.PostTitle, post.PostExcerpt, post.PostStatus, post.PostModifiedDate, post.PostImage)
+		post.PostAuthor = *post.PostAuthor.SelectUser(site)
 		ret = append(ret, post)
 	}
 	err = rows.Err()
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 
 	return ret

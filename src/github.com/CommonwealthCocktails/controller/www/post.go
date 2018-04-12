@@ -4,9 +4,9 @@ package www
 import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
-	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"html"
 	"html/template"
 	"net/http"
@@ -23,7 +23,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	} else {
 		//apply the template page info to the index page
 		id, _ := strconv.Atoi(params["postID"])
-		page.Post = page.Post.SelectPostByID(id)
+		page.Post = page.Post.SelectPostByID(id, page.View)
 		page.RenderPageTemplate(w, r, "post")
 	}
 }
@@ -32,22 +32,33 @@ func PostHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //displays the all the posts page.
 func PostsHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var p []model.Post
-	p = page.Post.SelectAllPosts()
+	p = page.Post.SelectAllPosts(page.View)
+	totalP := len(p)
+	diff := len(p) - ((page.Pagination.CurrentPage - 1) * 25)
+	if diff > 25 {
+		p = p[(page.Pagination.CurrentPage-1)*25 : ((page.Pagination.CurrentPage-1)*25)+25]
+	} else {
+		p = p[(page.Pagination.CurrentPage-1)*25 : ((page.Pagination.CurrentPage-1)*25)+diff]
+	}
 	page.Posts = p
+	PaginationCalculate(page, page.Pagination.CurrentPage, 25, totalP, 2)
+	page.SubrouteURL = "posts"
 	page.RenderPageTemplate(w, r, "posts")
 }
 
 //Post Modification Form page handler which displays the Post Modification
 //Form page.
 func PostModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	page.Posts = page.Post.SelectAllPosts()
+	page.Posts = page.Post.SelectAllPosts(page.View)
 	page.IsForm = true
 	if page.Post.ID == 0 {
 		page.Post.PostAuthor = page.UserSession.User
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "postmodform")
 	} else {
-		out := page.Post.SelectPost()
+		var in model.Post
+		in.ID = page.Post.ID
+		out := in.SelectPost(page.View)
 		page.Post = out[0]
 		page.RenderPageTemplate(w, r, "postmodform")
 	}
@@ -60,23 +71,23 @@ func PostModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//did we get an add, update, or something else request
 	page.IsForm = true
 	if page.SubmitButtonString == "add" {
-		ret_id := page.Post.InsertPost()
-		model.LoadMCWithPostData()
+		ret_id := page.Post.InsertPost(page.View)
+		model.LoadMCWithPostData(page.View)
 		page.Post.ID = ret_id
-		outPost := page.Post.SelectPost()
+		outPost := page.Post.SelectPost(page.View)
 		page.Post = outPost[0]
 		page.Messages["postModifySuccess"] = "Post data modified successfully and memcache updated!"
-		page.Posts = page.Post.SelectAllPosts()
+		page.Posts = page.Post.SelectAllPosts(page.View)
 		page.RenderPageTemplate(w, r, "postmodform")
 		return
 	} else if page.SubmitButtonString == "update" {
-		rows_updated := page.Post.UpdatePost()
-		model.LoadMCWithPostData()
-		glog.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
-		outPost := page.Post.SelectPost()
+		rows_updated := page.Post.UpdatePost(page.View)
+		model.LoadMCWithPostData(page.View)
+		log.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
+		outPost := page.Post.SelectPost(page.View)
 		page.Post = outPost[0]
 		page.Messages["postModifySuccess"] = "Post data modified successfully and memcache updated!"
-		page.Posts = page.Post.SelectAllPosts()
+		page.Posts = page.Post.SelectAllPosts(page.View)
 		page.RenderPageTemplate(w, r, "postmodform")
 		return
 	} else {
@@ -92,13 +103,20 @@ func PostModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func ValidatePost(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Post.Errors = make(map[string]string)
 	r.ParseForm() // Required if you don't call r.FormValue()
+	params := mux.Vars(r)
 	pUGCP := bluemonday.UGCPolicy()
 	pUGCP.AllowElements("img")
 	pSP := bluemonday.StrictPolicy()
-	glog.Infoln(r.Form)
+	log.Infoln(r.Form)
 	if len(r.Form["postID"]) > 0 && strings.TrimSpace(r.Form["postID"][0]) != "" {
 		if govalidator.IsInt(r.Form["postID"][0]) {
 			page.Post.ID, _ = strconv.Atoi(r.Form["postID"][0])
+		} else {
+			page.Post.Errors["PostID"] = "Please enter a valid post id. "
+		}
+	} else {
+		if govalidator.IsInt(params["postID"]) {
+			page.Post.ID, _ = strconv.Atoi(params["postID"])
 		} else {
 			page.Post.Errors["PostID"] = "Please enter a valid post id. "
 		}
@@ -158,7 +176,7 @@ func ValidatePost(w http.ResponseWriter, r *http.Request, page *page) bool {
 	if len(page.Post.Errors) > 0 {
 		page.Errors["postErrors"] = "You have errors in your input. "
 	}
-	glog.Errorln(page.Post)
+	log.Errorln(page.Post)
 	return len(page.Post.Errors) == 0
 }
 
@@ -179,6 +197,6 @@ func RequiredPostMod(w http.ResponseWriter, r *http.Request, page *page) bool {
 		page.Post.Errors["PostAuthor"] = "Post author is required."
 		missingRequired = true
 	}
-	glog.Errorln(page.Post)
+	log.Errorln(page.Post)
 	return missingRequired
 }

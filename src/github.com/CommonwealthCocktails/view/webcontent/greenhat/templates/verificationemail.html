@@ -1,0 +1,13 @@
+{{define "base"}}
+<p>Welcome {{.User.FirstName}} {{.User.LastName}}, to Commonwealth Cocktails. Please click the link below to verify that this email is yours and valid.</p>
+<p><a href='{{.BaseURL}}/verifyregistration?code={{.User.VerificationCode}}&email={{.User.Email}}'><button style=" background-color: #555555; /* Black */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;" >Verify</button></a></p>
+<p>If this email was sent to you in error we apologize.</p>
+<p>Thanks, The Commonwealth.</p>
+{{end}}

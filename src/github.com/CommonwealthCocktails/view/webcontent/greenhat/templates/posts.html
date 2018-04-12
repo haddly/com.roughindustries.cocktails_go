@@ -1,0 +1,94 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	{{template "head" .}}
+	
+	<style>
+		section:after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			bottom: -15px;
+			left: 0;
+			pointer-events: none;
+			background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 75%);
+			width: 100%;
+			height: 110px;
+		}
+	</style>
+
+</head>
+
+<body>
+	{{template "navbar" .}}
+
+	<!-- Page Content -->
+
+
+
+	<!-- Page Content -->
+	{{with .Posts}}
+	<div class="container">
+		&nbsp;
+		<div class="row">
+			<div class="page-header">
+				<h1 align="center">Articles</h1>
+			</div>
+			<div class="col-md-12">
+				<div class="row">
+					{{range .}}
+					<div class="brightness col-xs-12 col-sm-6 col-md-4 col-lg-3" style="height: 350px; margin-bottom: 50px;">
+						<a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/post/{{.ID}}" style="text-decoration : none; color : #555;">
+							<div align="center">
+								{{if .PostImage}}
+								<img class="img-responsive" style="height:150px" src="{{.PostImage}}" /> {{else}}
+								<img border="0" style="height:150px" class="img-responsive" src="https://placeholdit.imgix.net/~text?&bg=ffffff&txtclr=000000&txtsize=160&w=1200&h=900&txttrack=0">
+								{{end}}
+							</div>
+							<h3 style="text-align:center;">
+								{{.PostTitle}}
+							</h3>
+							{{if .PostAuthor}}<h6 style="text-align:center;">By:&nbsp;{{.PostAuthor.FirstName}}&nbsp;{{.PostAuthor.LastName}}</h6>{{end}}
+							<section style="height:125px; overflow:hidden;">{{.PostExcerpt}}</section>
+						</a>
+					</div>
+					{{end}}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{end}}
+	
+	{{ $length := len .Pagination.PageNums }} {{ if gt $length 1 }}
+	<div class="container">
+		<div class="row">
+			<div style="text-align:center;" >
+				<ul class="pagination">
+					{{if .Pagination.HasPrev}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/1" style="text-decoration : none; color : #555;"><<</a></li>
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.Pagination.PrevPage}}" style="text-decoration : none; color : #555;"><</a></li>
+					{{end}}
+					{{range .Pagination.PageNums}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.}}" style="text-decoration : none; color : #555;">{{.}}</a></li>
+					{{end}}
+					{{if .Pagination.HasNext}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.Pagination.NextPage}}" style="text-decoration : none; color : #555;">></a></li>
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/{{$.SubrouteURL}}/{{.Pagination.NumPages}}" style="text-decoration : none; color : #555;">>></a></li>
+					{{end}}
+				</ul> 
+			</div>
+		</div>
+	</div>
+	{{end}}
+	
+	{{template "footer" .}}
+	
+	<!-- /.container -->
+</body>
+
+</html>
+{{end}}

@@ -1,0 +1,53 @@
+{
+  "navbar_brandtitle" : {
+  "translation": "Chesapeake Bay Distillery"
+  },
+  "index_cocktail_description" : {
+  "translation": "There's a drink for every mood or occasion. Find your favorite cocktail recipes here at The Chesapeake Bay Distillery’s. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away."
+  },
+  "index_product_description" : {
+  "translation": "Founded in 2005, The Chesapeake Bay Distillery’s mission was to create spirits of exceptional quality that feature local ingredients and provide remarkable value to our patrons.  Some things never change."
+  },
+  "index_post_description" : {
+  "translation": "The Chesapeake Bay Distillery’s articles and opinions."
+  },
+  "index_search_description" : {
+  "translation": "This is what it is all about. The Super Mega Cocktail Search. It all started because of this. We wanted a way to find the right cocktail. At the right time. With the right ingredients, that we had on hand."
+  },
+  "index_ccp_description" : {
+  "translation": "Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset."
+  },
+  "index_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "index_productsindex_link" : {
+  "translation": "Products"    
+  },
+  "index_postsindex_link" : {
+  "translation": "Articles"    
+  },
+  "index_searchindex_link" : {
+  "translation": "Search"    
+  },
+  "index_ccpindex_link" : {
+  "translation": "The Commonwealth Cocktails Project"    
+  },
+  "navbar_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "navbar_productsindex_link" : {
+  "translation": "Products"    
+  },
+  "navbar_postsindex_link" : {
+  "translation": "Articles"    
+  },
+  "navbar_cocktailsearch_link" : {
+  "translation": "Cocktail Search"    
+  },
+  "navbar_quicksearch_link" : {
+  "translation": "Quick Search"    
+  },
+  "navbar_loginindex_link" : {
+  "translation": "Login"    
+  }
+}

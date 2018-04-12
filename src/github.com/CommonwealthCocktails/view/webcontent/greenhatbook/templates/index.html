@@ -1,0 +1,24 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {{template "head" .}}
+
+</head>
+
+<body>
+    <h1 style="font-family: 'Poiret One';" align="center">Green Hat Gin Cocktails</h1>
+    <a href="/{{.View}}/cocktail/40">Bacardia</a><br><br>
+    <a href="/{{.View}}/cocktail/1">Jamaican Quaalude</a><br><br>
+    <a href="/{{.View}}/cocktail/47">Gin Fizz</a><br><br>
+    <a href="/{{.View}}/post/7">Welcome</a><br><br>
+    <a href="/{{.View}}/post/10">Martini Glass</a><br><br>
+    <!-- Footer -->
+    {{template "footer" .}}
+
+</body>
+
+</html>
+{{end}}

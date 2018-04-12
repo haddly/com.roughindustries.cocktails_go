@@ -1,0 +1,182 @@
+{{define "navbar"}}
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top" style="border-width: 0 0 0px;">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+        <button id="bs-example-navbar-collapse-button" type="button" class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        </button>
+        
+            <a class="navbar-brand" style="font-family: Arial;" id="NavBrandStyle" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/">{{I18n $.View $.Locale "navbar_brandtitle"}}</a>
+            {{if ne .Template "index"}}<a id="searchXSButton" class="navbar-toggle navbar-right" style="background-color: transparent; border-width: 0 0 0px; padding: 15px 15px 15px 15px; margin: 0px 0px 0px 0px; " href="#" onclick="toggleSearch()"><i class="fa fa-inverse fa-search" ></i></a>{{end}}
+        </div>
+
+        {{if eq .State 3}}
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a style="color:#FFF;font-family:'Domine';" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/cocktailsindex">{{I18n .View .Locale "navbar_cocktailsindex_link"}}</a></li>
+                <li><a style="color:#FFF;font-family:'Domine';" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/products">{{I18n .View .Locale "navbar_productsindex_link"}}</a></li>
+                <li><a style="color:#FFF;font-family:'Domine';" href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/posts">{{I18n .View .Locale "navbar_postsindex_link"}}</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    {{if ne .Template "index"}}<li><a id="searchButton" href="#" onclick="toggleSearch();"><i class="fa fa-inverse fa-search" ></i></a></li>
+                    <script>
+                    (function($, document, window, viewport){
+                        // Executes once whole document has been loaded
+                        $(document).ready(function() {
+                            console.log('Current breakpoint:', viewport.current());
+                            if( viewport.is("xs") ) {
+                                $("#searchButton").hide();
+                                console.log('Ready XS Current breakpoint:', viewport.current());
+                            }
+                            if( viewport.is("sm") ) {
+                                $("#searchButton").hide();
+                                console.log('Ready SM Current breakpoint:', viewport.current());
+                            }
+                            if( viewport.is(">sm") ) {
+                                $("#searchButton").show();
+                                console.log('Ready GT MD Current breakpoint:', viewport.current());
+                            }
+                        });
+                        $(window).resize(
+                            viewport.changed(function(){
+                            if( viewport.is("sm") ) {
+                                console.log('Current breakpoint:', viewport.current());
+                                $("#searchButton").hide();
+                            }
+                            if( viewport.is(">sm") ) {
+                                console.log('Current breakpoint:', viewport.current());
+                                $("#searchButton").show();
+                            }
+                            })
+                        );
+                    
+                    })(jQuery, document, window, ResponsiveBootstrapToolkit);
+                    </script>
+                    {{end}}
+                    <li class="dropdown">
+                        <a style="color: #FFF;font-family:'Domine';" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        Searches
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/search">&nbsp;{{I18n .View .Locale "navbar_cocktailsearch_link"}}</a>
+                            </li>
+                        </ul>
+                    </li>
+                    {{if .Authenticated}}
+                    <li class="dropdown">
+                        <a style="color: #FFF;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{if not .UserSession.User.Username}}{{if .UserSession.IsDefaultUser}}default{{end}}{{end}}{{if .UserSession.User.Username}}{{.UserSession.User.Username}}{{end}} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            {{if .AllowAdmin}}
+                            {{if eq .UserSession.User.Role 1 2}}
+                            <li class="dropdown-header">Modify</li>
+                            <li><a href="/{{.View}}/cocktailModForm" onClick="toggleLoader()">Modify Cocktail</a></li>
+                            <li><a href="/{{.View}}/productModForm" onClick="toggleLoader()">Modify Product</a></li>
+                            <li><a href="/{{.View}}/metaModForm" onClick="toggleLoader()">Modify Meta</a></li>
+                            <li><a href="/{{.View}}/postModForm" onClick="toggleLoader()">Modify Post</a></li>
+                            <li><a href="/{{.View}}/imageModForm" onClick="toggleLoader()">Modify Image</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Data Stores</li>
+                            <li><a href="/{{.View}}/db_tables" onClick="toggleLoader()">Load DB Tables</a></li>
+                            <li><a href="/{{.View}}/db_data" onClick="toggleLoader()">Load DB Data</a></li>
+                            <li><a href="/{{.View}}/db_test" onClick="toggleLoader()">Verify DB</a></li>
+                            <li><a href="/{{.View}}/mc_delete" onClick="toggleLoader()">Delete Memcache</a></li>
+                            <li><a href="/{{.View}}/mc_load" onClick="toggleLoader()">Add Memcache</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Admin</li>
+                            <li role="separator" class="divider"></li>
+                            {{end}}
+                            {{end}}
+                            <li><a href="/{{.View}}/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                    <script>
+                        function toggleLoader() {
+                            $('#maindiv').addClass('hide');
+                            $('#loader').removeClass('hide');
+                        };
+                    </script>
+                    {{else}}
+                    {{if .AllowAdmin}}
+                    <li class="dropdown">
+                        <a style="color: #FFF;font-family:'Domine';" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {{I18n .View .Locale "navbar_loginindex_link"}}
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/loginIndex">{{I18n .View .Locale "navbar_loginindex_link"}}</a></li>
+                            <li><a href="/{{.View}}/GoogleLogin">Login with Google</a></li>
+                            <li><a href="/{{.View}}/FacebookLogin">Login with Facebook</a></li>
+                            <li><a href="/{{.View}}/registerForm">Signup</a></li>
+                        </ul>
+                    </li> {{end}}
+                    {{end}}
+                </li>
+            </ul>
+        </div>
+        {{end}}
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+{{template "loader" .}}
+<!--used to taggles on the loader.  This is closed in the footer-->
+<div id="maindiv" name="maindiv">
+    <form method="post" action="/{{.View}}{{if ne .Locale ""}}/{{.Locale}}{{end}}/quickSearchForm" id="quickSearchForm" role="search" autocomplete="nope">
+    <div id="quickSearchDiv" style="{{if ne .Template "index"}}display: none;{{end}} border: 1px solid transparent; border-width: 0 0 0px; background-color: #222; border-color: #080808; padding-top: 30px; padding-bottom: 10px; text-align: center; color: #f8f8f8;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-1"></div>
+                <div class="col-lg-10">
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" placeholder="{{I18n .View .Locale "navbar_quicksearch_link"}}" id="keywords" name="keywords">
+                        <span class="input-group-btn">
+                            <button name="button" id="quickSearchButton" value="quickSearch" class="btn btn-default" type="submit" form="quickSearchForm"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-1"></div>
+            </div>
+        </div>
+    </div>
+    </form>
+    <script>
+        function toggleSearch() {
+            var $t = $('#quickSearchDiv');
+            if ($t.is(':visible')) {
+                $t.slideUp();
+                // Other stuff to do on slideUp
+            } else {
+                $t.slideDown();
+                // Other stuff to down on slideDown
+                $("#keywords").focus()
+            }
+        } 
+    </script>
+{{end}} 
+
+<!---->
+{{define "navbar404"}}
+<nav class="navbar navbar-default navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+            <a style="color:#FFF; font-family: 'Poiret One';    font-weight: 700;" class="navbar-brand" href="/{{.View}}">Green Hat Cocktails</a>
+        </div>
+
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+{{end}}

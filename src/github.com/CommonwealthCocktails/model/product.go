@@ -86,7 +86,7 @@ const (
 	Liqueur
 	Wine
 	Mixer
-	Beer
+	BeerAndCider
 	Garnish
 	Drinkware
 	Tool
@@ -98,7 +98,7 @@ var ProductTypeStrings = [...]string{
 	"Liqueur",
 	"Wine",
 	"Mixer",
-	"Beer",
+	"Beer and Cider",
 	"Garnish",
 	"Drinkware",
 	"Tool",

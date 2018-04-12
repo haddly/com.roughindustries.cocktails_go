@@ -9,7 +9,7 @@ import (
 	"bytes"
 	"github.com/CommonwealthCocktails/connectors"
 	"github.com/CommonwealthCocktails/model"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -23,13 +23,13 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	// Check for a valid user and that authentication
 	var buffer bytes.Buffer
 	var dat []byte
-	if connectors.DBType == connectors.MySQL {
+	if connectors.GetDBType(page.View) == connectors.MySQL {
 		dat, _ = ioutil.ReadFile("sql/ccschemadump.sql")
-	} else if connectors.DBType == connectors.SQLite {
+	} else if connectors.GetDBType(page.View) == connectors.SQLite {
 		dat, _ = ioutil.ReadFile("sql/ccsqlite3schema.sql")
 	}
 	requests := strings.Split(string(dat), ";")
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(page.View)
 	//disable foreign key contraint sense I don't know the order we add
 	//the tables
 	conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
@@ -38,11 +38,11 @@ func DBTablesHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		r, _ := regexp.Compile("(.*/*!.*)")
 		if !r.MatchString(string(request)) {
 			buffer.WriteString(string(request) + ";<br><br>")
-			glog.Infoln(string(request))
+			log.Infoln(string(request))
 			if len(string(request)) > 0 {
 				_, err := conn.Exec(string(request))
 				if err != nil {
-					glog.Infoln(err)
+					log.Infoln(err)
 				}
 			}
 		}
@@ -60,16 +60,16 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	buffer.WriteString("<br/><b>Data Loaded!</b> ")
 	dir, _ := os.Getwd()
 	var dat *os.File
-	if connectors.DBType == connectors.MySQL {
+	if connectors.GetDBType(page.View) == connectors.MySQL {
 		dat, _ = os.Open("sql/ccdatadump.sql")
-	} else if connectors.DBType == connectors.SQLite {
+	} else if connectors.GetDBType(page.View) == connectors.SQLite {
 		dat, _ = os.Open("sql/ccsqlite3data.sql")
 	}
 	defer dat.Close()
 	scanner := bufio.NewScanner(dat)
 	scanner.Split(bufio.ScanLines)
 	buffer.WriteString(dir + "<br><br>")
-	conn, _ := connectors.GetDB()
+	conn, _ := connectors.GetDBFromMap(page.View)
 	//disable foreign key contraint sense I don't know the order we add
 	//the data
 	conn.Exec("SET FOREIGN_KEY_CHECKS=0;")
@@ -77,17 +77,17 @@ func DBDataHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	for scanner.Scan() {
 		request := scanner.Text()
 		buffer.WriteString(string(request) + ";<br><br>")
-		glog.Infoln(string(request))
+		log.Infoln(string(request))
 		if len(string(request)) > 0 {
 			_, err := conn.Exec(string(request))
 			if err != nil {
-				glog.Infoln(err)
+				log.Infoln(err)
 			}
 		}
 	}
 	//apply the template page info to the index page
 	statStr := buffer.String()
-	glog.Infoln(statStr)
+	log.Infoln(statStr)
 	page.Messages["Status"] = template.HTML(statStr)
 	page.RenderPageTemplate(w, r, "dbindex")
 }
@@ -97,10 +97,10 @@ func DBTestHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	if page.Authenticated {
 		var buffer bytes.Buffer
 		buffer.WriteString("<b>Database</b>:<br/>")
-		buffer.WriteString(model.SelectCurrentDB() + "<br/>")
+		buffer.WriteString(model.SelectCurrentDB(page.View) + "<br/>")
 
-		page.Meta.SelectMetaByTypes(false, false, true)
-		page.Product.SelectProductsByTypes(true, true, true)
+		page.Meta.SelectMetaByTypes(false, false, true, page.View)
+		page.Product.SelectProductsByTypes(true, true, true, page.View)
 		//apply the template page info to the index page
 		statStr := buffer.String()
 		page.Messages["Status"] = template.HTML(statStr)

@@ -6,7 +6,7 @@ package www
 import (
 	"github.com/asaskevich/govalidator"
 	"github.com/fogleman/gg"
-	"github.com/golang/glog"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
@@ -18,20 +18,20 @@ import (
 //Image Modification Form page handler which displays the Image Modification
 //Form page.
 func ImageModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
-	cba := page.Cocktail.SelectCocktailsByAlphaNums(false)
+	cba := page.Cocktail.SelectCocktailsByAlphaNums(false, page.View)
 	page.CocktailsByAlphaNums = cba
-	pbt := page.Product.SelectProductsByTypes(true, true, false)
+	pbt := page.Product.SelectProductsByTypes(true, true, false, page.View)
 	page.ProductsByTypes = pbt
 	if page.Cocktail.ID == 0 {
 		if page.Product.ID == 0 {
 			//apply the template page info to the index page
 			page.RenderPageTemplate(w, r, "imagemodform")
 		} else {
-			page.Product = page.Product.SelectProductByID(page.Product.ID)
+			page.Product = page.Product.SelectProductByID(page.Product.ID, page.View)
 			page.RenderPageTemplate(w, r, "imagemodform")
 		}
 	} else {
-		out := page.Cocktail.SelectCocktailsByID(page.Cocktail.ID, false)
+		out := page.Cocktail.SelectCocktailsByID(page.Cocktail.ID, false, page.View)
 		page.Cocktail = out.Cocktail
 		page.RenderPageTemplate(w, r, "imagemodform")
 	}
@@ -45,14 +45,14 @@ func ImageModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	// don't worry about errors
 	response, e := http.Get(url)
 	if e != nil {
-		glog.Errorln(e)
+		log.Errorln(e)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
 
-	cba := page.Cocktail.SelectCocktailsByAlphaNums(false)
+	cba := page.Cocktail.SelectCocktailsByAlphaNums(false, page.View)
 	page.CocktailsByAlphaNums = cba
-	pbt := page.Product.SelectProductsByTypes(true, true, false)
+	pbt := page.Product.SelectProductsByTypes(true, true, false, page.View)
 	page.ProductsByTypes = pbt
 
 	defer response.Body.Close()
@@ -61,24 +61,24 @@ func ImageModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	t, _ := GenerateRandomString(16)
 	file, err := os.Create("./view/webcontent/www/tmp/" + t + "-" + page.Image.Keywords + "-commonwealth-cocktails.jpg")
 	if err != nil {
-		glog.Errorln(err)
+		log.Errorln(err)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
 	// Use io.Copy to just dump the response body to the file. This supports huge files
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
-		glog.Errorln(err)
+		log.Errorln(err)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
 	file.Close()
-	glog.Infoln("Success!")
-	glog.Infoln("Image Test")
+	log.Infoln("Success!")
+	log.Infoln("Image Test")
 
 	im, err1 := gg.LoadImage("./view/webcontent/www/tmp/" + t + "-" + page.Image.Keywords + "-commonwealth-cocktails.jpg")
 	if err1 != nil {
-		glog.Errorln(err1)
+		log.Errorln(err1)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
@@ -88,7 +88,7 @@ func ImageModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 		panic(err1)
 	}
 	lines := len(dc.WordWrap(page.Image.Text, float64(dc.Width())))
-	glog.Infoln(lines)
+	log.Infoln(lines)
 	dc.DrawImage(im, 0, 0)
 	dc.SavePNG("./view/webcontent/www/tmp/" + t + "-" + page.Image.Keywords + "-commonwealth-cocktails.png")
 	dc = gg.NewContext(im.Bounds().Size().X, im.Bounds().Size().Y+(lines*font_size)+36)
@@ -122,19 +122,19 @@ func ImageModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 
 	err = os.Remove("./view/webcontent/www/tmp/" + t + "-" + page.Image.Keywords + "-commonwealth-cocktails.jpg")
 	if err != nil {
-		glog.Errorln(err)
+		log.Errorln(err)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
 	err = os.Remove("./view/webcontent/www/tmp/" + t + "-" + page.Image.Keywords + "-commonwealth-cocktails.png")
 	if err != nil {
-		glog.Errorln(err)
+		log.Errorln(err)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
 	err = os.Remove("./view/webcontent/www/tmp/" + t + "-" + page.Image.Keywords + "-commonwealth-cocktails_labeled.png")
 	if err != nil {
-		glog.Errorln(err)
+		log.Errorln(err)
 		page.RenderPageTemplate(w, r, "404")
 		return
 	}
@@ -147,15 +147,15 @@ func ImageModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 //update request.
 func ImageUpdateHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	if page.Image.ImageUpdate == "cocktail" {
-		id := strconv.FormatInt(int64(page.Cocktail.UpdateCocktailImages()), 10)
+		id := strconv.FormatInt(int64(page.Cocktail.UpdateCocktailImages(page.View)), 10)
 		http.Redirect(w, r, "/cocktail?cocktailID="+id, 302)
 	} else if page.Image.ImageUpdate == "product" {
-		id := strconv.FormatInt(int64(page.Product.UpdateProductImages()), 10)
+		id := strconv.FormatInt(int64(page.Product.UpdateProductImages(page.View)), 10)
 		http.Redirect(w, r, "/product?ID="+id, 302)
 	} else if page.Image.ImageUpdate == "restart" {
-		cba := page.Cocktail.SelectCocktailsByAlphaNums(false)
+		cba := page.Cocktail.SelectCocktailsByAlphaNums(false, page.View)
 		page.CocktailsByAlphaNums = cba
-		pbt := page.Product.SelectProductsByTypes(true, true, false)
+		pbt := page.Product.SelectProductsByTypes(true, true, false, page.View)
 		page.ProductsByTypes = pbt
 		page.RenderPageTemplate(w, r, "imagemodform")
 	}

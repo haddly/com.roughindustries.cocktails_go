@@ -1,0 +1,56 @@
+{
+  "navbar_brandtitle" : {
+  "translation": "Commonwealth Cocktails"
+  },
+  "index_slogan" : {
+  "translation": "Libations for Everyone"
+  },
+  "index_cocktail_description" : {
+  "translation": "There's a drink for every mood or occasion. Find your favorite cocktail recipes here at Commonwealth Cocktails. Or think outside the glass and try a brand new drink. Your new favorite could be a shake or stir away."
+  },
+  "index_product_description" : {
+  "translation": "At Commonwealth Cocktails we’ve compiled an extensive library of information about an array of liquor brands and spirits. Whether you're reading about a favorite bourbon or a new craft gin, you just might learn a thing or two. "
+  },
+  "index_post_description" : {
+  "translation": "Commonwealth Cocktail recipe articles and opinions."
+  },
+  "index_search_description" : {
+  "translation": "This is what it is all about. The Super Mega Cocktail Search. It all started because of this. We wanted a way to find the right cocktail. At the right time. With the right ingredients, that we had on hand."
+  },
+  "index_ccp_description" : {
+  "translation": "Commonwealth Cocktails is an open source project written in Go to discover new ways to create and present cocktails. Commonwealth Cocktails includes OAuth, Social Media, GCP, AWS, and more on a practical real-world dataset."
+  },
+  "index_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "index_productsindex_link" : {
+  "translation": "Products"    
+  },
+  "index_postsindex_link" : {
+  "translation": "Articles"    
+  },
+  "index_searchindex_link" : {
+  "translation": "Search"    
+  },
+  "index_ccpindex_link" : {
+  "translation": "The Commonwealth Cocktails Project"    
+  },
+  "navbar_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "navbar_productsindex_link" : {
+  "translation": "Products"    
+  },
+  "navbar_postsindex_link" : {
+  "translation": "Articles"    
+  },
+  "navbar_cocktailsearch_link" : {
+  "translation": "Cocktail Search"    
+  },
+  "navbar_quicksearch_link" : {
+  "translation": "Quick Search"    
+  },
+  "navbar_loginindex_link" : {
+  "translation": "Login"    
+  }
+}

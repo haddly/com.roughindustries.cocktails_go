@@ -5,8 +5,9 @@ package www
 import (
 	"github.com/CommonwealthCocktails/model"
 	"github.com/asaskevich/govalidator"
-	"github.com/golang/glog"
+	"github.com/gorilla/mux"
 	"github.com/microcosm-cc/bluemonday"
+	log "github.com/sirupsen/logrus"
 	"html"
 	"html/template"
 	"net/http"
@@ -18,14 +19,16 @@ import (
 //Form page.
 func MetaModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	var mbt model.MetasByTypes
-	mbt = page.Meta.SelectMetaByTypes(false, true, false)
+	mbt = page.Meta.SelectMetaByTypes(false, true, false, page.View)
 	page.MetasByTypes = mbt
 	page.IsForm = true
 	if page.Meta.ID == 0 {
 		//apply the template page info to the index page
 		page.RenderPageTemplate(w, r, "metamodform")
 	} else {
-		out := page.Meta.SelectMeta()
+		var in model.Meta
+		in.ID = page.Meta.ID
+		out := in.SelectMeta(page.View)
 		page.Meta = out[0]
 		page.RenderPageTemplate(w, r, "metamodform")
 	}
@@ -37,24 +40,24 @@ func MetaModFormHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func MetaModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 	//Get the generic data that all meta mod pages need
 	var mbt model.MetasByTypes
-	mbt = page.Meta.SelectMetaByTypes(false, true, false)
+	mbt = page.Meta.SelectMetaByTypes(false, true, false, page.View)
 	page.MetasByTypes = mbt
 	page.IsForm = true
 	//did we get an add, update, or something else request
 	if page.SubmitButtonString == "add" {
-		ret_id := page.Meta.InsertMeta()
-		model.LoadMCWithMetaData()
+		ret_id := page.Meta.InsertMeta(page.View)
+		model.LoadMCWithMetaData(page.View)
 		page.Meta.ID = ret_id
-		outMeta := page.Meta.SelectMeta()
+		outMeta := page.Meta.SelectMeta(page.View)
 		page.Meta = outMeta[0]
 		page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
 		page.RenderPageTemplate(w, r, "metamodform")
 		return
 	} else if page.SubmitButtonString == "update" {
-		rows_updated := page.Meta.UpdateMeta()
-		model.LoadMCWithMetaData()
-		glog.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
-		outMeta := page.Meta.SelectMeta()
+		rows_updated := page.Meta.UpdateMeta(page.View)
+		model.LoadMCWithMetaData(page.View)
+		log.Infoln("Updated " + strconv.Itoa(rows_updated) + " rows")
+		outMeta := page.Meta.SelectMeta(page.View)
 		page.Meta = outMeta[0]
 		page.Messages["metaModifySuccess"] = "Metadata modified successfully and memcache updated!"
 		page.RenderPageTemplate(w, r, "metamodform")
@@ -72,12 +75,19 @@ func MetaModHandler(w http.ResponseWriter, r *http.Request, page *page) {
 func ValidateMeta(w http.ResponseWriter, r *http.Request, page *page) bool {
 	page.Meta.Errors = make(map[string]string)
 	r.ParseForm() // Required if you don't call r.FormValue()
+	params := mux.Vars(r)
 	pUGCP := bluemonday.UGCPolicy()
 	pUGCP.AllowElements("img")
 	pSP := bluemonday.StrictPolicy()
 	if len(r.Form["metaID"]) > 0 && strings.TrimSpace(r.Form["metaID"][0]) != "" {
 		if govalidator.IsInt(r.Form["metaID"][0]) {
 			page.Meta.ID, _ = strconv.Atoi(r.Form["metaID"][0])
+		} else {
+			page.Meta.Errors["MetaID"] = "Please enter a valid meta id. "
+		}
+	} else {
+		if govalidator.IsInt(params["metaID"]) {
+			page.Meta.ID, _ = strconv.Atoi(params["metaID"])
 		} else {
 			page.Meta.Errors["MetaID"] = "Please enter a valid meta id. "
 		}

@@ -28,52 +28,65 @@ var DBTypeStrings = [...]string{
 // String returns the English name of the database types ("MySSQL", "SQLite", ...).
 func (dt DBTypesConst) String() string { return DBTypeStrings[dt-1] }
 
-//Database variables
-var db *sql.DB = nil
-var dbaddr string
-var dbpasswd string
-var user string
-var proto string
-var port string
-var dbname string
-var DBType DBTypesConst
+//Database struct
+type DBItem struct {
+	DB       *sql.DB
+	DBaddr   string
+	DBpasswd string
+	DBuser   string
+	DBproto  string
+	DBport   string
+	DBname   string
+	DBType   DBTypesConst
+	Site     string
+}
 
-//Set the database variables for connecting to the database
-func SetDBVars(in_dbaddr string, in_dbpasswd string, in_user string, in_proto string, in_port string, in_dbname string, in_dbtype DBTypesConst) {
-	dbaddr = in_dbaddr
-	dbpasswd = in_dbpasswd
-	user = in_user
-	proto = in_proto
-	port = in_port
-	dbname = in_dbname
-	DBType = in_dbtype
-	log.Infoln(DBType)
-	if DBType == MySQL {
-		log.Infoln(user + ":" + dbpasswd + "@" + proto + "(" + dbaddr + ":" + port + ")/" + dbname + "?parseTime=true&timeout=1m")
-	} else if DBType == SQLite {
-		log.Infoln("SQLite connecting to ./sql/commonwealthcocktails.db")
+//Map of database connections
+var db_list = make(map[string]DBItem)
+
+//Set the database variables from a list
+func SetDBMap(dbs map[string]DBItem) {
+	for k, v := range dbs {
+		db_list[k] = v
 	}
+	log.Infoln(db_list)
+}
+
+func GetDBType(site string) DBTypesConst {
+	return db_list[site].DBType
 }
 
 //Get a connection to the database
-func GetDB() (*sql.DB, error) {
-	if db == nil {
-		//which db do you want to use
-		var err error
-		var d *sql.DB
-		if DBType == MySQL {
-			log.Infoln("Creating a new connection: mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
-			d, err = sql.Open("mysql", user+":"+dbpasswd+"@"+proto+"("+dbaddr+":"+port+")/"+dbname+"?parseTime=true&timeout=1m")
-		} else if DBType == SQLite {
-			log.Infoln("Creating a new connection: sqllite to commonwealthcocktails.db")
-			d, err = sql.Open("sqlite3", "./sql/commonwealthcocktails.db")
+func GetDBFromMap(site string) (*sql.DB, error) {
+	//log.Infoln(site)
+	//log.Infoln(db_list)
+	if _, ok := db_list[site]; ok {
+		log.Infoln(db_list[site])
+		if db_list[site].DB == nil {
+			//which db do you want to use
+			var err error
+			var d *sql.DB
+			log.Infoln(db_list[site].DBType.String())
+			if db_list[site].DBType == MySQL {
+				log.Infoln("Creating a new connection: mysql", db_list[site].DBuser+":"+db_list[site].DBpasswd+"@"+db_list[site].DBproto+"("+db_list[site].DBaddr+":"+db_list[site].DBport+")/"+db_list[site].DBname+"?parseTime=true&timeout=1m")
+				d, err = sql.Open("mysql", db_list[site].DBuser+":"+db_list[site].DBpasswd+"@"+db_list[site].DBproto+"("+db_list[site].DBaddr+":"+db_list[site].DBport+")/"+db_list[site].DBname+"?parseTime=true&timeout=1m")
+			} else if db_list[site].DBType == SQLite {
+				log.Infoln("Creating a new connection: sqllite to " + db_list[site].DBname + ".db")
+				d, err = sql.Open("sqlite3", "./sql/"+db_list[site].DBname+".db")
+			}
+			if err != nil {
+				log.Infoln("Error connecting to database")
+				log.Error(err)
+				return nil, err
+			}
+			tmp := db_list[site]
+			tmp.DB = d
+			db_list[site] = tmp
+		} else {
+			//log.Infoln(db_list[site].DB)
 		}
-		if err != nil {
-			log.Infoln("Error connecting to database")
-			log.Error(err)
-			return nil, err
-		}
-		db = d
+		log.Infoln(db_list[site].DB.Stats())
+		return db_list[site].DB, nil
 	}
-	return db, nil
+	return nil, nil
 }

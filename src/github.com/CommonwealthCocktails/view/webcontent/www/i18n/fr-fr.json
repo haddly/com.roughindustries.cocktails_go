@@ -1,0 +1,56 @@
+{
+  "navbar_brandtitle" : {
+  "translation": "Commonwealth Cocktails"
+  },
+  "index_slogan" : {
+  "translation": "Libations pour tout le monde"
+  },
+  "index_cocktail_description" : {
+  "translation": "Il y a une boisson pour chaque humeur ou occasion. Trouvez vos recettes de cocktails préférées ici au Commonwealth Cocktails. Ou pensez à l'extérieur du verre et essayez une nouvelle boisson. Votre nouveau favori pourrait être un tremblement ou remuer loin."
+  },
+  "index_product_description" : {
+  "translation": "Au Commonwealth Cocktails, nous avons compilé une vaste bibliothèque d'informations sur un éventail de marques d'alcool et de spiritueux. Que vous lisiez un bourbon préféré ou un nouveau gin artisanal, vous pourriez apprendre une chose ou deux."
+  },
+  "index_post_description" : {
+  "translation": "Commonwealth Cocktail recette des articles et des opinions."
+  },
+  "index_search_description" : {
+  "translation": "C'est de cela qu'on parle. Le Super Mega Cocktail Search. Tout a commencé à cause de cela. Nous voulions un moyen de trouver le bon cocktail. Au bon moment. Avec les bons ingrédients, que nous avions en main."
+  },
+  "index_ccp_description" : {
+  "translation": "Commonwealth Cocktails est un projet open source écrit en Go pour découvrir de nouvelles façons de créer et de présenter des cocktails. Commonwealth Cocktails comprend OAuth, les médias sociaux, GCP, AWS, et plus encore sur un jeu de données pratique du monde réel."
+  },
+  "index_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "index_productsindex_link" : {
+  "translation": "Des produits"    
+  },
+  "index_postsindex_link" : {
+  "translation": "Des articles"    
+  },
+  "index_searchindex_link" : {
+  "translation": "Chercher"    
+  },
+  "index_ccpindex_link" : {
+  "translation": "Le projet du Commonwealth Cocktails"
+  },
+  "navbar_cocktailsindex_link" : {
+  "translation": "Cocktails"    
+  },
+  "navbar_productsindex_link" : {
+  "translation": "Des produits"    
+  },
+  "navbar_postsindex_link" : {
+  "translation": "Des articles"    
+  },
+  "navbar_cocktailsearch_link" : {
+  "translation": "Cocktail Recherche"    
+  },
+  "navbar_quicksearch_link" : {
+  "translation": "Recherche rapide"    
+  },
+  "navbar_loginindex_link" : {
+  "translation": "S'identifier"    
+  }
+}

@@ -1,0 +1,57 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+</head>
+
+<body>
+	{{template "navbar" .}}
+
+	<div class="container">
+		<!-- Portfolio Item Heading -->
+		<div class="page-header">
+			<h1 align="center">Search Results</h1>
+			<h4 align="center">Your search results for <strong>{{.Search.Keywords}}</strong>:</h4>
+		</div>
+		<div class="row">
+			<div class="col-lg-6 col-md-6 col-sm-6">
+				<h3>Cocktails</h3>
+				<hr style="border-color: #AAA;">
+				<ul>
+				{{range .Cocktails}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/cocktail/{{.ID}}" style="color : #555;">{{.Name}}</a></li>
+				{{end}}
+				</ul>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6">
+				<h3>Articles</h3>
+				<hr style="border-color: #AAA;">
+				<ul>
+				{{range .Posts}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/post/{{.ID}}" style="color : #555;">{{.PostTitle}}</a></li>
+				{{end}}
+				</ul>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6">
+				<h3>Products</h3>
+				<hr style="border-color: #AAA;">
+				<ul>
+				{{range .Products}}
+					<li><a href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/product/{{.ID}}" style="color : #555;">{{.ProductName}}</a></li>
+				{{end}}
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	
+	{{template "footer" .}}
+	<!-- /.container -->
+	
+</body>
+
+</html>
+{{end}}

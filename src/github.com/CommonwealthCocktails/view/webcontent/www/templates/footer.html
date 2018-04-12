@@ -27,12 +27,30 @@
                 </p>
             </div>
             <div class="col-lg-4">
-                <p align="center">About & Contact:&nbsp;
-                </p>
+                <p align="center"><a style="text-decoration : none; color: black;" href="/{{$.View}}{{if ne $.Locale ""}}/{{$.Locale}}{{end}}/static/about.html">About</a></p>
             </div>
             <div class="col-lg-4">
-                <p align="center">Terms & Policies:</p>
+                <p align="center">Terms & Policies</p>
             </div>
+        </div>
+        <hr style="border-color: #FFF;">
+        <div class="row">
+            <div class="col-lg-6"  style="text-align: center;">
+                <div class="dropdown">
+                    <button  style="text-align: center;" class="btn btn-default dropdown-toggle" type="button" id="countryDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                      Language
+                    <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" style="left: 50%; right: auto; transform: translate(-50%, 0); height: auto; max-height: 100px; overflow-x: hidden;" aria-labelledby="countryDropdown">
+                        <li><a href="/{{$.View}}/en-US/">English</a></li>
+                        <li><a href="/{{$.View}}/de-DE/">German</a></li>
+                        <li><a href="/{{$.View}}/fr-FR/">French</a></li>
+                        <li><a href="/{{$.View}}/zh-CN/">Chinese</a></li>
+                    </ul>
+                </div>
+                <hr style="border-color: #FFF;">
+            </div>
+            <div class="col-lg-6"  style="text-align: center;">Contact</div>
         </div>
         <div class="row">
             <div class="col-lg-12">

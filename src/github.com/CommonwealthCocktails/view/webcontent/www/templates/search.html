@@ -1,0 +1,408 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{{template "head" .}}
+
+    <style>
+        .sublinks{
+            max-height: 200px;
+            overflow: scroll;
+        }
+		.rating_from {
+		    unicode-bidi: bidi-override;
+		    direction: rtl;
+		    width: 8em;
+		}
+		
+		.rating_from input {
+		    position: relative;
+		    left: -999999px;
+		}
+		
+		.rating_from label {
+		    display: inline-block;
+		    font-size: 0;
+		}
+		
+		.rating_from > label:before {
+		    position: relative;
+		    font: 18px/1 FontAwesome;
+		    display: block;
+		    content: "\f006";
+		    color: #000;
+		    background: -webkit-linear-gradient(-45deg, #555 0%, #555 100%);
+		    -webkit-background-clip: text;
+		    -webkit-text-fill-color: transparent;
+		}
+		
+		.rating_from > label:hover:before,
+		.rating_from > label:hover ~ label:before,
+		.rating_from > label.selected:before,
+		.rating_from > label.selected ~ label:before {
+		    color: #f0ad4e;
+		    content: "\f005";
+		    background: -webkit-linear-gradient(-45deg, #000 0%, #000 100%);
+		    -webkit-background-clip: text;
+		    -webkit-text-fill-color: transparent;
+		}
+		
+		.rating_to {
+		    unicode-bidi: bidi-override;
+		    direction: rtl;
+		    width: 8em;
+		}
+		
+		.rating_to input {
+		    position: relative;
+		    left: -999999px;
+		}
+		
+		.rating_to label {
+		    display: inline-block;
+		    font-size: 0;
+		}
+		
+		.rating_to > label:before {
+		    position: relative;
+		    font: 18px/1 FontAwesome;
+		    display: block;
+		    content: "\f006";
+		    color: #000;
+		    background: -webkit-linear-gradient(-45deg, #555 0%, #555 100%);
+		    -webkit-background-clip: text;
+		    -webkit-text-fill-color: transparent;
+		}
+		
+		.rating_to > label:hover:before,
+		.rating_to > label:hover ~ label:before,
+		.rating_to > label.selected:before,
+		.rating_to > label.selected ~ label:before {
+		    color: #f0ad4e;
+		    content: "\f005";
+		    background: -webkit-linear-gradient(-45deg, #000 0%, #000 100%);
+		    -webkit-background-clip: text;
+		    -webkit-text-fill-color: transparent;
+		}
+    </style>
+</head>
+
+<body>
+	{{template "navbar" .}}
+
+		<div class="container">
+		<!-- Portfolio Item Heading -->
+		<div class="page-header">
+			<h1 align="center">Advanced Cocktail Search</h1>
+		</div>
+		<div class="row">
+			<form method="post" action="/{{$.View}}/searchForm" id="searchForm" autocomplete="nope">
+			<div class="col-md-8">
+				<div class="row">
+					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						&nbsp;
+					</div>
+					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+						&nbsp;
+					</div>
+					<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+						&nbsp;
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Cocktail Keywords</h3>
+						<input type="text" id="keywords" name="keywords" class="form-control" aria-describedby="keywordHelpBlock"/>
+						<small id="keywordHelpBlock" class="form-text text-muted">
+						  Keywords will be used to look for words in the cocktail name or description.
+						</small>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<h3>Rating</h3>
+						<font size="4">From:&nbsp;</font> 
+						<input type="hidden" id="rating_from_input" name="rating_from_input"/>
+						<div class="rating_from" style="display: inline-block; vertical-align: top;">
+						  <label class="">
+						    <input type="radio" id="rating_from_5" name="rating_from_5" value="5" title="5 stars"/> 5
+						  </label>
+						  <label>
+						    <input type="radio" name="rating_from_4" id="rating_from_4" value="4" title="4 stars"/> 4
+						  </label>
+						  <label>
+						    <input type="radio" name="rating_from_3" id="rating_from_3" value="3" title="3 stars"/> 3
+						  </label>
+						  <label>
+						    <input type="radio" name="rating_from_2" id="rating_from_2" value="2" title="2 stars"/> 2
+						  </label>
+						  <label class="selected">
+						    <input type="radio" name="rating_from_1" id="rating_from_1" value="1" title="1 star"/> 1
+						  </label>
+						</div>
+						<script>
+							$(document).ready(function () { 
+							    $('input[name="rating_from_input"]').val(1);
+							});
+							$('#rating_from_5').click(function () {
+							  var $radio = $(this);
+							  $('.rating_from .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_from_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_to .selected').removeClass('selected');
+								$('#rating_to_input').val($radio.val());
+							  	$('#rating_to_5').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_from_4').click(function () {
+							  var $radio = $(this);
+							  $('.rating_from .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_from_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_to .selected').removeClass('selected');
+								$('#rating_to_input').val($radio.val());
+							  	$('#rating_to_4').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_from_3').click(function () {
+							  var $radio = $(this);
+							  $('.rating_from .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_from_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_to .selected').removeClass('selected');
+								$('#rating_to_input').val($radio.val());
+							  	$('#rating_to_3').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_from_2').click(function () {
+							  var $radio = $(this);
+							  $('.rating_from .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_from_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_to .selected').removeClass('selected');
+								$('#rating_to_input').val($radio.val());
+							  	$('#rating_to_2').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_from_1').click(function () {
+							  var $radio = $(this);
+							  $('.rating_from .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_from_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_to .selected').removeClass('selected');
+								$('#rating_to_input').val($radio.val());
+							  	$('#rating_to_1').closest('label').addClass('selected');
+							  }
+							});
+						</script>
+						
+						<font size="4">&nbsp;&nbsp;&nbsp;To:</font> 
+						<input type="hidden" id="rating_to_input" name="rating_to_input" value="5"/>
+						<div class="rating_to" style="display: inline-block; vertical-align: top;">
+						  <label class="selected">
+						    <input type="radio" id="rating_to_5" name="rating_to_5" value="5" title="5 stars"> 5
+						  </label>
+						  <label class="selected">
+						    <input type="radio" id="rating_to_4" name="rating_to_4" value="4" title="4 stars"> 4
+						  </label>
+						  <label class="selected">
+						    <input type="radio" id="rating_to_3" name="rating_to_3" value="3" title="3 stars"> 3
+						  </label>
+						  <label class="selected">
+						    <input type="radio" id="rating_to_2" name="rating_to_2" value="2" title="2 stars"> 2
+						  </label>
+						  <label class="selected">
+						    <input type="radio" id="rating_to_1" name="rating_to_1" value="1" title="1 star"> 1
+						  </label>
+						</div>
+						<script>
+							$(document).ready(function () { 
+							    $('input[name="rating_to_input"]').val(5);
+							});
+							$('#rating_to_5').click(function () {
+							  var $radio = $(this);
+							  $('.rating_to .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_to_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_from .selected').removeClass('selected');
+								$('#rating_from_input').val($radio.val());
+							  	$('#rating_from_5').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_to_4').click(function () {
+							  var $radio = $(this);
+							  $('.rating_to .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_to_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_from .selected').removeClass('selected');
+								$('#rating_from_input').val($radio.val());
+							  	$('#rating_from_4').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_to_3').click(function () {
+							  var $radio = $(this);
+							  $('.rating_to .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_to_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_from .selected').removeClass('selected');
+								$('#rating_from_input').val($radio.val());
+							  	$('#rating_from_3').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_to_2').click(function () {
+							  var $radio = $(this);
+							  $('.rating_to .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_to_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_from .selected').removeClass('selected');
+								$('#rating_from_input').val($radio.val());
+							  	$('#rating_from_2').closest('label').addClass('selected');
+							  }
+							});
+							$('#rating_to_1').click(function () {
+							  var $radio = $(this);
+							  $('.rating_to .selected').removeClass('selected');
+							  $radio.closest('label').addClass('selected');
+							  $('#rating_to_input').val($radio.val());
+							  if ($('#rating_from_input').val() > $('#rating_to_input').val()) {
+							  	$('.rating_from .selected').removeClass('selected');
+								$('#rating_from_input').val($radio.val());
+							  	$('#rating_from_1').closest('label').addClass('selected');
+							  }
+							});
+						</script>
+					</div>
+				</div>
+				<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+					<div class="row">
+					    <div class="col-sm-12">
+							<h3>Ingredients</h3>
+							<div class="row">
+							    {{with .Ingredients}}{{range .PBT}}
+							    <div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom : 50px;">
+										<div class="panel-heading" role="tab" id="heading_Ingredients_{{.ProductType.ID}}">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapse_Ingredients_{{.ProductType.ID}}" aria-expanded="false" aria-controls="collapse_Ingredients_{{.ProductType.ID}}">{{.ProductType.ProductTypeName}}</a>
+											</h4>
+										</div>
+										<div id="collapse_Ingredients_{{.ProductType.ID}}" class="panel-collapse collapse sublinks" role="tabpanel" aria-labelledby="heading_Ingredients_{{.ProductType.ID}}">
+											<ul class="list-group">
+												{{range .Products}}
+												<li class="list-group-item" id="{{.ID}}_Ingredients_Item">{{.ProductName}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<input type="hidden" id="{{.ID}}_Ingredients" name="{{.ID}}_Ingredients" value="">
+													<input id="{{.ID}}_Ingredients_include" name="{{.ID}}_Ingredients_include" title="Include" onclick="search_item_include('{{.ID}}_Ingredients_include', '{{.ID}}_Ingredients_exclude', '{{.ID}}_Ingredients_Item', '{{.ID}}_Ingredients')" type="button" value="&#xf00c" class="fa fa-check btn btn-default">
+													<input id="{{.ID}}_Ingredients_exclude" name="{{.ID}}_Ingredients_exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}_Ingredients_include', '{{.ID}}_Ingredients_exclude', '{{.ID}}_Ingredients_Item', '{{.ID}}_Ingredients')" type="button" value="&#xf00d" class="fa fa-times btn btn-default">
+												</div>
+												</li>
+												{{end}}
+											</ul>
+										</div>
+									</div>
+								</div>
+							    {{end}}{{end}}
+							</div>
+						</div>
+					</div>
+					<div class="row">
+					    <div class="col-sm-12">
+							<h3>Other</h3>
+							<div class="row">
+							    {{with .NonIngredients}}{{range .PBT}}
+							    <div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom : 50px;">
+										<div class="panel-heading" role="tab" id="heading_NonIngredients_{{.ProductType.ID}}">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapse_NonIngredients_{{.ProductType.ID}}" aria-expanded="false" aria-controls="collapse_NonIngredients_{{.ProductType.ID}}">{{.ProductType.ProductTypeName}}</a>
+											</h4>
+										</div>
+										<div id="collapse_NonIngredients_{{.ProductType.ID}}" class="panel-collapse collapse sublinks" role="tabpanel" aria-labelledby="heading_NonIngredients_{{.ProductType.ID}}">
+											<ul class="list-group">
+												{{range .Products}}
+												<li class="list-group-item" id="{{.ID}}_NonIngredients_Item">{{.ProductName}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<input type="hidden" id="{{.ID}}_NonIngredients" name="{{.ID}}_NonIngredients" value="">
+													<input id="{{.ID}}_NonIngredients_include" name="{{.ID}}_NonIngredients_include" title="Include" onclick="search_item_include('{{.ID}}_NonIngredients_include', '{{.ID}}_NonIngredients_exclude', '{{.ID}}_NonIngredients_Item', '{{.ID}}_NonIngredients')" type="button" value="&#xf00c" class="fa fa-check btn btn-default"/>
+													<input id="{{.ID}}_NonIngredients_exclude" name="{{.ID}}_NonIngredients_exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}_NonIngredients_include', '{{.ID}}_NonIngredients_exclude', '{{.ID}}_NonIngredients_Item', '{{.ID}}_NonIngredients')" type="button" value="&#xf00d" class="fa fa-times btn btn-default"/>
+												</div>
+												</li>
+												{{end}}
+											</ul>
+										</div>
+									</div>
+								</div>
+							    {{end}}{{end}}
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12">
+							<h3>Metadata</h3>
+							<div class="row">
+							    {{with .MetasByTypes}}{{range .MBT}}
+							    <div class="col-sm-6">
+									<div class="panel panel-default" style="margin-bottom : 50px;">
+										<div class="panel-heading" role="tab" id="heading_Meta_{{.MetaType.ID}}">
+											<h4 class="panel-title">
+												<a style="text-decoration : none;" class="collapsed" role="button" data-toggle="collapse" href="#collapse_Meta_{{.MetaType.ID}}" aria-expanded="false" aria-controls="collapse_Meta_{{.MetaType.ID}}">{{.MetaType.MetaTypeName}}</a>
+											</h4>
+										</div>
+										<div id="collapse_Meta_{{.MetaType.ID}}" class="panel-collapse collapse sublinks" role="tabpanel" aria-labelledby="heading_Meta_{{.MetaType.ID}}">
+											<ul class="list-group">
+												{{range .Metas}}
+												<li class="list-group-item" id="{{.ID}}_Meta_Item">{{.MetaName}}
+												<div id="button_div" class="btn-group btn-group-xs" role="group" aria-label="..." style="margin: 5px;">
+													<input type="hidden" id="{{.ID}}_Meta" name="{{.ID}}_Meta" value="">
+													<input id="{{.ID}}_Meta_include" name="{{.ID}}_Meta_include" title="Include" onclick="search_item_include('{{.ID}}_Meta_include', '{{.ID}}_Meta_exclude', '{{.ID}}_Meta_Item', '{{.ID}}_Meta')" type="button" value="&#xf00c" class="fa fa-check btn btn-default"/>
+													<input id="{{.ID}}_Meta_exclude" name="{{.ID}}_Meta_exclude" title="Exclude" onclick="search_item_exclude('{{.ID}}_Meta_include', '{{.ID}}_Meta_exclude', '{{.ID}}_Meta_Item', '{{.ID}}_Meta')" type="button" value="&#xf00d" class="fa fa-times btn btn-default"/>
+												</div>
+												</li>
+												{{end}}
+											</ul>
+										</div>
+									</div>
+								</div>
+							    {{end}}{{end}}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</form>
+			<hr style="border-color: #FFF;">
+			<div class="col-md-4">
+				<div align="center" class="row">
+					<div style="">
+						<hr style="border-color: #FFF;">
+						<button name="button" type="submit" value="search" id="searchButton" form="searchForm" class="btn btn-default">Search</button>
+						<hr style="border-color: #FFF;">
+						<h3>Instructions</h3>
+						<span style="font-weight: bold;" class="glyphicon glyphicon-ok" aria-hidden="true"></span> = Include in search <br>
+						<span style="font-weight: bold;" class="glyphicon glyphicon-remove" aria-hidden="true"></span> = Exclude from search <br><br>
+						<p style="width:200px">If you don't select include or exclude then the item will be included but not searched for exclusively.</p>
+					</div>
+				</div>
+				<br>
+			</div>
+		</div>
+	</div>
+
+	
+	{{template "footer" .}}
+	<!-- /.container -->
+	
+</body>
+
+</html>
+{{end}}
